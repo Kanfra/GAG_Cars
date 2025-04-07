@@ -5,14 +5,14 @@ import '../../../GeneralComponents/Text/textMedium.dart';
 import '../../../GlobalVariables/colorGlobalVariables.dart';
 
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+class SignUpWithEmailPage extends StatefulWidget {
+  const SignUpWithEmailPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<SignUpWithEmailPage> createState() => _SignUpWithEmailPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
