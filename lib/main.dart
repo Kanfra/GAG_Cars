@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
-      initialRoute: RouteClass.getWelcomePage(),
+      initialRoute: RouteClass.getVerifyCodePage(),
       getPages: RouteClass.routes,
       //home: const SignUpPage(),
     );

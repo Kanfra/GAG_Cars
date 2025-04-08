@@ -16,8 +16,8 @@ class RouteClass{
 
     static String signUpWithEmailPage = "/sign-up-with-email";
     static String signUpWithPhonePage = "/sign-up-with-phone";
-    static String signInWithEmailPage = "sign-in-with-email";
-    static String signInWithPhonePage = "sign-in-with-phone";
+    static String signInWithEmailPage = "/sign-in-with-email";
+    static String signInWithPhonePage = "/sign-in-with-phone";
     static String welcomePage = "/welcome";
     static String verifyCodePage = "/verify-code";
     static String forgotPasswordPage = "/forgot-password";
