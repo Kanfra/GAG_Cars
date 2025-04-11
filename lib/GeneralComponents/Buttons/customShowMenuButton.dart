@@ -56,15 +56,15 @@ class CustomShowMenuButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SizedBox(width: SizeGlobalVariables.double_size_five,),
+            const SizedBox(width: SizeGlobalVariables.double_size_five,),
             // icon type
             CustomIcon(
               iconData: iconData, 
               isFaIcon: ColorGlobalVariables.falseValue,
-              iconColor: iconColor,
+              iconColor: iconColor ?? ColorGlobalVariables.blackColor,
               iconSize: iconSize,
               ),
-              SizedBox(width: SizeGlobalVariables.double_size_five,),
+              const SizedBox(width: SizeGlobalVariables.double_size_five,),
               // text type
               TextSmall(
                 title: buttonTextType,
@@ -72,12 +72,12 @@ class CustomShowMenuButton extends StatelessWidget {
               ),
               const Spacer(),
               // drop down arrow button
-              CustomIcon(
+              const CustomIcon(
                 iconData: Icons.expand_more, 
                 isFaIcon: ColorGlobalVariables.falseValue,
                 iconColor: ColorGlobalVariables.greyColor
                 ),
-              SizedBox(width: SizeGlobalVariables.double_size_five,),
+              const SizedBox(width: SizeGlobalVariables.double_size_five,),
           ],
         ),
       ),
