@@ -10,9 +10,9 @@ import '../GlobalVariables/sizeGlobalVariables.dart';
 class CustomIcon extends StatelessWidget {
   final IconData iconData;
   final bool isFaIcon;
-  double? iconSize;
-  final iconColor;
-  CustomIcon({
+  final double? iconSize;
+  final Color iconColor;
+  const CustomIcon({
     required this.iconData,
     required this.isFaIcon,
     this.iconSize,

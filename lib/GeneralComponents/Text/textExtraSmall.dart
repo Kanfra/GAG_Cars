@@ -6,13 +6,14 @@ import '../../GlobalVariables/sizeGlobalVariables.dart';
 
 class TextExtraSmall extends StatelessWidget {
   final String title;
-  FontWeight? fontWeight;
-  TextOverflow? overflow;
+  final FontWeight? fontWeight;
+  final TextOverflow? overflow;
   final Color textColor;
-  double? textSize;
-  TextDecoration? textDecoration;
-  Color? textDecorationColor;
-  TextExtraSmall({
+  final double? textSize;
+  final TextDecoration? textDecoration;
+  final TextAlign? textAlign;
+  final Color? textDecorationColor;
+  const TextExtraSmall({
     required this.title,
     this.fontWeight,
     this.overflow,
@@ -20,6 +21,7 @@ class TextExtraSmall extends StatelessWidget {
     this.textSize,
     this.textDecoration,
     this.textDecorationColor,
+    this.textAlign,
     super.key
   });
 
@@ -28,8 +30,10 @@ class TextExtraSmall extends StatelessWidget {
     return Text(
       title,
       overflow: overflow ?? TextOverflow.ellipsis,
+      textAlign: textAlign ?? TextAlign.start,
       style: GoogleFonts.inter(
         color: textColor,
+        
         fontWeight: fontWeight ?? FontWeight.normal,
         fontSize: textSize ?? SizeGlobalVariables.double_size_twelve,
         decoration: textDecoration ?? TextDecoration.none,
