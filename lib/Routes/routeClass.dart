@@ -1,15 +1,16 @@
 
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
-import 'package:gag_cars_frontend/Pages/Splash/Screens/welcomePage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/password_reset/view/forgotPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/password_reset/view/resetPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/otp/view/verifyCodePage.dart';
+import 'package:gag_cars_frontend/Pages/Splash/view/splash_page.dart';
+import 'package:gag_cars_frontend/Pages/Splash/view/welcomePage.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
-import '../Pages/Authentication/Screens/signInWithEmailPage.dart';
-import '../Pages/Authentication/Screens/signInWithPhonePage.dart';
-import '../Pages/Authentication/Screens/signUpWithEmailPage.dart';
-import '../Pages/Authentication/Screens/signUpWithPhonePage.dart';
+import '../Pages/Authentication/login/view/signInWithEmailPage.dart';
+import '../Pages/Authentication/login/view/signInWithPhonePage.dart';
+import '../Pages/Authentication/sign_up/view/signUpWithEmailPage.dart';
+import '../Pages/Authentication/sign_up/view/signUpWithPhonePage.dart';
 
 
 class RouteClass{
@@ -19,6 +20,7 @@ class RouteClass{
     static String signInWithEmailPage = "/sign-in-with-email";
     static String signInWithPhonePage = "/sign-in-with-phone";
     static String welcomePage = "/welcome";
+       static String splash_page = "/splash_page";
     static String verifyCodePage = "/verify-code";
     static String forgotPasswordPage = "/forgot-password";
     static String resetPassowrdPage = "/reset-password";
@@ -28,6 +30,7 @@ class RouteClass{
     static String getSignUpWithPhonePage() => signUpWithPhonePage;
     static String getSignInWithEmailPage() => signInWithEmailPage;
     static String getSignInWithPhonePage() => signInWithPhonePage;
+        static String getSplashPage() => splash_page;
     static String getWelcomePage() => welcomePage;
     static String getVerifyCodePage() => verifyCodePage;
     static String getForgotPasswordPage() => forgotPasswordPage;
@@ -35,9 +38,17 @@ class RouteClass{
   
 
   static List<GetPage> routes = [
+    //Sign up 
     GetPage(
       page: ()=> const SignUpWithEmailPage(), 
       name: signUpWithEmailPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      //Splash page 
+        GetPage(
+      page: ()=> const SplashPage(), 
+      name: splash_page, 
       transition: Transition.noTransition, 
       transitionDuration: const Duration(milliseconds: 350),
       ),
