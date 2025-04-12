@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gag_cars_frontend/Pages/Splash/view/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'GlobalVariables/colorGlobalVariables.dart';
@@ -25,9 +26,9 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
-      initialRoute: RouteClass.getVerifyCodePage(),
+      initialRoute: RouteClass.splash_page,
       getPages: RouteClass.routes,
-      //home: const SignUpPage(),
+      home: const SplashPage(),
     );
   }
 }
