@@ -1,16 +1,16 @@
 
-import 'package:gag_cars_frontend/Pages/Authentication/password_reset/view/forgotPasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/password_reset/view/resetPasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/otp/view/verifyCodePage.dart';
-import 'package:gag_cars_frontend/Pages/Splash/view/splash_page.dart';
-import 'package:gag_cars_frontend/Pages/Splash/view/welcomePage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
+import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
-import '../Pages/Authentication/login/view/signInWithEmailPage.dart';
-import '../Pages/Authentication/login/view/signInWithPhonePage.dart';
-import '../Pages/Authentication/sign_up/view/signUpWithEmailPage.dart';
-import '../Pages/Authentication/sign_up/view/signUpWithPhonePage.dart';
+import '../Pages/Authentication/Screens/signInWithEmailPage.dart';
+import '../Pages/Authentication/Screens/signInWithPhonePage.dart';
+import '../Pages/Authentication/Screens/signUpWithEmailPage.dart';
+import '../Pages/Authentication/Screens/signUpWithPhonePage.dart';
 
 
 class RouteClass{
@@ -19,22 +19,24 @@ class RouteClass{
     static String signUpWithPhonePage = "/sign-up-with-phone";
     static String signInWithEmailPage = "/sign-in-with-email";
     static String signInWithPhonePage = "/sign-in-with-phone";
-    static String welcomePage = "/welcome";
-       static String splash_page = "/splash_page";
+    static String splashPage = "/splash";
     static String verifyCodePage = "/verify-code";
     static String forgotPasswordPage = "/forgot-password";
     static String resetPassowrdPage = "/reset-password";
+
+    static String homePage = "/home";
 
 
     static String getSignUpWithEmailPage() => signUpWithEmailPage;
     static String getSignUpWithPhonePage() => signUpWithPhonePage;
     static String getSignInWithEmailPage() => signInWithEmailPage;
     static String getSignInWithPhonePage() => signInWithPhonePage;
-        static String getSplashPage() => splash_page;
-    static String getWelcomePage() => welcomePage;
+    static String getSplashPage() => splashPage;
     static String getVerifyCodePage() => verifyCodePage;
     static String getForgotPasswordPage() => forgotPasswordPage;
     static String getResetPasswordPage() => resetPassowrdPage;
+
+    static String getHomePage() => homePage;
   
 
   static List<GetPage> routes = [
@@ -48,7 +50,7 @@ class RouteClass{
       //Splash page 
         GetPage(
       page: ()=> const SplashPage(), 
-      name: splash_page, 
+      name: splashPage, 
       transition: Transition.noTransition, 
       transitionDuration: const Duration(milliseconds: 350),
       ),
@@ -70,12 +72,12 @@ class RouteClass{
       transition: Transition.noTransition, 
       transitionDuration: const Duration(milliseconds: 350),
       ),
-    GetPage(
-      page: ()=> const WelcomePage(), 
-      name: welcomePage, 
-      transition: Transition.noTransition, 
-      transitionDuration: const Duration(milliseconds: 350),
-      ),
+    // GetPage(
+    //   page: ()=> const WelcomePage(), 
+    //   name: welcomePage, 
+    //   transition: Transition.noTransition, 
+    //   transitionDuration: const Duration(milliseconds: 350),
+    //   ),
     GetPage(
       page: ()=> const VerifyCodePage(), 
       name: verifyCodePage, 
@@ -91,6 +93,13 @@ class RouteClass{
     GetPage(
       page: ()=> const ResetPasswordPage(), 
       name: resetPassowrdPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+
+      GetPage(
+      page: ()=> const HomePage(), 
+      name: homePage, 
       transition: Transition.noTransition, 
       transitionDuration: const Duration(milliseconds: 350),
       ),

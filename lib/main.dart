@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gag_cars_frontend/Pages/Splash/view/splash_page.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/signUpWithPhonePage.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'GlobalVariables/colorGlobalVariables.dart';
@@ -26,9 +31,24 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
-      initialRoute: RouteClass.splash_page,
       getPages: RouteClass.routes,
-      home: const SplashPage(),
+      //initialRoute: RouteClass.splashPage,
+      // intialRoute: RouteClass.signUpWithEmailPage,
+      //initialRoute: RouteClass.signUpWithPhonePage,
+      // initialRoute: RouteClass.SignInWithEmailPage,
+       //initialRoute: RouteClass.signInWithPhonePage,
+      //initialRoute: RouteClass.verifyCodePage,
+      //initialRoute: RouteClass.forgotPasswordPage,
+      //initialRoute: RouteClass.resetPassowrdPage,
+      initialRoute: RouteClass.homePage,
+
+        //home: const SignUpWithPhonePage(),
+        //home: const SignInWithPhonePage()
+        //home: const VerifyCodePage()
+        //home: const ForgotPasswordPage(),
+       //home: const ResetPasswordPage()
+      //home: const SplashPage(),
+      home: const HomePage(),
     );
   }
 }
