@@ -72,5 +72,5 @@ class CardContainer extends StatelessWidget {
           children: columnList,
         ),
       );
-  }
+  }  
 }

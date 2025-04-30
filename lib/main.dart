@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/customerServicePage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/profileUpdatePage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settings.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
       // initialRoute: RouteClass.getVerifyCodePage(),
       // getPages: RouteClass.routes,
-      home: const HelpCenterPage() ,
+      home:  CustomerServicePage() ,
     );
   }
 }
