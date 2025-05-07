@@ -8,6 +8,7 @@ class TextSmall extends StatelessWidget {
   final FontWeight fontWeight;
   final TextOverflow? overflow;
   final Color textColor;
+  final int? maxLines;
   final double? textSize;
   final TextAlign? textAlign;
   final TextDecoration? textDecoration;
@@ -19,6 +20,7 @@ class TextSmall extends StatelessWidget {
     this.overflow,
     required this.textColor,
     this.textSize,
+    this.maxLines,
     this.textAlign,
     this.textDecoration,
     this.textDecorationColor,
@@ -31,6 +33,7 @@ class TextSmall extends StatelessWidget {
       title,
       overflow: overflow ?? TextOverflow.visible,
       textAlign: textAlign ?? TextAlign.start,
+      maxLines: maxLines,
       style: GoogleFonts.inter(
         color: textColor,
         fontWeight: fontWeight,

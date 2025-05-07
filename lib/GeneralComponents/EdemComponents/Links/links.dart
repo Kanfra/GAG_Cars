@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../../GlobalVariables/colorGlobalVariables.dart';
 import '../../../GlobalVariables/sizeGlobalVariables.dart';
@@ -20,11 +19,14 @@ class Links extends StatelessWidget {
   final Color? backgroundColor;
   final double? linkBorderRadius;
   final Color? iconColor;
+  final Color? borderColor;
+  final double? iconSize;
 
   const Links({
     required this.linkTextType,
     required this.linkTextColor,
     required this.isTextSmall,
+    this.iconSize,
     required this.isIconWidgetRequiredAtEnd,
     required this.isIconWidgetRequiredAtFront,
     this.textDecoration,
@@ -35,6 +37,7 @@ class Links extends StatelessWidget {
     this.iconData,
     this.backgroundColor,
     this.iconColor,
+    this.borderColor,
     super.key
   });
 
@@ -47,6 +50,10 @@ class Links extends StatelessWidget {
         backgroundColor: backgroundColor ?? Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(linkBorderRadius ?? SizeGlobalVariables.double_size_five),
+          side: BorderSide(
+            color: borderColor ?? Colors.transparent, // Provide a default color
+            width: 0.5, // You should also specify a width for the border
+          ),
         ),
       ),
       child: Row(
@@ -56,6 +63,7 @@ class Links extends StatelessWidget {
           isIconWidgetRequiredAtFront ? CustomIcon(
             iconData: iconData ?? Icons.edit,
             isFaIcon: ColorGlobalVariables.falseValue,
+            iconSize: iconSize,
             iconColor: iconColor ?? ColorGlobalVariables.buttonColor,
           ) : const SizedBox(),
           SizedBox(width: SizeGlobalVariables.double_size_four,),
@@ -77,6 +85,7 @@ class Links extends StatelessWidget {
           // iconType
           isIconWidgetRequiredAtEnd ? CustomIcon(
               iconData: iconData ?? Icons.arrow_forward,
+              iconSize: iconSize,
               isFaIcon: ColorGlobalVariables.falseValue,
               iconColor: iconColor ?? ColorGlobalVariables.buttonColor,
           ) : const SizedBox(),

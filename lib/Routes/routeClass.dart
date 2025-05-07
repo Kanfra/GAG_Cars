@@ -2,8 +2,18 @@
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/newsBlogPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/allMakesPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/detailPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainNewsPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
@@ -25,6 +35,14 @@ class RouteClass{
     static String resetPassowrdPage = "/reset-password";
 
     static String homePage = "/home";
+    static String detailPage = "/detail";
+    static String newsBlogPage = "/news-blog";
+    static String mainNewsPage = "/main-news";
+    static String myListingsPage = "/my-listings";
+    static String wishlistPage = "/wishlist";
+    static String sellCarPage = "/sell-car";
+    static String sellCarTwoPage = "/sell-car-two";
+    static String allMakesPage = "/all-makes";
 
 
     static String getSignUpWithEmailPage() => signUpWithEmailPage;
@@ -37,8 +55,15 @@ class RouteClass{
     static String getResetPasswordPage() => resetPassowrdPage;
 
     static String getHomePage() => homePage;
-  
-
+    static String getDetailPage() => detailPage;
+    static String getNewsBlogPage() => newsBlogPage;
+    static String getMainNewsPage() => mainNewsPage;
+    static String getMyListingsPage() => myListingsPage;
+    static String getMyWishlistPage() => wishlistPage;
+    static String getSellCarPage() => sellCarPage;
+    static String getSellCarTwoPage() => sellCarTwoPage;
+    static String getAllMakesPage() => allMakesPage;
+ 
   static List<GetPage> routes = [
     //Sign up 
     GetPage(
@@ -100,6 +125,57 @@ class RouteClass{
       GetPage(
       page: ()=> const HomePage(), 
       name: homePage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      GetPage(
+      page: ()=> const DetailPage(), 
+      name: detailPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      GetPage(
+      page: ()=> const NewsBlogPage(), 
+      name: newsBlogPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      // navigation with parameters
+       GetPage(
+      page: ()=> MainNewsPage(
+        allJson: Get.arguments ?? {},
+      ), 
+      name: mainNewsPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+       GetPage(
+      page: ()=> const MyListingsPage(), 
+      name: myListingsPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+       GetPage(
+      page: ()=> const WishlistPage(), 
+      name: wishlistPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      GetPage(
+      page: ()=> const SellCarPage(), 
+      name: sellCarPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      GetPage(
+      page: ()=> const SellCarTwoPage(), 
+      name: sellCarTwoPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+       GetPage(
+      page: ()=> const AllMakesPage(), 
+      name: allMakesPage, 
       transition: Transition.noTransition, 
       transitionDuration: const Duration(milliseconds: 350),
       ),

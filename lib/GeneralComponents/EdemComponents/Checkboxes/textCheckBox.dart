@@ -61,7 +61,7 @@ class TextCheckBox extends StatelessWidget {
                     iconData: Icons.check, 
                     isFaIcon: ColorGlobalVariables.falseValue,
                     iconSize: SizeGlobalVariables.double_size_fourteen,
-                    iconColor: isChecked ? ColorGlobalVariables.whiteColor : ColorGlobalVariables.whiteColor
+                    iconColor: isChecked ? ColorGlobalVariables.blackColor : ColorGlobalVariables.whiteColor
                     ),
                 ),
                 SizedBox(width: SizeGlobalVariables.double_size_five,),

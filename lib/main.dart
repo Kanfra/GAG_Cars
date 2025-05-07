@@ -5,7 +5,14 @@ import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signUpWithPhonePage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/newsBlogPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/allMakesPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/detailPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'GlobalVariables/colorGlobalVariables.dart';
@@ -40,7 +47,13 @@ class MyApp extends StatelessWidget {
       //initialRoute: RouteClass.verifyCodePage,
       //initialRoute: RouteClass.forgotPasswordPage,
       //initialRoute: RouteClass.resetPassowrdPage,
-      initialRoute: RouteClass.homePage,
+      //initialRoute: RouteClass.detailPage,
+      //initialRoute: RouteClass.newsBlogPage,
+      //initialRoute: RouteClass.myListingsPage,
+      //initialRoute: RouteClass.wishlistPage,
+      //initialRoute: RouteClass.sellCarPage,
+      //initialRoute: RouteClass.sellCarTwoPage,
+      initialRoute: RouteClass.allMakesPage,
 
         //home: const SignUpWithPhonePage(),
         //home: const SignInWithPhonePage()
@@ -48,7 +61,13 @@ class MyApp extends StatelessWidget {
         //home: const ForgotPasswordPage(),
        //home: const ResetPasswordPage()
       //home: const SplashPage(),
-      home: const HomePage(),
+      //home: const DetailPage(),
+      //home: const NewsBlogPage()
+      //home: const MyListingsPage()
+      //home: const WishlistPage()
+      //home: SellCarPage(),
+      //home: SellCarTwoPage()
+      home: AllMakesPage()
     );
   }
 }

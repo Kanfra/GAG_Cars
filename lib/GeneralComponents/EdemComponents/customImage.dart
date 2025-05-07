@@ -34,9 +34,11 @@ class CustomImage extends StatelessWidget {
       height: imageHeight ?? 45,
       decoration: BoxDecoration(
         color: imageBackgroundColor ?? Colors.transparent,
-        borderRadius: isImageBorderRadiusRequired ?  BorderRadius.circular(imageBorderRadius!): BorderRadius.circular(0),
+        borderRadius: _calculateBorderRadius(),
       ),
-      child: _buildImageContent(),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(imageBorderRadius ?? 0),
+        child: _buildImageContent()),
     );
   }
 
@@ -103,6 +105,9 @@ class CustomImage extends StatelessWidget {
   }
 
   BorderRadius _calculateBorderRadius() {
+    if (!isImageBorderRadiusRequired) {
+      return BorderRadius.circular(0);
+    }
     return BorderRadius.circular(
       imageBorderRadius ?? (imageWidth ?? 45) * 0.5,
     );
