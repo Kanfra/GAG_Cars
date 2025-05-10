@@ -10,8 +10,11 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/allMakesPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/detailPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/notificationPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
@@ -53,7 +56,10 @@ class MyApp extends StatelessWidget {
       //initialRoute: RouteClass.wishlistPage,
       //initialRoute: RouteClass.sellCarPage,
       //initialRoute: RouteClass.sellCarTwoPage,
-      initialRoute: RouteClass.allMakesPage,
+      //initialRoute: RouteClass.allMakesPage,
+      //initialRoute: RouteClass.specialOfferPage,
+      //initialRoute: RouteClass.notificationsPage,
+      initialRoute: RouteClass.searchPage,
 
         //home: const SignUpWithPhonePage(),
         //home: const SignInWithPhonePage()
@@ -67,7 +73,10 @@ class MyApp extends StatelessWidget {
       //home: const WishlistPage()
       //home: SellCarPage(),
       //home: SellCarTwoPage()
-      home: AllMakesPage()
+      //home: AllMakesPage()
+      //home: SpecialOffersPage()
+      //home: NotificationsPage()
+      home: SearchPage(),
     );
   }
 }

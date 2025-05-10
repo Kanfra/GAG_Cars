@@ -8,8 +8,11 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/detailPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainNewsPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/notificationPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get.dart';
@@ -43,6 +46,9 @@ class RouteClass{
     static String sellCarPage = "/sell-car";
     static String sellCarTwoPage = "/sell-car-two";
     static String allMakesPage = "/all-makes";
+    static String specialOfferPage = "/special-offer";
+    static String notificationsPage = "/notifications";
+    static String searchPage = "/search";
 
 
     static String getSignUpWithEmailPage() => signUpWithEmailPage;
@@ -63,6 +69,9 @@ class RouteClass{
     static String getSellCarPage() => sellCarPage;
     static String getSellCarTwoPage() => sellCarTwoPage;
     static String getAllMakesPage() => allMakesPage;
+    static String getSpecialOfferPage() => specialOfferPage;
+    static String getNotificationsPage() => notificationsPage;
+    static String getSearchPage() => searchPage;
  
   static List<GetPage> routes = [
     //Sign up 
@@ -176,6 +185,24 @@ class RouteClass{
        GetPage(
       page: ()=> const AllMakesPage(), 
       name: allMakesPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      GetPage(
+      page: ()=> const SpecialOffersPage(), 
+      name: specialOfferPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+       GetPage(
+      page: ()=> const NotificationsPage(), 
+      name: notificationsPage, 
+      transition: Transition.noTransition, 
+      transitionDuration: const Duration(milliseconds: 350),
+      ),
+      GetPage(
+      page: ()=> const SearchPage(), 
+      name: searchPage, 
       transition: Transition.noTransition, 
       transitionDuration: const Duration(milliseconds: 350),
       ),
