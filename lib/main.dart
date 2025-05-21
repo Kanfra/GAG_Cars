@@ -54,12 +54,12 @@ class MyApp extends StatelessWidget {
       //initialRoute: RouteClass.newsBlogPage,
       //initialRoute: RouteClass.myListingsPage,
       //initialRoute: RouteClass.wishlistPage,
-      //initialRoute: RouteClass.sellCarPage,
+      initialRoute: RouteClass.sellCarPage,
       //initialRoute: RouteClass.sellCarTwoPage,
       //initialRoute: RouteClass.allMakesPage,
       //initialRoute: RouteClass.specialOfferPage,
       //initialRoute: RouteClass.notificationsPage,
-      initialRoute: RouteClass.searchPage,
+      //initialRoute: RouteClass.searchPage,
 
         //home: const SignUpWithPhonePage(),
         //home: const SignInWithPhonePage()
@@ -71,12 +71,12 @@ class MyApp extends StatelessWidget {
       //home: const NewsBlogPage()
       //home: const MyListingsPage()
       //home: const WishlistPage()
-      //home: SellCarPage(),
+      home: SellCarPage(),
       //home: SellCarTwoPage()
       //home: AllMakesPage()
       //home: SpecialOffersPage()
       //home: NotificationsPage()
-      home: SearchPage(),
+      //home: SearchPage(),
     );
   }
 }

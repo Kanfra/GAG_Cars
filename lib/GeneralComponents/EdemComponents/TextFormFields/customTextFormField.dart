@@ -5,8 +5,8 @@ import '../../../GlobalVariables/sizeGlobalVariables.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final bool obscureText;
-  final TextInputType textInputType;
-  final TextEditingController editingController;
+  final TextInputType? textInputType;
+  final TextEditingController? editingController;
   final ValueChanged<String>? onChangeFunction;
   final String? Function(String?)? validatorFunction;
   final VoidCallback? onSuffixIconClickFunction;
@@ -34,14 +34,14 @@ class CustomTextFormField extends StatelessWidget {
     this.enabledBorderColor,
     this.focusedBorderColor,
     this.cursorColor,
-    required this.textInputType,
+    this.textInputType,
     required this.hintText,
     this.hintTextColor,
     this.prefixIconData,
     this.suffixIconData,
     required this.isSuffixIconRequired,
     required this.isPrefixIconRequired,
-    required this.editingController,
+    this.editingController,
     this.onChangeFunction,
     this.validatorFunction,
     this.maxLines,

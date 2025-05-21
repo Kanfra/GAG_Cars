@@ -9,6 +9,7 @@ class TextCheckBox extends StatelessWidget {
   final VoidCallback? onTap;
   final String checkboxTextType;
   final bool isChecked;
+  final Color? checkBoxIconColor;
   final double? checkBoxBorderRadius;
   final bool isIconAtFrontRequired;
   final IconData? iconAtFrontData;
@@ -21,6 +22,7 @@ class TextCheckBox extends StatelessWidget {
   const TextCheckBox({
     required this.checkboxTextType,
     this.isCheckedColor,
+    this.checkBoxIconColor,
     required this.isChecked,
     this.checkBoxBorderRadius,
     required this.isIconAtFrontRequired,
@@ -61,7 +63,7 @@ class TextCheckBox extends StatelessWidget {
                     iconData: Icons.check, 
                     isFaIcon: ColorGlobalVariables.falseValue,
                     iconSize: SizeGlobalVariables.double_size_fourteen,
-                    iconColor: isChecked ? ColorGlobalVariables.blackColor : ColorGlobalVariables.whiteColor
+                    iconColor: isChecked ? checkBoxIconColor ?? ColorGlobalVariables.blackColor : ColorGlobalVariables.whiteColor
                     ),
                 ),
                 SizedBox(width: SizeGlobalVariables.double_size_five,),

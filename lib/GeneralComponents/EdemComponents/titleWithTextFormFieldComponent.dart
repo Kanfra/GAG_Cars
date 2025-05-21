@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 
 class TitleWithTextformfieldComponent extends StatelessWidget {
   // for textSmall
@@ -17,8 +21,8 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
 
   // for customtextformfield
   final bool obscureText;
-  final TextInputType textInputType;
-  final TextEditingController editingController;
+  final TextInputType? textInputType;
+  final TextEditingController? editingController;
   final ValueChanged<String>? onChangeFunction;
   final String? Function(String?)? validatorFunction;
   final VoidCallback? onSuffixIconClickFunction;
@@ -39,6 +43,13 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
   final Color? focusedBorderColor;
   final Color? cursorColor;
 
+  // isTitleWithContainerWidgetRequired
+  final bool isTitleWithContainerWidgetRequired;
+  final VoidCallback? onTitleWithContainerWidgetClickFunction;
+  final bool isIconAtFrontRequiredOfContainerWidgetRequired;
+  final IconData? iconData;
+  final Color? iconColor;
+
   const TitleWithTextformfieldComponent({
     super.key,
     required this.title,
@@ -51,8 +62,11 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
     this.textDecorationColor,
 
     required this.obscureText,
-    required this.textInputType,
-    required this.editingController,
+    required this.isTitleWithContainerWidgetRequired,
+    this.isIconAtFrontRequiredOfContainerWidgetRequired = false,
+
+    this.textInputType,
+    this.editingController,
     this.onChangeFunction,
     this.validatorFunction,
     this.onSuffixIconClickFunction,
@@ -72,6 +86,9 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
     this.enabledBorderColor,
     this.focusedBorderColor,
     this.cursorColor,    
+    this.onTitleWithContainerWidgetClickFunction,
+    this.iconData,
+    this.iconColor,
     });
 
   @override
@@ -91,7 +108,41 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
           textDecorationColor: textDecorationColor,
           ),
         const SizedBox(height: 8,),
-        CustomTextFormField(
+        isTitleWithContainerWidgetRequired ? GestureDetector(
+          onTap: onTitleWithContainerWidgetClickFunction,
+          child: Container(
+                    width: fieldWidth,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 5, 
+                      vertical: fieldHeight ?? 15
+                      ),
+                    decoration: BoxDecoration(
+                      color: ColorGlobalVariables.textFieldColor.withOpacity(0.99),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: ColorGlobalVariables.greenColor,
+                        width: 0.2,
+                      )
+                    ),
+                    child: Row(
+                      children: [
+                        // icon 
+                        isIconAtFrontRequiredOfContainerWidgetRequired ? CustomIcon(
+                          iconData: iconData ?? Icons.location_on, 
+                          isFaIcon: false, 
+                          iconColor: iconColor ?? ColorGlobalVariables.fadedBlackColor,
+                          ) : const SizedBox(),
+                        isIconAtFrontRequiredOfContainerWidgetRequired ? const SizedBox(width: 8,) : const SizedBox(),
+                        // hinttext
+                        TextSmall(
+                          title: hintText, 
+                          fontWeight: FontWeight.normal, 
+                          textColor: ColorGlobalVariables.fadedBlackColor,
+                          ),
+                      ],
+                    ),
+                  ),
+        ) :  CustomTextFormField(
           // for customtextformfield
           obscureText: obscureText,
           textInputType: textInputType,
