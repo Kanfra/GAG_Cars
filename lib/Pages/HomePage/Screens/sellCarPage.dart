@@ -382,9 +382,15 @@ class _SellCarPageState extends State<SellCarPage> {
                                 });
                               }
                               );
-                            }
-                            logger.e("Select a Make first");
+                            }else{
+                               showSnackbar(
+                                backgroundColor: ColorGlobalVariables.whiteColor, 
+                                title: 'Select a Make first'
+                                );
+                                logger.e("Select a Make first");
                           
+                            }
+                           
                               }
                         ),
                       ),
@@ -1083,6 +1089,24 @@ class _SellCarPageState extends State<SellCarPage> {
     );
   }
 
+  // show snackbar
+  void showSnackbar({
+    required Color backgroundColor,
+    required String title,
+    Color? textColor,
+  }){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: backgroundColor,
+        elevation: 1,
+        content: TextSmall(
+          title: title, 
+          fontWeight: FontWeight.w500, 
+          textColor: textColor ?? ColorGlobalVariables.redColor,
+          )
+        )
+    );
+  }
   // pick images
   Future<void> _pickImages() async {
     try{
