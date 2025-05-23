@@ -63,15 +63,6 @@ class _SellCarPageState extends State<SellCarPage> {
   // location
   String? selectedLocation;
 
-  // make
-  Map<String, dynamic>? selectedMake;
-  //String? selectedMake;
-  //List<String> makeOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
-
-  // model
-  String? selectedModel;
-  List<String> modelOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
-
   // steer position
   String? selectedSteerPosition;
   List<String> steerPositionOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
@@ -97,8 +88,8 @@ class _SellCarPageState extends State<SellCarPage> {
   List<XFile> selectedImages = [];
   final ImagePicker picker = ImagePicker();
 
-  // 
-  List<Map<String, dynamic>> something = [
+  // make and model list
+  List<Map<String, dynamic>> makeAndModels = [
     {
       "make": "Toyota",
       "model": ["Corolla", "Camry", "Highlander"],
@@ -112,6 +103,11 @@ class _SellCarPageState extends State<SellCarPage> {
       "model": ["C250", "C300", "GLE"],
     },
   ]; 
+
+  // selectedMakeModelMap
+  Map<String, dynamic>? selectedMakeAndModelMap; // get selected make from here
+  // selectedModel
+  String? selectedModel; // get selected model from here
 
 
   // for terminal works
@@ -134,7 +130,8 @@ class _SellCarPageState extends State<SellCarPage> {
     logger.i("year: ${year}");
     logger.i("vehicle type: ${vehicleType}");
     logger.i("condition: ${condition}");
-    logger.i("make: ${selectedMake}");
+    logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
+    logger.i("selectedModel: $selectedModel");
     logger.i("selected features: ${selectedFeatures}");
     for(int i = 0; i<selectedImages.length; i++){
       logger.i("selected images: ${selectedImages[i].path}");
@@ -340,7 +337,7 @@ class _SellCarPageState extends State<SellCarPage> {
                           textColor: ColorGlobalVariables.blackColor, 
                           obscureText: false, 
                           textInputType: TextInputType.text, 
-                          hintText: selectedMake == null ? "" : selectedMake?["make"]!, 
+                          hintText: selectedMakeAndModelMap == null ? "" : selectedMakeAndModelMap?["make"]!, 
                           isTitleWithContainerWidgetRequired: true,
                           fieldWidth: double.infinity,
                           isSuffixIconRequired: false, 
@@ -348,11 +345,12 @@ class _SellCarPageState extends State<SellCarPage> {
                           isFieldHeightRequired: false, 
                           onTitleWithContainerWidgetClickFunction: () => _showMakeModelDialog(
                               context: context,  
-                              options: something,
+                              options: makeAndModels,
                               onSelected: (selected){
-                                setState(() {
-                                  selectedMake = selected as Map<String, dynamic>?;
-                                });
+                                selectedMakeAndModelMap = selected;
+                                selectedModel = null;
+                                //logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
+                                setState(() {});
                               }
                               )
                     
@@ -367,21 +365,27 @@ class _SellCarPageState extends State<SellCarPage> {
                         textColor: ColorGlobalVariables.blackColor, 
                         obscureText: false, 
                         textInputType: TextInputType.text, 
-                        hintText: selectedModel == null ? "Select Model" : selectedModel!, 
+                        hintText: selectedModel == null ? "Select a Model" : selectedModel!, 
                         fieldWidth: double.infinity,
                         isSuffixIconRequired: false, 
                         isPrefixIconRequired: false, 
                         isFieldHeightRequired: false, 
                         isTitleWithContainerWidgetRequired: true,
-                        onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
+                        onTitleWithContainerWidgetClickFunction: () {
+                          if(selectedMakeAndModelMap != null){
+                             _showSelectionDialog(
                               context: context,  
-                              options: modelOptions,
+                              options: selectedMakeAndModelMap?['model'],
                               onSelected: (selected){
                                 setState(() {
                                   selectedModel = selected;
                                 });
                               }
-                              )
+                              );
+                            }
+                            logger.e("Select a Make first");
+                          
+                              }
                         ),
                       ),
                     ],
@@ -960,9 +964,9 @@ class _SellCarPageState extends State<SellCarPage> {
   Future<void> _showMakeModelDialog({
     required BuildContext context, 
     required List<Map<String, dynamic>> options,
-    required void Function(String) onSelected,
+    required void Function(Map<String,dynamic>) onSelected,
     }) async {
-    final selected = await showDialog<String>(
+    final selected = await showDialog<Map<String, dynamic>>(
       context: context, 
       builder: (BuildContext context) {
         return SimpleDialog(
