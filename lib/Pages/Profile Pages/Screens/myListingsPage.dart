@@ -4,14 +4,14 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/live.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/sold.dart';
 
-class MyListingsPage extends StatefulWidget {
-  const MyListingsPage({super.key});
+class MyListingPage extends StatefulWidget {
+  const MyListingPage({super.key});
 
   @override
-  State<MyListingsPage> createState() => _MyListingsPageState();
+  State<MyListingPage> createState() => _MyListingPageState();
 }
 
-class _MyListingsPageState extends State<MyListingsPage>
+class _MyListingPageState extends State<MyListingPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 

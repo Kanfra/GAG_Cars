@@ -1,0 +1,2 @@
+C:/Users/Edem Jerry-Kanfra/Desktop/gag_cars/gag_cars_frontend/android/app/.cxx/Debug/5r386a4e/x86/CMakeFiles/edit_cache.dir
+C:/Users/Edem Jerry-Kanfra/Desktop/gag_cars/gag_cars_frontend/android/app/.cxx/Debug/5r386a4e/x86/CMakeFiles/rebuild_cache.dir

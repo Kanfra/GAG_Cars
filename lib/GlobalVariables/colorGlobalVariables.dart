@@ -30,6 +30,10 @@ class ColorGlobalVariables{
   static const Color greenColor = Color(0xFF16B671);
   static const Color lemonGreenColor = Color(0xff04c500);
   static const Color redColor = Color(0xFFFF0000);
+  static const Color brownColor = Color(0xFF9F1010);
+
+  static const Color lightpinkColor = Color(0xF2E2E261);
+
   static const Color textFieldColor = Color(0xFFF4F4F4);
   static const Color textFieldDeeperShadeColor = Color(0xffcccccc);
   static const Color textFieldDeeperShadeColorTwo = Color(0xff999999);
