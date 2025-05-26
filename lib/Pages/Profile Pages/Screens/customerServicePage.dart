@@ -1,64 +1,5 @@
 import 'package:flutter/material.dart';
-//
-// class CustomerServicePage extends StatefulWidget {
-//   const CustomerServicePage({super.key});
-//
-//   @override
-//   State<CustomerServicePage> createState() => _CustomerServicePageState();
-// }
-//
-// class _CustomerServicePageState extends State<CustomerServicePage> {
-//   @override
-//   Widget build(BuildContext context) {
-//     final size = MediaQuery.of(context).size;
-//     return SafeArea(child: Scaffold(
-//       body: Container(
-//         padding: const EdgeInsets.all(25),
-//         child:  Column(
-//           children: [
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Row(
-//                   children: [
-//                     const Icon(Icons.arrow_back),
-//                     SizedBox(width:size.width*0.05),
-//                     const Text("Profile Update",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)
-//
-//                   ],
-//                 ),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: [
-//                     const Icon(Icons.phone_outlined),
-//                     const SizedBox(width: 15,),
-//                     Container(
-//                       // padding:const EdgeInsets.all(1) ,
-//                     decoration:  BoxDecoration(
-//                       shape: BoxShape.circle,
-//                       border: Border.all(color: Colors.black)
-//                     ),
-//                       child:const Icon(Icons.more_horiz_rounded) ,
-//                     )
-//                   ],
-//                 )
-//
-//                             ],
-//             ),
-//
-//
-//           ],
-//         ),
-//       ),
-//     ));
-//   }
-// }
-//
-
-//test
-
-
-import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
 
 class CustomerServicePage extends StatefulWidget {
   const CustomerServicePage({Key? key}) : super(key: key);
@@ -123,72 +64,59 @@ class _CustomerServicePageState extends State<CustomerServicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppbar(onLeadingIconClickFunction: (){},
+          isLeadingWidgetExist: true,
+          leadingIconData: Icons.arrow_back,
+          titleText: "Customer Service",
+           centerTitle: true,
+        actions: [
+          IconButton(onPressed: (){},
+              icon: const Icon(Icons.phone_outlined,color: Colors.black)
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Container(
+              // padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black),
+              ),
+              child: const Icon(Icons.more_horiz_rounded,color: Colors.black,),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Custom header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: const [
-                      Icon(Icons.arrow_back),
-                      SizedBox(width: 10),
-                      Text(
-                        "Profile Update",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.phone_outlined),
-                      const SizedBox(width: 15),
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: const Icon(Icons.more_horiz_rounded),
-                      ),
-                    ],
-                  ),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.only(left: 25,right: 25),
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    List<Widget> widgets = [];
+
+                    if (_isNewDate(index)) {
+                      widgets.add(_DateHeader(date: _messages[index].timestamp));
+                    }
+
+                    widgets.add(ChatBubble(message: _messages[index]));
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: widgets,
+                    );
+                  },
+                ),
               ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  List<Widget> widgets = [];
-
-                  if (_isNewDate(index)) {
-                    widgets.add(_DateHeader(date: _messages[index].timestamp));
-                  }
-
-                  widgets.add(ChatBubble(message: _messages[index]));
-
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: widgets,
-                  );
-                },
+              _MessageInputField(
+                controller: _textController,
+                onSend: _handleSendMessage,
               ),
-            ),
-            const Divider(height: 1),
-            _MessageInputField(
-              controller: _textController,
-              onSend: _handleSendMessage,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -218,18 +146,19 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMe = message.isMe;
     final bgColor =
-    isMe ? Colors.lightBlueAccent.withOpacity(0.7) : Colors.grey[300];
+    isMe ? Colors.black54.withOpacity(0.7) : Colors.grey[300];
     final align = isMe ? Alignment.centerRight : Alignment.centerLeft;
     final radius = isMe
         ? const BorderRadius.only(
       topLeft: Radius.circular(12),
-      topRight: Radius.circular(12),
       bottomLeft: Radius.circular(12),
+      bottomRight: Radius.circular(12)
     )
         : const BorderRadius.only(
-      topLeft: Radius.circular(12),
       topRight: Radius.circular(12),
       bottomRight: Radius.circular(12),
+      bottomLeft: Radius.circular(12)
+      
     );
 
     return Align(
@@ -246,7 +175,7 @@ class ChatBubble extends StatelessWidget {
           children: [
             Text(
               message.text,
-              style: const TextStyle(fontSize: 16),
+              style:  TextStyle(fontSize: 16,color: isMe? Colors.white : Colors.black),
             ),
             const SizedBox(height: 4),
             Text(
@@ -289,54 +218,38 @@ class _MessageInputField extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: TextField(
+              child: TextFormField(
                 controller: controller,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  hintText: 'Type a message...',
-                  border: InputBorder.none,
+                decoration:  InputDecoration(
+                  hintText: 'message...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                suffixIcon: GestureDetector(
+                  onTap: (){},
+                    child: const Icon(Icons.photo,color: Colors.black,)
+                )
+
                 ),
-                onSubmitted: (_) => onSend(),
+
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.send, color: Colors.blue),
-              onPressed: onSend,
-            ),
+           const SizedBox(width: 25,),
+            const CircleAvatar(
+              radius: 15,
+                backgroundColor: Colors.black54,
+                child: Icon(Icons.mic_none,color: Colors.white,)
+            )
           ],
         ),
       ),
     );
   }
 }
-//
-// // --- Date Header Widget ---
-// class _DateHeader extends StatelessWidget {
-//   final DateTime date;
-//
-//   const _DateHeader({Key? key, required this.date}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final now = DateTime.now();
-//     final today = DateTime(now.year, now.month, now.day);
-//     final yesterday = today.subtract(const Duration(days: 1));
-//
-//     String text;
-//     if (DateTime(date.year, date.month, date.day) == today) {
-//       text = 'Today';
-//     } else if (DateTime(date.year, date.month, date.day) == yesterday) {
-//       text = 'Yesterday';
-//     } else {
-//       text = "${date.day}/${date.month}/${date.year}";
-//     }
-//
-//     return Center(
-//         child: Container(
-//         margin: const EdgeInsets.symmetric(vertical: 10),
-//     padding: const EdgeInsets.symmetric(horizontal: 12, vertical:
-//
-
 
 
 

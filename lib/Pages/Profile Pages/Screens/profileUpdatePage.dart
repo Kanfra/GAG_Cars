@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GeneralComponents/Buttons/customTextButton.dart';
 import 'package:gag_cars_frontend/GeneralComponents/TextFormFields/customTextFormField.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 
 class ProfileUpdatePage extends StatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -25,70 +27,82 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     final size = MediaQuery.of(context).size;
     return SafeArea(
         child: Scaffold(
+          appBar: CustomAppbar(onLeadingIconClickFunction: (){},
+              isLeadingWidgetExist: true,
+              leadingIconData: Icons.arrow_back_ios_new_outlined,
+              titleText: "Profile Update",
+              centerTitle: true,
+                      ),
           body: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(25.00),
-              width:double.infinity ,
+            child: Padding(
+              padding: const EdgeInsets.all(25.0),
               child: Column(
-             crossAxisAlignment: CrossAxisAlignment.start,
+               crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                    Row(
-                    children: [
-                      const Icon(Icons.arrow_back_ios_new),
-                      SizedBox(width:size.width*0.22),
-                      const Text("Profile Update",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),)
-                    ],
-                  ),
-                  const SizedBox(height: 20,),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Column(
                         children: [
-                          Stack(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: size.width * 0.15,
-                                child: ClipOval(
-                                  child: Image.asset("assets/images/gag_logo_red.png",
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top:0,
-                                right: 4,
-                                child: GestureDetector(
-                                  onTap: (){},
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6.00),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.rectangle,
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 2,
+                          SizedBox(
+                            width: size.width * 0.3,
+                            height: size.width * 0.3,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: size.width * 0.15,
+                                  child: ClipOval(
+                                    child: Image.asset(
+                                      "assets/images/gag_logo_red.png",
+                                      fit: BoxFit.contain,
                                     ),
-                                    borderRadius: BorderRadius.circular(5)
-
                                   ),
-                                    child: const Icon(Icons.mode_edit_outline_outlined,size: 25,),
-                              ),
                                 ),
-                              )
-                            ],
+                                Positioned(
+                                  top: 0,
+                                  right: -8, // Adjusted to avoid overflow
+                                  child: GestureDetector(
+                                    onTap: () {},
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6.0),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        border: Border.all(
+                                          color: ColorGlobalVariables.blackColor,
+                                          width: 2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: const Icon(
+                                        Icons.mode_edit_outline_outlined,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 10,),
-                          const Text("Gordon Auto Garage",style: TextStyle(fontSize: 13,fontWeight: FontWeight.bold),),
-                          const Text("joined: 1st January 2025",style: TextStyle(fontSize: 10),),
-
-                                                  ],
-                      )
+                          const SizedBox(height: 10),
+                          const Text(
+                            "Gordon Auto Garage",
+                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          ),
+                          const Text(
+                            "joined: 1st January 2025",
+                            style: TextStyle(fontSize: 10),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
+
+
                   const SizedBox(height: 25,),
                    const Text("Name",style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),
-                   CustomTextFormField(obscureText: true,
+                   CustomTextFormField(obscureText: false,
                       textInputType: TextInputType.text,
                       hintText: "Gordon Auto Garage",
                       isSuffixIconRequired: false,
@@ -102,7 +116,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                    ),
                     const SizedBox(height:6 ,),
                   const Text("Phone Number",style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),
-                  CustomTextFormField(obscureText: true,
+                  CustomTextFormField(obscureText: false,
                     textInputType: const TextInputType.numberWithOptions(),
                     hintText: "0240295342",
                     isSuffixIconRequired: false,
@@ -116,7 +130,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                   ),
                   const SizedBox(height:6 ,),
                   const Text("Email",style: TextStyle(fontSize: 17,fontWeight: FontWeight.bold),),
-                  CustomTextFormField(obscureText: true,
+                  CustomTextFormField(obscureText: false,
                     textInputType: TextInputType.emailAddress,
                     hintText: "iamrosman@gmail.com",
                     isSuffixIconRequired: false,
@@ -128,12 +142,12 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     minLines: 1,
 
                   ),
-                  SizedBox(height: size.height * 0.1,),
+                    const SizedBox(height: 50,),
                   CustomTextButton(buttonTextType: "Update",
                     textSize: 25,
-                    textTypeColor: Colors.white,
+                    textTypeColor: ColorGlobalVariables.whiteColor,
                     isFullButtonWidthRequired: true,
-                    buttonBackgroundColor: Colors.red,
+                    buttonBackgroundColor: ColorGlobalVariables.redColor,
                     buttonVerticalPadding: 18,
 
 
