@@ -57,9 +57,9 @@ dependencies:
   syncfusion_flutter_datepicker: ^29.2.4
   logger: ^2.5.0
   cached_network_image: ^3.4.1
-  # google_maps_flutter: ^2.12.2
-  # geolocator: ^14.0.0
-  # google_places_flutter: ^2.1.0
+  google_maps_flutter: ^2.1.1    # Last version before Android SDK 30 requirement
+  geolocator: ^9.0.2             # Compatible with older Gradle versions
+  google_places_flutter: ^2.0.1 
   http: ^1.4.0
 
   
