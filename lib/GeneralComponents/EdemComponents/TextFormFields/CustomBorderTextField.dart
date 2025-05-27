@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../GlobalVariables/colorGlobalVariables.dart';
-import '../../GlobalVariables/sizeGlobalVariables.dart';
+import '../../../GlobalVariables/colorGlobalVariables.dart';
+import '../../../GlobalVariables/sizeGlobalVariables.dart';
+
 
 class CustomBorderTextFormField extends StatelessWidget {
   final bool obscureText;

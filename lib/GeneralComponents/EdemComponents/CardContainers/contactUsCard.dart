@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../GlobalVariables/colorGlobalVariables.dart';
-import '../../GlobalVariables/sizeGlobalVariables.dart';
+import '../../../GlobalVariables/colorGlobalVariables.dart';
+import '../../../GlobalVariables/sizeGlobalVariables.dart';
+
 
 class ContactUsCard extends StatelessWidget {
   final Size screenSize;
