@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/CardContainers/carCard.dart';
+import '../../../GeneralComponents/EdemComponents/CardContainers/carCard.dart';
 
 class Live extends StatefulWidget {
   const Live({super.key});

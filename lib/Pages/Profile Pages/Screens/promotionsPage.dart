@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
-import 'package:gag_cars_frontend/GeneralComponents/CardContainers/promotionsCard.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
+import '../../../GeneralComponents/EdemComponents/CardContainers/promotionsCard.dart';
 
 class PromotionsPage extends StatefulWidget {
   const PromotionsPage({super.key});

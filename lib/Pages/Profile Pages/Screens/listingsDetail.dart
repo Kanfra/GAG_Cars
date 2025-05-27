@@ -1,8 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class ListingDetailPage extends StatefulWidget {
   const ListingDetailPage({super.key});

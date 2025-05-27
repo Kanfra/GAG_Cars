@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/sizeGlobalVariables.dart';
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 
 class SettingsOnePage extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Buttons/customTextButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/TextFormFields/CustomBorderTextField.dart';
-import 'package:gag_cars_frontend/GeneralComponents/TextFormFields/customTextFormField.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
+import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
+import '../../../GeneralComponents/EdemComponents/TextFormFields/CustomBorderTextField.dart';
+import '../../../GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
 
 class DealerLoginPage extends StatefulWidget {
   const DealerLoginPage({super.key});

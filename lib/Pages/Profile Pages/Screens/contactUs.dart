@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/CardContainers/contactUsCard.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../../GeneralComponents/EdemComponents/CardContainers/contactUsCard.dart';
 
 
 class ContactUs extends StatefulWidget {

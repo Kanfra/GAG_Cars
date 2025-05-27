@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/contactUs.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/faq.dart';
-
-import '../../../GeneralComponents/Appbar/customAppbarOne.dart';
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class HelpCenterPage extends StatefulWidget {
   const HelpCenterPage({super.key});

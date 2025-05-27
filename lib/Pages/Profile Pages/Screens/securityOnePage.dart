@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
-import 'package:gag_cars_frontend/GeneralComponents/TextFormFields/customTextFormField.dart';
-import '../../../GeneralComponents/Buttons/customTextButton.dart';
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
+import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
+import '../../../GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
 
 class SecurityOnePage extends StatefulWidget {
   const SecurityOnePage({super.key});

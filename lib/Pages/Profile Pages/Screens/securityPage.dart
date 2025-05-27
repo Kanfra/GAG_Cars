@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/Appbar/customAppbarOne.dart';
+import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
