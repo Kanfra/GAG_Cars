@@ -15,6 +15,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithRowComponent.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -27,6 +28,9 @@ class SellCarPage extends StatefulWidget {
 }
 
 class _SellCarPageState extends State<SellCarPage> {
+  //
+  
+
   TextEditingController _vehicleNameController = TextEditingController();
   TextEditingController _mileageController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
@@ -69,7 +73,7 @@ class _SellCarPageState extends State<SellCarPage> {
 
   // engine capacity
   String? selectedEngineCapacity;
-  List<double> engineCapacityOptions = [1.0, 2.0, 3.0];
+  List<String> engineCapacityOptions = ['1.0', '2.0', '3.0'];
 
   // transmission
   String? selectedTransmission;
@@ -111,7 +115,7 @@ class _SellCarPageState extends State<SellCarPage> {
 
 
   // for terminal works
-  final logger = Logger();
+  final logger = Logger();  
 
   @override
   void dispose() {
@@ -428,14 +432,16 @@ class _SellCarPageState extends State<SellCarPage> {
                           fieldWidth: double.infinity, 
                           textColor: ColorGlobalVariables.blackColor, 
                           obscureText: false, 
+                          overflow: TextOverflow.ellipsis,
                           textInputType: TextInputType.text, 
-                          hintText: selectedLocation == null ? "Search Location" : selectedLocation!, 
+                          hintText: _currentPosition == null ? "Search Location" : "Latitude: ${_currentPosition?.latitude}, Longitude: ${_currentPosition?.longitude}", 
                           isSuffixIconRequired: false, 
                           isPrefixIconRequired: false, 
                           isFieldHeightRequired: false, 
                           isTitleWithContainerWidgetRequired: true,
                           onTitleWithContainerWidgetClickFunction: (){
                             // show google map location search
+                            _getLocation();
                           },
                           ),
                       ),
@@ -905,10 +911,10 @@ class _SellCarPageState extends State<SellCarPage> {
                                         image: selectedImages.isEmpty ? null : DecorationImage(
                                           image: FileImage(File(selectedImages[3].path)),
                                           fit: BoxFit.cover,
-                                          // colorFilter: ColorFilter.mode(
-                                          //   Colors.black.withOpacity(0.7), 
-                                          //     BlendMode.darken
-                                          //   )
+                                          colorFilter: ColorFilter.mode(
+                                            Colors.black.withOpacity(0.7), 
+                                              BlendMode.darken
+                                            )
                                           ),
                                       ),
                                       child: selectedImages.isEmpty ? CustomIcon(
@@ -965,6 +971,69 @@ class _SellCarPageState extends State<SellCarPage> {
         ),
     );
   }
+
+  // 
+  Position? _currentPosition;
+
+  Future<void> _getLocation() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+  
+  // Check if location services are enabled
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    showSnackbar(
+      backgroundColor: ColorGlobalVariables.whiteColor,
+      title: 'Location services are disabled. Please enable them.'
+    );
+    return;
+  }
+
+  // Check location permissions
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.deniedForever) {
+    showSnackbar(
+      backgroundColor: ColorGlobalVariables.whiteColor,
+      title: 'Location permissions are permanently denied. Please enable them in app settings.'
+    );
+    return;
+  }
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+      showSnackbar(
+        backgroundColor: ColorGlobalVariables.whiteColor,
+        title: 'Location permissions are denied'
+      );
+      return;
+    }
+  }
+
+  try {
+    // Get the current position
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high
+    );
+
+    // Update the state with the new position
+    setState(() {
+      _currentPosition = position;
+    });
+
+    // Optional: You could also show a snackbar to confirm the location was updated
+    showSnackbar(
+      backgroundColor: ColorGlobalVariables.whiteColor,
+      title: 'Location updated to your current position'
+    );
+
+  } catch (e) {
+    showSnackbar(
+      backgroundColor: ColorGlobalVariables.whiteColor,
+      title: 'Error getting location: ${e.toString()}'
+    );
+  }
+}
 
   // for make alertDialog
   Future<void> _showMakeModelDialog({
