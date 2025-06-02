@@ -134,11 +134,13 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
                           ) : const SizedBox(),
                         isIconAtFrontRequiredOfContainerWidgetRequired ? const SizedBox(width: 8,) : const SizedBox(),
                         // hinttext
-                        TextSmall(
-                          title: hintText, 
-                          fontWeight: FontWeight.normal, 
-                          textColor: ColorGlobalVariables.fadedBlackColor,
-                          ),
+                        Expanded(
+                          child: TextSmall(
+                            title: hintText, 
+                            fontWeight: FontWeight.normal, 
+                            textColor: ColorGlobalVariables.fadedBlackColor,
+                            ),
+                        ),
                       ],
                     ),
                   ),

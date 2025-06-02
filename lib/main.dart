@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePage.dart';
@@ -21,9 +22,9 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
 import 'Routes/routeClass.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
-  
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.black.withOpacity(0.77), // Change this to your desired color
     statusBarBrightness: Brightness.light, // For iOS (light for dark background)
