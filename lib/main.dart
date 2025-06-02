@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePage.dart';
@@ -16,14 +17,20 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
+
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'GlobalVariables/colorGlobalVariables.dart';
+import 'Pages/Authentication/Screens/forgotPasswordPage.dart';
+import 'Pages/Authentication/Screens/signUpWithEmailPage.dart';
+import 'Pages/Messages/Screens/messagesPage.dart';
+import 'Pages/Profile Pages/Screens/helpCenterPage.dart';
+import 'Pages/Profile Pages/Screens/myListingsPage.dart';
 import 'Routes/routeClass.dart';
 
 void main() {
   runApp(const MyApp());
-  
+
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.black.withOpacity(0.77), // Change this to your desired color
     statusBarBrightness: Brightness.light, // For iOS (light for dark background)
@@ -41,6 +48,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
+
       getPages: RouteClass.routes,
       //initialRoute: RouteClass.splashPage,
       // intialRoute: RouteClass.signUpWithEmailPage,
@@ -71,12 +79,13 @@ class MyApp extends StatelessWidget {
       //home: const NewsBlogPage()
       //home: const MyListingsPage()
       //home: const WishlistPage()
-      home: SellCarPage(),
+      home:  SellCarPage(),
       //home: SellCarTwoPage()
       //home: AllMakesPage()
       //home: SpecialOffersPage()
       //home: NotificationsPage()
       //home: SearchPage(),
+
     );
   }
 }
