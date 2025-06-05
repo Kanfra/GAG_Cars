@@ -289,6 +289,8 @@
 
 
 
+import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
@@ -364,6 +366,10 @@ class RouteClass {
   static String notificationsPage = "/notifications";
   static String searchPage = "/search";
 
+  //message
+  static String messagePage = "/messagePage";
+  static String mockUpScreenPage = "/mockUpScreenPage";
+
   // Getters
   static String getSignUpWithEmailPage() => signUpWithEmailPage;
   static String getSignUpWithPhonePage() => signUpWithPhonePage;
@@ -397,6 +403,9 @@ class RouteClass {
   static String getSpecialOfferPage() => specialOfferPage;
   static String getNotificationsPage() => notificationsPage;
   static String getSearchPage() => searchPage;
+
+  static String getMessagesPage() => messagePage;
+  static String getMockUpScreenPage() => mockUpScreenPage;
 
   // Routes
   static List<GetPage> routes = [
@@ -433,6 +442,10 @@ class RouteClass {
     GetPage(page: () => const SpecialOffersPage(), name: specialOfferPage, transition: Transition.noTransition),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
+
+    //message
+    GetPage(page: () => const MessagesPage(), name: messagePage, transition: Transition.noTransition),
+    GetPage(page: () => const MockUpScreenPage(), name: mockUpScreenPage, transition: Transition.noTransition),
   ];
 }
 
