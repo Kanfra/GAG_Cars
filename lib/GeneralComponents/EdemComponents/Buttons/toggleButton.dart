@@ -18,7 +18,7 @@ class ToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoSwitch(
       value: isToggleOn ?? ColorGlobalVariables.falseValue,
-      activeColor: activeColor ?? ColorGlobalVariables.buttonColor,
+      activeTrackColor: activeColor ?? ColorGlobalVariables.buttonColor,
       onChanged: onChangeFunction
     );
   }

@@ -4,7 +4,6 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarg
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 class SellCarTwoPage extends StatefulWidget {
   const SellCarTwoPage({super.key});

@@ -1,31 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/signUpWithPhonePage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/newsBlogPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/allMakesPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/detailPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/notificationPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
 import 'GlobalVariables/colorGlobalVariables.dart';
-import 'Pages/Authentication/Screens/forgotPasswordPage.dart';
-import 'Pages/Authentication/Screens/signUpWithEmailPage.dart';
-import 'Pages/Messages/Screens/messagesPage.dart';
-import 'Pages/Profile Pages/Screens/helpCenterPage.dart';
-import 'Pages/Profile Pages/Screens/myListingsPage.dart';
 import 'Routes/routeClass.dart';
 
 void main() async {

@@ -4,11 +4,7 @@ import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/cust
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
-import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
-import '../../../GeneralComponents/EdemComponents/Text/textMedium.dart';
-import '../../../GlobalVariables/colorGlobalVariables.dart';
 
 
 class SignUpWithEmailPage extends StatefulWidget {

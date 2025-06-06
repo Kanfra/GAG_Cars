@@ -22,7 +22,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
  late Timer _timer;
   int _remainingSeconds = 48;
   
-  get buttonName => null;
+  Null get buttonName => null;
   @override
   void initState() {
     super.initState();

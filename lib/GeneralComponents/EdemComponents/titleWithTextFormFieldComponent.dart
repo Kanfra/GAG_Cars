@@ -1,11 +1,9 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
-import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 
 class TitleWithTextformfieldComponent extends StatelessWidget {

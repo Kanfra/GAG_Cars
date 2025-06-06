@@ -6,10 +6,10 @@ class PromotionCard extends StatelessWidget {
   final String endText;
 
   const PromotionCard({
-    Key? key,
+    super.key,
     required this.startText,
     required this.endText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 
 class TitleWithRowComponent extends StatelessWidget {
   // for textSmall

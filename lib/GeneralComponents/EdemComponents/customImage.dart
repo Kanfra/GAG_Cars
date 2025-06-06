@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../GlobalVariables/colorGlobalVariables.dart';
 
 class CustomImage extends StatelessWidget {
   final double? imageWidth;

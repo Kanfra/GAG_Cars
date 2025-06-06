@@ -290,8 +290,6 @@
 
 
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/routes/get_route.dart';
-import 'package:get/get_navigation/src/routes/transitions_type.dart';
 
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';

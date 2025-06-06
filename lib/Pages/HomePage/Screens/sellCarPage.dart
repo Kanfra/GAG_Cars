@@ -30,15 +30,17 @@ class SellCarPage extends StatefulWidget {
 class _SellCarPageState extends State<SellCarPage> {
   //
   
+  // for validation
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  TextEditingController _vehicleNameController = TextEditingController();
-  TextEditingController _mileageController = TextEditingController();
-  TextEditingController _priceController = TextEditingController();
+  final TextEditingController _vehicleNameController = TextEditingController();
+  final TextEditingController _mileageController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
   //TextEditingController _engineCapacityController = TextEditingController();
-  TextEditingController _numberOfPassengersController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _numberOfPassengersController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
-  TextEditingController _colorController = TextEditingController();
+  final TextEditingController _colorController = TextEditingController();
 
   bool isCarSelected = false;
   bool isSpaSelected = false;
@@ -113,6 +115,149 @@ class _SellCarPageState extends State<SellCarPage> {
   // selectedModel
   String? selectedModel; // get selected model from here
 
+  Future<void> sellCarFunction() async {
+    // send some images to online store and receive it subsequent http string
+    final selectedImageString = [];
+
+    // request for token
+
+    // gather data to body (Table name Vehicle)
+    final Map<String, dynamic> body = {
+        // "user_id": "",
+        // "vehicle_id": "",
+        "vehicle_name": _vehicleNameController.text, //string
+        "vehicle_type": vehicleType, //string
+        "condition": condition,  // string
+        "year": year,  // number
+        "make": selectedMakeAndModelMap?["make"],  //string
+        "model": selectedModel,  //string
+        "location": {
+          "latitude": _currentPosition!.latitude,  // number
+          "longitude": _currentPosition!.longitude, // number
+          // "address":   // string or null
+        },
+        "price": _priceController.text,  // string
+        "steer_position": selectedSteerPosition,  // string
+        "engine_capacity": selectedEngineCapacity,  // string
+        "transmission": selectedTransmission,   // string
+        "color": {
+          "hex": _colorController.text,  // string
+          "name": _colorController.text,  // string
+        },
+        "build_type": selectedBuildType, // string
+        "mileage": selectedMileage, // string
+        "number_of_passengers": _numberOfPassengersController.text,  // number
+        "features": selectedFeatures.map((e)=>e).toList(), // ["string"]
+        "description": _descriptionController.text,  // string
+        "images": selectedImageString.map((e)=>e).toList(), // ["string"]
+        // "created_at": 
+      };
+
+      // create the post request
+
+      // handle http status response and feedback
+  }
+
+  // test here
+   void _formValidation() {
+    if (_formKey.currentState!.validate()) {
+      // vehicle type test
+      if(vehicleType.isEmpty){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select vehicle type", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // condition test
+      if(condition.isEmpty){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select condition", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // make test
+      if(selectedMakeAndModelMap == null || selectedMakeAndModelMap!["make"].isEmpty){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select vehicle make", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // model test
+      if(selectedModel == null || selectedModel!.isEmpty){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select vehicle model", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // current position test
+      if(_currentPosition == null){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select vehicle location", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // Steer position
+      // Engine cpapacity
+      // Transmission
+      // Color
+
+      // BuildType
+      if(selectedBuildType == null || selectedBuildType == ""){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select build type", 
+          isForFormValidation: false,
+          );
+          return;
+      }
+      // Mileage
+      if(selectedMileage == null || selectedMileage == ""){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select mileage", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // Features
+      if(selectedFeatures.isEmpty){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please select features", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      // Images
+      if(selectedImages.isEmpty){
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor, 
+          title: "Please upload at least 2 images and at most 4 images", 
+          isForFormValidation: false
+          );
+          return;
+      }
+      print("All validations passed");
+    }
+    else{
+      showSnackbar(
+        backgroundColor: ColorGlobalVariables.whiteColor, 
+        title: 'Please correct the errors in the form', 
+        isForFormValidation: false
+        );
+    }
+  }
+
 
   // for terminal works
   final logger = Logger();  
@@ -131,12 +276,12 @@ class _SellCarPageState extends State<SellCarPage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     logger.i("color: ${_colorController.text}");
-    logger.i("year: ${year}");
-    logger.i("vehicle type: ${vehicleType}");
-    logger.i("condition: ${condition}");
+    logger.i("year: $year");
+    logger.i("vehicle type: $vehicleType");
+    logger.i("condition: $condition");
     logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
     logger.i("selectedModel: $selectedModel");
-    logger.i("selected features: ${selectedFeatures}");
+    logger.i("selected features: $selectedFeatures");
     for(int i = 0; i<selectedImages.length; i++){
       logger.i("selected images: ${selectedImages[i].path}");
     }
@@ -149,823 +294,851 @@ class _SellCarPageState extends State<SellCarPage> {
         titleText: ''
         ),
       body: SafeArea(
-        child: Container(
-          width: screenSize.width,
-          height: screenSize.height,
-          decoration: BoxDecoration(
-            color: ColorGlobalVariables.whiteColor,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 20,),
-                // vehicle name
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: TitleWithTextformfieldComponent(
-                    title: "Vehicle Name", 
-                    fontWeight: FontWeight.w500, 
-                    textColor: ColorGlobalVariables.blackColor, 
-                    obscureText: ColorGlobalVariables.falseValue, 
-                    textInputType: TextInputType.text, 
-                    editingController: _vehicleNameController, 
-                    hintText: 'Enter name', 
-                    fieldWidth: double.infinity,
-                    isSuffixIconRequired: ColorGlobalVariables.falseValue, 
-                    isPrefixIconRequired: ColorGlobalVariables.falseValue, 
-                    isFieldHeightRequired: ColorGlobalVariables.falseValue, 
-                    isTitleWithContainerWidgetRequired: false,
-                    ),
-                ),
-                const SizedBox(height: 20,),
-                // type of vehicle
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: TitleWithRowComponent(
-                    title: "Type of Vehicle", 
-                    fontWeight: FontWeight.w500, 
-                    textColor: ColorGlobalVariables.blackColor, 
-                    children: [ 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Form(
+          key: _formKey,
+          child: Container(
+            width: screenSize.width,
+            height: screenSize.height,
+            decoration: BoxDecoration(
+              color: ColorGlobalVariables.whiteColor,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20,),
+                  // vehicle name
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: TitleWithTextformfieldComponent(
+                      title: "Vehicle Name", 
+                      fontWeight: FontWeight.w500, 
+                      textColor: ColorGlobalVariables.blackColor, 
+                      obscureText: ColorGlobalVariables.falseValue, 
+                      textInputType: TextInputType.text, 
+                      editingController: _vehicleNameController, 
+                      hintText: 'Enter name', 
+                      fieldWidth: double.infinity,
+                      isSuffixIconRequired: ColorGlobalVariables.falseValue, 
+                      isPrefixIconRequired: ColorGlobalVariables.falseValue, 
+                      isFieldHeightRequired: ColorGlobalVariables.falseValue, 
+                      isTitleWithContainerWidgetRequired: false,
+                      validatorFunction: (value){
+                        if(value == null || value.isEmpty){
+                          return "Please enter vehicle name";
+                        }
+                        return null;
+                      },
+                      ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // type of vehicle
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: TitleWithRowComponent(
+                      title: "Type of Vehicle", 
+                      fontWeight: FontWeight.w500, 
+                      textColor: ColorGlobalVariables.blackColor, 
+                      children: [ 
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // car 
+                        RoundCheckBox(
+                          checkboxTextType: "Car", 
+                          isChecked: isCarSelected, 
+                          isIconAtFrontRequired: false,
+                          onTap: (){
+                            setState(() {
+                              isCarSelected = true;
+                              isSpaSelected = false;
+                              isMotobikeSelected = false;
+                              isShipSelected = false;
+                              vehicleType = "Car";
+                            });
+                          },
+                          ),
+                        // condition
+                        RoundCheckBox(
+                          checkboxTextType: "Spa", 
+                          isChecked: isSpaSelected, 
+                          isIconAtFrontRequired: false,
+                          onTap: (){
+                            setState(() {
+                              isCarSelected = false;
+                              isSpaSelected = true;
+                              isMotobikeSelected = false;
+                              isShipSelected = false;
+                              vehicleType = "Spa";
+                            });
+                          },
+                          ),
+                        // motobike
+                        RoundCheckBox(
+                          checkboxTextType: "Motobike", 
+                          isChecked: isMotobikeSelected, 
+                          isIconAtFrontRequired: false,
+                          onTap: (){
+                            setState(() {
+                              isCarSelected = false;
+                              isSpaSelected = false;
+                              isMotobikeSelected = true;
+                              isShipSelected = false;
+                              vehicleType = "Motobike";
+                            });
+                          },
+                          ),
+                        // ship
+                        RoundCheckBox(
+                          checkboxTextType: "Ship", 
+                          isChecked: isShipSelected, 
+                          isIconAtFrontRequired: false,
+                          onTap: (){
+                            setState(() {
+                              isCarSelected = false;
+                              isSpaSelected = false;
+                              isMotobikeSelected = false;
+                              isShipSelected = true;
+                              vehicleType = "Ship";
+                            });
+                          },
+                          ),
+                          ],
+                        ),
+                      ],
+                      ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // row for conditon and year
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // car 
-                      RoundCheckBox(
-                        checkboxTextType: "Car", 
-                        isChecked: isCarSelected, 
-                        isIconAtFrontRequired: false,
-                        onTap: (){
-                          setState(() {
-                            isCarSelected = true;
-                            isSpaSelected = false;
-                            isMotobikeSelected = false;
-                            isShipSelected = false;
-                            vehicleType = "Car";
-                          });
-                        },
-                        ),
-                      // condition
-                      RoundCheckBox(
-                        checkboxTextType: "Spa", 
-                        isChecked: isSpaSelected, 
-                        isIconAtFrontRequired: false,
-                        onTap: (){
-                          setState(() {
-                            isCarSelected = false;
-                            isSpaSelected = true;
-                            isMotobikeSelected = false;
-                            isShipSelected = false;
-                            vehicleType = "Spa";
-                          });
-                        },
-                        ),
-                      // motobike
-                      RoundCheckBox(
-                        checkboxTextType: "Motobike", 
-                        isChecked: isMotobikeSelected, 
-                        isIconAtFrontRequired: false,
-                        onTap: (){
-                          setState(() {
-                            isCarSelected = false;
-                            isSpaSelected = false;
-                            isMotobikeSelected = true;
-                            isShipSelected = false;
-                            vehicleType = "Motobike";
-                          });
-                        },
-                        ),
-                      // ship
-                      RoundCheckBox(
-                        checkboxTextType: "Ship", 
-                        isChecked: isShipSelected, 
-                        isIconAtFrontRequired: false,
-                        onTap: (){
-                          setState(() {
-                            isCarSelected = false;
-                            isSpaSelected = false;
-                            isMotobikeSelected = false;
-                            isShipSelected = true;
-                            vehicleType = "Ship";
-                          });
-                        },
-                        ),
+                          // condition
+                          Expanded(
+                            child: TitleWithRowComponent(
+                              title: 'Condition', 
+                              fontWeight: FontWeight.w500, 
+                              textColor: ColorGlobalVariables.blackColor, 
+                              children: [
+                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                   // new
+                                RoundCheckBox(
+                                  checkboxTextType: "New", 
+                                  isChecked: isNewSelected, 
+                                  isIconAtFrontRequired: false,
+                                  onTap: (){
+                                    setState(() {
+                                      isNewSelected = true;
+                                      isUsedSelected = false;
+                                      condition = "New";
+                                    });
+                                  },
+                                  ),
+                                // used
+                                RoundCheckBox(
+                                  checkboxTextType: "Used", 
+                                  isChecked: isUsedSelected, 
+                                  isIconAtFrontRequired: false,
+                                  onTap: (){
+                                    setState(() {
+                                      isNewSelected = false;
+                                      isUsedSelected = true;
+                                      condition = "Used";
+                                    });
+                                  },
+                                  ),
+                              
+                                ],
+                               ),
+                              ]
+                              ),
+                          ),
+                          const SizedBox(width: 20,),
+                          // year
+                          Expanded(
+                            child: TitleWithTextformfieldComponent(
+                              title: "Year", 
+                              fontWeight: FontWeight.w500,
+                              fieldWidth: double.infinity, 
+                              textColor: ColorGlobalVariables.blackColor, 
+                              obscureText: ColorGlobalVariables.falseValue, 
+                              textInputType: TextInputType.datetime, // numbe 
+                              hintText: year.toString(), 
+                              isSuffixIconRequired: false, 
+                              isPrefixIconRequired: false, 
+                              isFieldHeightRequired: false, 
+                              isTitleWithContainerWidgetRequired: true,
+                              onTitleWithContainerWidgetClickFunction: (){
+                                // will be displaying alertDialog here
+                                _showYearPicker();
+                                 },
+                              ),
+                          ),
                         ],
                       ),
-                    ],
-                    ),
-                ),
-                const SizedBox(height: 20,),
-                // row for conditon and year
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  const SizedBox(height: 20,),
+                  // row for make and model
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
                       children: [
-                        // condition
-                        Expanded(
-                          child: TitleWithRowComponent(
-                            title: 'Condition', 
-                            fontWeight: FontWeight.w500, 
-                            textColor: ColorGlobalVariables.blackColor, 
-                            children: [
-                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                 // new
-                              RoundCheckBox(
-                                checkboxTextType: "New", 
-                                isChecked: isNewSelected, 
-                                isIconAtFrontRequired: false,
-                                onTap: (){
-                                  setState(() {
-                                    isNewSelected = true;
-                                    isUsedSelected = false;
-                                    condition = "New";
-                                  });
-                                },
-                                ),
-                              // used
-                              RoundCheckBox(
-                                checkboxTextType: "Used", 
-                                isChecked: isUsedSelected, 
-                                isIconAtFrontRequired: false,
-                                onTap: (){
-                                  setState(() {
-                                    isNewSelected = false;
-                                    isUsedSelected = true;
-                                    condition = "Used";
-                                  });
-                                },
-                                ),
-                            
-                              ],
-                             ),
-                            ]
-                            ),
-                        ),
-                        const SizedBox(width: 20,),
-                        // year
+                        // make
                         Expanded(
                           child: TitleWithTextformfieldComponent(
-                            title: "Year", 
+                            title: 'Make', 
+                            fontWeight: FontWeight.w500, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text, 
+                            hintText: selectedMakeAndModelMap == null ? "" : selectedMakeAndModelMap?["make"]!, 
+                            isTitleWithContainerWidgetRequired: true,
+                            fieldWidth: double.infinity,
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            onTitleWithContainerWidgetClickFunction: () => _showMakeModelDialog(
+                                context: context,  
+                                options: makeAndModels,
+                                onSelected: (selected){
+                                  selectedMakeAndModelMap = selected;
+                                  selectedModel = null;
+                                  //logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
+                                  setState(() {});
+                                }
+                                )
+                      
+                            ),
+                        ),
+                      const SizedBox(width: 20,),
+                      //  model
+                      Expanded(
+                        child: TitleWithTextformfieldComponent(
+                          title: 'Model', 
+                          fontWeight: FontWeight.w500, 
+                          textColor: ColorGlobalVariables.blackColor, 
+                          obscureText: false, 
+                          textInputType: TextInputType.text, 
+                          hintText: selectedModel == null ? "Select a Model" : selectedModel!, 
+                          fieldWidth: double.infinity,
+                          isSuffixIconRequired: false, 
+                          isPrefixIconRequired: false, 
+                          isFieldHeightRequired: false, 
+                          isTitleWithContainerWidgetRequired: true,
+                          onTitleWithContainerWidgetClickFunction: () {
+                            if(selectedMakeAndModelMap != null){
+                               _showSelectionDialog(
+                                context: context,  
+                                options: selectedMakeAndModelMap?['model'],
+                                onSelected: (selected){
+                                  setState(() {
+                                    selectedModel = selected;
+                                  });
+                                }
+                                );
+                              }else{
+                                 showSnackbar(
+                                  backgroundColor: ColorGlobalVariables.whiteColor, 
+                                  isForFormValidation: false,
+                                  title: 'Select a Make first'
+                                  );
+                                  logger.e("Select a Make first");
+                            
+                              }
+                             
+                                }
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // // mileage
+                  // Align(
+                  //   alignment: Alignment.centerLeft,
+                  //   child: TitleWithTextformfieldComponent(
+                  //     title: title, 
+                  //     fontWeight: fontWeight, 
+                  //     textColor: textColor, 
+                  //     obscureText: obscureText, 
+                  //     textInputType: textInputType, 
+                  //     editingController: editingController, 
+                  //     hintText: hintText, 
+                  //     isSuffixIconRequired: isSuffixIconRequired, 
+                  //     isPrefixIconRequired: isPrefixIconRequired, 
+                  //     isFieldHeightRequired: isFieldHeightRequired
+                  //     ),
+                  // ),
+                  // const SizedBox(height: 15,),
+                  // row for location and price
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
+                      children: [
+                        // location
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Location', 
                             fontWeight: FontWeight.w500,
                             fieldWidth: double.infinity, 
                             textColor: ColorGlobalVariables.blackColor, 
-                            obscureText: ColorGlobalVariables.falseValue, 
-                            textInputType: TextInputType.datetime, // numbe 
-                            hintText: year.toString(), 
+                            obscureText: false, 
+                            overflow: TextOverflow.ellipsis,
+                            textInputType: TextInputType.text, 
+                            hintText: _currentPosition == null ? "Search Location" : "Latitude: ${_currentPosition?.latitude}, Longitude: ${_currentPosition?.longitude}", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: (){
-                              // will be displaying alertDialog here
-                              _showYearPicker();
-                               },
+                              // show google map location search
+                              _getLocation();
+                            },
+                            ),
+                        ),
+                        const SizedBox(width: 20,),
+                        // price
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Price', 
+                            fontWeight: FontWeight.w500,
+                            fieldWidth: double.infinity, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.number, 
+                            editingController: _priceController, 
+                            hintText: 'Enter price', 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: false,
+                            validatorFunction: (value){
+                              if(value == null || value.isEmpty){
+                                return "Please enter price";
+                              }
+                              return null;
+                            },
                             ),
                         ),
                       ],
                     ),
-                ),
-                const SizedBox(height: 20,),
-                // row for make and model
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                    children: [
-                      // make
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Make', 
-                          fontWeight: FontWeight.w500, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text, 
-                          hintText: selectedMakeAndModelMap == null ? "" : selectedMakeAndModelMap?["make"]!, 
-                          isTitleWithContainerWidgetRequired: true,
-                          fieldWidth: double.infinity,
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          onTitleWithContainerWidgetClickFunction: () => _showMakeModelDialog(
-                              context: context,  
-                              options: makeAndModels,
-                              onSelected: (selected){
-                                selectedMakeAndModelMap = selected;
-                                selectedModel = null;
-                                //logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
-                                setState(() {});
-                              }
-                              )
-                    
-                          ),
-                      ),
-                    const SizedBox(width: 20,),
-                    //  model
-                    Expanded(
-                      child: TitleWithTextformfieldComponent(
-                        title: 'Model', 
-                        fontWeight: FontWeight.w500, 
-                        textColor: ColorGlobalVariables.blackColor, 
-                        obscureText: false, 
-                        textInputType: TextInputType.text, 
-                        hintText: selectedModel == null ? "Select a Model" : selectedModel!, 
-                        fieldWidth: double.infinity,
-                        isSuffixIconRequired: false, 
-                        isPrefixIconRequired: false, 
-                        isFieldHeightRequired: false, 
-                        isTitleWithContainerWidgetRequired: true,
-                        onTitleWithContainerWidgetClickFunction: () {
-                          if(selectedMakeAndModelMap != null){
-                             _showSelectionDialog(
-                              context: context,  
-                              options: selectedMakeAndModelMap?['model'],
-                              onSelected: (selected){
-                                setState(() {
-                                  selectedModel = selected;
-                                });
-                              }
-                              );
-                            }else{
-                               showSnackbar(
-                                backgroundColor: ColorGlobalVariables.whiteColor, 
-                                title: 'Select a Make first'
-                                );
-                                logger.e("Select a Make first");
-                          
-                            }
-                           
-                              }
-                        ),
-                      ),
-                    ],
                   ),
-                ),
-                const SizedBox(height: 20,),
-                // // mileage
-                // Align(
-                //   alignment: Alignment.centerLeft,
-                //   child: TitleWithTextformfieldComponent(
-                //     title: title, 
-                //     fontWeight: fontWeight, 
-                //     textColor: textColor, 
-                //     obscureText: obscureText, 
-                //     textInputType: textInputType, 
-                //     editingController: editingController, 
-                //     hintText: hintText, 
-                //     isSuffixIconRequired: isSuffixIconRequired, 
-                //     isPrefixIconRequired: isPrefixIconRequired, 
-                //     isFieldHeightRequired: isFieldHeightRequired
-                //     ),
-                // ),
-                // const SizedBox(height: 15,),
-                // row for location and price
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                    children: [
-                      // location
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Location', 
-                          fontWeight: FontWeight.w500,
-                          fieldWidth: double.infinity, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          overflow: TextOverflow.ellipsis,
-                          textInputType: TextInputType.text, 
-                          hintText: _currentPosition == null ? "Search Location" : "Latitude: ${_currentPosition?.latitude}, Longitude: ${_currentPosition?.longitude}", 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: (){
-                            // show google map location search
-                            _getLocation();
-                          },
-                          ),
-                      ),
-                      const SizedBox(width: 20,),
-                      // price
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Price', 
-                          fontWeight: FontWeight.w500,
-                          fieldWidth: double.infinity, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.number, 
-                          editingController: _priceController, 
-                          hintText: 'Enter price', 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: false,
-                          ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                // row for steer position and engine capacity
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                    children: [
-                      // steer postion
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Steer Position', 
-                          fontWeight: FontWeight.w500, 
-                          fieldWidth: double.infinity,
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text,
-                          hintText: selectedSteerPosition == null ? "left" : selectedSteerPosition!, 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                              context: context,  
-                              options: steerPositionOptions,
-                              onSelected: (selected){
-                                setState(() {
-                                  selectedSteerPosition = selected;
-                                });
-                              }
-                              )
-                          ),
-                        ),
-                      const SizedBox(width: 20,),
-                      // engine capacity
-                       Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Engine Capacity', 
-                          fontWeight: FontWeight.w500,
-                          fieldWidth: double.infinity, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.number, 
-                          hintText: selectedEngineCapacity == null ? "1.5" : selectedEngineCapacity!, 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                              context: context,  
-                              options: engineCapacityOptions,
-                              onSelected: (selected){
-                                setState(() {
-                                  selectedEngineCapacity = selected;
-                                });
-                              }
-                              )
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15,),
-                // row for transmission and color
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                    children: [
-                      // transmission
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: "Transmission", 
-                          fieldWidth: double.infinity,
-                          fontWeight: FontWeight.w500, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text, 
-                          //editingController: _transmissionController, 
-                          hintText: selectedTransmission == null ? "Automatic" : selectedTransmission!, 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                              context: context,  
-                              options: transmissionOptions,
-                              onSelected: (selected){
-                                setState(() {
-                                  selectedTransmission = selected;
-                                });
-                              }
-                              ),
-                          ),
-                        ),
-                      const SizedBox(width: 20,),
-                      // color
-                       Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Color', 
-                          fontWeight: FontWeight.w500,
-                          fieldWidth: double.infinity, 
-                          textColor: Colors.black, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text, 
-                          editingController: _colorController, 
-                          hintText: _colorController.text, 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: (){
-                            // some color palette here
-                            _showColorPicker();
-                          },
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                // row for build type and mileage
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                    children: [
-                      // build type
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: "Build Type", 
-                          fontWeight: FontWeight.w500,
-                          fieldWidth: double.infinity, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text, 
-                          //editingController: _buildTypeController, 
-                          hintText: selectedBuildType == null ? "Sedan" : selectedBuildType!, 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                              context: context,  
-                              options: buildTypeOptions,
-                              onSelected: (selected){
-                                setState(() {
-                                  selectedBuildType = selected;
-                                });
-                              }
-                              ),
-                          ),
-                        ),
-                      const SizedBox(width: 20,),
-                      // mileage
-                       Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Mileage', 
-                          fieldWidth: double.infinity,
-                          fontWeight: FontWeight.w500, 
-                          textColor: Colors.black, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text, 
-                          editingController: _mileageController, 
-                          hintText: selectedMileage == null ? "" : selectedMileage!, 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                              context: context,  
-                              options: mileageOptions,
-                              onSelected: (selected){
-                                setState(() {
-                                  selectedMileage = selected;
-                                });
-                              }
-                              ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                // number of passengers
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Number of Passengers', 
-                          fontWeight: FontWeight.w500, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          fieldWidth: double.infinity,
-                          textInputType: TextInputType.number, 
-                          editingController: _numberOfPassengersController, 
-                          hintText: "4", 
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: false,
-                          ),
-                      ),
-                      const SizedBox(width: 20,),
-                      Expanded(child: SizedBox(width: double.infinity,))
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20,),
-                // features
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: TitleWithRowComponent(
-                    title: "Features", 
-                    fontWeight: FontWeight.w500, 
-                    textColor: ColorGlobalVariables.blackColor, 
-                    children: [
-                      // first row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // alarm
-                          Expanded(
-                            child: TextCheckBox(
-                              checkBoxIconColor: ColorGlobalVariables.greenColor,
-                              checkboxTextType: 'Alarm', 
-                              isChecked: selectedFeatures.contains('Alarm'), 
-                              isIconAtFrontRequired: false,
-                              onTap: (){
-                                setState(() {
-                                  _toggleFeature('Alarm');
-                                });
-                              },
-                              ),
-                          ),
-                          const SizedBox(width: 20,),
-                          // cruise control
-                          Expanded(
-                            child: TextCheckBox(
-                              checkboxTextType: 'Cruise Control', 
-                              checkBoxIconColor: ColorGlobalVariables.greenColor,
-                              isChecked: selectedFeatures.contains('Cruise Control'), 
-                              isIconAtFrontRequired: false,
-                              onTap: (){
-                                setState(() {
-                                  _toggleFeature('Cruise Control');
-                                });
-                              },
-                              ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10,),
-                      // second row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // alarm
-                          Expanded(
-                            child: TextCheckBox(
-                              checkboxTextType: 'Bluetooth', 
-                              checkBoxIconColor: ColorGlobalVariables.greenColor,
-                              isChecked: selectedFeatures.contains('Bluetooth'), 
-                              isIconAtFrontRequired: false,
-                              onTap: (){
-                                setState(() {
-                                  _toggleFeature('Bluetooth');
-                                });
-                              },
-                              ),
-                          ),
-                          const SizedBox(width: 20,),
-                          // cruise control
-                          Expanded(
-                            child: TextCheckBox(
-                              checkboxTextType: 'Front Parking Sensor', 
-                              checkBoxIconColor: ColorGlobalVariables.greenColor,
-                              isChecked: selectedFeatures.contains('Front Parking Sensor'), 
-                              isIconAtFrontRequired: false,
-                              onTap: (){
-                                setState(() {
-                                  _toggleFeature('Front Parking Sensor');
-                                });
-                              },
-                              ),
-                          ),
-                        ],
-                      ),
-                    ]
-                    ),
-                ),
-                const SizedBox(height: 20,),
-                // description
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: TitleWithTextformfieldComponent(
-                    title: "Description", 
-                    fontWeight: FontWeight.w500, 
-                    textColor: ColorGlobalVariables.blackColor, 
-                    obscureText: false, 
-                    textInputType: TextInputType.text, 
-                    editingController: _descriptionController, 
-                    hintText: 'Write description about your car', 
-                    fieldWidth: double.infinity,
-                    isSuffixIconRequired: false, 
-                    isPrefixIconRequired: false, 
-                    isFieldHeightRequired: true, 
-                    isTitleWithContainerWidgetRequired: false,
-                    //maxLines: 4,
-                    ),
-                ),
-                const SizedBox(height: 20,),
-                // button for upload images
-                // Selected images grid
-                //selectedImages.isNotEmpty ? 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15,),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                     //row product images text and clear button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  const SizedBox(height: 20,),
+                  // row for steer position and engine capacity
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
                       children: [
-                         // Product Images
-                      TextSmall(
-                        title: "Product Images", 
-                        fontWeight: FontWeight.w500, 
-                        textColor: ColorGlobalVariables.blackColor,
-                        ),
-                      // clear images
-                      CustomTextButton(
-                        buttonTextType: "Clear Images", 
-                        textTypeColor: ColorGlobalVariables.maroonColor, 
-                        isFullButtonWidthRequired: false, 
-                        buttonBackgroundColor: Colors.transparent, 
-                        onClickFunction: (){
-                          setState(() {
-                            selectedImages = [];
-                          });
-                        }
-                        ),
+                        // steer postion
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Steer Position', 
+                            fontWeight: FontWeight.w500, 
+                            fieldWidth: double.infinity,
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text,
+                            hintText: selectedSteerPosition == null ? "left" : selectedSteerPosition!, 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
+                                context: context,  
+                                options: steerPositionOptions,
+                                onSelected: (selected){
+                                  setState(() {
+                                    selectedSteerPosition = selected;
+                                  });
+                                }
+                                )
+                            ),
+                          ),
+                        const SizedBox(width: 20,),
+                        // engine capacity
+                         Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Engine Capacity', 
+                            fontWeight: FontWeight.w500,
+                            fieldWidth: double.infinity, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.number, 
+                            hintText: selectedEngineCapacity == null ? "1.5" : selectedEngineCapacity!, 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
+                                context: context,  
+                                options: engineCapacityOptions,
+                                onSelected: (selected){
+                                  setState(() {
+                                    selectedEngineCapacity = selected;
+                                  });
+                                }
+                                )
+                            ),
+                          ),
                       ],
                     ),
-                    const SizedBox(height: 20,),
-                    // images
-                    GestureDetector(
-                      onTap: () => _pickImages(),
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 15,),
-                        width: double.infinity,
-                        height: 200,
-                        child: Row(
-                          children: [
-                            // first column for images
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    flex: 4,
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: ColorGlobalVariables.textFieldColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        image: selectedImages.isEmpty ? null : DecorationImage(
-                                          image: FileImage(File(selectedImages[0].path)),
-                                          fit: BoxFit.cover,
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black.withOpacity(0.7), 
-                                              BlendMode.darken
-                                            )
-                                          ),
-                                      ),
-                                      child: selectedImages.isEmpty ? CustomIcon(
-                                        iconData: Icons.photo_library, 
-                                        isFaIcon: false, 
-                                        iconSize: 60,
-                                        iconColor: ColorGlobalVariables.blueColor
-                                        ) : null,
-                                      )),
-                                  const SizedBox(height: 15,),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: ColorGlobalVariables.textFieldColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        image: selectedImages.isEmpty ? null : DecorationImage(
-                                          image: FileImage(File(selectedImages[1].path)),
-                                          fit: BoxFit.cover,
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black.withOpacity(0.7), 
-                                              BlendMode.darken
-                                            )
-                                          ),
-                                      ),
-                                      child: selectedImages.isEmpty ? CustomIcon(
-                                        iconData: Icons.photo, 
-                                        isFaIcon: false, 
-                                        iconSize: 50,
-                                        iconColor: ColorGlobalVariables.blueColor
-                                        ) : null,
-                                      )),
-                                ],
-                              )
-                              ),
-                            const SizedBox(width: 15,),
-                            // second column for images
-                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                   Expanded(
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: ColorGlobalVariables.textFieldColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        image: selectedImages.isEmpty ? null : DecorationImage(
-                                          image: FileImage(File(selectedImages[2].path)),
-                                          fit: BoxFit.cover,
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black.withOpacity(0.7), 
-                                              BlendMode.darken
-                                            )
-                                          ),
-                                      ),
-                                      child: selectedImages.isEmpty ? CustomIcon(
-                                        iconData: Icons.photo, 
-                                        isFaIcon: false, 
-                                        iconSize: 60,
-                                        iconColor: ColorGlobalVariables.blueColor
-                                        ) : null,
-                                      )),
-                                  const SizedBox(height: 15,),
-                                  Expanded(
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: ColorGlobalVariables.textFieldColor,
-                                        borderRadius: BorderRadius.circular(12),
-                                        image: selectedImages.isEmpty ? null : DecorationImage(
-                                          image: FileImage(File(selectedImages[3].path)),
-                                          fit: BoxFit.cover,
-                                          colorFilter: ColorFilter.mode(
-                                            Colors.black.withOpacity(0.7), 
-                                              BlendMode.darken
-                                            )
-                                          ),
-                                      ),
-                                      child: selectedImages.isEmpty ? CustomIcon(
-                                        iconData: Icons.photo, 
-                                        isFaIcon: false, 
-                                        iconSize: 50,
-                                        iconColor: ColorGlobalVariables.blueColor
-                                        ) : null,
-                                      )),
-                                ],
-                              )
-                              ),
-                          ],
-                          ),
-                      ),
-                    ),
-                    ],
                   ),
-                ),
-                //: 
-                // Links(
-                //   linkTextType: 'Upload images/Video', 
-                //   linkTextColor: ColorGlobalVariables.blackColor, 
-                //   isTextSmall: true,
-                //   iconSize: 40,
-                //   borderColor: ColorGlobalVariables.buttonColor,
-                //   linkFontWeight: FontWeight.w500,
-                //   textDecoration: TextDecoration.none,
-                //   iconData: Icons.image, // upload, add_photo_alternate, cloud_upload, (fontawesome: upload, image, fileImage, cameraRetro, cloudUploadAlt) 
-                //   isIconWidgetRequiredAtEnd: false, 
-                //   isIconWidgetRequiredAtFront: true, 
-                //   onClickFunction: (){}
-                //   ),
-
-                const SizedBox(height: 20,),
-                // sell car button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20,),
-                  child: CustomElevatedButton(
-                    buttonTextType: "Sell Car", 
-                    textTypeColor: ColorGlobalVariables.whiteColor, 
-                    buttonVerticalPadding: 15,
-                    borderRadius: 8,
-                    isFullButtonWidthRequired: true, 
-                    buttonBackgroundColor: Colors.red, onClickFunction: () {  },
-                    //ColorGlobalVariables.brownColor
+                  const SizedBox(height: 15,),
+                  // row for transmission and color
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
+                      children: [
+                        // transmission
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: "Transmission", 
+                            fieldWidth: double.infinity,
+                            fontWeight: FontWeight.w500, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text, 
+                            //editingController: _transmissionController, 
+                            hintText: selectedTransmission == null ? "Automatic" : selectedTransmission!, 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
+                                context: context,  
+                                options: transmissionOptions,
+                                onSelected: (selected){
+                                  setState(() {
+                                    selectedTransmission = selected;
+                                  });
+                                }
+                                ),
+                            ),
+                          ),
+                        const SizedBox(width: 20,),
+                        // color
+                         Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Color', 
+                            fontWeight: FontWeight.w500,
+                            fieldWidth: double.infinity, 
+                            textColor: Colors.black, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text, 
+                            editingController: _colorController, 
+                            hintText: _colorController.text, 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: (){
+                              // some color palette here
+                              _showColorPicker();
+                            },
+                            ),
+                          ),
+                      ],
                     ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // row for build type and mileage
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
+                      children: [
+                        // build type
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: "Build Type", 
+                            fontWeight: FontWeight.w500,
+                            fieldWidth: double.infinity, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text, 
+                            //editingController: _buildTypeController, 
+                            hintText: selectedBuildType == null ? "Sedan" : selectedBuildType!, 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
+                                context: context,  
+                                options: buildTypeOptions,
+                                onSelected: (selected){
+                                  setState(() {
+                                    selectedBuildType = selected;
+                                  });
+                                }
+                                ),
+                            ),
+                          ),
+                        const SizedBox(width: 20,),
+                        // mileage
+                         Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Mileage', 
+                            fieldWidth: double.infinity,
+                            fontWeight: FontWeight.w500, 
+                            textColor: Colors.black, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text, 
+                            editingController: _mileageController, 
+                            hintText: selectedMileage == null ? "" : selectedMileage!, 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
+                                context: context,  
+                                options: mileageOptions,
+                                onSelected: (selected){
+                                  setState(() {
+                                    selectedMileage = selected;
+                                  });
+                                }
+                                ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // number of passengers
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Number of Passengers', 
+                            fontWeight: FontWeight.w500, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            fieldWidth: double.infinity,
+                            textInputType: TextInputType.number, 
+                            editingController: _numberOfPassengersController, 
+                            hintText: "4", 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: false,
+                            validatorFunction: (value){
+                              if(value == null || value.isEmpty){
+                                return "No of passengers required";
+                              }
+                              return null;
+                            },
+                            ),
+                        ),
+                        const SizedBox(width: 20,),
+                        Expanded(child: SizedBox(width: double.infinity,))
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // features
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TitleWithRowComponent(
+                      title: "Features", 
+                      fontWeight: FontWeight.w500, 
+                      textColor: ColorGlobalVariables.blackColor, 
+                      children: [
+                        // first row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // alarm
+                            Expanded(
+                              child: TextCheckBox(
+                                checkBoxIconColor: ColorGlobalVariables.greenColor,
+                                checkboxTextType: 'Alarm', 
+                                isChecked: selectedFeatures.contains('Alarm'), 
+                                isIconAtFrontRequired: false,
+                                onTap: (){
+                                  setState(() {
+                                    _toggleFeature('Alarm');
+                                  });
+                                },
+                                ),
+                            ),
+                            const SizedBox(width: 20,),
+                            // cruise control
+                            Expanded(
+                              child: TextCheckBox(
+                                checkboxTextType: 'Cruise Control', 
+                                checkBoxIconColor: ColorGlobalVariables.greenColor,
+                                isChecked: selectedFeatures.contains('Cruise Control'), 
+                                isIconAtFrontRequired: false,
+                                onTap: (){
+                                  setState(() {
+                                    _toggleFeature('Cruise Control');
+                                  });
+                                },
+                                ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10,),
+                        // second row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // alarm
+                            Expanded(
+                              child: TextCheckBox(
+                                checkboxTextType: 'Bluetooth', 
+                                checkBoxIconColor: ColorGlobalVariables.greenColor,
+                                isChecked: selectedFeatures.contains('Bluetooth'), 
+                                isIconAtFrontRequired: false,
+                                onTap: (){
+                                  setState(() {
+                                    _toggleFeature('Bluetooth');
+                                  });
+                                },
+                                ),
+                            ),
+                            const SizedBox(width: 20,),
+                            // cruise control
+                            Expanded(
+                              child: TextCheckBox(
+                                checkboxTextType: 'Front Parking Sensor', 
+                                checkBoxIconColor: ColorGlobalVariables.greenColor,
+                                isChecked: selectedFeatures.contains('Front Parking Sensor'), 
+                                isIconAtFrontRequired: false,
+                                onTap: (){
+                                  setState(() {
+                                    _toggleFeature('Front Parking Sensor');
+                                  });
+                                },
+                                ),
+                            ),
+                          ],
+                        ),
+                      ]
+                      ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // description
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: TitleWithTextformfieldComponent(
+                      title: "Description", 
+                      fontWeight: FontWeight.w500, 
+                      textColor: ColorGlobalVariables.blackColor, 
+                      obscureText: false, 
+                      textInputType: TextInputType.text, 
+                      editingController: _descriptionController, 
+                      hintText: 'Write description about your car', 
+                      fieldWidth: double.infinity,
+                      isSuffixIconRequired: false, 
+                      isPrefixIconRequired: false, 
+                      isFieldHeightRequired: true, 
+                      isTitleWithContainerWidgetRequired: false,
+                      validatorFunction: (value){
+                        if(value == null || value.isEmpty){
+                          return "Please enter your description";
+                        }
+                        return null;
+                      },
+                      //maxLines: 4,
+                      ),
+                  ),
+                  const SizedBox(height: 20,),
+                  // button for upload images
+                  // Selected images grid
+                  //selectedImages.isNotEmpty ? 
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15,),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                       //row product images text and clear button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                           // Product Images
+                        TextSmall(
+                          title: "Product Images", 
+                          fontWeight: FontWeight.w500, 
+                          textColor: ColorGlobalVariables.blackColor,
+                          ),
+                        // clear images
+                        CustomTextButton(
+                          buttonTextType: "Clear Images", 
+                          textTypeColor: ColorGlobalVariables.maroonColor, 
+                          isFullButtonWidthRequired: false, 
+                          buttonBackgroundColor: Colors.transparent, 
+                          onClickFunction: (){
+                            setState(() {
+                              selectedImages = [];
+                            });
+                          }
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20,),
+                      // images
+                      GestureDetector(
+                        onTap: () => _pickImages(),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 15,),
+                          width: double.infinity,
+                          height: 280,
+                          child: Row(
+                            children: [
+                              // first column for images
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 4,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: ColorGlobalVariables.textFieldColor,
+                                          borderRadius: BorderRadius.circular(12),
+                                          image: selectedImages.isEmpty ? null : DecorationImage(
+                                            image: FileImage(File(selectedImages[0].path)),
+                                            fit: BoxFit.cover,
+                                            colorFilter: ColorFilter.mode(
+                                              Colors.black.withOpacity(0.7), 
+                                                BlendMode.darken
+                                              )
+                                            ),
+                                        ),
+                                        child: selectedImages.isEmpty ? CustomIcon(
+                                          iconData: Icons.photo_library, 
+                                          isFaIcon: false, 
+                                          iconSize: 60,
+                                          iconColor: ColorGlobalVariables.blueColor
+                                          ) : null,
+                                        )),
+                                    const SizedBox(height: 15,),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: ColorGlobalVariables.textFieldColor,
+                                          borderRadius: BorderRadius.circular(12),
+                                          image: selectedImages.isEmpty ? null : DecorationImage(
+                                            image: FileImage(File(selectedImages[1].path)),
+                                            fit: BoxFit.cover,
+                                            colorFilter: ColorFilter.mode(
+                                              Colors.black.withOpacity(0.7), 
+                                                BlendMode.darken
+                                              )
+                                            ),
+                                        ),
+                                        child: selectedImages.isEmpty ? CustomIcon(
+                                          iconData: Icons.photo, 
+                                          isFaIcon: false, 
+                                          iconSize: 50,
+                                          iconColor: ColorGlobalVariables.blueColor
+                                          ) : null,
+                                        )),
+                                  ],
+                                )
+                                ),
+                              const SizedBox(width: 15,),
+                              // second column for images
+                               Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                     Expanded(
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: ColorGlobalVariables.textFieldColor,
+                                          borderRadius: BorderRadius.circular(12),
+                                          image: selectedImages.isEmpty ? null : DecorationImage(
+                                            image: FileImage(File(selectedImages[2].path)),
+                                            fit: BoxFit.cover,
+                                            colorFilter: ColorFilter.mode(
+                                              Colors.black.withOpacity(0.7), 
+                                                BlendMode.darken
+                                              )
+                                            ),
+                                        ),
+                                        child: selectedImages.isEmpty ? CustomIcon(
+                                          iconData: Icons.photo, 
+                                          isFaIcon: false, 
+                                          iconSize: 60,
+                                          iconColor: ColorGlobalVariables.blueColor
+                                          ) : null,
+                                        )),
+                                    const SizedBox(height: 15,),
+                                    Expanded(
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: ColorGlobalVariables.textFieldColor,
+                                          borderRadius: BorderRadius.circular(12),
+                                          image: selectedImages.isEmpty ? null : DecorationImage(
+                                            image: FileImage(File(selectedImages[3].path)),
+                                            fit: BoxFit.cover,
+                                            colorFilter: ColorFilter.mode(
+                                              Colors.black.withOpacity(0.7), 
+                                                BlendMode.darken
+                                              )
+                                            ),
+                                        ),
+                                        child: selectedImages.isEmpty ? CustomIcon(
+                                          iconData: Icons.photo, 
+                                          isFaIcon: false, 
+                                          iconSize: 50,
+                                          iconColor: ColorGlobalVariables.blueColor
+                                          ) : null,
+                                        )),
+                                  ],
+                                )
+                                ),
+                            ],
+                            ),
+                        ),
+                      ),
+                      ],
+                    ),
+                  ),
+                  //: 
+                  // Links(
+                  //   linkTextType: 'Upload images/Video', 
+                  //   linkTextColor: ColorGlobalVariables.blackColor, 
+                  //   isTextSmall: true,
+                  //   iconSize: 40,
+                  //   borderColor: ColorGlobalVariables.buttonColor,
+                  //   linkFontWeight: FontWeight.w500,
+                  //   textDecoration: TextDecoration.none,
+                  //   iconData: Icons.image, // upload, add_photo_alternate, cloud_upload, (fontawesome: upload, image, fileImage, cameraRetro, cloudUploadAlt) 
+                  //   isIconWidgetRequiredAtEnd: false, 
+                  //   isIconWidgetRequiredAtFront: true, 
+                  //   onClickFunction: (){}
+                  //   ),
+            
+                  const SizedBox(height: 20,),
+                  // sell car button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    child: CustomElevatedButton(
+                      buttonTextType: "Sell Car", 
+                      textTypeColor: ColorGlobalVariables.whiteColor, 
+                      buttonVerticalPadding: 15,
+                      borderRadius: 8,
+                      isFullButtonWidthRequired: true, 
+                      buttonBackgroundColor: Colors.red, onClickFunction: () => _formValidation(),
+                      //ColorGlobalVariables.brownColor
+                      ),
+                  ),
+                  const SizedBox(height: 20,),
+                ],
                 ),
-                const SizedBox(height: 20,),
-              ],
-              ),
+            ),
           ),
         ),
         ),
@@ -984,6 +1157,7 @@ class _SellCarPageState extends State<SellCarPage> {
   if (!serviceEnabled) {
     showSnackbar(
       backgroundColor: ColorGlobalVariables.whiteColor,
+      isForFormValidation: false,
       title: 'Location services are disabled. Please enable them.'
     );
     return;
@@ -994,6 +1168,7 @@ class _SellCarPageState extends State<SellCarPage> {
   if (permission == LocationPermission.deniedForever) {
     showSnackbar(
       backgroundColor: ColorGlobalVariables.whiteColor,
+      isForFormValidation: false,
       title: 'Location permissions are permanently denied. Please enable them in app settings.'
     );
     return;
@@ -1004,6 +1179,7 @@ class _SellCarPageState extends State<SellCarPage> {
     if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
       showSnackbar(
         backgroundColor: ColorGlobalVariables.whiteColor,
+        isForFormValidation: false,
         title: 'Location permissions are denied'
       );
       return;
@@ -1024,12 +1200,14 @@ class _SellCarPageState extends State<SellCarPage> {
     // Optional: You could also show a snackbar to confirm the location was updated
     showSnackbar(
       backgroundColor: ColorGlobalVariables.whiteColor,
+      isForFormValidation: false,
       title: 'Location updated to your current position'
     );
 
   } catch (e) {
     showSnackbar(
       backgroundColor: ColorGlobalVariables.whiteColor,
+      isForFormValidation: false,
       title: 'Error getting location: ${e.toString()}'
     );
   }
@@ -1158,10 +1336,15 @@ class _SellCarPageState extends State<SellCarPage> {
     );
   }
 
+  // Validation function
+ 
+
+
   // show snackbar
   void showSnackbar({
     required Color backgroundColor,
     required String title,
+    required bool isForFormValidation,
     Color? textColor,
   }){
     ScaffoldMessenger.of(context).showSnackBar(
@@ -1169,7 +1352,7 @@ class _SellCarPageState extends State<SellCarPage> {
         backgroundColor: backgroundColor,
         elevation: 1,
         content: TextSmall(
-          title: title, 
+          title: isForFormValidation ? "Please enter a/an $title" : title, 
           fontWeight: FontWeight.w500, 
           textColor: textColor ?? ColorGlobalVariables.redColor,
           )
@@ -1179,7 +1362,7 @@ class _SellCarPageState extends State<SellCarPage> {
   // pick images
   Future<void> _pickImages() async {
     try{
-      final List<XFile>? pickedFiles = await picker.pickMultiImage(
+      final List<XFile> pickedFiles = await picker.pickMultiImage(
         maxWidth: 1000,
         maxHeight: 1000,
         imageQuality: 85,

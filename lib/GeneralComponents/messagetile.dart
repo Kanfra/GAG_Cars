@@ -1,6 +1,5 @@
 // messagetile.dart
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 class Message {
   final String sender;
   final String content;

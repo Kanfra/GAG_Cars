@@ -26,7 +26,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   final ScrollController _scrollController = ScrollController();
-  double _appBarHeight = 300;
+  final double _appBarHeight = 300;
   double _lastScrollPosition = 0;
   bool _isAppBarVisible = true;
 

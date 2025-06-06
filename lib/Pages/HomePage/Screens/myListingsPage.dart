@@ -9,7 +9,6 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.d
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class MyListingsPage extends StatefulWidget {
   const MyListingsPage({super.key});

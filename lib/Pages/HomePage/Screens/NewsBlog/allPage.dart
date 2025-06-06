@@ -10,7 +10,6 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class AllPage extends StatefulWidget {
   // final String imagePath;

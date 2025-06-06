@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/country_code_text_field.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class SignInWithPhonePage extends StatefulWidget {
   const SignInWithPhonePage({super.key});

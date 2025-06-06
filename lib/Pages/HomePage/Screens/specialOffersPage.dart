@@ -3,13 +3,11 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/custom
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/DotSeparator/dotSeparator.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/customRichtext.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 class SpecialOffersPage extends StatefulWidget {
   const SpecialOffersPage({super.key});

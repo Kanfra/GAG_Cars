@@ -65,6 +65,7 @@ class CustomTextFormField extends StatelessWidget {
         cursorColor: ColorGlobalVariables.greenColor,
         controller: editingController,
         onChanged: onChangeFunction,
+        validator: validatorFunction,
         style: TextStyle(
           fontSize: SizeGlobalVariables.double_size_fourteen,
         ),
@@ -90,6 +91,24 @@ class CustomTextFormField extends StatelessWidget {
               color: focusedBorderColor ?? ColorGlobalVariables.greenColor,
               width: SizeGlobalVariables.one_point_two,
             ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderSide: BorderSide(
+              color: ColorGlobalVariables.redColor,
+              width: SizeGlobalVariables.one_point_two,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderSide: BorderSide(
+              color: ColorGlobalVariables.redColor,
+              width: SizeGlobalVariables.one_point_two,
+            ),
+          ),
+          errorStyle: TextStyle(
+            color: ColorGlobalVariables.redColor,
+              fontSize: SizeGlobalVariables.double_size_fourteen,
           ),
           hintText: hintText,
           hintStyle: TextStyle(

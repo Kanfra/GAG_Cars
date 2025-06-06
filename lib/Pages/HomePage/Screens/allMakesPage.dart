@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
