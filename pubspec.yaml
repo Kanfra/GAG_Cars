@@ -54,9 +54,9 @@ dependencies:
   country_code_picker: ^3.3.0
   country_picker: ^2.0.15
   lottie: ^2.6.0
-  syncfusion_flutter_sliders: ^23.2.7
+  syncfusion_flutter_sliders: ^22.2.8
   flutter_colorpicker: ^1.1.0
-  syncfusion_flutter_datepicker: ^23.2.7
+  syncfusion_flutter_datepicker: ^22.2.8
   logger: ^2.5.0
   cached_network_image: ^3.4.1
   google_maps_flutter: ^2.1.1    #^2.5.3  Last version before Android SDK 30 requirement
