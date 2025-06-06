@@ -17,6 +17,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 
@@ -50,7 +51,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
 
-      getPages: RouteClass.routes,
+      home: const MockUpScreenPage(),
+      // getPages: RouteClass.routes,
       //initialRoute: RouteClass.splashPage,
       // intialRoute: RouteClass.signUpWithEmailPage,
       //initialRoute: RouteClass.signUpWithPhonePage,
@@ -63,7 +65,8 @@ class MyApp extends StatelessWidget {
       //initialRoute: RouteClass.newsBlogPage,
       //initialRoute: RouteClass.myListingsPage,
       //initialRoute: RouteClass.wishlistPage,
-      initialRoute: RouteClass.sellCarPage,
+      // initialRoute: RouteClass.sellCarPage,
+      // initialRoute: RouteClass.mockUpScreenPage,
       //initialRoute: RouteClass.sellCarTwoPage,
       //initialRoute: RouteClass.allMakesPage,
       //initialRoute: RouteClass.specialOfferPage,
@@ -80,7 +83,7 @@ class MyApp extends StatelessWidget {
       //home: const NewsBlogPage()
       //home: const MyListingsPage()
       //home: const WishlistPage()
-      home:  SellCarPage(),
+      // home:  const MockUpScreenPage(),
       //home: SellCarTwoPage()
       //home: AllMakesPage()
       //home: SpecialOffersPage()
