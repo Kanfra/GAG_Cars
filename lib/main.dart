@@ -5,13 +5,15 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
 import 'Routes/routeClass.dart';
 
-void main() async {
+void main()async{
   await dotenv.load(fileName: ".env");
+  await CloudinaryService.init();
   runApp(const MyApp());
   
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
 
-      home: const MockUpScreenPage(),
+      home: SellCarPage(),
       // getPages: RouteClass.routes,
       //initialRoute: RouteClass.splashPage,
       // intialRoute: RouteClass.signUpWithEmailPage,

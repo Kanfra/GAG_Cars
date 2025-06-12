@@ -15,6 +15,8 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithRowComponent.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/vehicleModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
@@ -116,50 +118,38 @@ class _SellCarPageState extends State<SellCarPage> {
   String? selectedModel; // get selected model from here
 
   Future<void> sellCarFunction() async {
-    // send some images to online store and receive it subsequent http string
-    final selectedImageString = [];
-
-    // request for token
-
-    // gather data to body (Table name Vehicle)
-    final Map<String, dynamic> body = {
-        // "user_id": "",
-        // "vehicle_id": "",
-        "vehicle_name": _vehicleNameController.text, //string
-        "vehicle_type": vehicleType, //string
-        "condition": condition,  // string
-        "year": year,  // number
-        "make": selectedMakeAndModelMap?["make"],  //string
-        "model": selectedModel,  //string
-        "location": {
-          "latitude": _currentPosition!.latitude,  // number
-          "longitude": _currentPosition!.longitude, // number
-          // "address":   // string or null
-        },
-        "price": _priceController.text,  // string
-        "steer_position": selectedSteerPosition,  // string
-        "engine_capacity": selectedEngineCapacity,  // string
-        "transmission": selectedTransmission,   // string
-        "color": {
-          "hex": _colorController.text,  // string
-          "name": _colorController.text,  // string
-        },
-        "build_type": selectedBuildType, // string
-        "mileage": selectedMileage, // string
-        "number_of_passengers": _numberOfPassengersController.text,  // number
-        "features": selectedFeatures.map((e)=>e).toList(), // ["string"]
-        "description": _descriptionController.text,  // string
-        "images": selectedImageString.map((e)=>e).toList(), // ["string"]
-        // "created_at": 
-      };
-
-      // create the post request
-
-      // handle http status response and feedback
+    // gather data 
+    final vehicle = VehicleModel(
+      user_id: "",
+      vehicle_id: "",
+      vehicleName:  _vehicleNameController.text, 
+      vehicleType: vehicleType, 
+      condition: condition, 
+      year: year, 
+      make: selectedMakeAndModelMap?["make"], 
+      model: selectedModel!, 
+      location: VehicleLocation(latitude: _currentPosition!.latitude, longitude: _currentPosition!.longitude), 
+      price: _priceController.text, 
+      steerPosition: selectedSteerPosition!, 
+      engineCapacity: selectedEngineCapacity!, 
+      transmission: selectedTransmission!, 
+      color: VehicleColor(hex: _colorController.text, name: _colorController.text), 
+      buildType: selectedBuildType!, 
+      mileage: selectedMileage!, 
+      numberOfPassengers: int.tryParse(_numberOfPassengersController.text) ?? 0, 
+      features: selectedFeatures.map((e)=>e).toList(),
+      description: _descriptionController.text,
+      images: []
+      );
+      // 
+      await VehicleService.uploadVehicle(
+        vehicle: vehicle, 
+        imageFiles: selectedImages.map((e) =>e).toList(),
+        );
   }
 
   // test here
-   void _formValidation() {
+   Future<void> _formValidation()async{
     if (_formKey.currentState!.validate()) {
       // vehicle type test
       if(vehicleType.isEmpty){
@@ -248,6 +238,7 @@ class _SellCarPageState extends State<SellCarPage> {
           return;
       }
       print("All validations passed");
+      await sellCarFunction();
     }
     else{
       showSnackbar(
