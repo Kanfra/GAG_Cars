@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:logger/logger.dart';
 
 class VehicleService {
+  // token needed
   static const String baseUrl = 'https://your-backend-api.com/vehicles';
 
   static Future<void> uploadVehicle({

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({super.key, required this.buttonName, this.onPressed});
+  const CustomButton({
+    super.key, 
+    required this.isLoading,
+    required this.buttonName, 
+    this.onPressed
+    });
 final String buttonName;
+final bool isLoading;
 final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,7 @@ final void Function()? onPressed;
     ),
     elevation: 0, // optional: remove shadow
   ),
-  child: Text(
+  child: isLoading ? CircularProgressIndicator(color: ColorGlobalVariables.maroonColor,) : Text(
    buttonName,
     style: TextStyle(
       fontSize: 18,

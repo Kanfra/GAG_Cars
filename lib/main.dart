@@ -9,6 +9,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudin
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
+import 'Pages/Authentication/Screens/signUpWithEmailPage.dart';
 import 'Routes/routeClass.dart';
 
 void main()async{
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
 
-      home: SellCarPage(),
+      home: SignUpWithEmailPage(),
       // getPages: RouteClass.routes,
       //initialRoute: RouteClass.splashPage,
       // intialRoute: RouteClass.signUpWithEmailPage,
