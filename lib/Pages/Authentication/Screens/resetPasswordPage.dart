@@ -38,7 +38,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                                                                                 SizedBox(height: 50,),
 
-                                                                            CustomButton(buttonName: 'Reset  Password',onPressed: (){},)
+                                                                            CustomButton(buttonName: 'Reset  Password',onPressed: (){}, isLoading: false,)
                         
                 ],),
               ),

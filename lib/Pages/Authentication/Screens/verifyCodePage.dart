@@ -161,7 +161,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                               padding: const EdgeInsets.symmetric(horizontal: 20),
                               child: CustomButton(buttonName: 'Verify Code', onPressed: (){
                                       
-                                     },),
+                                     }, isLoading: false,),
                             )
                   ],
                 ),

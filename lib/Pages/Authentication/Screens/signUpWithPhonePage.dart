@@ -55,7 +55,7 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
                            Get.offNamed(RouteClass.getVerifyCodePage());
 
                     
-                  },),
+                  }, isLoading: false,),
                   
                   SizedBox(height: 20,),
                   

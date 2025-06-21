@@ -51,7 +51,7 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
                                                SizedBox(
                                                 height: 20,
                                                ),
-                  CustomButton(buttonName: 'Sign In', onPressed: (){},),
+                  CustomButton(buttonName: 'Sign In', onPressed: (){}, isLoading: false,),
                   
                   SizedBox(height: 20,),
                   

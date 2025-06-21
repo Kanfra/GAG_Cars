@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
+import 'package:gag_cars_frontend/Utils/utils.dart';
 import 'package:get/get.dart';
 
 
@@ -29,7 +31,27 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
    Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       setState(()=>_isLoading = true);
-      // accessing service here
+      try{
+        final user = await AuthService.signUpWithEmail(
+          name: nameController.text, 
+          email: emailController.text, 
+          password: passwordController.text
+          );
+        // navigate to another page
+        //Get.offNamed(RouteClass.get);
+        showCustomSnackBar(
+          context: context, 
+          message: "Success, Account created successfully!"
+          );
+
+      }catch(e){
+        showCustomSnackBar(
+          context: context,
+          message: "Error, ${e.toString()}"
+          );
+      }finally{
+        setState(()=>_isLoading = false);
+      }
       print("All validations passed");
       //await sellCarFunction();
     }
@@ -130,9 +152,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                     CustomButton(
                       isLoading: _isLoading,
                       buttonName: 'Sign Up', 
-                      onPressed: (){
-                        // 
-                      },
+                      onPressed: _signUp,
                       ),
                     
                     SizedBox(height: 20,),

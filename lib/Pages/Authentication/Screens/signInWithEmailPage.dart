@@ -50,7 +50,7 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
                                                SizedBox(
                                                 height: 20,
                                                ),
-                  CustomButton(buttonName: 'Login', onPressed: (){},),
+                  CustomButton(buttonName: 'Login', onPressed: (){}, isLoading: false,),
                   
                   SizedBox(height: 20,),
                   
