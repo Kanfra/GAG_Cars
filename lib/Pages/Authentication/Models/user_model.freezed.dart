@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'authWithEmailModel.dart';
+part of 'user_model.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,57 +14,60 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-AuthWithEmailModel _$AuthWithEmailModelFromJson(Map<String, dynamic> json) {
-  return _AuthWithEmailModel.fromJson(json);
+UserModel _$UserModelFromJson(Map<String, dynamic> json) {
+  return _UserModel.fromJson(json);
 }
 
 /// @nodoc
-mixin _$AuthWithEmailModel {
+mixin _$UserModel {
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
+  @JsonKey(name: 'phone')
   String? get phoneNumber => throw _privateConstructorUsedError;
+  @JsonKey(name: 'device_name')
+  String get deviceName => throw _privateConstructorUsedError;
   String? get id => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
-  /// Serializes this AuthWithEmailModel to a JSON map.
+  /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of AuthWithEmailModel
+  /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $AuthWithEmailModelCopyWith<AuthWithEmailModel> get copyWith =>
+  $UserModelCopyWith<UserModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $AuthWithEmailModelCopyWith<$Res> {
-  factory $AuthWithEmailModelCopyWith(
-          AuthWithEmailModel value, $Res Function(AuthWithEmailModel) then) =
-      _$AuthWithEmailModelCopyWithImpl<$Res, AuthWithEmailModel>;
+abstract class $UserModelCopyWith<$Res> {
+  factory $UserModelCopyWith(UserModel value, $Res Function(UserModel) then) =
+      _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
   $Res call(
       {String name,
       String email,
       String password,
-      String? phoneNumber,
+      @JsonKey(name: 'phone') String? phoneNumber,
+      @JsonKey(name: 'device_name') String deviceName,
       String? id,
       String? profileImage,
       DateTime? createdAt});
 }
 
 /// @nodoc
-class _$AuthWithEmailModelCopyWithImpl<$Res, $Val extends AuthWithEmailModel>
-    implements $AuthWithEmailModelCopyWith<$Res> {
-  _$AuthWithEmailModelCopyWithImpl(this._value, this._then);
+class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
+    implements $UserModelCopyWith<$Res> {
+  _$UserModelCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AuthWithEmailModel
+  /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -73,6 +76,7 @@ class _$AuthWithEmailModelCopyWithImpl<$Res, $Val extends AuthWithEmailModel>
     Object? email = null,
     Object? password = null,
     Object? phoneNumber = freezed,
+    Object? deviceName = null,
     Object? id = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
@@ -94,6 +98,10 @@ class _$AuthWithEmailModelCopyWithImpl<$Res, $Val extends AuthWithEmailModel>
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
+      deviceName: null == deviceName
+          ? _value.deviceName
+          : deviceName // ignore: cast_nullable_to_non_nullable
+              as String,
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -111,32 +119,33 @@ class _$AuthWithEmailModelCopyWithImpl<$Res, $Val extends AuthWithEmailModel>
 }
 
 /// @nodoc
-abstract class _$$AuthWithEmailModelImplCopyWith<$Res>
-    implements $AuthWithEmailModelCopyWith<$Res> {
-  factory _$$AuthWithEmailModelImplCopyWith(_$AuthWithEmailModelImpl value,
-          $Res Function(_$AuthWithEmailModelImpl) then) =
-      __$$AuthWithEmailModelImplCopyWithImpl<$Res>;
+abstract class _$$UserModelImplCopyWith<$Res>
+    implements $UserModelCopyWith<$Res> {
+  factory _$$UserModelImplCopyWith(
+          _$UserModelImpl value, $Res Function(_$UserModelImpl) then) =
+      __$$UserModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
       {String name,
       String email,
       String password,
-      String? phoneNumber,
+      @JsonKey(name: 'phone') String? phoneNumber,
+      @JsonKey(name: 'device_name') String deviceName,
       String? id,
       String? profileImage,
       DateTime? createdAt});
 }
 
 /// @nodoc
-class __$$AuthWithEmailModelImplCopyWithImpl<$Res>
-    extends _$AuthWithEmailModelCopyWithImpl<$Res, _$AuthWithEmailModelImpl>
-    implements _$$AuthWithEmailModelImplCopyWith<$Res> {
-  __$$AuthWithEmailModelImplCopyWithImpl(_$AuthWithEmailModelImpl _value,
-      $Res Function(_$AuthWithEmailModelImpl) _then)
+class __$$UserModelImplCopyWithImpl<$Res>
+    extends _$UserModelCopyWithImpl<$Res, _$UserModelImpl>
+    implements _$$UserModelImplCopyWith<$Res> {
+  __$$UserModelImplCopyWithImpl(
+      _$UserModelImpl _value, $Res Function(_$UserModelImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AuthWithEmailModel
+  /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -145,11 +154,12 @@ class __$$AuthWithEmailModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? password = null,
     Object? phoneNumber = freezed,
+    Object? deviceName = null,
     Object? id = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
   }) {
-    return _then(_$AuthWithEmailModelImpl(
+    return _then(_$UserModelImpl(
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -166,6 +176,10 @@ class __$$AuthWithEmailModelImplCopyWithImpl<$Res>
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
+      deviceName: null == deviceName
+          ? _value.deviceName
+          : deviceName // ignore: cast_nullable_to_non_nullable
+              as String,
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -184,18 +198,19 @@ class __$$AuthWithEmailModelImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$AuthWithEmailModelImpl implements _AuthWithEmailModel {
-  const _$AuthWithEmailModelImpl(
+class _$UserModelImpl implements _UserModel {
+  const _$UserModelImpl(
       {required this.name,
       required this.email,
       required this.password,
-      this.phoneNumber,
+      @JsonKey(name: 'phone') this.phoneNumber,
+      @JsonKey(name: 'device_name') required this.deviceName,
       this.id,
       this.profileImage,
       this.createdAt});
 
-  factory _$AuthWithEmailModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AuthWithEmailModelImplFromJson(json);
+  factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserModelImplFromJson(json);
 
   @override
   final String name;
@@ -204,7 +219,11 @@ class _$AuthWithEmailModelImpl implements _AuthWithEmailModel {
   @override
   final String password;
   @override
+  @JsonKey(name: 'phone')
   final String? phoneNumber;
+  @override
+  @JsonKey(name: 'device_name')
+  final String deviceName;
   @override
   final String? id;
   @override
@@ -214,20 +233,22 @@ class _$AuthWithEmailModelImpl implements _AuthWithEmailModel {
 
   @override
   String toString() {
-    return 'AuthWithEmailModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, id: $id, profileImage: $profileImage, createdAt: $createdAt)';
+    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, deviceName: $deviceName, id: $id, profileImage: $profileImage, createdAt: $createdAt)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AuthWithEmailModelImpl &&
+            other is _$UserModelImpl &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.password, password) ||
                 other.password == password) &&
             (identical(other.phoneNumber, phoneNumber) ||
                 other.phoneNumber == phoneNumber) &&
+            (identical(other.deviceName, deviceName) ||
+                other.deviceName == deviceName) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.profileImage, profileImage) ||
                 other.profileImage == profileImage) &&
@@ -238,37 +259,37 @@ class _$AuthWithEmailModelImpl implements _AuthWithEmailModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, name, email, password,
-      phoneNumber, id, profileImage, createdAt);
+      phoneNumber, deviceName, id, profileImage, createdAt);
 
-  /// Create a copy of AuthWithEmailModel
+  /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$AuthWithEmailModelImplCopyWith<_$AuthWithEmailModelImpl> get copyWith =>
-      __$$AuthWithEmailModelImplCopyWithImpl<_$AuthWithEmailModelImpl>(
-          this, _$identity);
+  _$$UserModelImplCopyWith<_$UserModelImpl> get copyWith =>
+      __$$UserModelImplCopyWithImpl<_$UserModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$AuthWithEmailModelImplToJson(
+    return _$$UserModelImplToJson(
       this,
     );
   }
 }
 
-abstract class _AuthWithEmailModel implements AuthWithEmailModel {
-  const factory _AuthWithEmailModel(
+abstract class _UserModel implements UserModel {
+  const factory _UserModel(
       {required final String name,
       required final String email,
       required final String password,
-      final String? phoneNumber,
+      @JsonKey(name: 'phone') final String? phoneNumber,
+      @JsonKey(name: 'device_name') required final String deviceName,
       final String? id,
       final String? profileImage,
-      final DateTime? createdAt}) = _$AuthWithEmailModelImpl;
+      final DateTime? createdAt}) = _$UserModelImpl;
 
-  factory _AuthWithEmailModel.fromJson(Map<String, dynamic> json) =
-      _$AuthWithEmailModelImpl.fromJson;
+  factory _UserModel.fromJson(Map<String, dynamic> json) =
+      _$UserModelImpl.fromJson;
 
   @override
   String get name;
@@ -277,7 +298,11 @@ abstract class _AuthWithEmailModel implements AuthWithEmailModel {
   @override
   String get password;
   @override
+  @JsonKey(name: 'phone')
   String? get phoneNumber;
+  @override
+  @JsonKey(name: 'device_name')
+  String get deviceName;
   @override
   String? get id;
   @override
@@ -285,10 +310,10 @@ abstract class _AuthWithEmailModel implements AuthWithEmailModel {
   @override
   DateTime? get createdAt;
 
-  /// Create a copy of AuthWithEmailModel
+  /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AuthWithEmailModelImplCopyWith<_$AuthWithEmailModelImpl> get copyWith =>
+  _$$UserModelImplCopyWith<_$UserModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

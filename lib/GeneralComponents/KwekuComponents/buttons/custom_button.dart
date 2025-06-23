@@ -24,7 +24,7 @@ final void Function()? onPressed;
     ),
     elevation: 0, // optional: remove shadow
   ),
-  child: isLoading ? CircularProgressIndicator(color: ColorGlobalVariables.maroonColor,) : Text(
+  child: isLoading ? CircularProgressIndicator(color: ColorGlobalVariables.whiteColor,) : Text(
    buttonName,
     style: TextStyle(
       fontSize: 18,

@@ -6,6 +6,7 @@ import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_i
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
 import 'package:gag_cars_frontend/Utils/utils.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 
 
@@ -17,6 +18,8 @@ class SignUpWithEmailPage extends StatefulWidget {
 }
 
 class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
+
+  final logger = Logger();
 
   // form validation
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -37,8 +40,9 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
           email: emailController.text, 
           password: passwordController.text
           );
+
         // navigate to another page
-        //Get.offNamed(RouteClass.get);
+        Get.offNamed(RouteClass.getHomePage());
         showCustomSnackBar(
           context: context, 
           message: "Success, Account created successfully!"
@@ -52,8 +56,6 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
       }finally{
         setState(()=>_isLoading = false);
       }
-      print("All validations passed");
-      //await sellCarFunction();
     }
     else{
       
@@ -120,6 +122,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                                   CustomTextField(
                                     controller: passwordController,
                                     hintText: "Password", 
+                                    obscureText: true,
                                     prefixImage: AppIcons.lock_icon,
                                     onChanged: (value)=>{},
                                     validator: (value){
@@ -136,6 +139,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                                   CustomTextField(
                                     controller: confirmPasswordController,
                                     hintText: "Repeat  Password",
+                                    obscureText: true,
                                     prefixImage: AppIcons.lock_icon,
                                     onChanged: (value)=>{},
                                     validator: (value){

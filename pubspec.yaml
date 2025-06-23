@@ -67,6 +67,9 @@ dependencies:
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0
   cloudinary: ^1.2.0
+  device_info_plus: ^11.5.0
+  shared_preferences: ^2.5.3
+  flutter_secure_storage: ^4.2.1
 
   
   

@@ -4,6 +4,7 @@ class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
     this.controller,
+    this.obscureText,
     required this.hintText,
     required this.prefixImage,
     this.validator,
@@ -11,6 +12,7 @@ class CustomTextField extends StatelessWidget {
   });
 
   final String hintText;
+  final bool? obscureText;
   final String prefixImage;
   final TextEditingController? controller;
 
@@ -45,6 +47,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         onChanged: onChanged,
         validator: validator,
+        obscureText: obscureText ?? false,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
           hintText: hintText,
