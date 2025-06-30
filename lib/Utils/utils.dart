@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 import '../GlobalVariables/colorGlobalVariables.dart';
 
 void showCustomSnackBar({
-  required BuildContext context,
-  required String message,
+  BuildContext? context,
+  String? message,
   Color? backgroundColor,
   Color? textColor,
   Duration? duration,
   SnackBarAction? action,
 }) {
-  final scaffoldMessenger = ScaffoldMessenger.of(context);
-
+   // early exit if context is null or invalid
+  if(context == null || !context.mounted) return;
+  try{
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
   // Remove any currently showing snackbars
   scaffoldMessenger.clearSnackBars();
 
   final snackBar = SnackBar(
     content: Text(
-      message,
+      message ?? "An error occured",
       style: TextStyle(color: textColor ?? ColorGlobalVariables.whiteColor),
     ),
     backgroundColor: backgroundColor ?? ColorGlobalVariables.redColor,
@@ -29,4 +31,7 @@ void showCustomSnackBar({
   );
 
   scaffoldMessenger.showSnackBar(snackBar);
+  }catch(e){
+    debugPrint("Failed to show snackbar: $e");
+  }
 }

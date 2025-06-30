@@ -3,9 +3,15 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:logger/logger.dart';
 import 'package:pinput/pinput.dart';
 
 class VerifyCodePage extends StatefulWidget {
@@ -21,19 +27,31 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   late final GlobalKey<FormState> formKey;
  late Timer _timer;
   int _remainingSeconds = 48;
-  
+  bool _isLoading = false;
+  String? _errorMessage;
+  late String _phoneNumber;
+  bool _otpSent = false;
+  late bool _isSignUp;
+  final logger = Logger();
+
   Null get buttonName => null;
   @override
   void initState() {
     super.initState();
-    if (kIsWeb) {
-      BrowserContextMenu.disableContextMenu();
-    }
+    // get phone number from arguments
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+    _phoneNumber = args["phone"] ?? "";
+    _isSignUp = args["isSignUp"] ?? false;
+    logger.i("Phone number parsed: $_phoneNumber and isSignUp parsed: $_isSignUp");
+    if (kIsWeb) BrowserContextMenu.disableContextMenu();
     formKey = GlobalKey<FormState>();
     pinController = TextEditingController();
     focusNode = FocusNode();
+        // automatically send otp when page loads
+        _sendInitialOtp();
         _startCountdown();
   }
+  
   void _startCountdown() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds == 0) {
@@ -46,11 +64,90 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     });
   }
 
+  Future<void> _sendInitialOtp() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try{
+      await AuthService.sendOtp(_phoneNumber);
+      setState(() => _otpSent);
+      showCustomSnackBar(
+      message: "OTP sent to $_phoneNumber",
+      backgroundColor: ColorGlobalVariables.blueColor,
+      );
+    }catch(e){
+      setState(() => _errorMessage = e.toString());
+      showCustomSnackBar(
+        message: "Failed to send OTP: $_errorMessage"
+      );
+    } finally{
+      if(mounted){
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+  Future<void> _verifyCode() async {
+    if(!formKey.currentState!.validate()) return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    
+    try{
+      final authResponse = await AuthService.verifyOtp(
+        phone: _phoneNumber, 
+        otp: pinController.text
+        );
+
+        // handle successful verification
+        if(_isSignUp){
+          // navigate to home page
+          Get.offAllNamed(RouteClass.getHomePage());
+        } else{
+          Get.offAllNamed(RouteClass.getSignUpWithPhonePage());
+        }
+    }catch(e){
+      setState(() => _errorMessage = e.toString());
+      showCustomSnackBar(
+        message: "Verification failed: $_errorMessage"
+        );
+    } finally{
+      if(mounted){
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _resendOtp() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try{
+      await AuthService.sendOtp(_phoneNumber);
+      setState(() {
+        _remainingSeconds = 48;
+        _otpSent = true;
+      });
+      _startCountdown();
+      showCustomSnackBar(message: "OTP resent successfully");
+    }catch(e){
+      setState(() => _errorMessage = e.toString());
+      showCustomSnackBar(message: "Failed to resend OTP: $_errorMessage");
+    } finally{
+      if(mounted){
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   void dispose() {
-    if (kIsWeb) {
-      BrowserContextMenu.enableContextMenu();
-    }
+    _timer.cancel();
+    if (kIsWeb) BrowserContextMenu.enableContextMenu();
     pinController.dispose();
     focusNode.dispose();
     super.dispose();
@@ -102,7 +199,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                           
                     Text('Verify Code',style: TextStyle(fontSize:32, fontWeight: FontWeight.w500 ),),
                     SizedBox(height: 50,),
-                    Pinput(
+                    _isLoading && !_otpSent ? CircularProgressIndicator() : Pinput(
                       controller: pinController,
                       focusNode: focusNode,
                       length: 4,
@@ -120,7 +217,13 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                         border: Border.all(color: Colors.redAccent),
                       ),
                       validator: (value) {
-                        return value == '2222' ? null : 'Incorrect Code';
+                        if(value == null || value.isEmpty){
+                          return "Please enter the code";
+                        }
+                        if(value.length != 4){
+                          return "Code must be 4 digits";
+                        }
+                        return null;
                       },
                       hapticFeedbackType: HapticFeedbackType.lightImpact,
                       onCompleted: (pin) {
@@ -138,30 +241,49 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     //   },
                     //   child: const Text('Validate'),
                     // ),
-                  
-                     RichText(
+                    if(_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: TextExtraSmall(
+                        title: _errorMessage!, 
+                        textColor: ColorGlobalVariables.redColor,
+                        ),
+                    ),
+                    RichText(
                           text: TextSpan(
-                            text: 'Time Remaining :',
+                            text: 'Time Remaining : ',
                             style: TextStyle(color: Colors.black87, fontSize: 16),
                             children: <TextSpan>[
                               TextSpan(
                                 text: '$_remainingSeconds  seconds ',
                                 style: TextStyle(
-                                  color: Color.fromRGBO(159, 16, 16, 1),
+                                  color: _remainingSeconds < 10 ? ColorGlobalVariables.redColor : Color.fromRGBO(159, 16, 16, 1),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                
-                
-                        SizedBox(height: 60,),
+                        const SizedBox(height: 10,),
+                        // button for resendOTP
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: CustomButton(
+                            isLoading: false, 
+                            buttonName: "Resend Code",
+                            backgroundColor: _remainingSeconds == 0 ? Color.fromRGBO(159, 16, 16, 1) : Colors.grey,
+                            onPressed: _remainingSeconds == 0 ? _resendOtp : null,
+                            ),
+                        ),
+                        SizedBox(height: 40,),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 20),
-                              child: CustomButton(buttonName: 'Verify Code', onPressed: (){
-                                      
-                                     }, isLoading: false,),
+                              child: CustomButton(
+                                buttonName: 'Verify Code',
+                                backgroundColor: _remainingSeconds == 0 ? Colors.grey : Color.fromRGBO(159, 16, 16, 1), 
+                                onPressed: _verifyCode, 
+                                     isLoading: _isLoading,
+                                     ),
                             )
                   ],
                 ),
@@ -173,7 +295,17 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
         left: 30,
         child: GestureDetector(
           onTap: (){
-          Get.back();
+            if(_remainingSeconds > 0){
+              Get.defaultDialog(
+                title: "Warning",
+                middleText: "Your OTP is still valid. Are you sure you want to go back?",
+                textConfirm: "Yes",
+                textCancel: "No",
+                onConfirm: () => Get.offAllNamed(RouteClass.getSignUpWithPhonePage())
+              );
+            } else{
+              Get.offAllNamed(RouteClass.getSignUpWithPhonePage());
+            }
           },
           child: Icon(Icons.arrow_back_ios,size: 30,color: Colors.black,)))
        ,

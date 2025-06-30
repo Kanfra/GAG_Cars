@@ -1359,26 +1359,24 @@ class _SellCarPageState extends State<SellCarPage> {
         imageQuality: 85,
       );
 
-      if(pickedFiles != null){
-        setState(() {
-          // combine existing images with new ones
-          selectedImages.addAll(pickedFiles);
-          // ensuring we don't exceed 4 images
-          if(selectedImages.length > 4){
-            selectedImages = selectedImages.sublist(0,4);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: TextSmall(
-                  title: 'Maximum of 4 images allowed', 
-                  fontWeight: FontWeight.w500, 
-                  textColor: ColorGlobalVariables.redColor
-                  )
+      setState(() {
+        // combine existing images with new ones
+        selectedImages.addAll(pickedFiles);
+        // ensuring we don't exceed 4 images
+        if(selectedImages.length > 4){
+          selectedImages = selectedImages.sublist(0,4);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: TextSmall(
+                title: 'Maximum of 4 images allowed', 
+                fontWeight: FontWeight.w500, 
+                textColor: ColorGlobalVariables.redColor
                 )
-            );
-          }
-        });
-      }
-    }catch(e){
+              )
+          );
+        }
+      });
+        }catch(e){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: TextSmall(

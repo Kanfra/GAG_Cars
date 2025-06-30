@@ -204,7 +204,6 @@ class _MessageInputField extends StatelessWidget {
   final VoidCallback onSend;
 
   const _MessageInputField({
-    super.key,
     required this.controller,
     required this.onSend,
   });
@@ -257,7 +256,7 @@ class _MessageInputField extends StatelessWidget {
 class _DateHeader extends StatelessWidget {
   final DateTime date;
 
-  const _DateHeader({super.key, required this.date});
+  const _DateHeader({required this.date});
 
   @override
   Widget build(BuildContext context) {

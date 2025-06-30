@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -39,6 +40,58 @@ class AuthService {
     }
   }
 
+  // Sign up with Phone
+  static Future<AuthResponseModel> signUpWithPhone({
+    required String phone
+  }) async {
+    final logger = Logger();
+    const endpoint = '/otp/send';
+    final url = Uri.parse('$baseApiUrl$endpoint');
+    try{
+      // take the body
+      final body = jsonEncode({
+        "phone": phone,
+      });
+      // check url valid by print out in terminal
+      logger.i('Sending request to $url');
+      // check body valid by print out in terminal
+      logger.t('Request body: $body');
+      // make the api request
+      final response = await http.post(
+        url,
+        headers: {"Content-Type":"application/json"},
+        body: body
+      ).timeout(const Duration(seconds: 10)); // add timeout
+
+      logger.i("Response status: ${response.statusCode}");
+      logger.t("Response body: ${response.body}");
+
+      // check response status
+      if(response.statusCode == 201 || response.statusCode == 200){
+        return AuthResponseModel.fromJson(jsonDecode(response.body));
+      }else{
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData["message"]) ?? "Failed to sign up.";
+      }
+    }on SocketException{
+      logger.e("Network unreachable");
+      throw Exception("No internet connection.");
+    }on TimeoutException{
+      logger.e("Request timed out");
+      throw Exception("Server timeout. Please try again.");
+    }
+    on http.ClientException catch (e) {
+      logger.e("HTTP client error: ${e.message}");
+      throw Exception("Network request failed.");
+    } on FormatException catch (e) {
+      logger.e("Malformed response: $e");
+      throw Exception("Invalid server response.");
+    } catch (e) {
+      logger.e('Unexpected error: $e');
+      throw Exception("Signup failed. Please try again.");
+    }
+  }
+
   // Sign up with email
   static Future<UserModel?> signUpWithEmail({
     required String name,
@@ -57,12 +110,12 @@ class AuthService {
         "name": name,
         "email": email,
         "password": password,
-        if (phoneNumber != null) "phone": phoneNumber, // Note the 'phone' key
+        // if (phoneNumber != null) "phone": phoneNumber, // Note the 'phone' key
         "device_name": deviceName, // Added device name
       });
 
       logger.i('Sending request to $url');
-      logger.i('Request body: $body');
+      logger.t('Request body: $body'); // verbose log for sensitive data
 
       final response = await http.post(
         url,
@@ -71,15 +124,15 @@ class AuthService {
           "Accept": "application/json",
         },
         body: body,
-      );
+      ).timeout(const Duration(seconds: 10));
 
-      logger.d('Response status: ${response.statusCode}');
-      logger.d('Response body: ${response.body}');
+      logger.i('Response status: ${response.statusCode}');
+      logger.t('Response body: ${response.body}');
 
       if (response.statusCode == 201) {
-        return UserModel.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>,
-        );
+        final authResponse = AuthResponseModel.fromJson(jsonDecode(response.body));
+        logger.i("Parsed response: $authResponse");
+        return authResponse.user;
       } else {
         final errorData = jsonDecode(response.body);
         throw Exception(
@@ -115,6 +168,7 @@ class AuthService {
         'password': password,
         'device_name': deviceName,
       });
+      logger.i("body: $body");
       final response = await http.post(
         url,
         headers: {
@@ -124,7 +178,7 @@ class AuthService {
         body: body,
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final authResponse = AuthResponseModel.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>,
         );
@@ -139,14 +193,82 @@ class AuthService {
         return authResponse;
       } else {
         final error = jsonDecode(response.body);
+        logger.e("Login failed: ${error['message']}");
         throw Exception(error['message'] ?? 'Login failed');
       }
     } catch (e) {
+      logger.e("Login failed: $e");
       throw Exception('Login failed: ${e.toString()}');
     }
   }
 
 
+static Future<bool> sendOtp(String phone) async {
+  final logger = Logger();
+  const endpoint = '/otp/send'; 
+  final url = Uri.parse('$baseApiUrl$endpoint');
+  try{
+    final body = jsonEncode({
+        'phone': phone 
+        });
+      logger.i("body: $body");
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        logger.i("OTP sent successfully");
+        return true;
+      } else {
+        logger.e("Failed to send OTP: ${response.body}");
+        throw Exception("Failed to send OTP: ${response.body}");
+        }
+  }catch(e){
+    logger.e("Error sending OTP: $e");
+    throw Exception("Error sending OTP: $e");
+  }
+}
+
+static Future<AuthResponseModel> verifyOtp({
+  required String phone,
+  required String otp,
+}) async {
+  final logger = Logger();
+  const endpoint = '/otp/verify'; 
+  final url = Uri.parse('$baseApiUrl$endpoint');
+  try{
+    final body = jsonEncode({
+        'phone': phone ,
+        'otp': otp
+        });
+      logger.i("body: $body");
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        logger.i("OTP verified successfully: ${response.body}");
+        return AuthResponseModel.fromJson(jsonDecode(response.body));
+      } else {
+        logger.e("Failed to verify OTP: ${response.body}");
+        throw Exception('Failed to verify OTP: ${response.body}');
+      }
+
+  }catch(e){
+    logger.e("Error verifying OTP: $e");
+    throw Exception("Error verifying OTP: $e");
+  }
+}
   // Get stored user
   // static Future<UserModel?> getCurrentUser() async {
   //   final userJson = await _storage.read(key: _userKey);

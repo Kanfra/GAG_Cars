@@ -6,10 +6,12 @@ class CustomButton extends StatelessWidget {
     super.key, 
     required this.isLoading,
     required this.buttonName, 
+    this.backgroundColor,
     this.onPressed
     });
 final String buttonName;
 final bool isLoading;
+final Color? backgroundColor;
 final void Function()? onPressed;
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ final void Function()? onPressed;
                                            ElevatedButton(
   onPressed: onPressed,
   style: ElevatedButton.styleFrom(
-    backgroundColor: Color.fromRGBO(159, 16, 16, 1),
+    backgroundColor: backgroundColor ?? Color.fromRGBO(159, 16, 16, 1),
     minimumSize: Size(double.infinity, 64), // full width, 64 height
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),

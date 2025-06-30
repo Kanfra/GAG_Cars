@@ -17,7 +17,7 @@ class _SplashPageState extends State<SplashPage> {
 
     // Wait 3 seconds and navigate
     Future.delayed(const Duration(seconds: 3), () {
-  Get.offNamed(RouteClass.signUpWithEmailPage);
+  Get.offNamed(RouteClass.signUpWithPhonePage);
     });
   }
 
