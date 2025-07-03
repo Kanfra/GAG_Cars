@@ -23,7 +23,6 @@ class CountryCodeTextField extends StatefulWidget {
 class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
   late Country selectedCountry;
   late TextEditingController _controller;
-  String? _initialCountryCode;
   String? _validationError;
 
   @override
@@ -31,6 +30,7 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
     
+    // Always initialize with Ghana as default
     selectedCountry = Country(
       phoneCode: '233',
       countryCode: 'GH',
@@ -43,12 +43,6 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
       displayNameNoCountryCode: 'Ghana',
       e164Key: '',
     );
-
-    // immediatel notify parent of initial country
-    WidgetsBinding.instance.addPostFrameCallback((_){
-      widget.onCountryChanged?.call(selectedCountry);
-    });
-    
   }
 
   @override
@@ -59,14 +53,23 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
     super.dispose();
   }
 
- 
-
   String? _validateInput(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your phone number';
     }
     
-    return widget.validator?.call(value);
+    // Use the parent validator if provided
+    final parentValidation = widget.validator?.call(value);
+    if (parentValidation != null) {
+      return parentValidation;
+    }
+    
+    // Basic validation - ensure it's digits only
+    if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+      return 'Phone number should contain only digits';
+    }
+    
+    return null;
   }
 
   @override
@@ -101,19 +104,11 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
               FilteringTextInputFormatter.digitsOnly,
             ],
             validator: _validateInput,
-            onChanged: (value) async {
+            onChanged: (value) {
               widget.onPhoneNumberChanged?.call(value);
-              
-              if (value.isNotEmpty) {
-              
-                setState(() {
-                 
-                });
-              } else {
-                setState(() {
-                  _validationError = null;
-                });
-              }
+              setState(() {
+                _validationError = _validateInput(value);
+              });
             },
             decoration: InputDecoration(
               filled: true,
@@ -145,7 +140,7 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
                       ),
                     ),
                     showPhoneCode: true,
-                    favorite: ['GH'],
+                    favorite: ['GH'], // Ghana as favorite
                     onSelect: (Country country) {
                       setState(() {
                         selectedCountry = country;

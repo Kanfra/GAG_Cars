@@ -22,14 +22,16 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 mixin _$UserModel {
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
-  String get password => throw _privateConstructorUsedError;
+  String? get password => throw _privateConstructorUsedError;
   @JsonKey(name: 'phone')
-  String? get phoneNumber => throw _privateConstructorUsedError;
-  @JsonKey(name: 'device_name')
-  String get deviceName => throw _privateConstructorUsedError;
+  String? get phoneNumber =>
+      throw _privateConstructorUsedError; // @JsonKey(name: 'device_name') required String deviceName,
   String? get id => throw _privateConstructorUsedError;
   String? get profileImage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -49,12 +51,12 @@ abstract class $UserModelCopyWith<$Res> {
   $Res call(
       {String name,
       String email,
-      String password,
+      String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
-      @JsonKey(name: 'device_name') String deviceName,
       String? id,
       String? profileImage,
-      DateTime? createdAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -74,12 +76,12 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   $Res call({
     Object? name = null,
     Object? email = null,
-    Object? password = null,
+    Object? password = freezed,
     Object? phoneNumber = freezed,
-    Object? deviceName = null,
     Object? id = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -90,18 +92,14 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      password: null == password
+      password: freezed == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       phoneNumber: freezed == phoneNumber
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      deviceName: null == deviceName
-          ? _value.deviceName
-          : deviceName // ignore: cast_nullable_to_non_nullable
-              as String,
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -113,6 +111,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ) as $Val);
   }
@@ -129,12 +131,12 @@ abstract class _$$UserModelImplCopyWith<$Res>
   $Res call(
       {String name,
       String email,
-      String password,
+      String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
-      @JsonKey(name: 'device_name') String deviceName,
       String? id,
       String? profileImage,
-      DateTime? createdAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -152,12 +154,12 @@ class __$$UserModelImplCopyWithImpl<$Res>
   $Res call({
     Object? name = null,
     Object? email = null,
-    Object? password = null,
+    Object? password = freezed,
     Object? phoneNumber = freezed,
-    Object? deviceName = null,
     Object? id = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$UserModelImpl(
       name: null == name
@@ -168,18 +170,14 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.email
           : email // ignore: cast_nullable_to_non_nullable
               as String,
-      password: null == password
+      password: freezed == password
           ? _value.password
           : password // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       phoneNumber: freezed == phoneNumber
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      deviceName: null == deviceName
-          ? _value.deviceName
-          : deviceName // ignore: cast_nullable_to_non_nullable
-              as String,
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -191,6 +189,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
   }
@@ -204,10 +206,10 @@ class _$UserModelImpl implements _UserModel {
       required this.email,
       required this.password,
       @JsonKey(name: 'phone') this.phoneNumber,
-      @JsonKey(name: 'device_name') required this.deviceName,
       this.id,
       this.profileImage,
-      this.createdAt});
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -217,23 +219,25 @@ class _$UserModelImpl implements _UserModel {
   @override
   final String email;
   @override
-  final String password;
+  final String? password;
   @override
   @JsonKey(name: 'phone')
   final String? phoneNumber;
-  @override
-  @JsonKey(name: 'device_name')
-  final String deviceName;
+// @JsonKey(name: 'device_name') required String deviceName,
   @override
   final String? id;
   @override
   final String? profileImage;
   @override
+  @JsonKey(name: 'created_at')
   final DateTime? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, deviceName: $deviceName, id: $id, profileImage: $profileImage, createdAt: $createdAt)';
+    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, id: $id, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -247,19 +251,19 @@ class _$UserModelImpl implements _UserModel {
                 other.password == password) &&
             (identical(other.phoneNumber, phoneNumber) ||
                 other.phoneNumber == phoneNumber) &&
-            (identical(other.deviceName, deviceName) ||
-                other.deviceName == deviceName) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.profileImage, profileImage) ||
                 other.profileImage == profileImage) &&
             (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt));
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, name, email, password,
-      phoneNumber, deviceName, id, profileImage, createdAt);
+      phoneNumber, id, profileImage, createdAt, updatedAt);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -279,14 +283,15 @@ class _$UserModelImpl implements _UserModel {
 
 abstract class _UserModel implements UserModel {
   const factory _UserModel(
-      {required final String name,
-      required final String email,
-      required final String password,
-      @JsonKey(name: 'phone') final String? phoneNumber,
-      @JsonKey(name: 'device_name') required final String deviceName,
-      final String? id,
-      final String? profileImage,
-      final DateTime? createdAt}) = _$UserModelImpl;
+          {required final String name,
+          required final String email,
+          required final String? password,
+          @JsonKey(name: 'phone') final String? phoneNumber,
+          final String? id,
+          final String? profileImage,
+          @JsonKey(name: 'created_at') final DateTime? createdAt,
+          @JsonKey(name: 'updated_at') final DateTime? updatedAt}) =
+      _$UserModelImpl;
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
@@ -296,19 +301,21 @@ abstract class _UserModel implements UserModel {
   @override
   String get email;
   @override
-  String get password;
+  String? get password;
   @override
   @JsonKey(name: 'phone')
-  String? get phoneNumber;
-  @override
-  @JsonKey(name: 'device_name')
-  String get deviceName;
+  String?
+      get phoneNumber; // @JsonKey(name: 'device_name') required String deviceName,
   @override
   String? get id;
   @override
   String? get profileImage;
   @override
+  @JsonKey(name: 'created_at')
   DateTime? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

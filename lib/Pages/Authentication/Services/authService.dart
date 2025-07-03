@@ -7,11 +7,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/auth_response_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
 
 class AuthService {
   static String get _tokenKey => dotenv.get('TOKEN_KEY');
   static String get _userKey => dotenv.get("USER_KEY");
+
   static final _storage = FlutterSecureStorage();
 
   // Get base URL with error handling
@@ -39,6 +41,88 @@ class AuthService {
       return 'Unknown Device';
     }
   }
+
+  
+  // get stored token
+  static Future<String?> getToken() async {
+    final logger = Logger();
+    try{
+      return await _storage.read(key: _tokenKey);
+    } catch(e){
+      logger.e("Error reading token: $e");
+      return null;
+    }
+  }
+
+  // save token securely
+  static Future<void> saveToken(String token) async {
+    final logger = Logger();
+    try{
+      await _storage.write(key: _tokenKey, value: token);
+    } catch(e){
+      logger.e("Error saving token: $e");
+      throw Exception("Failed to save token");
+    }
+  }
+
+  // delete token (logout)
+  static Future<void> deleteToken() async {
+    final logger = Logger();
+    try {
+      await _storage.delete(key: _tokenKey);
+    } catch (e) {
+      logger.e('Error deleting token: $e');
+      throw Exception('Failed to delete token');
+    }
+  }
+
+  // check if token is valid and not expired
+  static bool _isTokenValid(String token){
+    final logger = Logger();
+    try{
+      if(JwtDecoder.isExpired(token)){
+        logger.e("Token is expired");
+        return false;
+      }
+      return true;
+    } catch(e){
+      logger.e("Token validation error: $e");
+      return false;
+    }
+  }
+  static Future<bool> isAuthenticated() async {
+    final logger = Logger();
+    try{
+      final token = await getToken();
+      if(token == null) return false;
+      return _isTokenValid(token);
+    } catch(e){
+      // if any error occurs, treat as unauthenticated
+      logger.e("Auth check error: $e");
+      return false;
+    }
+  }
+
+  //  // Get token expiration date
+  // static DateTime? getTokenExpiration(String token) {
+  //   try {
+  //     return JwtDecoder.getExpirationDate(token);
+  //   } catch (e) {
+  //     print('Error getting token expiration: $e');
+  //     return null;
+  //   }
+  // }
+
+  // // Get user ID from token
+  // static String? getUserId(String token) {
+  //   try {
+  //     final payload = JwtDecoder.decode(token);
+  //     return payload['sub'] ?? payload['userId'];
+  //   } catch (e) {
+  //     print('Error getting user ID from token: $e');
+  //     return null;
+  //   }
+  // }
 
   // Sign up with Phone
   static Future<AuthResponseModel> signUpWithPhone({
@@ -93,7 +177,7 @@ class AuthService {
   }
 
   // Sign up with email
-  static Future<UserModel?> signUpWithEmail({
+  static Future<AuthResponseModel?> signUpWithEmail({
     required String name,
     required String email,
     required String password,
@@ -130,11 +214,13 @@ class AuthService {
       logger.t('Response body: ${response.body}');
 
       if (response.statusCode == 201) {
-        final authResponse = AuthResponseModel.fromJson(jsonDecode(response.body));
+        final responseData = jsonDecode(response.body);
+        final authResponse = AuthResponseModel.fromJson(responseData);
         logger.i("Parsed response: $authResponse");
-        return authResponse.user;
+        return authResponse;
       } else {
         final errorData = jsonDecode(response.body);
+        logger.e("Failed to sign up: ${response.statusCode}, response body: ${response.body}");
         throw Exception(
           errorData['message'] ?? 'Failed to sign up: ${response.statusCode}',
         );
@@ -203,20 +289,23 @@ class AuthService {
   }
 
 
-static Future<bool> sendOtp(String phone) async {
+static Future<bool> sendOtp(String phone, String email, String token) async {
   final logger = Logger();
   const endpoint = '/otp/send'; 
   final url = Uri.parse('$baseApiUrl$endpoint');
   try{
     final body = jsonEncode({
-        'phone': phone 
+        'phone': phone,
+        'email': email
         });
       logger.i("body: $body");
+      logger.i("token: $token");
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
         },
         body: body,
       );
@@ -237,10 +326,12 @@ static Future<bool> sendOtp(String phone) async {
 static Future<AuthResponseModel> verifyOtp({
   required String phone,
   required String otp,
+  required String? token,
 }) async {
   final logger = Logger();
   const endpoint = '/otp/verify'; 
   final url = Uri.parse('$baseApiUrl$endpoint');
+  const storage = FlutterSecureStorage();
   try{
     final body = jsonEncode({
         'phone': phone ,
@@ -257,6 +348,11 @@ static Future<AuthResponseModel> verifyOtp({
       );
 
       if (response.statusCode == 200) {
+        // store token securely
+        if(token != null){
+          await storage.write(key: 'auth_token', value: token);
+          logger.i("Auth token stored securely");
+        }
         logger.i("OTP verified successfully: ${response.body}");
         return AuthResponseModel.fromJson(jsonDecode(response.body));
       } else {
@@ -269,6 +365,8 @@ static Future<AuthResponseModel> verifyOtp({
     throw Exception("Error verifying OTP: $e");
   }
 }
+ 
+ 
   // Get stored user
   // static Future<UserModel?> getCurrentUser() async {
   //   final userJson = await _storage.read(key: _userKey);

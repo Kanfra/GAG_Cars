@@ -8,9 +8,9 @@ part 'auth_response_model.g.dart';
 @freezed
 class AuthResponseModel with _$AuthResponseModel {
   const factory AuthResponseModel({
-    required String token,
+    String? token,
     required UserModel user,  // Now using your actual UserModel
-    @JsonKey(name: 'device_name') String? deviceName,
+    // @JsonKey(name: 'device_name') String? deviceName,
   }) = _AuthResponseModel;
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>

@@ -121,7 +121,7 @@ class RouteClass {
     GetPage(page: () => const SignInWithEmailPage(), name: signInWithEmailPage, transition: Transition.noTransition),
     GetPage(page: () => const SignInWithPhonePage(), name: signInWithPhonePage, transition: Transition.noTransition),
     GetPage(page: () => const SplashPage(), name: splashPage, transition: Transition.noTransition),
-    GetPage(page: () => const VerifyCodePage(), name: verifyCodePage, transition: Transition.noTransition),
+    GetPage(page: () => VerifyCodePage(allJson: Get.arguments ?? {}), name: verifyCodePage, transition: Transition.noTransition),
     GetPage(page: () => const ForgotPasswordPage(), name: forgotPasswordPage, transition: Transition.noTransition),
     GetPage(page: () => const ResetPasswordPage(), name: resetPasswordPage, transition: Transition.noTransition),
 

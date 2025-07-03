@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
 import 'package:get/get.dart';
@@ -14,11 +15,22 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
+    _checkAuthAndNavigate();
+  }
 
-    // Wait 3 seconds and navigate
-    Future.delayed(const Duration(seconds: 3), () {
-  Get.offNamed(RouteClass.signUpWithPhonePage);
-    });
+  Future<void> _checkAuthAndNavigate() async {
+    // wait 3 seconds for splash screen
+    await Future.delayed(const Duration(seconds: 3));
+
+    // check authenticated status
+    final isAuthenticated = await AuthService.isAuthenticated();
+
+    // naviagate based on auth status
+    if(isAuthenticated){
+     Get.offNamed(RouteClass.homePage); 
+    } else{
+      Get.offNamed(RouteClass.signUpWithPhonePage);
+    }
   }
 
   @override

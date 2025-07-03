@@ -20,11 +20,8 @@ AuthResponseModel _$AuthResponseModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AuthResponseModel {
-  String get token => throw _privateConstructorUsedError;
-  UserModel get user =>
-      throw _privateConstructorUsedError; // Now using your actual UserModel
-  @JsonKey(name: 'device_name')
-  String? get deviceName => throw _privateConstructorUsedError;
+  String? get token => throw _privateConstructorUsedError;
+  UserModel get user => throw _privateConstructorUsedError;
 
   /// Serializes this AuthResponseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,10 +39,7 @@ abstract class $AuthResponseModelCopyWith<$Res> {
           AuthResponseModel value, $Res Function(AuthResponseModel) then) =
       _$AuthResponseModelCopyWithImpl<$Res, AuthResponseModel>;
   @useResult
-  $Res call(
-      {String token,
-      UserModel user,
-      @JsonKey(name: 'device_name') String? deviceName});
+  $Res call({String? token, UserModel user});
 
   $UserModelCopyWith<$Res> get user;
 }
@@ -65,23 +59,18 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? token = null,
+    Object? token = freezed,
     Object? user = null,
-    Object? deviceName = freezed,
   }) {
     return _then(_value.copyWith(
-      token: null == token
+      token: freezed == token
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as UserModel,
-      deviceName: freezed == deviceName
-          ? _value.deviceName
-          : deviceName // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 
@@ -104,10 +93,7 @@ abstract class _$$AuthResponseModelImplCopyWith<$Res>
       __$$AuthResponseModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String token,
-      UserModel user,
-      @JsonKey(name: 'device_name') String? deviceName});
+  $Res call({String? token, UserModel user});
 
   @override
   $UserModelCopyWith<$Res> get user;
@@ -126,23 +112,18 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? token = null,
+    Object? token = freezed,
     Object? user = null,
-    Object? deviceName = freezed,
   }) {
     return _then(_$AuthResponseModelImpl(
-      token: null == token
+      token: freezed == token
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       user: null == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as UserModel,
-      deviceName: freezed == deviceName
-          ? _value.deviceName
-          : deviceName // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -150,26 +131,19 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$AuthResponseModelImpl implements _AuthResponseModel {
-  const _$AuthResponseModelImpl(
-      {required this.token,
-      required this.user,
-      @JsonKey(name: 'device_name') this.deviceName});
+  const _$AuthResponseModelImpl({this.token, required this.user});
 
   factory _$AuthResponseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AuthResponseModelImplFromJson(json);
 
   @override
-  final String token;
+  final String? token;
   @override
   final UserModel user;
-// Now using your actual UserModel
-  @override
-  @JsonKey(name: 'device_name')
-  final String? deviceName;
 
   @override
   String toString() {
-    return 'AuthResponseModel(token: $token, user: $user, deviceName: $deviceName)';
+    return 'AuthResponseModel(token: $token, user: $user)';
   }
 
   @override
@@ -178,14 +152,12 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
         (other.runtimeType == runtimeType &&
             other is _$AuthResponseModelImpl &&
             (identical(other.token, token) || other.token == token) &&
-            (identical(other.user, user) || other.user == user) &&
-            (identical(other.deviceName, deviceName) ||
-                other.deviceName == deviceName));
+            (identical(other.user, user) || other.user == user));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, token, user, deviceName);
+  int get hashCode => Object.hash(runtimeType, token, user);
 
   /// Create a copy of AuthResponseModel
   /// with the given fields replaced by the non-null parameter values.
@@ -206,21 +178,16 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
 
 abstract class _AuthResponseModel implements AuthResponseModel {
   const factory _AuthResponseModel(
-          {required final String token,
-          required final UserModel user,
-          @JsonKey(name: 'device_name') final String? deviceName}) =
-      _$AuthResponseModelImpl;
+      {final String? token,
+      required final UserModel user}) = _$AuthResponseModelImpl;
 
   factory _AuthResponseModel.fromJson(Map<String, dynamic> json) =
       _$AuthResponseModelImpl.fromJson;
 
   @override
-  String get token;
+  String? get token;
   @override
-  UserModel get user; // Now using your actual UserModel
-  @override
-  @JsonKey(name: 'device_name')
-  String? get deviceName;
+  UserModel get user;
 
   /// Create a copy of AuthResponseModel
   /// with the given fields replaced by the non-null parameter values.

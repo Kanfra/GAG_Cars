@@ -15,7 +15,11 @@ import 'package:logger/logger.dart';
 import 'package:pinput/pinput.dart';
 
 class VerifyCodePage extends StatefulWidget {
-  const VerifyCodePage({super.key});
+  final Map<String, dynamic> allJson;
+  const VerifyCodePage({
+    super.key,
+    required this.allJson,
+    });
 
   @override
   State<VerifyCodePage> createState() => _VerifyCodePageState();
@@ -29,9 +33,11 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   int _remainingSeconds = 48;
   bool _isLoading = false;
   String? _errorMessage;
-  late String _phoneNumber;
   bool _otpSent = false;
+  late String _phoneNumber;
   late bool _isSignUp;
+  late String _token;
+  late String _email;
   final logger = Logger();
 
   Null get buttonName => null;
@@ -42,7 +48,9 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     final args = Get.arguments as Map<String, dynamic>? ?? {};
     _phoneNumber = args["phone"] ?? "";
     _isSignUp = args["isSignUp"] ?? false;
-    logger.i("Phone number parsed: $_phoneNumber and isSignUp parsed: $_isSignUp");
+    _email = args["email"] ?? "";
+    _token = args["token"] ?? "";
+    logger.i("Phone number parsed: $_phoneNumber, email: $_email, token: $_token, isSignUp parsed: $_isSignUp");
     if (kIsWeb) BrowserContextMenu.disableContextMenu();
     formKey = GlobalKey<FormState>();
     pinController = TextEditingController();
@@ -71,7 +79,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     });
 
     try{
-      await AuthService.sendOtp(_phoneNumber);
+      await AuthService.sendOtp(_phoneNumber, _email, _token);
       setState(() => _otpSent);
       showCustomSnackBar(
       message: "OTP sent to $_phoneNumber",
@@ -98,7 +106,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     try{
       final authResponse = await AuthService.verifyOtp(
         phone: _phoneNumber, 
-        otp: pinController.text
+        otp: pinController.text, token: _token
         );
 
         // handle successful verification
@@ -127,7 +135,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     });
 
     try{
-      await AuthService.sendOtp(_phoneNumber);
+      await AuthService.sendOtp(_phoneNumber, _email, _token);
       setState(() {
         _remainingSeconds = 48;
         _otpSent = true;

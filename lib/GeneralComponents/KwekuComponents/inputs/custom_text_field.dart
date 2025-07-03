@@ -7,6 +7,8 @@ class CustomTextField extends StatelessWidget {
     this.obscureText,
     required this.hintText,
     required this.prefixImage,
+    this.suffixIcon,
+    this.onSuffixIconPressed,
     this.validator,
     this.onChanged,
   });
@@ -14,12 +16,10 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final bool? obscureText;
   final String prefixImage;
+  final IconData? suffixIcon; // Add this for suffix icon
+  final VoidCallback? onSuffixIconPressed; // Add this for click handler
   final TextEditingController? controller;
-
-  /// Optional validator for using in a `Form`
   final String? Function(String?)? validator;
-
-  /// Optional onChanged callback
   final void Function(String)? onChanged;
 
   @override
@@ -67,6 +67,13 @@ class CustomTextField extends StatelessWidget {
               height: 24,
             ),
           ),
+          suffixIcon: suffixIcon != null
+              ? IconButton(
+                  icon: Icon(suffixIcon),
+                  onPressed: onSuffixIconPressed,
+                  color: Colors.grey[600],
+                )
+              : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,

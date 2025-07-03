@@ -1,4 +1,7 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/country_code_text_field.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
@@ -25,11 +28,29 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool _isLoading = false;
+  String? _errorMessage;
+  String _countryCode = "+233";
+  String _fullPhoneNumber = "";
+  String _token = "";
+  bool obscureText = true;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+
+   bool _isValidPhoneNumber(String phone){
+    final phoneRegex = RegExp(r'^[0-9]{9,15}$');
+    return phoneRegex.hasMatch(phone);
+  }
+
+  void _onCountryChanged(Country country){
+    setState(() {
+      _countryCode = "+${country.phoneCode}";
+    });
+  }
+
 
    Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -41,24 +62,37 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
           password: passwordController.text
           );
 
-        // navigate to another page
-        Get.offNamed(RouteClass.getHomePage());
-        showCustomSnackBar(
-          context: context, 
-          message: "Success, Account created successfully!"
+        if(context.mounted){
+          // eg +2335205....
+          _fullPhoneNumber = "$_countryCode${phoneController.text}";
+          // navigate to verifyCodePage
+          Get.offNamed(
+            RouteClass.getVerifyCodePage(),
+            arguments: {
+              'phone': _fullPhoneNumber,
+              'email': user?.user.email,
+              'token': user?.token,
+              'isSignUp': true
+            }
           );
+        //   showCustomSnackBar(
+        //     context: context, 
+        //     backgroundColor: ColorGlobalVariables.blueColor,
+        //     message: "Success, Account created successfully!"
+        //     );
+         }
 
       }catch(e){
-        showCustomSnackBar(
+        if(context.mounted){
+          logger.e("Error, ${e.toString()}");
+          showCustomSnackBar(
           context: context,
           message: "Error, ${e.toString()}"
           );
+        }
       }finally{
         setState(()=>_isLoading = false);
       }
-    }
-    else{
-      
     }
   }
 
@@ -118,17 +152,45 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                                      SizedBox(
                                   height: 14,
                                 ),
+                                // phone
+                                CountryCodeTextField(
+                                controller: phoneController,
+                                onCountryChanged: _onCountryChanged,
+                                onPhoneNumberChanged: (value){
+                                  // clear error when user types
+                                  if(_errorMessage != null && value.isNotEmpty){
+                                    setState(() => _errorMessage = null);
+                                  }
+                                },
+                                validator: (value){
+                                  if(value == null || value.isEmpty){
+                                    return 'Please enter your phone number';
+                                  }
+                                  if(!_isValidPhoneNumber(value)){
+                                    return 'Please enter a valid phone number (9-15 digits)';
+                                  }
+                                  return null;
+                                },
+                               ),
+                                const SizedBox(
+                                  height: 14,
+                                ),
                                   // password
                                   CustomTextField(
                                     controller: passwordController,
                                     hintText: "Password", 
-                                    obscureText: true,
+                                    obscureText: obscureText,
+                                    suffixIcon: obscureText ? Icons.visibility_off : Icons.visibility,
                                     prefixImage: AppIcons.lock_icon,
                                     onChanged: (value)=>{},
                                     validator: (value){
                                       if(value == null || value.isEmpty){return "Please enter password";}
-                                      if(value.length < 6){return "Password must be at least 6 characters";}
+                                      if(value.length < 8){return "Password must be at least 8 characters";}
                                       return null;
+                                    },
+                                    onSuffixIconPressed: (){
+                                      obscureText = !obscureText;
+                                      setState(() {});
                                     },
                                     ),
                                              SizedBox(
@@ -139,13 +201,18 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                                   CustomTextField(
                                     controller: confirmPasswordController,
                                     hintText: "Repeat  Password",
-                                    obscureText: true,
+                                    suffixIcon: obscureText ? Icons.visibility_off : Icons.visibility,
+                                    obscureText: obscureText,
                                     prefixImage: AppIcons.lock_icon,
                                     onChanged: (value)=>{},
                                     validator: (value){
                                       if(value == null || value.isEmpty){return "Please confirm password";}
                                       if(value != passwordController.text){return "Passwords don't match";}
                                       return null;
+                                    },
+                                     onSuffixIconPressed: (){
+                                      obscureText = !obscureText;
+                                      setState(() {});
                                     },
                                     ),
                     
