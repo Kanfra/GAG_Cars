@@ -55,21 +55,21 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
    Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       setState(()=>_isLoading = true);
+      _fullPhoneNumber = "$_countryCode${phoneController.text}";
       try{
         final user = await AuthService.signUpWithEmail(
           name: nameController.text, 
           email: emailController.text, 
-          password: passwordController.text
+          password: passwordController.text,
+          phone: _fullPhoneNumber,
           );
 
         if(context.mounted){
-          // eg +2335205....
-          _fullPhoneNumber = "$_countryCode${phoneController.text}";
           // navigate to verifyCodePage
           Get.offNamed(
             RouteClass.getVerifyCodePage(),
             arguments: {
-              'phone': _fullPhoneNumber,
+              'phone': user?.user.phoneNumber,
               'email': user?.user.email,
               'token': user?.token,
               'isSignUp': true

@@ -181,7 +181,7 @@ class AuthService {
     required String name,
     required String email,
     required String password,
-    String? phoneNumber,
+    required String phone,
   }) async {
     final logger = Logger();
     const endpoint = '/sanctum/register'; 
@@ -194,7 +194,7 @@ class AuthService {
         "name": name,
         "email": email,
         "password": password,
-        // if (phoneNumber != null) "phone": phoneNumber, // Note the 'phone' key
+        "phone": phone,
         "device_name": deviceName, // Added device name
       });
 
