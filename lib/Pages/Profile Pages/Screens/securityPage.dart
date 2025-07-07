@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/customListTile.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class SecurityPage extends StatefulWidget {
@@ -18,18 +22,13 @@ class _SecurityPageState extends State<SecurityPage> {
               leadingIconData: Icons.arrow_back_ios_new_outlined,
               titleText: "Security",
           ),
-          body:  Padding(
-            padding: const EdgeInsets.only(left: 25, right: 25,top: 20),
-            child: GestureDetector(
-              child: const Row(
-                children: [
-                  Icon(Icons.lock_outline_sharp,),
-                  SizedBox(width: 20,),
-                  Text("Change Password",style: TextStyle(fontSize: 18),)
-                ],
-              ),
-            ),
-          ),
+          body:  CustomListTile(leadingIcon: Icons.lock_outline_sharp, title: "Change Password", isTrailingIconRequired: false,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getSettingsOnePage(),
+        );
+      }
+      ),
         )
     );
   }

@@ -30,7 +30,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   late final FocusNode focusNode;
   late final GlobalKey<FormState> formKey;
  late Timer _timer;
-  int _remainingSeconds = 48;
+  int _remainingSeconds = 60;
   bool _isLoading = false;
   String? _errorMessage;
   bool _otpSent = false;

@@ -1,3 +1,4 @@
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:get/get.dart';
@@ -31,7 +32,7 @@ import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/promotionsPage.d
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/securityOnePage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/securityPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settingsOnePage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/myListingsPage.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/myListingPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settingsPage.dart';
 
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
@@ -54,24 +55,25 @@ class RouteClass {
   static String securityOnePage = "/security-one-page";
   static String promotionsPage = "/promotions-page";
   static String profileUpdatePage = "/profile-update-page";
-  static String myListingsPage = "/my-listings-page";
+  static String myListingPage = "/my-listing-page";
   static String helpCenterPage = "/help-center-page";
   static String getVerifiedPage = "/get-verified-page";
   static String dealerLoginPage = "/dealer-login-page";
   static String customerServicePage = "/customer-service-page";
 
   // Homepage
-  static String homePage = "/home";
-  static String detailPage = "/detail";
-  static String newsBlogPage = "/news-blog";
-  static String mainNewsPage = "/main-news";
-  static String wishlistPage = "/wishlist";
-  static String sellCarPage = "/sell-car";
-  static String sellCarTwoPage = "/sell-car-two";
-  static String allMakesPage = "/all-makes";
-  static String specialOfferPage = "/special-offer";
-  static String notificationsPage = "/notifications";
-  static String searchPage = "/search";
+  static String homePage = "/home-page";
+  static String detailPage = "/detail-page";
+  static String newsBlogPage = "/news-blog-page";
+  static String mainNewsPage = "/main-news-page";
+  static String myListingsPage = "/my-listings-page";
+  static String wishlistPage = "/wishlist-page";
+  static String sellCarPage = "/sell-car-page";
+  static String sellCarTwoPage = "/sell-car-two-page";
+  static String allMakesPage = "/all-makes-page";
+  static String specialOfferPage = "/special-offer-page";
+  static String notificationsPage = "/notifications-page";
+  static String searchPage = "/search-page";
 
   //message
   static String messagePage = "/messagePage";
@@ -93,7 +95,7 @@ class RouteClass {
   static String getSecurityOnePage() => securityOnePage;
   static String getPromotionsPage() => promotionsPage;
   static String getProfileUpdatePage() => profileUpdatePage;
-  static String getMyListingsPage() => myListingsPage;
+  static String getMyListingPage() => myListingPage;
   static String getHelpCenterPage() => helpCenterPage;
   static String getGetVerifiedPage() => getVerifiedPage;
   static String getDealerLoginPage() => dealerLoginPage;
@@ -104,6 +106,7 @@ class RouteClass {
   static String getNewsBlogPage() => newsBlogPage;
   static String getMainNewsPage() => mainNewsPage;
   static String getWishlistPage() => wishlistPage;
+  static String getMyListingsPage() => myListingsPage;
   static String getSellCarPage() => sellCarPage;
   static String getSellCarTwoPage() => sellCarTwoPage;
   static String getAllMakesPage() => allMakesPage;
@@ -131,7 +134,7 @@ class RouteClass {
     GetPage(page: () => const SecurityPage(), name: securityPage, transition: Transition.noTransition),
     GetPage(page: () => const SecurityOnePage(), name: securityOnePage, transition: Transition.noTransition),
     GetPage(page: () => const PromotionsPage(), name: promotionsPage, transition: Transition.noTransition),
-    GetPage(page: () => const MyListingPage(), name: myListingsPage, transition: Transition.noTransition),
+    GetPage(page: () => const MyListingPage(), name: myListingPage, transition: Transition.noTransition),
     GetPage(page: () => const HelpCenterPage(), name: helpCenterPage, transition: Transition.noTransition),
     GetPage(page: () => const GetVerifiedPage(), name: getVerifiedPage, transition: Transition.noTransition),
     GetPage(page: () => const DealerLoginPage(), name: dealerLoginPage, transition: Transition.noTransition),
@@ -144,6 +147,7 @@ class RouteClass {
     GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
     GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),
     GetPage(page: () => const SellCarPage(), name: sellCarPage, transition: Transition.noTransition),
+    GetPage(page: () => const MyListingsPage(), name: myListingsPage, transition: Transition.noTransition),
     GetPage(page: () => const SellCarTwoPage(), name: sellCarTwoPage, transition: Transition.noTransition),
     GetPage(page: () => const AllMakesPage(), name: allMakesPage, transition: Transition.noTransition),
     GetPage(page: () => const SpecialOffersPage(), name: specialOfferPage, transition: Transition.noTransition),

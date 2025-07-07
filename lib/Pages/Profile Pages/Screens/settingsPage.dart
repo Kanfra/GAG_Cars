@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/customRow.dart';
+import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/customListTile.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 
@@ -54,6 +57,7 @@ class _SettingsState extends State<SettingsPage> {
             const Text("joined: 1st January 2025",
                 style: TextStyle(fontSize: 10)),
             const SizedBox(height: 10),
+            // get verified button
             TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
@@ -77,12 +81,48 @@ class _SettingsState extends State<SettingsPage> {
         ),
       ),
       const SizedBox(height: 50),
-      const CustomRow(icon: Icons.perm_identity, text: "Profile"),
-      const CustomRow(icon: Icons.list_alt_rounded, text: "My Listings"),
-      const CustomRow(icon: Icons.shield_outlined, text: "Security"),
-      const CustomRow(icon: Icons.logout_rounded, text: "Dealer Login"),
-      const CustomRow(icon: Icons.help_outline, text: "Help"),
-      const CustomRow(icon: Icons.settings_outlined, text: "Settings"),
+      CustomListTile(leadingIcon: Icons.perm_identity, title: "Profile", isTrailingIconRequired: true,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getProfileUpdatePage(),
+        );
+      }
+      ),
+      CustomListTile(leadingIcon: Icons.list_alt_rounded, title: "My Listings", isTrailingIconRequired: true,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getMyListingPage(),
+        );
+      },
+      ),
+      CustomListTile(leadingIcon: Icons.shield_outlined, title: "Security", isTrailingIconRequired: true,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getSecurityPage(),
+        );
+      },
+      ),
+      CustomListTile(leadingIcon: Icons.logout_rounded, title: "Dealer Login", isTrailingIconRequired: true,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getDealerLoginPage(),
+        );
+      },
+      ),
+      CustomListTile(leadingIcon: Icons.help_outline, title: "Help", isTrailingIconRequired: true,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getHelpCenterPage(),
+        );
+      },
+      ),
+      CustomListTile(leadingIcon: Icons.settings_outlined, title: "Settings", isTrailingIconRequired: true,
+      onTap: (){
+        Get.toNamed(
+          RouteClass.getSettingsOnePage(),
+        );
+      },
+      ),
       const SizedBox(height: 70),
       const Row(
         mainAxisAlignment: MainAxisAlignment.center,
