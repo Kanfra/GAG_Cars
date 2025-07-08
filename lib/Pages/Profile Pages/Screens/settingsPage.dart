@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/customListTile.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
@@ -19,13 +22,17 @@ class _SettingsState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return  Scaffold(
       appBar: CustomAppbar(
-          onLeadingIconClickFunction: (){},
+          onLeadingIconClickFunction: (){
+            Get.back();
+          },
           isLeadingWidgetExist: true,
           leadingIconData: Icons.arrow_back_ios_new_outlined,
           titleText: "",
           centerTitle: true,
            actions: [
-             IconButton(onPressed: (){},
+             IconButton(onPressed: (){
+              Get.toNamed(RouteClass.notificationsPage);
+             },
                  icon: const Icon( Icons.notifications_none_outlined,color: ColorGlobalVariables.blackColor,)
              )
            ],
@@ -40,23 +47,30 @@ class _SettingsState extends State<SettingsPage> {
       Center(
         child: Column(
           children: [
-            CircleAvatar(
-              backgroundColor: ColorGlobalVariables.whiteColor,
-              radius: 60,
-              child: ClipOval(
-                child: Image.asset(
-                  "assets/images/gag_logo_red.png",
-                  fit: BoxFit.contain,
-                ),
+            // profile image
+            CustomImage(
+              imagePath: "assets/images/gordon_image_temporary.png", 
+              isAssetImage: true, 
+              imageHeight: 115,
+              imageWidth: 115,
+              imageBorderRadius: 80,
+              isImageBorderRadiusRequired: true,
               ),
-            ),
             const SizedBox(height: 10),
-            const Text("Gordon Auto Garage",
-                style:
-                TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-            const Text("joined: 1st January 2025",
-                style: TextStyle(fontSize: 10)),
-            const SizedBox(height: 10),
+            // profile name
+            TextSmall(
+              title: "Gordon Auto Garage", 
+              fontWeight: FontWeight.w500, 
+              overflow: TextOverflow.ellipsis,
+              textColor: ColorGlobalVariables.blackColor,
+              ),
+            const SizedBox(height: 2,),
+            // date
+            TextExtraSmall(
+              title: "joined: 1st January 2025", 
+              textColor: ColorGlobalVariables.blackColor
+              ),
+            const SizedBox(height: 8,),
             // get verified button
             TextButton(
               onPressed: () {},

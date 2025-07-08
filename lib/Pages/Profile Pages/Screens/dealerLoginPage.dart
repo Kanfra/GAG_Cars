@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
 import '../../../GeneralComponents/EdemComponents/TextFormFields/CustomBorderTextField.dart';
@@ -23,7 +25,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     return SafeArea(
         child: Scaffold(
           appBar: CustomAppbar(
-              onLeadingIconClickFunction: (){},
+              onLeadingIconClickFunction: (){
+                Get.back();
+              },
               isLeadingWidgetExist: true,
               leadingIconData: Icons.arrow_back_ios_new_outlined,
               titleText: "Dealer Login",

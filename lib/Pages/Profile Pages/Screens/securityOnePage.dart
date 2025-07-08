@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
 import '../../../GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
@@ -21,7 +23,9 @@ class _SecurityOnePageState extends State<SecurityOnePage> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: CustomAppbar(
-          onLeadingIconClickFunction: () {},
+          onLeadingIconClickFunction: () {
+            Get.back();
+          },
           isLeadingWidgetExist: true,
           leadingIconData: Icons.arrow_back_ios_new_outlined,
           titleText: "Security",

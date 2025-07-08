@@ -4,6 +4,8 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedi
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
@@ -18,7 +20,9 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: CustomAppbar(
-        onLeadingIconClickFunction: (){}, 
+        onLeadingIconClickFunction: (){
+          Get.back();
+        }, 
         isLeadingWidgetExist: ColorGlobalVariables.trueValue,
         leadingIconData: Icons.arrow_back_ios, 
         appbarBackgroundColor: ColorGlobalVariables.whiteColor,

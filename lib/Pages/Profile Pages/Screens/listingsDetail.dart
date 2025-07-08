@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
@@ -89,7 +91,9 @@ class _ListingDetailPageState extends State<ListingDetailPage> {
     return SafeArea(
       child: Scaffold(
         appBar: CustomAppbar(
-          onLeadingIconClickFunction: () {},
+          onLeadingIconClickFunction: () {
+            Get.back();
+          },
           isLeadingWidgetExist: true,
           leadingIconData: Icons.arrow_back_ios_new_outlined,
           titleText: car["name"] ?? "Car Details",

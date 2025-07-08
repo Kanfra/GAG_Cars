@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/sizeGlobalVariables.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 
@@ -19,7 +21,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-          appBar: CustomAppbar(onLeadingIconClickFunction: (){},
+          appBar: CustomAppbar(onLeadingIconClickFunction: (){
+            Get.back();
+          },
               isLeadingWidgetExist: true,
               leadingIconData: Icons.arrow_back_ios_new_outlined,
               titleText: "Settings",

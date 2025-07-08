@@ -1,6 +1,8 @@
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/profileUpdatePage.dart';
 import 'package:get/get.dart';
 
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
@@ -60,6 +62,7 @@ class RouteClass {
   static String getVerifiedPage = "/get-verified-page";
   static String dealerLoginPage = "/dealer-login-page";
   static String customerServicePage = "/customer-service-page";
+  static String changePasswordPage = "/change-password-page";
 
   // Homepage
   static String homePage = "/home-page";
@@ -100,6 +103,8 @@ class RouteClass {
   static String getGetVerifiedPage() => getVerifiedPage;
   static String getDealerLoginPage() => dealerLoginPage;
   static String getCustomerServicePage() => customerServicePage;
+  static String getChangePassword() => changePasswordPage;
+
 
   static String getHomePage() => homePage;
   static String getDetailPage() => detailPage;
@@ -139,6 +144,10 @@ class RouteClass {
     GetPage(page: () => const GetVerifiedPage(), name: getVerifiedPage, transition: Transition.noTransition),
     GetPage(page: () => const DealerLoginPage(), name: dealerLoginPage, transition: Transition.noTransition),
     GetPage(page: () => const CustomerServicePage(), name: customerServicePage, transition: Transition.noTransition),
+    GetPage(page: () => const ChangePasswordPage(), name: changePasswordPage, transition: Transition.noTransition),
+    GetPage(page: () => const ProfileUpdatePage(), name: profileUpdatePage, transition: Transition.noTransition),
+
+
 
     // Home & others
     GetPage(page: () => const HomePage(), name: homePage, transition: Transition.noTransition),
@@ -153,6 +162,8 @@ class RouteClass {
     GetPage(page: () => const SpecialOffersPage(), name: specialOfferPage, transition: Transition.noTransition),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
+    GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
+
 
     //message
     GetPage(page: () => const MessagesPage(), name: messagePage, transition: Transition.noTransition),

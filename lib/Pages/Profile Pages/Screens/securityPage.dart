@@ -17,15 +17,18 @@ class _SecurityPageState extends State<SecurityPage> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-          appBar: CustomAppbar(onLeadingIconClickFunction: (){},
-              isLeadingWidgetExist: true,
-              leadingIconData: Icons.arrow_back_ios_new_outlined,
-              titleText: "Security",
+          appBar: CustomAppbar(
+            onLeadingIconClickFunction: (){
+              Get.back();
+            },
+            isLeadingWidgetExist: true,
+            leadingIconData: Icons.arrow_back_ios_new_outlined,
+            titleText: "Security",
           ),
           body:  CustomListTile(leadingIcon: Icons.lock_outline_sharp, title: "Change Password", isTrailingIconRequired: false,
       onTap: (){
         Get.toNamed(
-          RouteClass.getSettingsOnePage(),
+          RouteClass.getChangePassword(),
         );
       }
       ),

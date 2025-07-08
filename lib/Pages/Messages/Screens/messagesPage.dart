@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/messagetile.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class MessagesPage extends StatefulWidget {
@@ -24,7 +26,9 @@ class _MessagesPageState extends State<MessagesPage> {
     return SafeArea(
       child: Scaffold(
         appBar: CustomAppbar(
-          onLeadingIconClickFunction: () {},
+          onLeadingIconClickFunction: () {
+            Get.back();
+          },
           isLeadingWidgetExist: true,
           leadingIconData: Icons.arrow_back_ios_new_outlined,
           titleText: "Messages",

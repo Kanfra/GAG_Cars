@@ -48,7 +48,9 @@ class _HomePageState extends State<HomePage> {
             buttonSize: 35,
             iconSize: 18,
             isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
-            onIconButtonClickFunction: (){}
+            onIconButtonClickFunction: (){
+              // Get.toNamed(RouteClass.notificationsPage);
+            }
             ),
           const SizedBox(width: 3,),
           // bell notification icon
@@ -59,7 +61,9 @@ class _HomePageState extends State<HomePage> {
                 iconSize: 18,
                 buttonSize: 35,
                 isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
-                onIconButtonClickFunction: (){}
+                onIconButtonClickFunction: (){
+                  Get.toNamed(RouteClass.notificationsPage);
+                }
                 ),
               Positioned(
                 right: 2,

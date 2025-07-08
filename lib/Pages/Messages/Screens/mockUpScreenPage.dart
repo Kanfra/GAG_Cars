@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -67,7 +69,9 @@ class _MockUpScreenPageState extends State<MockUpScreenPage> {
     return  SafeArea(
         child: Scaffold(
           appBar: CustomAppbar(
-              onLeadingIconClickFunction: (){},
+              onLeadingIconClickFunction: (){
+                Get.back();
+              },
               isLeadingWidgetExist: true,
               leadingIconData: Icons.arrow_back_ios_new_outlined,
               titleText: "Gordon Yeboah",

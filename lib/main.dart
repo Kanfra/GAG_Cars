@@ -8,6 +8,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart'
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
 
       // home: SplashPage(),
       home: MainBottomNavigationPage(),
+      // home: ChangePasswordPage(),
       getPages: RouteClass.routes,
       // getPages: RouteClass.routes,
       //initialRoute: RouteClass.splashPage,

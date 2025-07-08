@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/contactUs.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/faq.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class HelpCenterPage extends StatefulWidget {
@@ -33,7 +35,10 @@ class _HelpCenterPageState extends State<HelpCenterPage>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: CustomAppbar(onLeadingIconClickFunction: () {  },
+        appBar: CustomAppbar(
+          onLeadingIconClickFunction: () {  
+          Get.back();
+        },
           isLeadingWidgetExist: true,
           leadingIconData: Icons.arrow_back_ios_new_outlined,
           titleText: 'Help Center',

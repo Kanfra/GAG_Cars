@@ -11,6 +11,8 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class DetailPage extends StatefulWidget {
   //final List<String> imageUrls;
@@ -86,7 +88,9 @@ class _DetailPageState extends State<DetailPage> {
               isBorderSlightlyCurved: false, 
               iconDataColor: ColorGlobalVariables.fadedBlackColor,
               //backgroundColor: ,
-              onIconButtonClickFunction: (){}
+              onIconButtonClickFunction: (){
+                Get.back();
+              }
               ),
             actions: [
               CustomRoundIconButton(

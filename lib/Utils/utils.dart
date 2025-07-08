@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../GlobalVariables/colorGlobalVariables.dart';
 
+// snackbar
 void showCustomSnackBar({
   BuildContext? context,
   String? message,
