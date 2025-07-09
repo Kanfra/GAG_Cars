@@ -7,6 +7,8 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class AllMakesPage extends StatefulWidget {
   const AllMakesPage({super.key});
@@ -22,7 +24,9 @@ class _AllMakesPageState extends State<AllMakesPage> {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: CustomAppbar(
-        onLeadingIconClickFunction: (){}, 
+        onLeadingIconClickFunction: (){
+          Get.back();
+        }, 
         isLeadingWidgetExist: ColorGlobalVariables.trueValue,
         leadingIconData: Icons.arrow_back_ios, 
         appbarBackgroundColor: ColorGlobalVariables.whiteColor,

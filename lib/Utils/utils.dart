@@ -36,3 +36,14 @@ void showCustomSnackBar({
     debugPrint("Failed to show snackbar: $e");
   }
 }
+
+void showFilterBottomSheet({
+  required BuildContext context,
+  required Widget widget,
+}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => widget
+    );
+  }

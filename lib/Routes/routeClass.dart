@@ -163,6 +163,7 @@ class RouteClass {
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
+    // GetPage(page: () => const Noti, name: newsBlogPage, transition: Transition.noTransition),
 
 
     //message

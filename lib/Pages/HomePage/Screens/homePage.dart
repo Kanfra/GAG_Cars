@@ -11,9 +11,12 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,6 +28,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   final TextEditingController searchEditingController = TextEditingController();
+
+   SfRangeValues _priceRange = const SfRangeValues(700, 2000);
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -49,7 +54,7 @@ class _HomePageState extends State<HomePage> {
             iconSize: 18,
             isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
             onIconButtonClickFunction: (){
-              // Get.toNamed(RouteClass.notificationsPage);
+              Get.toNamed(RouteClass.newsBlogPage);
             }
             ),
           const SizedBox(width: 3,),
@@ -110,7 +115,15 @@ class _HomePageState extends State<HomePage> {
                   fieldWidth: double.infinity,
                   fieldHeight: 14,
                   suffixIconData: FontAwesomeIcons.sliders,
-                  onSuffixIconClickFunction: (){},
+                  onSuffixIconClickFunction: () => showFilterBottomSheet(
+                    context: context, 
+                    widget: FilterBottomSheetContent(
+                      priceRange: _priceRange,
+                      onPriceRangeChanged: (newRange) {
+                        setState(() => _priceRange = newRange);
+                      },
+                    ),
+                    ),
                    
                   isSuffixIconRequired: ColorGlobalVariables.trueValue, 
                   isPrefixIconRequired: ColorGlobalVariables.trueValue, 
