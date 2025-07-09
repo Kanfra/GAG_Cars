@@ -49,8 +49,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     _phoneNumber = args["phone"] ?? "";
     _isSignUp = args["isSignUp"] ?? false;
     _email = args["email"] ?? "";
-    _token = args["token"] ?? "";
-    logger.i("Phone number parsed: $_phoneNumber, email: $_email, token: $_token, isSignUp parsed: $_isSignUp");
+    // _token = args["token"] ?? "";
+    logger.i("Phone number parsed: $_phoneNumber, email: $_email, isSignUp parsed: $_isSignUp");
     if (kIsWeb) BrowserContextMenu.disableContextMenu();
     formKey = GlobalKey<FormState>();
     pinController = TextEditingController();
@@ -79,7 +79,11 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     });
 
     try{
-      await AuthService.sendOtp(_phoneNumber, _email, _token);
+      await AuthService.sendOtp(
+        _phoneNumber, 
+        _email, 
+        // _token
+        );
       setState(() => _otpSent);
       showCustomSnackBar(
       message: "OTP sent to $_phoneNumber",
@@ -96,6 +100,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       }
     }
   }
+  
+  // verify otp function
   Future<void> _verifyCode() async {
     if(!formKey.currentState!.validate()) return;
     setState(() {
@@ -106,7 +112,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     try{
       final authResponse = await AuthService.verifyOtp(
         phone: _phoneNumber, 
-        otp: pinController.text, token: _token
+        otp: pinController.text, 
+        // token: _token
         );
 
         // handle successful verification
@@ -128,6 +135,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     }
   }
 
+  // resend otp function
   Future<void> _resendOtp() async {
     setState(() {
       _isLoading = true;
@@ -135,9 +143,13 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     });
 
     try{
-      await AuthService.sendOtp(_phoneNumber, _email, _token);
+      await AuthService.sendOtp(
+        _phoneNumber, 
+        _email, 
+        // _token
+        );
       setState(() {
-        _remainingSeconds = 48;
+        _remainingSeconds = 60;
         _otpSent = true;
       });
       _startCountdown();
@@ -181,8 +193,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     );
 
     final pinTheme = PinTheme(
-      width: 71,
-      height: 66,
+      width: 50,
+      height: 50,
       textStyle: const TextStyle(
         fontSize: 20,
         color: Colors.black,
@@ -204,13 +216,14 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                          
+                    // verify code text
                     Text('Verify Code',style: TextStyle(fontSize:32, fontWeight: FontWeight.w500 ),),
+                    // pinput field
                     SizedBox(height: 50,),
                     _isLoading && !_otpSent ? CircularProgressIndicator() : Pinput(
                       controller: pinController,
                       focusNode: focusNode,
-                      length: 4,
+                      length: 6,
                       defaultPinTheme: pinTheme,
                       separatorBuilder: (index) => const SizedBox(width: 10),
                       focusedPinTheme: pinTheme.copyDecorationWith(
@@ -228,8 +241,8 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                         if(value == null || value.isEmpty){
                           return "Please enter the code";
                         }
-                        if(value.length != 4){
-                          return "Code must be 4 digits";
+                        if(value.length != 6){
+                          return "Code must be 6 digits";
                         }
                         return null;
                       },

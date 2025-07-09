@@ -71,7 +71,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
             arguments: {
               'phone': user?.user.phoneNumber,
               'email': user?.user.email,
-              'token': user?.token,
+              // 'token': user?.token,
               'isSignUp': true
             }
           );

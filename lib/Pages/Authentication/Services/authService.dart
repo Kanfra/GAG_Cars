@@ -289,7 +289,11 @@ class AuthService {
   }
 
 
-static Future<bool> sendOtp(String phone, String email, String token) async {
+static Future<bool> sendOtp(
+  String phone, 
+  String email, 
+  // String token
+  ) async {
   final logger = Logger();
   const endpoint = '/otp/send'; 
   final url = Uri.parse('$baseApiUrl$endpoint');
@@ -299,13 +303,13 @@ static Future<bool> sendOtp(String phone, String email, String token) async {
         'email': email
         });
       logger.i("body: $body");
-      logger.i("token: $token");
+      // logger.i("token: $token");
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
+          // 'Authorization': 'Bearer $token',
         },
         body: body,
       );
@@ -326,7 +330,7 @@ static Future<bool> sendOtp(String phone, String email, String token) async {
 static Future<AuthResponseModel> verifyOtp({
   required String phone,
   required String otp,
-  required String? token,
+  // required String? token,
 }) async {
   final logger = Logger();
   const endpoint = '/otp/verify'; 
@@ -346,15 +350,18 @@ static Future<AuthResponseModel> verifyOtp({
         },
         body: body,
       );
-
+      final responseBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        final token = responseBody['token'];
+        final message = responseBody['message'];
+        logger.i('test success response: $message');
         // store token securely
         if(token != null){
           await storage.write(key: 'auth_token', value: token);
           logger.i("Auth token stored securely");
         }
         logger.i("OTP verified successfully: ${response.body}");
-        return AuthResponseModel.fromJson(jsonDecode(response.body));
+        return AuthResponseModel.fromJson(responseBody);
       } else {
         logger.e("Failed to verify OTP: ${response.body}");
         throw Exception('Failed to verify OTP: ${response.body}');

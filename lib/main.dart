@@ -37,8 +37,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
 
-      // home: SplashPage(),
-      home: MainBottomNavigationPage(),
+      home: SplashPage(),
+      // home: MainBottomNavigationPage(),
       // home: ChangePasswordPage(),
       getPages: RouteClass.routes,
       // getPages: RouteClass.routes,
