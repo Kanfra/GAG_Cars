@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../GlobalVariables/colorGlobalVariables.dart';
+import '../../GlobalVariables/colorGlobalVariables.dart';
 
 // snackbar
 void showCustomSnackBar({

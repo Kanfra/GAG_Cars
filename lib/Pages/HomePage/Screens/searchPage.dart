@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
-import 'package:gag_cars_frontend/Utils/utils.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:lottie/lottie.dart';
 

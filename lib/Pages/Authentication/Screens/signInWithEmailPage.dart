@@ -4,7 +4,7 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
-import 'package:gag_cars_frontend/Utils/utils.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 
 class SignInWithEmailPage extends StatefulWidget {

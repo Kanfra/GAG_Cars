@@ -13,7 +13,7 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/utils.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';

@@ -8,7 +8,7 @@ import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/cust
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/utils.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:logger/logger.dart';
@@ -119,7 +119,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
         // handle successful verification
         if(_isSignUp){
           // navigate to home page
-          Get.offAllNamed(RouteClass.getHomePage());
+          Get.offAllNamed(RouteClass.getMainBottomNavigationPage());
         } else{
           Get.offAllNamed(RouteClass.getSignUpWithPhonePage());
         }

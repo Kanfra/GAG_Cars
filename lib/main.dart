@@ -13,6 +13,7 @@ import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
 import 'Pages/Authentication/Screens/signUpWithEmailPage.dart';
+import 'Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'Routes/routeClass.dart';
 
 void main()async{

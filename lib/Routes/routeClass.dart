@@ -1,3 +1,4 @@
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
@@ -77,6 +78,7 @@ class RouteClass {
   static String specialOfferPage = "/special-offer-page";
   static String notificationsPage = "/notifications-page";
   static String searchPage = "/search-page";
+  static String mainBottomNavigationPage = "/main-bottom-navigation-page";
 
   //message
   static String messagePage = "/messagePage";
@@ -118,6 +120,7 @@ class RouteClass {
   static String getSpecialOfferPage() => specialOfferPage;
   static String getNotificationsPage() => notificationsPage;
   static String getSearchPage() => searchPage;
+  static String getMainBottomNavigationPage() => mainBottomNavigationPage;
 
   static String getMessagesPage() => messagePage;
   static String getMockUpScreenPage() => mockUpScreenPage;
@@ -163,7 +166,7 @@ class RouteClass {
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
-    // GetPage(page: () => const Noti, name: newsBlogPage, transition: Transition.noTransition),
+    GetPage(page: () => MainBottomNavigationPage(), name: mainBottomNavigationPage, transition: Transition.noTransition),
 
 
     //message
