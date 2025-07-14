@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
@@ -31,7 +33,6 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
       Get.offNamed(RouteClass.getHomePage()); // Navigate after success
     } catch (e) {
       showCustomSnackBar(
-        context: context, 
         message: "Error, ${e.toString()}"
         );
     } finally {
@@ -90,14 +91,21 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
                                           },
                                           ),
                                              SizedBox(
-                                  height: 14,
+                                  height: 15,
                                 ),
-                                             GestureDetector(
-                                              onTap: (){
-                                                    Get.offNamed(RouteClass.getForgotPasswordPage());
-                                              },
-                                              child: Text("Forgot Password?",style: TextStyle(fontSize: 14,fontWeight: FontWeight.w500),)),
-                    
+
+                                // forgot password button
+                                CustomTextButton(
+                                  buttonTextType: 'Forgot Password?', 
+                                  fontWeight: FontWeight.w500,
+                                  borderColor: ColorGlobalVariables.greyColor,
+                                  borderThickness: 0.09,
+                                  textTypeColor: ColorGlobalVariables.blackColor, 
+                                  isFullButtonWidthRequired: false,
+                                  buttonBackgroundColor: Colors.transparent,
+                                  onClickFunction: () { 
+                                    Get.toNamed(RouteClass.getForgotPasswordPage());
+                                   },),
                                                  SizedBox(
                                                   height: 20,
                                                  ),

@@ -1,18 +1,84 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
-import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
+import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart' show AppIcons;
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/country_code_text_field.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 
 class SignInWithPhonePage extends StatefulWidget {
-  const SignInWithPhonePage({super.key});
+  final Map<String, dynamic> allJson;
+  const SignInWithPhonePage({
+    super.key,
+    required this.allJson,
+    });
 
   @override
   State<SignInWithPhonePage> createState() => _SignInWithPhonePageState();
 }
 
 class _SignInWithPhonePageState extends State<SignInWithPhonePage> {
+
+  final TextEditingController _phoneController = TextEditingController();
+  bool _isLoading = false;
+  String? _errorMessage;
+  String _countryCode = "+233"; // default to Ghana code
+  String _fullPhoneNumber = "";
+
+  Future<void> _handleSignUp() async {
+    // validate phone number
+    if(_phoneController.text.isEmpty){
+      setState(()=>_errorMessage = "Please enter your phone number");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try{
+      // full phone number  with country code
+      _fullPhoneNumber = "$_countryCode${_phoneController.text}";
+      Get.offNamed(
+        RouteClass.getVerifyCodePage(),
+        arguments: {
+          'phone': _fullPhoneNumber,
+          'isSignIn': true, // to distinguish between sign up and login
+        }
+      );
+    }catch(e){
+      setState(()=> _errorMessage = e.toString());
+      showCustomSnackBar(
+        message: "Error $_errorMessage",
+      );
+    } finally{
+      if(mounted){
+        setState(()=> _isLoading = false);
+      }
+    }
+  }
+
+  bool _isValidPhoneNumber(String phone){
+    final phoneRegex = RegExp(r'^[0-9]{9,15}$');
+    return phoneRegex.hasMatch(phone);
+  }
+
+  void _onCountryChanged(Country country){
+    setState(() {
+      _countryCode = "+${country.phoneCode}";
+    });
+  }
+
+  @override
+  void dispose (){
+    _phoneController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +98,16 @@ Row(children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Sign  In",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
+                          Text("Sign In",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
                              Text('''Enter your  phone number. We will send SMS to 
 verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400),),
+if(_errorMessage != null) Padding(
+padding: const EdgeInsets.only(top: 8),
+child: TextExtraSmall(
+title: _errorMessage!, 
+textColor: ColorGlobalVariables.redColor,
+),
+),
                         ],
                       ),
                         
@@ -42,7 +115,16 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
                   SizedBox(
                     height: 20,
                   ),
-                               CountryCodeTextField(),
+                               CountryCodeTextField(
+                                controller: _phoneController,
+                                onCountryChanged: _onCountryChanged,
+                                onPhoneNumberChanged: (value){
+                                  // clear error when user types
+                                  if(_errorMessage != null && value.isNotEmpty){
+                                    setState(() => _errorMessage = null);
+                                  }
+                                },
+                               ),
                               SizedBox(
                                 height: 14,
                               ),
@@ -51,8 +133,7 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
                                                SizedBox(
                                                 height: 20,
                                                ),
-                  CustomButton(buttonName: 'Sign In', onPressed: (){}, isLoading: false,),
-                  
+                  CustomButton(buttonName: 'Sign In', onPressed: _handleSignUp, isLoading: _isLoading,),
                   SizedBox(height: 20,),
                   
                   Row(
@@ -97,16 +178,21 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
                              child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                
+                                // facebook
                                 Image.asset(AppIcons.facebook ,width: 24,),
-                                   Image.asset(AppIcons.apple_logo ,width: 24,),
-                                      Image.asset(AppIcons.google_logo ,width: 24,),
-                                         Image.asset(AppIcons.phone_call_logo ,width: 24,),
-                                            GestureDetector(
-                                              onTap: (){
-                                                Get.offNamed(RouteClass.signInWithEmailPage);
-                                              },
-                                              child: Image.asset(AppIcons.email_logo ,width: 24,)),
+                                // apple
+                                Image.asset(AppIcons.apple_logo ,width: 24,),
+                                // google 
+                                Image.asset(AppIcons.google_logo ,width: 24,),
+                                // phone
+                                // Image.asset(AppIcons.phone_call_logo ,width: 24,),
+                                // email
+                                GestureDetector(
+                                  onTap: (){
+                                    
+                                    Get.offNamed(RouteClass.getSignInWithEmailPage());
+                                  },
+                                  child: Image.asset(AppIcons.email_logo ,width: 24,)),
                               ],
                              ),
                            ),
@@ -116,15 +202,15 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
                           ),
                           GestureDetector(
                             onTap: (){
-                                 Get.offNamed(RouteClass.getSignUpWithPhonePage());
+                              Get.offNamed(RouteClass.getSignUpWithEmailPage());
                             },
                             child: RichText(
                                                 text: TextSpan(
-                                                  text: 'Don’t have an account?? ',
+                                                  text: "Don't have an account? ",
                                                   style: TextStyle(color: Colors.black87, fontSize: 16),
                                                   children: <TextSpan>[
                                                     TextSpan(
-                            text: 'Sign In',
+                            text: 'Sign Up',
                             style: TextStyle(
                               color: Color.fromRGBO(159, 16, 16, 1),
                               fontWeight: FontWeight.bold,
@@ -144,6 +230,7 @@ verify your number ''',style: TextStyle(fontSize: 15,fontWeight: FontWeight.w400
             ),
     
     );
+  
   
   }
 }

@@ -5,6 +5,7 @@ import '../Text/textSmall.dart';
 class CustomTextButton extends StatelessWidget {
   final String buttonTextType;
   final Color textTypeColor;
+  final FontWeight? fontWeight;
   final double? borderRadius;
   final double? textButtonHeight;
   final double? textButtonWidth;
@@ -22,6 +23,7 @@ class CustomTextButton extends StatelessWidget {
     required this.textTypeColor,
     this.borderRadius,
     this.textSize,
+    this.fontWeight,
     this.textButtonHeight,
     this.textButtonWidth,
     this.borderColor,
@@ -63,7 +65,8 @@ class CustomTextButton extends StatelessWidget {
           ),
           child: TextSmall(
             title: buttonTextType,
-            textColor: textTypeColor, fontWeight: FontWeight.normal,
+            textColor: textTypeColor, 
+            fontWeight: fontWeight ?? FontWeight.normal,
             textSize: textSize,
           ),
         ),

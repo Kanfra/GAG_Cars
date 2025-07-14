@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,6 @@ import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:logger/logger.dart';
 import 'package:pinput/pinput.dart';
 
@@ -121,7 +119,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
           // navigate to home page
           Get.offAllNamed(RouteClass.getMainBottomNavigationPage());
         } else{
-          Get.offAllNamed(RouteClass.getSignUpWithPhonePage());
+          Get.offAllNamed(RouteClass.getSignInWithPhonePage());
         }
     }catch(e){
       setState(() => _errorMessage = e.toString());
@@ -322,10 +320,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                 middleText: "Your OTP is still valid. Are you sure you want to go back?",
                 textConfirm: "Yes",
                 textCancel: "No",
-                onConfirm: () => Get.offAllNamed(RouteClass.getSignUpWithPhonePage())
+                onConfirm: () => Get.offAllNamed(RouteClass.getSignInWithPhonePage())
               );
             } else{
-              Get.offAllNamed(RouteClass.getSignUpWithPhonePage());
+              Get.offAllNamed(RouteClass.getSignInWithPhonePage());
             }
           },
           child: Icon(Icons.arrow_back_ios,size: 30,color: Colors.black,)))

@@ -29,7 +29,7 @@ class _SplashPageState extends State<SplashPage> {
     if(isAuthenticated){
      Get.offNamed(RouteClass.homePage); 
     } else{
-      Get.offNamed(RouteClass.signUpWithPhonePage);
+      Get.offNamed(RouteClass.signInWithPhonePage);
     }
   }
 

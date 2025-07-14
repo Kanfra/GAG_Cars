@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/auth_response_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
@@ -125,7 +128,7 @@ class AuthService {
   // }
 
   // Sign up with Phone
-  static Future<AuthResponseModel> signUpWithPhone({
+  static Future<AuthResponseModel> signInWithPhone({
     required String phone
   }) async {
     final logger = Logger();
@@ -373,6 +376,44 @@ static Future<AuthResponseModel> verifyOtp({
   }
 }
  
+
+// send password reset email
+static Future<void> sendPasswordResetEmail({
+  required String email,
+}) async {
+  try{
+    await postApiData<void>(
+      endpoint: ApiEndpoint.resetPassword,
+      body: {
+        'email': email
+      },
+      fromJson: (_){}, // empty function since we don't need return data
+    );
+  } catch(e){
+    rethrow; // let the calling function handle the error
+  }
+}
+
+// reset password
+static Future<void> resetPassword({
+  required String token,
+  required String email,
+  required String newPassword,
+}) async {
+  try{
+    await postApiData(
+      endpoint: ApiEndpoint.sendResetPasswordOtp, 
+      body: {
+        'token': token,
+        'email': email,
+        'newPassword': newPassword,
+      }, 
+      fromJson: (_){},  // no return data expected
+      );
+  }catch(e){
+    rethrow; //let the UI handle the error
+  }
+}
  
   // Get stored user
   // static Future<UserModel?> getCurrentUser() async {

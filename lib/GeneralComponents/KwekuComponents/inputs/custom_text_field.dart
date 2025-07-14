@@ -5,6 +5,7 @@ class CustomTextField extends StatelessWidget {
     super.key,
     this.controller,
     this.obscureText,
+    this.textInputType,
     required this.hintText,
     required this.prefixImage,
     this.suffixIcon,
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final bool? obscureText;
   final String prefixImage;
+  final TextInputType? textInputType;
   final IconData? suffixIcon; // Add this for suffix icon
   final VoidCallback? onSuffixIconPressed; // Add this for click handler
   final TextEditingController? controller;
@@ -47,6 +49,7 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         onChanged: onChanged,
         validator: validator,
+        keyboardType: textInputType ?? TextInputType.text,
         obscureText: obscureText ?? false,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(

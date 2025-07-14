@@ -13,6 +13,59 @@ String get baseApiUrl {
   return url;
 }
 
+// generic POST method
+Future<T> postApiData<T>({
+  required String endpoint,
+  required Map<String, dynamic> body,
+  int successStatusCode = 200,
+  Map<String, String>? headers,
+  required T Function(Map<String, dynamic>) fromJson,
+  Duration timeout = const Duration(seconds: 10),
+}) async {
+  final logger = Logger();
+  final uri = Uri.parse('$baseApiUrl$endpoint');
+  try{
+    logger.i('Sending POST request to $uri');
+    logger.t('Request body: $body');
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        ...?headers,
+      },
+      body: jsonEncode(body),
+    ).timeout(timeout);
+
+    logger.i('Response status: ${response.statusCode}');
+    logger.t('Response body: ${response.body}');
+
+    if(response.statusCode == successStatusCode){
+      try{
+        final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+        return fromJson(responseData);
+      } catch(e){
+        logger.e('Failed to parse response from $uri: $e');
+        throw FormatException('Failed to parse response: $e');
+      }
+    } else{
+      logger.e('API request failed: ${response.statusCode} - $uri');
+      final errorData = jsonDecode(response.body);
+      throw http.ClientException(
+        errorData['message'] ?? 'Request failed with status: ${response.statusCode}',
+        uri,
+      );
+    }
+  } on http.ClientException {
+    rethrow;
+  } on FormatException{
+    rethrow;
+  } catch(e){
+    logger.e('Unexpected error in API call to $uri: $e');
+    throw Exception('Failed to complete API request: $e');
+  }
+}
+
 Future<T> fetchApiData<T>({
   required String endpoint,
   int successStatusCode = 200,

@@ -278,7 +278,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                                           // sign up with phone number button
                                            GestureDetector(
                                             onTap: (){
-                                                      Get.offNamed(RouteClass.getSignUpWithPhonePage());
+                                                      // Get.offNamed(RouteClass.getSignUpWithPhonePage());
                                             },
                                             child: Image.asset(AppIcons.phone_call_logo ,width: 24,)),
                                               Image.asset(AppIcons.email_logo ,width: 24,),
@@ -291,10 +291,10 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage> {
                             ),
 
                             // sign in with email button
-                            GestureDetector(
+                            GestureDetector( 
                               onTap: (){
 
-                                       Get.offNamed(RouteClass.getSignInWithEmailPage());
+                                       Get.offNamed(RouteClass.getSignInWithPhonePage());
                               },
                               child: RichText(
                                                   text: TextSpan(
