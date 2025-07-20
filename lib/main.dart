@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:provider/provider.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
 import 'Pages/Authentication/Screens/signUpWithEmailPage.dart';
 import 'Pages/HomePage/Screens/mainBottomNavigationPage.dart';
@@ -19,7 +23,17 @@ import 'Routes/routeClass.dart';
 void main()async{
   await dotenv.load(fileName: ".env");
   await CloudinaryService.init();
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => HomeProvider(HomeService()),
+          ),
+          // add other providers if needed
+      ],
+      child: const MyApp(),
+    ),
+    );
   
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.black.withOpacity(0.77), // Change this to your desired color
@@ -38,6 +52,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
 
+        // home: ForgotPasswordPage(),
       home: SplashPage(),
       // home: MainBottomNavigationPage(),
       // home: ChangePasswordPage(),

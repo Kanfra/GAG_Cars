@@ -1,5 +1,6 @@
 // apiUtils.dart
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -74,10 +75,22 @@ Future<T> fetchApiData<T>({
 }) async {
   final logger = Logger();
   final uri = Uri.parse('$baseApiUrl$endpoint');
+  const storage = FlutterSecureStorage();
 
   try {
-    final response = await http.get(uri, headers: headers ?? {});
-    
+    // Get auth token from secure storage
+    final token = await storage.read(key: 'auth_token');
+    logger.i("Your secured token: $token");
+    // Merge headers: passed-in headers + Authorization
+    final requestHeaders = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+      ...?headers, // override if any custom headers passed
+    };
+
+    final response = await http.get(uri, headers: requestHeaders);
+
     if (response.statusCode == successStatusCode) {
       try {
         logger.i("Successfully parsed response from $uri");

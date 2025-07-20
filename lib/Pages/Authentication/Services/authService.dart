@@ -336,7 +336,7 @@ static Future<AuthResponseModel> verifyOtp({
   // required String? token,
 }) async {
   final logger = Logger();
-  const endpoint = '/otp/verify'; 
+  const endpoint = ApiEndpoint.verifyOtp; 
   final url = Uri.parse('$baseApiUrl$endpoint');
   const storage = FlutterSecureStorage();
   try{
@@ -357,7 +357,7 @@ static Future<AuthResponseModel> verifyOtp({
       if (response.statusCode == 200) {
         final token = responseBody['token'];
         final message = responseBody['message'];
-        logger.i('test success response: $message');
+        logger.i('test success response: $message and token: $token');
         // store token securely
         if(token != null){
           await storage.write(key: 'auth_token', value: token);
@@ -383,7 +383,7 @@ static Future<void> sendPasswordResetEmail({
 }) async {
   try{
     await postApiData<void>(
-      endpoint: ApiEndpoint.resetPassword,
+      endpoint: ApiEndpoint.sendResetPasswordOtp,
       body: {
         'email': email
       },

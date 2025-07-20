@@ -30,7 +30,7 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      Get.offNamed(RouteClass.getHomePage()); // Navigate after success
+      Get.offNamed(RouteClass.getMainBottomNavigationPage()); // Navigate after success
     } catch (e) {
       showCustomSnackBar(
         message: "Error, ${e.toString()}"

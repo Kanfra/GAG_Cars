@@ -27,7 +27,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   late final TextEditingController pinController;
   late final FocusNode focusNode;
   late final GlobalKey<FormState> formKey;
- late Timer _timer;
+  late Timer _timer;
   int _remainingSeconds = 60;
   bool _isLoading = false;
   String? _errorMessage;

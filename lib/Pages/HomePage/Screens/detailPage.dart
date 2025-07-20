@@ -16,9 +16,10 @@ import 'package:get/get_core/src/get_main.dart';
 
 class DetailPage extends StatefulWidget {
   //final List<String> imageUrls;
-
+  final Map<String, dynamic> offer;
   const DetailPage({
     super.key, 
+    required this.offer,
     //required this.imageUrls
     });
 

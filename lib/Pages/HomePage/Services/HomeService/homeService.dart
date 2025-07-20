@@ -7,7 +7,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
-class Homeservice {
+class HomeService {
   // trend makes
    Future<List<TrendingMake>> fetchTrendingMakes() async {
     final response = await fetchApiData<TrendingMakeResponse>(

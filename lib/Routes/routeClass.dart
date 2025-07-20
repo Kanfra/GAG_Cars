@@ -1,3 +1,4 @@
+import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
@@ -42,14 +43,15 @@ import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 
 class RouteClass {
   // Route names
-  static String signUpWithEmailPage = "/sign-up-with-email";
+  static String signUpWithEmailPage = "/sign-up-with-email-page";
   // static String signUpWithPhonePage = "/sign-up-with-phone";
-  static String signInWithEmailPage = "/sign-in-with-email";
-  static String signInWithPhonePage = "/sign-in-with-phone";
-  static String splashPage = "/splash";
-  static String verifyCodePage = "/verify-code";
-  static String forgotPasswordPage = "/forgot-password";
-  static String resetPasswordPage = "/reset-password";
+  static String signInWithEmailPage = "/sign-in-with-email-page";
+  static String signInWithPhonePage = "/sign-in-with-phone-page";
+  static String splashPage = "/splash-page";
+  static String verifyCodePage = "/verify-code-page";
+  static String forgotPasswordPage = "/forgot-password-page";
+  static String resetPasswordPage = "/reset-password-page";
+  static String enterOtpPage = "/enter-otp-page";
 
   // Profile pages
   static String settingsPage = "/settings-page";
@@ -66,7 +68,7 @@ class RouteClass {
   static String changePasswordPage = "/change-password-page";
 
   // Homepage
-  static String homePage = "/home-page";
+  // static String homePage = "/home-page";
   static String detailPage = "/detail-page";
   static String newsBlogPage = "/news-blog-page";
   static String mainNewsPage = "/main-news-page";
@@ -93,6 +95,7 @@ class RouteClass {
   static String getVerifyCodePage() => verifyCodePage;
   static String getForgotPasswordPage() => forgotPasswordPage;
   static String getResetPasswordPage() => resetPasswordPage;
+  static String getEnterOtpPage() => enterOtpPage;
 
   static String getSettingsPage() => settingsPage;
   static String getSettingsOnePage() => settingsOnePage;
@@ -108,7 +111,7 @@ class RouteClass {
   static String getChangePassword() => changePasswordPage;
 
 
-  static String getHomePage() => homePage;
+  // static String getHomePage() => homePage;
   static String getDetailPage() => detailPage;
   static String getNewsBlogPage() => newsBlogPage;
   static String getMainNewsPage() => mainNewsPage;
@@ -135,6 +138,7 @@ class RouteClass {
     GetPage(page: () => VerifyCodePage(allJson: Get.arguments ?? {}), name: verifyCodePage, transition: Transition.noTransition),
     GetPage(page: () => const ForgotPasswordPage(), name: forgotPasswordPage, transition: Transition.noTransition),
     GetPage(page: () => const ResetPasswordPage(), name: resetPasswordPage, transition: Transition.noTransition),
+    GetPage(page: () => EnterOtpPage(email: Get.arguments ?? ""), name: enterOtpPage, transition: Transition.noTransition),
 
     // Profile
     GetPage(page: () => const SettingsPage(), name: settingsPage, transition: Transition.noTransition),
@@ -153,8 +157,8 @@ class RouteClass {
 
 
     // Home & others
-    GetPage(page: () => const HomePage(), name: homePage, transition: Transition.noTransition),
-    GetPage(page: () => const DetailPage(), name: detailPage, transition: Transition.noTransition),
+    // GetPage(page: () => const HomePage(), name: homePage, transition: Transition.noTransition),
+    GetPage(page: () => DetailPage(offer: Get.arguments ?? {}), name: detailPage, transition: Transition.noTransition),
     GetPage(page: () => const NewsBlogPage(), name: newsBlogPage, transition: Transition.noTransition),
     GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
     GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),
