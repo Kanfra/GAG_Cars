@@ -21,8 +21,8 @@ SpecialOfferResponse _$SpecialOfferResponseFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$SpecialOfferResponse {
   List<SpecialOffer> get data => throw _privateConstructorUsedError;
-  PaginationLinks get links => throw _privateConstructorUsedError;
-  PaginationMeta get meta => throw _privateConstructorUsedError;
+  PaginationLinks? get links => throw _privateConstructorUsedError;
+  PaginationMeta? get meta => throw _privateConstructorUsedError;
 
   /// Serializes this SpecialOfferResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -41,10 +41,10 @@ abstract class $SpecialOfferResponseCopyWith<$Res> {
       _$SpecialOfferResponseCopyWithImpl<$Res, SpecialOfferResponse>;
   @useResult
   $Res call(
-      {List<SpecialOffer> data, PaginationLinks links, PaginationMeta meta});
+      {List<SpecialOffer> data, PaginationLinks? links, PaginationMeta? meta});
 
-  $PaginationLinksCopyWith<$Res> get links;
-  $PaginationMetaCopyWith<$Res> get meta;
+  $PaginationLinksCopyWith<$Res>? get links;
+  $PaginationMetaCopyWith<$Res>? get meta;
 }
 
 /// @nodoc
@@ -64,22 +64,22 @@ class _$SpecialOfferResponseCopyWithImpl<$Res,
   @override
   $Res call({
     Object? data = null,
-    Object? links = null,
-    Object? meta = null,
+    Object? links = freezed,
+    Object? meta = freezed,
   }) {
     return _then(_value.copyWith(
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
               as List<SpecialOffer>,
-      links: null == links
+      links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as PaginationLinks,
-      meta: null == meta
+              as PaginationLinks?,
+      meta: freezed == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as PaginationMeta,
+              as PaginationMeta?,
     ) as $Val);
   }
 
@@ -87,8 +87,12 @@ class _$SpecialOfferResponseCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PaginationLinksCopyWith<$Res> get links {
-    return $PaginationLinksCopyWith<$Res>(_value.links, (value) {
+  $PaginationLinksCopyWith<$Res>? get links {
+    if (_value.links == null) {
+      return null;
+    }
+
+    return $PaginationLinksCopyWith<$Res>(_value.links!, (value) {
       return _then(_value.copyWith(links: value) as $Val);
     });
   }
@@ -97,8 +101,12 @@ class _$SpecialOfferResponseCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PaginationMetaCopyWith<$Res> get meta {
-    return $PaginationMetaCopyWith<$Res>(_value.meta, (value) {
+  $PaginationMetaCopyWith<$Res>? get meta {
+    if (_value.meta == null) {
+      return null;
+    }
+
+    return $PaginationMetaCopyWith<$Res>(_value.meta!, (value) {
       return _then(_value.copyWith(meta: value) as $Val);
     });
   }
@@ -113,12 +121,12 @@ abstract class _$$SpecialOfferResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {List<SpecialOffer> data, PaginationLinks links, PaginationMeta meta});
+      {List<SpecialOffer> data, PaginationLinks? links, PaginationMeta? meta});
 
   @override
-  $PaginationLinksCopyWith<$Res> get links;
+  $PaginationLinksCopyWith<$Res>? get links;
   @override
-  $PaginationMetaCopyWith<$Res> get meta;
+  $PaginationMetaCopyWith<$Res>? get meta;
 }
 
 /// @nodoc
@@ -135,22 +143,22 @@ class __$$SpecialOfferResponseImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? data = null,
-    Object? links = null,
-    Object? meta = null,
+    Object? links = freezed,
+    Object? meta = freezed,
   }) {
     return _then(_$SpecialOfferResponseImpl(
       data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
               as List<SpecialOffer>,
-      links: null == links
+      links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as PaginationLinks,
-      meta: null == meta
+              as PaginationLinks?,
+      meta: freezed == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as PaginationMeta,
+              as PaginationMeta?,
     ));
   }
 }
@@ -178,9 +186,9 @@ class _$SpecialOfferResponseImpl
   }
 
   @override
-  final PaginationLinks links;
+  final PaginationLinks? links;
   @override
-  final PaginationMeta meta;
+  final PaginationMeta? meta;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -233,8 +241,8 @@ class _$SpecialOfferResponseImpl
 abstract class _SpecialOfferResponse implements SpecialOfferResponse {
   const factory _SpecialOfferResponse(
       {required final List<SpecialOffer> data,
-      required final PaginationLinks links,
-      required final PaginationMeta meta}) = _$SpecialOfferResponseImpl;
+      required final PaginationLinks? links,
+      required final PaginationMeta? meta}) = _$SpecialOfferResponseImpl;
 
   factory _SpecialOfferResponse.fromJson(Map<String, dynamic> json) =
       _$SpecialOfferResponseImpl.fromJson;
@@ -242,9 +250,9 @@ abstract class _SpecialOfferResponse implements SpecialOfferResponse {
   @override
   List<SpecialOffer> get data;
   @override
-  PaginationLinks get links;
+  PaginationLinks? get links;
   @override
-  PaginationMeta get meta;
+  PaginationMeta? get meta;
 
   /// Create a copy of SpecialOfferResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -273,7 +281,8 @@ mixin _$SpecialOffer {
   int get discount => throw _privateConstructorUsedError;
   @JsonKey(name: 'discount_type')
   String get discountType => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
+  String? get description =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'created_at')
   String get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -305,7 +314,7 @@ abstract class $SpecialOfferCopyWith<$Res> {
       String status,
       int discount,
       @JsonKey(name: 'discount_type') String discountType,
-      String description,
+      String? description,
       @JsonKey(name: 'created_at') String createdAt,
       @JsonKey(name: 'updated_at') String updatedAt,
       Item? item});
@@ -336,7 +345,7 @@ class _$SpecialOfferCopyWithImpl<$Res, $Val extends SpecialOffer>
     Object? status = null,
     Object? discount = null,
     Object? discountType = null,
-    Object? description = null,
+    Object? description = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? item = freezed,
@@ -374,10 +383,10 @@ class _$SpecialOfferCopyWithImpl<$Res, $Val extends SpecialOffer>
           ? _value.discountType
           : discountType // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -425,7 +434,7 @@ abstract class _$$SpecialOfferImplCopyWith<$Res>
       String status,
       int discount,
       @JsonKey(name: 'discount_type') String discountType,
-      String description,
+      String? description,
       @JsonKey(name: 'created_at') String createdAt,
       @JsonKey(name: 'updated_at') String updatedAt,
       Item? item});
@@ -455,7 +464,7 @@ class __$$SpecialOfferImplCopyWithImpl<$Res>
     Object? status = null,
     Object? discount = null,
     Object? discountType = null,
-    Object? description = null,
+    Object? description = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? item = freezed,
@@ -493,10 +502,10 @@ class __$$SpecialOfferImplCopyWithImpl<$Res>
           ? _value.discountType
           : discountType // ignore: cast_nullable_to_non_nullable
               as String,
-      description: null == description
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -525,10 +534,10 @@ class _$SpecialOfferImpl with DiagnosticableTreeMixin implements _SpecialOffer {
       required this.status,
       required this.discount,
       @JsonKey(name: 'discount_type') required this.discountType,
-      required this.description,
+      this.description,
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'updated_at') required this.updatedAt,
-      required this.item});
+      this.item});
 
   factory _$SpecialOfferImpl.fromJson(Map<String, dynamic> json) =>
       _$$SpecialOfferImplFromJson(json);
@@ -555,7 +564,8 @@ class _$SpecialOfferImpl with DiagnosticableTreeMixin implements _SpecialOffer {
   @JsonKey(name: 'discount_type')
   final String discountType;
   @override
-  final String description;
+  final String? description;
+// Changed from required
   @override
   @JsonKey(name: 'created_at')
   final String createdAt;
@@ -656,10 +666,10 @@ abstract class _SpecialOffer implements SpecialOffer {
       required final String status,
       required final int discount,
       @JsonKey(name: 'discount_type') required final String discountType,
-      required final String description,
+      final String? description,
       @JsonKey(name: 'created_at') required final String createdAt,
       @JsonKey(name: 'updated_at') required final String updatedAt,
-      required final Item? item}) = _$SpecialOfferImpl;
+      final Item? item}) = _$SpecialOfferImpl;
 
   factory _SpecialOffer.fromJson(Map<String, dynamic> json) =
       _$SpecialOfferImpl.fromJson;
@@ -686,7 +696,7 @@ abstract class _SpecialOffer implements SpecialOffer {
   @JsonKey(name: 'discount_type')
   String get discountType;
   @override
-  String get description;
+  String? get description; // Changed from required
   @override
   @JsonKey(name: 'created_at')
   String get createdAt;
@@ -714,52 +724,73 @@ mixin _$Item {
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'country_id')
-  int get countryId => throw _privateConstructorUsedError;
+  int? get countryId =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'brand_model_id')
-  int get brandModelId => throw _privateConstructorUsedError;
+  int? get brandModelId =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'brand_id')
-  int get brandId => throw _privateConstructorUsedError;
+  int? get brandId =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'category_id')
-  int get categoryId => throw _privateConstructorUsedError;
+  int? get categoryId =>
+      throw _privateConstructorUsedError; // Changed from required
   String get name => throw _privateConstructorUsedError;
-  String get year => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  List<String> get images => throw _privateConstructorUsedError;
-  String get location => throw _privateConstructorUsedError;
+  String? get year =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get slug =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get description =>
+      throw _privateConstructorUsedError; // Changed from required
+  List<String>? get images =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get location =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'serial_number')
   String? get serialNumber => throw _privateConstructorUsedError;
-  String get condition => throw _privateConstructorUsedError;
+  String? get condition =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'steer_position')
   String? get steerPosition => throw _privateConstructorUsedError;
   @JsonKey(name: 'engine_capacity')
-  String get engineCapacity => throw _privateConstructorUsedError;
+  String? get engineCapacity =>
+      throw _privateConstructorUsedError; // Changed from required
   String? get transmission => throw _privateConstructorUsedError;
-  String get color => throw _privateConstructorUsedError;
+  String? get color =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'build_type')
   String? get buildType => throw _privateConstructorUsedError;
   @JsonKey(name: 'number_of_passengers')
-  int get numberOfPassengers => throw _privateConstructorUsedError;
-  List<String> get features => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
-  String get price => throw _privateConstructorUsedError;
-  String get mileage => throw _privateConstructorUsedError;
-  int get warranty => throw _privateConstructorUsedError;
+  int? get numberOfPassengers =>
+      throw _privateConstructorUsedError; // Changed from required
+  List<String>? get features =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get status =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get price =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get mileage =>
+      throw _privateConstructorUsedError; // Changed from required
+  int? get warranty =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
   String? get deletedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
+  String? get createdAt =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
-  Brand? get brand => throw _privateConstructorUsedError;
-  Category? get category => throw _privateConstructorUsedError;
+  String? get updatedAt =>
+      throw _privateConstructorUsedError; // Changed from required
+  Brand? get brand =>
+      throw _privateConstructorUsedError; // Changed from required
+  Category? get category =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'brand_model')
-  BrandModel? get brandModel => throw _privateConstructorUsedError;
-  @JsonKey(name: 'BrandModel')
-  BrandModel? get brandModelAlt => throw _privateConstructorUsedError;
-  dynamic get user => throw _privateConstructorUsedError;
+  BrandModel? get brandModel =>
+      throw _privateConstructorUsedError; // Removed duplicate BrandModel field
+  Map<String, dynamic>? get user => throw _privateConstructorUsedError;
 
   /// Serializes this Item to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -778,43 +809,41 @@ abstract class $ItemCopyWith<$Res> {
   $Res call(
       {String id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id') int countryId,
-      @JsonKey(name: 'brand_model_id') int brandModelId,
-      @JsonKey(name: 'brand_id') int brandId,
-      @JsonKey(name: 'category_id') int categoryId,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'brand_model_id') int? brandModelId,
+      @JsonKey(name: 'brand_id') int? brandId,
+      @JsonKey(name: 'category_id') int? categoryId,
       String name,
-      String year,
-      String slug,
-      String description,
-      List<String> images,
-      String location,
+      String? year,
+      String? slug,
+      String? description,
+      List<String>? images,
+      String? location,
       @JsonKey(name: 'serial_number') String? serialNumber,
-      String condition,
+      String? condition,
       @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String engineCapacity,
+      @JsonKey(name: 'engine_capacity') String? engineCapacity,
       String? transmission,
-      String color,
+      String? color,
       @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int numberOfPassengers,
-      List<String> features,
-      String status,
-      String price,
-      String mileage,
-      int warranty,
+      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      List<String>? features,
+      String? status,
+      String? price,
+      String? mileage,
+      int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
-      @JsonKey(name: 'BrandModel') BrandModel? brandModelAlt,
-      dynamic user});
+      Map<String, dynamic>? user});
 
   $BrandCopyWith<$Res>? get brand;
   $CategoryCopyWith<$Res>? get category;
   $BrandModelCopyWith<$Res>? get brandModel;
-  $BrandModelCopyWith<$Res>? get brandModelAlt;
 }
 
 /// @nodoc
@@ -834,37 +863,36 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
   $Res call({
     Object? id = null,
     Object? userId = freezed,
-    Object? countryId = null,
-    Object? brandModelId = null,
-    Object? brandId = null,
-    Object? categoryId = null,
+    Object? countryId = freezed,
+    Object? brandModelId = freezed,
+    Object? brandId = freezed,
+    Object? categoryId = freezed,
     Object? name = null,
-    Object? year = null,
-    Object? slug = null,
-    Object? description = null,
-    Object? images = null,
-    Object? location = null,
+    Object? year = freezed,
+    Object? slug = freezed,
+    Object? description = freezed,
+    Object? images = freezed,
+    Object? location = freezed,
     Object? serialNumber = freezed,
-    Object? condition = null,
+    Object? condition = freezed,
     Object? steerPosition = freezed,
-    Object? engineCapacity = null,
+    Object? engineCapacity = freezed,
     Object? transmission = freezed,
-    Object? color = null,
+    Object? color = freezed,
     Object? buildType = freezed,
-    Object? numberOfPassengers = null,
-    Object? features = null,
-    Object? status = null,
-    Object? price = null,
-    Object? mileage = null,
-    Object? warranty = null,
+    Object? numberOfPassengers = freezed,
+    Object? features = freezed,
+    Object? status = freezed,
+    Object? price = freezed,
+    Object? mileage = freezed,
+    Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
-    Object? brandModelAlt = freezed,
     Object? user = freezed,
   }) {
     return _then(_value.copyWith(
@@ -876,98 +904,98 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String?,
-      countryId: null == countryId
+      countryId: freezed == countryId
           ? _value.countryId
           : countryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      brandModelId: null == brandModelId
+              as int?,
+      brandModelId: freezed == brandModelId
           ? _value.brandModelId
           : brandModelId // ignore: cast_nullable_to_non_nullable
-              as int,
-      brandId: null == brandId
+              as int?,
+      brandId: freezed == brandId
           ? _value.brandId
           : brandId // ignore: cast_nullable_to_non_nullable
-              as int,
-      categoryId: null == categoryId
+              as int?,
+      categoryId: freezed == categoryId
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      year: null == year
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
+              as String?,
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
+              as String?,
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      images: null == images
+              as String?,
+      images: freezed == images
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      location: null == location
+              as List<String>?,
+      location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       serialNumber: freezed == serialNumber
           ? _value.serialNumber
           : serialNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      condition: null == condition
+      condition: freezed == condition
           ? _value.condition
           : condition // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       steerPosition: freezed == steerPosition
           ? _value.steerPosition
           : steerPosition // ignore: cast_nullable_to_non_nullable
               as String?,
-      engineCapacity: null == engineCapacity
+      engineCapacity: freezed == engineCapacity
           ? _value.engineCapacity
           : engineCapacity // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       transmission: freezed == transmission
           ? _value.transmission
           : transmission // ignore: cast_nullable_to_non_nullable
               as String?,
-      color: null == color
+      color: freezed == color
           ? _value.color
           : color // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       buildType: freezed == buildType
           ? _value.buildType
           : buildType // ignore: cast_nullable_to_non_nullable
               as String?,
-      numberOfPassengers: null == numberOfPassengers
+      numberOfPassengers: freezed == numberOfPassengers
           ? _value.numberOfPassengers
           : numberOfPassengers // ignore: cast_nullable_to_non_nullable
-              as int,
-      features: null == features
+              as int?,
+      features: freezed == features
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      status: null == status
+              as List<String>?,
+      status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      price: null == price
+              as String?,
+      price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as String,
-      mileage: null == mileage
+              as String?,
+      mileage: freezed == mileage
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
-              as String,
-      warranty: null == warranty
+              as String?,
+      warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
@@ -976,14 +1004,14 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -996,14 +1024,10 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
           ? _value.brandModel
           : brandModel // ignore: cast_nullable_to_non_nullable
               as BrandModel?,
-      brandModelAlt: freezed == brandModelAlt
-          ? _value.brandModelAlt
-          : brandModelAlt // ignore: cast_nullable_to_non_nullable
-              as BrandModel?,
       user: freezed == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 
@@ -1048,20 +1072,6 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
       return _then(_value.copyWith(brandModel: value) as $Val);
     });
   }
-
-  /// Create a copy of Item
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $BrandModelCopyWith<$Res>? get brandModelAlt {
-    if (_value.brandModelAlt == null) {
-      return null;
-    }
-
-    return $BrandModelCopyWith<$Res>(_value.brandModelAlt!, (value) {
-      return _then(_value.copyWith(brandModelAlt: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -1074,38 +1084,37 @@ abstract class _$$ItemImplCopyWith<$Res> implements $ItemCopyWith<$Res> {
   $Res call(
       {String id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id') int countryId,
-      @JsonKey(name: 'brand_model_id') int brandModelId,
-      @JsonKey(name: 'brand_id') int brandId,
-      @JsonKey(name: 'category_id') int categoryId,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'brand_model_id') int? brandModelId,
+      @JsonKey(name: 'brand_id') int? brandId,
+      @JsonKey(name: 'category_id') int? categoryId,
       String name,
-      String year,
-      String slug,
-      String description,
-      List<String> images,
-      String location,
+      String? year,
+      String? slug,
+      String? description,
+      List<String>? images,
+      String? location,
       @JsonKey(name: 'serial_number') String? serialNumber,
-      String condition,
+      String? condition,
       @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String engineCapacity,
+      @JsonKey(name: 'engine_capacity') String? engineCapacity,
       String? transmission,
-      String color,
+      String? color,
       @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int numberOfPassengers,
-      List<String> features,
-      String status,
-      String price,
-      String mileage,
-      int warranty,
+      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      List<String>? features,
+      String? status,
+      String? price,
+      String? mileage,
+      int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
-      @JsonKey(name: 'BrandModel') BrandModel? brandModelAlt,
-      dynamic user});
+      Map<String, dynamic>? user});
 
   @override
   $BrandCopyWith<$Res>? get brand;
@@ -1113,8 +1122,6 @@ abstract class _$$ItemImplCopyWith<$Res> implements $ItemCopyWith<$Res> {
   $CategoryCopyWith<$Res>? get category;
   @override
   $BrandModelCopyWith<$Res>? get brandModel;
-  @override
-  $BrandModelCopyWith<$Res>? get brandModelAlt;
 }
 
 /// @nodoc
@@ -1131,37 +1138,36 @@ class __$$ItemImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? userId = freezed,
-    Object? countryId = null,
-    Object? brandModelId = null,
-    Object? brandId = null,
-    Object? categoryId = null,
+    Object? countryId = freezed,
+    Object? brandModelId = freezed,
+    Object? brandId = freezed,
+    Object? categoryId = freezed,
     Object? name = null,
-    Object? year = null,
-    Object? slug = null,
-    Object? description = null,
-    Object? images = null,
-    Object? location = null,
+    Object? year = freezed,
+    Object? slug = freezed,
+    Object? description = freezed,
+    Object? images = freezed,
+    Object? location = freezed,
     Object? serialNumber = freezed,
-    Object? condition = null,
+    Object? condition = freezed,
     Object? steerPosition = freezed,
-    Object? engineCapacity = null,
+    Object? engineCapacity = freezed,
     Object? transmission = freezed,
-    Object? color = null,
+    Object? color = freezed,
     Object? buildType = freezed,
-    Object? numberOfPassengers = null,
-    Object? features = null,
-    Object? status = null,
-    Object? price = null,
-    Object? mileage = null,
-    Object? warranty = null,
+    Object? numberOfPassengers = freezed,
+    Object? features = freezed,
+    Object? status = freezed,
+    Object? price = freezed,
+    Object? mileage = freezed,
+    Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
-    Object? brandModelAlt = freezed,
     Object? user = freezed,
   }) {
     return _then(_$ItemImpl(
@@ -1173,98 +1179,98 @@ class __$$ItemImplCopyWithImpl<$Res>
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String?,
-      countryId: null == countryId
+      countryId: freezed == countryId
           ? _value.countryId
           : countryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      brandModelId: null == brandModelId
+              as int?,
+      brandModelId: freezed == brandModelId
           ? _value.brandModelId
           : brandModelId // ignore: cast_nullable_to_non_nullable
-              as int,
-      brandId: null == brandId
+              as int?,
+      brandId: freezed == brandId
           ? _value.brandId
           : brandId // ignore: cast_nullable_to_non_nullable
-              as int,
-      categoryId: null == categoryId
+              as int?,
+      categoryId: freezed == categoryId
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      year: null == year
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
+              as String?,
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
+              as String?,
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      images: null == images
+              as String?,
+      images: freezed == images
           ? _value._images
           : images // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      location: null == location
+              as List<String>?,
+      location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       serialNumber: freezed == serialNumber
           ? _value.serialNumber
           : serialNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      condition: null == condition
+      condition: freezed == condition
           ? _value.condition
           : condition // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       steerPosition: freezed == steerPosition
           ? _value.steerPosition
           : steerPosition // ignore: cast_nullable_to_non_nullable
               as String?,
-      engineCapacity: null == engineCapacity
+      engineCapacity: freezed == engineCapacity
           ? _value.engineCapacity
           : engineCapacity // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       transmission: freezed == transmission
           ? _value.transmission
           : transmission // ignore: cast_nullable_to_non_nullable
               as String?,
-      color: null == color
+      color: freezed == color
           ? _value.color
           : color // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       buildType: freezed == buildType
           ? _value.buildType
           : buildType // ignore: cast_nullable_to_non_nullable
               as String?,
-      numberOfPassengers: null == numberOfPassengers
+      numberOfPassengers: freezed == numberOfPassengers
           ? _value.numberOfPassengers
           : numberOfPassengers // ignore: cast_nullable_to_non_nullable
-              as int,
-      features: null == features
+              as int?,
+      features: freezed == features
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      status: null == status
+              as List<String>?,
+      status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      price: null == price
+              as String?,
+      price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as String,
-      mileage: null == mileage
+              as String?,
+      mileage: freezed == mileage
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
-              as String,
-      warranty: null == warranty
+              as String?,
+      warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
@@ -1273,14 +1279,14 @@ class __$$ItemImplCopyWithImpl<$Res>
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1293,14 +1299,10 @@ class __$$ItemImplCopyWithImpl<$Res>
           ? _value.brandModel
           : brandModel // ignore: cast_nullable_to_non_nullable
               as BrandModel?,
-      brandModelAlt: freezed == brandModelAlt
-          ? _value.brandModelAlt
-          : brandModelAlt // ignore: cast_nullable_to_non_nullable
-              as BrandModel?,
       user: freezed == user
-          ? _value.user
+          ? _value._user
           : user // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -1311,40 +1313,40 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   const _$ItemImpl(
       {required this.id,
       @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'country_id') required this.countryId,
-      @JsonKey(name: 'brand_model_id') required this.brandModelId,
-      @JsonKey(name: 'brand_id') required this.brandId,
-      @JsonKey(name: 'category_id') required this.categoryId,
+      @JsonKey(name: 'country_id') this.countryId,
+      @JsonKey(name: 'brand_model_id') this.brandModelId,
+      @JsonKey(name: 'brand_id') this.brandId,
+      @JsonKey(name: 'category_id') this.categoryId,
       required this.name,
-      required this.year,
-      required this.slug,
-      required this.description,
-      required final List<String> images,
-      required this.location,
+      this.year,
+      this.slug,
+      this.description,
+      final List<String>? images,
+      this.location,
       @JsonKey(name: 'serial_number') this.serialNumber,
-      required this.condition,
+      this.condition,
       @JsonKey(name: 'steer_position') this.steerPosition,
-      @JsonKey(name: 'engine_capacity') required this.engineCapacity,
+      @JsonKey(name: 'engine_capacity') this.engineCapacity,
       this.transmission,
-      required this.color,
+      this.color,
       @JsonKey(name: 'build_type') this.buildType,
-      @JsonKey(name: 'number_of_passengers') required this.numberOfPassengers,
-      required final List<String> features,
-      required this.status,
-      required this.price,
-      required this.mileage,
-      required this.warranty,
+      @JsonKey(name: 'number_of_passengers') this.numberOfPassengers,
+      final List<String>? features,
+      this.status,
+      this.price,
+      this.mileage,
+      this.warranty,
       @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
       @JsonKey(name: 'deleted_at') this.deletedAt,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt,
-      required this.brand,
-      required this.category,
-      @JsonKey(name: 'brand_model') required this.brandModel,
-      @JsonKey(name: 'BrandModel') this.brandModelAlt,
-      required this.user})
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      this.brand,
+      this.category,
+      @JsonKey(name: 'brand_model') this.brandModel,
+      final Map<String, dynamic>? user = null})
       : _images = images,
-        _features = features;
+        _features = features,
+        _user = user;
 
   factory _$ItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$ItemImplFromJson(json);
@@ -1356,71 +1358,95 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   final String? userId;
   @override
   @JsonKey(name: 'country_id')
-  final int countryId;
+  final int? countryId;
+// Changed from required
   @override
   @JsonKey(name: 'brand_model_id')
-  final int brandModelId;
+  final int? brandModelId;
+// Changed from required
   @override
   @JsonKey(name: 'brand_id')
-  final int brandId;
+  final int? brandId;
+// Changed from required
   @override
   @JsonKey(name: 'category_id')
-  final int categoryId;
+  final int? categoryId;
+// Changed from required
   @override
   final String name;
   @override
-  final String year;
+  final String? year;
+// Changed from required
   @override
-  final String slug;
+  final String? slug;
+// Changed from required
   @override
-  final String description;
-  final List<String> _images;
+  final String? description;
+// Changed from required
+  final List<String>? _images;
+// Changed from required
   @override
-  List<String> get images {
+  List<String>? get images {
+    final value = _images;
+    if (value == null) return null;
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_images);
+    return EqualUnmodifiableListView(value);
   }
 
+// Changed from required
   @override
-  final String location;
+  final String? location;
+// Changed from required
   @override
   @JsonKey(name: 'serial_number')
   final String? serialNumber;
   @override
-  final String condition;
+  final String? condition;
+// Changed from required
   @override
   @JsonKey(name: 'steer_position')
   final String? steerPosition;
   @override
   @JsonKey(name: 'engine_capacity')
-  final String engineCapacity;
+  final String? engineCapacity;
+// Changed from required
   @override
   final String? transmission;
   @override
-  final String color;
+  final String? color;
+// Changed from required
   @override
   @JsonKey(name: 'build_type')
   final String? buildType;
   @override
   @JsonKey(name: 'number_of_passengers')
-  final int numberOfPassengers;
-  final List<String> _features;
+  final int? numberOfPassengers;
+// Changed from required
+  final List<String>? _features;
+// Changed from required
   @override
-  List<String> get features {
+  List<String>? get features {
+    final value = _features;
+    if (value == null) return null;
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_features);
+    return EqualUnmodifiableListView(value);
   }
 
+// Changed from required
   @override
-  final String status;
+  final String? status;
+// Changed from required
   @override
-  final String price;
+  final String? price;
+// Changed from required
   @override
-  final String mileage;
+  final String? mileage;
+// Changed from required
   @override
-  final int warranty;
+  final int? warranty;
+// Changed from required
   @override
   @JsonKey(name: 'warranty_expiration')
   final String? warrantyExpiration;
@@ -1429,26 +1455,37 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   final String? deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  final String createdAt;
+  final String? createdAt;
+// Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  final String? updatedAt;
+// Changed from required
   @override
   final Brand? brand;
+// Changed from required
   @override
   final Category? category;
+// Changed from required
   @override
   @JsonKey(name: 'brand_model')
   final BrandModel? brandModel;
+// Removed duplicate BrandModel field
+  final Map<String, dynamic>? _user;
+// Removed duplicate BrandModel field
   @override
-  @JsonKey(name: 'BrandModel')
-  final BrandModel? brandModelAlt;
-  @override
-  final dynamic user;
+  @JsonKey()
+  Map<String, dynamic>? get user {
+    final value = _user;
+    if (value == null) return null;
+    if (_user is EqualUnmodifiableMapView) return _user;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Item(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, brand: $brand, category: $category, brandModel: $brandModel, brandModelAlt: $brandModelAlt, user: $user)';
+    return 'Item(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, brand: $brand, category: $category, brandModel: $brandModel, user: $user)';
   }
 
   @override
@@ -1488,7 +1525,6 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
       ..add(DiagnosticsProperty('brand', brand))
       ..add(DiagnosticsProperty('category', category))
       ..add(DiagnosticsProperty('brandModel', brandModel))
-      ..add(DiagnosticsProperty('brandModelAlt', brandModelAlt))
       ..add(DiagnosticsProperty('user', user));
   }
 
@@ -1548,9 +1584,7 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
                 other.category == category) &&
             (identical(other.brandModel, brandModel) ||
                 other.brandModel == brandModel) &&
-            (identical(other.brandModelAlt, brandModelAlt) ||
-                other.brandModelAlt == brandModelAlt) &&
-            const DeepCollectionEquality().equals(other.user, user));
+            const DeepCollectionEquality().equals(other._user, _user));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1589,8 +1623,7 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
         brand,
         category,
         brandModel,
-        brandModelAlt,
-        const DeepCollectionEquality().hash(user)
+        const DeepCollectionEquality().hash(_user)
       ]);
 
   /// Create a copy of Item
@@ -1613,39 +1646,37 @@ abstract class _Item implements Item {
   const factory _Item(
       {required final String id,
       @JsonKey(name: 'user_id') final String? userId,
-      @JsonKey(name: 'country_id') required final int countryId,
-      @JsonKey(name: 'brand_model_id') required final int brandModelId,
-      @JsonKey(name: 'brand_id') required final int brandId,
-      @JsonKey(name: 'category_id') required final int categoryId,
+      @JsonKey(name: 'country_id') final int? countryId,
+      @JsonKey(name: 'brand_model_id') final int? brandModelId,
+      @JsonKey(name: 'brand_id') final int? brandId,
+      @JsonKey(name: 'category_id') final int? categoryId,
       required final String name,
-      required final String year,
-      required final String slug,
-      required final String description,
-      required final List<String> images,
-      required final String location,
+      final String? year,
+      final String? slug,
+      final String? description,
+      final List<String>? images,
+      final String? location,
       @JsonKey(name: 'serial_number') final String? serialNumber,
-      required final String condition,
+      final String? condition,
       @JsonKey(name: 'steer_position') final String? steerPosition,
-      @JsonKey(name: 'engine_capacity') required final String engineCapacity,
+      @JsonKey(name: 'engine_capacity') final String? engineCapacity,
       final String? transmission,
-      required final String color,
+      final String? color,
       @JsonKey(name: 'build_type') final String? buildType,
-      @JsonKey(name: 'number_of_passengers')
-      required final int numberOfPassengers,
-      required final List<String> features,
-      required final String status,
-      required final String price,
-      required final String mileage,
-      required final int warranty,
+      @JsonKey(name: 'number_of_passengers') final int? numberOfPassengers,
+      final List<String>? features,
+      final String? status,
+      final String? price,
+      final String? mileage,
+      final int? warranty,
       @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') final String? deletedAt,
-      @JsonKey(name: 'created_at') required final String createdAt,
-      @JsonKey(name: 'updated_at') required final String updatedAt,
-      required final Brand? brand,
-      required final Category? category,
-      @JsonKey(name: 'brand_model') required final BrandModel? brandModel,
-      @JsonKey(name: 'BrandModel') final BrandModel? brandModelAlt,
-      required final dynamic user}) = _$ItemImpl;
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt,
+      final Brand? brand,
+      final Category? category,
+      @JsonKey(name: 'brand_model') final BrandModel? brandModel,
+      final Map<String, dynamic>? user}) = _$ItemImpl;
 
   factory _Item.fromJson(Map<String, dynamic> json) = _$ItemImpl.fromJson;
 
@@ -1656,59 +1687,59 @@ abstract class _Item implements Item {
   String? get userId;
   @override
   @JsonKey(name: 'country_id')
-  int get countryId;
+  int? get countryId; // Changed from required
   @override
   @JsonKey(name: 'brand_model_id')
-  int get brandModelId;
+  int? get brandModelId; // Changed from required
   @override
   @JsonKey(name: 'brand_id')
-  int get brandId;
+  int? get brandId; // Changed from required
   @override
   @JsonKey(name: 'category_id')
-  int get categoryId;
+  int? get categoryId; // Changed from required
   @override
   String get name;
   @override
-  String get year;
+  String? get year; // Changed from required
   @override
-  String get slug;
+  String? get slug; // Changed from required
   @override
-  String get description;
+  String? get description; // Changed from required
   @override
-  List<String> get images;
+  List<String>? get images; // Changed from required
   @override
-  String get location;
+  String? get location; // Changed from required
   @override
   @JsonKey(name: 'serial_number')
   String? get serialNumber;
   @override
-  String get condition;
+  String? get condition; // Changed from required
   @override
   @JsonKey(name: 'steer_position')
   String? get steerPosition;
   @override
   @JsonKey(name: 'engine_capacity')
-  String get engineCapacity;
+  String? get engineCapacity; // Changed from required
   @override
   String? get transmission;
   @override
-  String get color;
+  String? get color; // Changed from required
   @override
   @JsonKey(name: 'build_type')
   String? get buildType;
   @override
   @JsonKey(name: 'number_of_passengers')
-  int get numberOfPassengers;
+  int? get numberOfPassengers; // Changed from required
   @override
-  List<String> get features;
+  List<String>? get features; // Changed from required
   @override
-  String get status;
+  String? get status; // Changed from required
   @override
-  String get price;
+  String? get price; // Changed from required
   @override
-  String get mileage;
+  String? get mileage; // Changed from required
   @override
-  int get warranty;
+  int? get warranty; // Changed from required
   @override
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration;
@@ -1717,22 +1748,19 @@ abstract class _Item implements Item {
   String? get deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  String get createdAt;
+  String? get createdAt; // Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  String get updatedAt;
+  String? get updatedAt; // Changed from required
   @override
-  Brand? get brand;
+  Brand? get brand; // Changed from required
   @override
-  Category? get category;
+  Category? get category; // Changed from required
   @override
   @JsonKey(name: 'brand_model')
-  BrandModel? get brandModel;
+  BrandModel? get brandModel; // Removed duplicate BrandModel field
   @override
-  @JsonKey(name: 'BrandModel')
-  BrandModel? get brandModelAlt;
-  @override
-  dynamic get user;
+  Map<String, dynamic>? get user;
 
   /// Create a copy of Item
   /// with the given fields replaced by the non-null parameter values.
@@ -1752,12 +1780,15 @@ mixin _$Brand {
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
+  String? get slug =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get image =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
+  String? get createdAt =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Brand to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1777,10 +1808,10 @@ abstract class $BrandCopyWith<$Res> {
       {int id,
       @JsonKey(name: 'user_id') String? userId,
       String name,
-      String slug,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      String? slug,
+      String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -1801,10 +1832,10 @@ class _$BrandCopyWithImpl<$Res, $Val extends Brand>
     Object? id = null,
     Object? userId = freezed,
     Object? name = null,
-    Object? slug = null,
-    Object? image = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? slug = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -1819,22 +1850,22 @@ class _$BrandCopyWithImpl<$Res, $Val extends Brand>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
+              as String?,
+      image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -1850,10 +1881,10 @@ abstract class _$$BrandImplCopyWith<$Res> implements $BrandCopyWith<$Res> {
       {int id,
       @JsonKey(name: 'user_id') String? userId,
       String name,
-      String slug,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      String? slug,
+      String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -1872,10 +1903,10 @@ class __$$BrandImplCopyWithImpl<$Res>
     Object? id = null,
     Object? userId = freezed,
     Object? name = null,
-    Object? slug = null,
-    Object? image = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? slug = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$BrandImpl(
       id: null == id
@@ -1890,22 +1921,22 @@ class __$$BrandImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
+              as String?,
+      image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -1917,10 +1948,10 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
       {required this.id,
       @JsonKey(name: 'user_id') this.userId,
       required this.name,
-      required this.slug,
-      required this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      this.slug,
+      this.image,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$BrandImpl.fromJson(Map<String, dynamic> json) =>
       _$$BrandImplFromJson(json);
@@ -1933,15 +1964,18 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
   @override
   final String name;
   @override
-  final String slug;
+  final String? slug;
+// Changed from required
   @override
-  final String image;
+  final String? image;
+// Changed from required
   @override
   @JsonKey(name: 'created_at')
-  final String createdAt;
+  final String? createdAt;
+// Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  final String? updatedAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -2001,14 +2035,13 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
 
 abstract class _Brand implements Brand {
   const factory _Brand(
-          {required final int id,
-          @JsonKey(name: 'user_id') final String? userId,
-          required final String name,
-          required final String slug,
-          required final String image,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$BrandImpl;
+      {required final int id,
+      @JsonKey(name: 'user_id') final String? userId,
+      required final String name,
+      final String? slug,
+      final String? image,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$BrandImpl;
 
   factory _Brand.fromJson(Map<String, dynamic> json) = _$BrandImpl.fromJson;
 
@@ -2020,15 +2053,15 @@ abstract class _Brand implements Brand {
   @override
   String get name;
   @override
-  String get slug;
+  String? get slug; // Changed from required
   @override
-  String get image;
+  String? get image; // Changed from required
   @override
   @JsonKey(name: 'created_at')
-  String get createdAt;
+  String? get createdAt; // Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  String get updatedAt;
+  String? get updatedAt;
 
   /// Create a copy of Brand
   /// with the given fields replaced by the non-null parameter values.
@@ -2050,14 +2083,19 @@ mixin _$Category {
   @JsonKey(name: 'parent_id')
   String? get parentId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  List<String> get features => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
+  String? get slug =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get description =>
+      throw _privateConstructorUsedError; // Changed from required
+  List<String>? get features =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get image =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
+  String? get createdAt =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Category to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2079,12 +2117,12 @@ abstract class $CategoryCopyWith<$Res> {
       @JsonKey(name: 'user_id') String? userId,
       @JsonKey(name: 'parent_id') String? parentId,
       String name,
-      String slug,
-      String description,
-      List<String> features,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      String? slug,
+      String? description,
+      List<String>? features,
+      String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -2106,12 +2144,12 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
     Object? userId = freezed,
     Object? parentId = freezed,
     Object? name = null,
-    Object? slug = null,
-    Object? description = null,
-    Object? features = null,
-    Object? image = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? slug = freezed,
+    Object? description = freezed,
+    Object? features = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -2130,30 +2168,30 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
+              as String?,
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      features: null == features
+              as String?,
+      features: freezed == features
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      image: null == image
+              as List<String>?,
+      image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -2171,12 +2209,12 @@ abstract class _$$CategoryImplCopyWith<$Res>
       @JsonKey(name: 'user_id') String? userId,
       @JsonKey(name: 'parent_id') String? parentId,
       String name,
-      String slug,
-      String description,
-      List<String> features,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      String? slug,
+      String? description,
+      List<String>? features,
+      String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -2196,12 +2234,12 @@ class __$$CategoryImplCopyWithImpl<$Res>
     Object? userId = freezed,
     Object? parentId = freezed,
     Object? name = null,
-    Object? slug = null,
-    Object? description = null,
-    Object? features = null,
-    Object? image = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? slug = freezed,
+    Object? description = freezed,
+    Object? features = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$CategoryImpl(
       id: null == id
@@ -2220,30 +2258,30 @@ class __$$CategoryImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
+              as String?,
+      description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      features: null == features
+              as String?,
+      features: freezed == features
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      image: null == image
+              as List<String>?,
+      image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -2256,12 +2294,12 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
       @JsonKey(name: 'user_id') this.userId,
       @JsonKey(name: 'parent_id') this.parentId,
       required this.name,
-      required this.slug,
-      required this.description,
-      required final List<String> features,
-      required this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt})
+      this.slug,
+      this.description,
+      final List<String>? features,
+      this.image,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt})
       : _features = features;
 
   factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -2278,25 +2316,33 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   @override
   final String name;
   @override
-  final String slug;
+  final String? slug;
+// Changed from required
   @override
-  final String description;
-  final List<String> _features;
+  final String? description;
+// Changed from required
+  final List<String>? _features;
+// Changed from required
   @override
-  List<String> get features {
+  List<String>? get features {
+    final value = _features;
+    if (value == null) return null;
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_features);
+    return EqualUnmodifiableListView(value);
   }
 
+// Changed from required
   @override
-  final String image;
+  final String? image;
+// Changed from required
   @override
   @JsonKey(name: 'created_at')
-  final String createdAt;
+  final String? createdAt;
+// Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  final String? updatedAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -2374,17 +2420,16 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-          {required final int id,
-          @JsonKey(name: 'user_id') final String? userId,
-          @JsonKey(name: 'parent_id') final String? parentId,
-          required final String name,
-          required final String slug,
-          required final String description,
-          required final List<String> features,
-          required final String image,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$CategoryImpl;
+      {required final int id,
+      @JsonKey(name: 'user_id') final String? userId,
+      @JsonKey(name: 'parent_id') final String? parentId,
+      required final String name,
+      final String? slug,
+      final String? description,
+      final List<String>? features,
+      final String? image,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
       _$CategoryImpl.fromJson;
@@ -2400,19 +2445,19 @@ abstract class _Category implements Category {
   @override
   String get name;
   @override
-  String get slug;
+  String? get slug; // Changed from required
   @override
-  String get description;
+  String? get description; // Changed from required
   @override
-  List<String> get features;
+  List<String>? get features; // Changed from required
   @override
-  String get image;
+  String? get image; // Changed from required
   @override
   @JsonKey(name: 'created_at')
-  String get createdAt;
+  String? get createdAt; // Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  String get updatedAt;
+  String? get updatedAt;
 
   /// Create a copy of Category
   /// with the given fields replaced by the non-null parameter values.
@@ -2430,13 +2475,16 @@ BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
 mixin _$BrandModel {
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'brand_id')
-  int get brandId => throw _privateConstructorUsedError;
+  int? get brandId =>
+      throw _privateConstructorUsedError; // Changed from required
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
+  String? get slug =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
+  String? get createdAt =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this BrandModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2456,11 +2504,11 @@ abstract class $BrandModelCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      @JsonKey(name: 'brand_id') int brandId,
+      @JsonKey(name: 'brand_id') int? brandId,
       String name,
-      String slug,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      String? slug,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -2479,37 +2527,37 @@ class _$BrandModelCopyWithImpl<$Res, $Val extends BrandModel>
   @override
   $Res call({
     Object? id = null,
-    Object? brandId = null,
+    Object? brandId = freezed,
     Object? name = null,
-    Object? slug = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? slug = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      brandId: null == brandId
+      brandId: freezed == brandId
           ? _value.brandId
           : brandId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -2524,11 +2572,11 @@ abstract class _$$BrandModelImplCopyWith<$Res>
   @useResult
   $Res call(
       {int id,
-      @JsonKey(name: 'brand_id') int brandId,
+      @JsonKey(name: 'brand_id') int? brandId,
       String name,
-      String slug,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      String? slug,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -2545,37 +2593,37 @@ class __$$BrandModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? brandId = null,
+    Object? brandId = freezed,
     Object? name = null,
-    Object? slug = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? slug = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$BrandModelImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      brandId: null == brandId
+      brandId: freezed == brandId
           ? _value.brandId
           : brandId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
+              as String?,
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -2585,11 +2633,11 @@ class __$$BrandModelImplCopyWithImpl<$Res>
 class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
   const _$BrandModelImpl(
       {required this.id,
-      @JsonKey(name: 'brand_id') required this.brandId,
+      @JsonKey(name: 'brand_id') this.brandId,
       required this.name,
-      required this.slug,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      this.slug,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$BrandModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$BrandModelImplFromJson(json);
@@ -2598,17 +2646,20 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
   final int id;
   @override
   @JsonKey(name: 'brand_id')
-  final int brandId;
+  final int? brandId;
+// Changed from required
   @override
   final String name;
   @override
-  final String slug;
+  final String? slug;
+// Changed from required
   @override
   @JsonKey(name: 'created_at')
-  final String createdAt;
+  final String? createdAt;
+// Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  final String? updatedAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -2666,13 +2717,12 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
 
 abstract class _BrandModel implements BrandModel {
   const factory _BrandModel(
-          {required final int id,
-          @JsonKey(name: 'brand_id') required final int brandId,
-          required final String name,
-          required final String slug,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$BrandModelImpl;
+      {required final int id,
+      @JsonKey(name: 'brand_id') final int? brandId,
+      required final String name,
+      final String? slug,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$BrandModelImpl;
 
   factory _BrandModel.fromJson(Map<String, dynamic> json) =
       _$BrandModelImpl.fromJson;
@@ -2681,17 +2731,17 @@ abstract class _BrandModel implements BrandModel {
   int get id;
   @override
   @JsonKey(name: 'brand_id')
-  int get brandId;
+  int? get brandId; // Changed from required
   @override
   String get name;
   @override
-  String get slug;
+  String? get slug; // Changed from required
   @override
   @JsonKey(name: 'created_at')
-  String get createdAt;
+  String? get createdAt; // Changed from required
   @override
   @JsonKey(name: 'updated_at')
-  String get updatedAt;
+  String? get updatedAt;
 
   /// Create a copy of BrandModel
   /// with the given fields replaced by the non-null parameter values.
@@ -2924,15 +2974,19 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 mixin _$PaginationMeta {
   @JsonKey(name: 'current_page')
   int get currentPage => throw _privateConstructorUsedError;
-  int get from => throw _privateConstructorUsedError;
+  int? get from => throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'last_page')
-  int get lastPage => throw _privateConstructorUsedError;
-  List<PaginationMetaLink> get links => throw _privateConstructorUsedError;
-  String get path => throw _privateConstructorUsedError;
+  int? get lastPage =>
+      throw _privateConstructorUsedError; // Changed from required
+  List<PaginationMetaLink>? get links =>
+      throw _privateConstructorUsedError; // Changed from required
+  String? get path =>
+      throw _privateConstructorUsedError; // Changed from required
   @JsonKey(name: 'per_page')
-  int get perPage => throw _privateConstructorUsedError;
-  int get to => throw _privateConstructorUsedError;
-  int get total => throw _privateConstructorUsedError;
+  int? get perPage =>
+      throw _privateConstructorUsedError; // Changed from required
+  int? get to => throw _privateConstructorUsedError; // Changed from required
+  int? get total => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMeta to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -2952,13 +3006,13 @@ abstract class $PaginationMetaCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'current_page') int currentPage,
-      int from,
-      @JsonKey(name: 'last_page') int lastPage,
-      List<PaginationMetaLink> links,
-      String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int to,
-      int total});
+      int? from,
+      @JsonKey(name: 'last_page') int? lastPage,
+      List<PaginationMetaLink>? links,
+      String? path,
+      @JsonKey(name: 'per_page') int? perPage,
+      int? to,
+      int? total});
 }
 
 /// @nodoc
@@ -2977,47 +3031,47 @@ class _$PaginationMetaCopyWithImpl<$Res, $Val extends PaginationMeta>
   @override
   $Res call({
     Object? currentPage = null,
-    Object? from = null,
-    Object? lastPage = null,
-    Object? links = null,
-    Object? path = null,
-    Object? perPage = null,
-    Object? to = null,
-    Object? total = null,
+    Object? from = freezed,
+    Object? lastPage = freezed,
+    Object? links = freezed,
+    Object? path = freezed,
+    Object? perPage = freezed,
+    Object? to = freezed,
+    Object? total = freezed,
   }) {
     return _then(_value.copyWith(
       currentPage: null == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
               as int,
-      from: null == from
+      from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
-              as int,
-      lastPage: null == lastPage
+              as int?,
+      lastPage: freezed == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      links: null == links
+              as int?,
+      links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationMetaLink>,
-      path: null == path
+              as List<PaginationMetaLink>?,
+      path: freezed == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
-              as String,
-      perPage: null == perPage
+              as String?,
+      perPage: freezed == perPage
           ? _value.perPage
           : perPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      to: null == to
+              as int?,
+      to: freezed == to
           ? _value.to
           : to // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
+              as int?,
+      total: freezed == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ) as $Val);
   }
 }
@@ -3032,13 +3086,13 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'current_page') int currentPage,
-      int from,
-      @JsonKey(name: 'last_page') int lastPage,
-      List<PaginationMetaLink> links,
-      String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int to,
-      int total});
+      int? from,
+      @JsonKey(name: 'last_page') int? lastPage,
+      List<PaginationMetaLink>? links,
+      String? path,
+      @JsonKey(name: 'per_page') int? perPage,
+      int? to,
+      int? total});
 }
 
 /// @nodoc
@@ -3055,47 +3109,47 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? currentPage = null,
-    Object? from = null,
-    Object? lastPage = null,
-    Object? links = null,
-    Object? path = null,
-    Object? perPage = null,
-    Object? to = null,
-    Object? total = null,
+    Object? from = freezed,
+    Object? lastPage = freezed,
+    Object? links = freezed,
+    Object? path = freezed,
+    Object? perPage = freezed,
+    Object? to = freezed,
+    Object? total = freezed,
   }) {
     return _then(_$PaginationMetaImpl(
       currentPage: null == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
               as int,
-      from: null == from
+      from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
-              as int,
-      lastPage: null == lastPage
+              as int?,
+      lastPage: freezed == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      links: null == links
+              as int?,
+      links: freezed == links
           ? _value._links
           : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationMetaLink>,
-      path: null == path
+              as List<PaginationMetaLink>?,
+      path: freezed == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
-              as String,
-      perPage: null == perPage
+              as String?,
+      perPage: freezed == perPage
           ? _value.perPage
           : perPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      to: null == to
+              as int?,
+      to: freezed == to
           ? _value.to
           : to // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
+              as int?,
+      total: freezed == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -3107,13 +3161,13 @@ class _$PaginationMetaImpl
     implements _PaginationMeta {
   const _$PaginationMetaImpl(
       {@JsonKey(name: 'current_page') required this.currentPage,
-      required this.from,
-      @JsonKey(name: 'last_page') required this.lastPage,
-      required final List<PaginationMetaLink> links,
-      required this.path,
-      @JsonKey(name: 'per_page') required this.perPage,
-      required this.to,
-      required this.total})
+      this.from,
+      @JsonKey(name: 'last_page') this.lastPage,
+      final List<PaginationMetaLink>? links,
+      this.path,
+      @JsonKey(name: 'per_page') this.perPage,
+      this.to,
+      this.total})
       : _links = links;
 
   factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
@@ -3123,27 +3177,36 @@ class _$PaginationMetaImpl
   @JsonKey(name: 'current_page')
   final int currentPage;
   @override
-  final int from;
+  final int? from;
+// Changed from required
   @override
   @JsonKey(name: 'last_page')
-  final int lastPage;
-  final List<PaginationMetaLink> _links;
+  final int? lastPage;
+// Changed from required
+  final List<PaginationMetaLink>? _links;
+// Changed from required
   @override
-  List<PaginationMetaLink> get links {
+  List<PaginationMetaLink>? get links {
+    final value = _links;
+    if (value == null) return null;
     if (_links is EqualUnmodifiableListView) return _links;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_links);
+    return EqualUnmodifiableListView(value);
   }
 
+// Changed from required
   @override
-  final String path;
+  final String? path;
+// Changed from required
   @override
   @JsonKey(name: 'per_page')
-  final int perPage;
+  final int? perPage;
+// Changed from required
   @override
-  final int to;
+  final int? to;
+// Changed from required
   @override
-  final int total;
+  final int? total;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -3207,13 +3270,13 @@ class _$PaginationMetaImpl
 abstract class _PaginationMeta implements PaginationMeta {
   const factory _PaginationMeta(
       {@JsonKey(name: 'current_page') required final int currentPage,
-      required final int from,
-      @JsonKey(name: 'last_page') required final int lastPage,
-      required final List<PaginationMetaLink> links,
-      required final String path,
-      @JsonKey(name: 'per_page') required final int perPage,
-      required final int to,
-      required final int total}) = _$PaginationMetaImpl;
+      final int? from,
+      @JsonKey(name: 'last_page') final int? lastPage,
+      final List<PaginationMetaLink>? links,
+      final String? path,
+      @JsonKey(name: 'per_page') final int? perPage,
+      final int? to,
+      final int? total}) = _$PaginationMetaImpl;
 
   factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaImpl.fromJson;
@@ -3222,21 +3285,21 @@ abstract class _PaginationMeta implements PaginationMeta {
   @JsonKey(name: 'current_page')
   int get currentPage;
   @override
-  int get from;
+  int? get from; // Changed from required
   @override
   @JsonKey(name: 'last_page')
-  int get lastPage;
+  int? get lastPage; // Changed from required
   @override
-  List<PaginationMetaLink> get links;
+  List<PaginationMetaLink>? get links; // Changed from required
   @override
-  String get path;
+  String? get path; // Changed from required
   @override
   @JsonKey(name: 'per_page')
-  int get perPage;
+  int? get perPage; // Changed from required
   @override
-  int get to;
+  int? get to; // Changed from required
   @override
-  int get total;
+  int? get total;
 
   /// Create a copy of PaginationMeta
   /// with the given fields replaced by the non-null parameter values.
@@ -3253,8 +3316,9 @@ PaginationMetaLink _$PaginationMetaLinkFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$PaginationMetaLink {
   String? get url => throw _privateConstructorUsedError;
-  String get label => throw _privateConstructorUsedError;
-  bool get active => throw _privateConstructorUsedError;
+  String? get label =>
+      throw _privateConstructorUsedError; // Changed from required
+  bool? get active => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMetaLink to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -3272,7 +3336,7 @@ abstract class $PaginationMetaLinkCopyWith<$Res> {
           PaginationMetaLink value, $Res Function(PaginationMetaLink) then) =
       _$PaginationMetaLinkCopyWithImpl<$Res, PaginationMetaLink>;
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call({String? url, String? label, bool? active});
 }
 
 /// @nodoc
@@ -3291,22 +3355,22 @@ class _$PaginationMetaLinkCopyWithImpl<$Res, $Val extends PaginationMetaLink>
   @override
   $Res call({
     Object? url = freezed,
-    Object? label = null,
-    Object? active = null,
+    Object? label = freezed,
+    Object? active = freezed,
   }) {
     return _then(_value.copyWith(
       url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
-      label: null == label
+      label: freezed == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      active: null == active
+              as String?,
+      active: freezed == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
     ) as $Val);
   }
 }
@@ -3319,7 +3383,7 @@ abstract class _$$PaginationMetaLinkImplCopyWith<$Res>
       __$$PaginationMetaLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call({String? url, String? label, bool? active});
 }
 
 /// @nodoc
@@ -3336,22 +3400,22 @@ class __$$PaginationMetaLinkImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? url = freezed,
-    Object? label = null,
-    Object? active = null,
+    Object? label = freezed,
+    Object? active = freezed,
   }) {
     return _then(_$PaginationMetaLinkImpl(
       url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
-      label: null == label
+      label: freezed == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      active: null == active
+              as String?,
+      active: freezed == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
     ));
   }
 }
@@ -3361,8 +3425,7 @@ class __$$PaginationMetaLinkImplCopyWithImpl<$Res>
 class _$PaginationMetaLinkImpl
     with DiagnosticableTreeMixin
     implements _PaginationMetaLink {
-  const _$PaginationMetaLinkImpl(
-      {this.url, required this.label, required this.active});
+  const _$PaginationMetaLinkImpl({this.url, this.label, this.active});
 
   factory _$PaginationMetaLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaLinkImplFromJson(json);
@@ -3370,9 +3433,10 @@ class _$PaginationMetaLinkImpl
   @override
   final String? url;
   @override
-  final String label;
+  final String? label;
+// Changed from required
   @override
-  final bool active;
+  final bool? active;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -3423,8 +3487,8 @@ class _$PaginationMetaLinkImpl
 abstract class _PaginationMetaLink implements PaginationMetaLink {
   const factory _PaginationMetaLink(
       {final String? url,
-      required final String label,
-      required final bool active}) = _$PaginationMetaLinkImpl;
+      final String? label,
+      final bool? active}) = _$PaginationMetaLinkImpl;
 
   factory _PaginationMetaLink.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaLinkImpl.fromJson;
@@ -3432,9 +3496,9 @@ abstract class _PaginationMetaLink implements PaginationMetaLink {
   @override
   String? get url;
   @override
-  String get label;
+  String? get label; // Changed from required
   @override
-  bool get active;
+  bool? get active;
 
   /// Create a copy of PaginationMetaLink
   /// with the given fields replaced by the non-null parameter values.

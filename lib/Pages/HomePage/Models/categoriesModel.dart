@@ -1,4 +1,3 @@
-// category_model.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -9,13 +8,13 @@ part 'categoriesModel.g.dart';
 class Categories with _$Categories {
   const factory Categories({
     required int id,
-    @JsonKey(name: 'user_id') required String userId,
-    @JsonKey(name: 'parent_id') required int parentId,
+    @JsonKey(name: 'user_id') String? userId, // Changed to nullable
+    @JsonKey(name: 'parent_id') int? parentId, // Changed to nullable
     required String name,
-    required String slug,
-    required String description,
-    required List<String?> features, // Handles null values in array
-    required String image,
+    @Default('') String slug, // Added default value
+    @Default('') String description, // Added default value
+    @Default([]) List<String> features, // Removed nullable items
+    @Default('assets/images/category_placeholder.png') String image, // Added default
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
   }) = _Categories;
@@ -27,7 +26,7 @@ class Categories with _$Categories {
 @freezed
 class CategoriesResponse with _$CategoriesResponse {
   const factory CategoriesResponse({
-    required List<Categories> data,
+    @Default([]) List<Categories> data, // Added default empty list
   }) = _CategoriesResponse;
 
   factory CategoriesResponse.fromJson(Map<String, dynamic> json) =>

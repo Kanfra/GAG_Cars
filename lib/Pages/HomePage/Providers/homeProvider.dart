@@ -4,38 +4,75 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/recommendedModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
+import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class HomeProvider with ChangeNotifier {
   final HomeService _homeService;
+  final Logger logger = Logger();
 
-  HomeProvider(this._homeService);
+  int _recommendedPage = 1;
+  bool _isLoadingMore = false;
+  bool _hasMoreRecommended = true;
+
+  bool get isLoadingMore => _isLoadingMore;
+  bool get hasMoreRecommended => _hasMoreRecommended;
+
+  Future<void> loadMoreRecommended() async {
+    if(_isLoadingMore || !_hasMoreRecommended) return;
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try{
+      final newItems = await _homeService.fetchRecommended(page: _recommendedPage + 1);
+      if(newItems.isEmpty){
+        _hasMoreRecommended = false;
+      } else{
+        final newIds = newItems.map((e) => e.id).toSet();
+        _recommendedItems.removeWhere((item) => newIds.contains(item.id));
+        _recommendedItems.addAll(newItems);
+        _recommendedPage++;
+      }
+    }catch(e){
+      logger.e("Failed to load more recommended, error: $e");
+    } finally{
+      _isLoadingMore = false;
+      notifyListeners();
+    }
+  } 
 
   // State variables
   List<TrendingMake> _trendingMakes = [];
   List<SpecialOffer> _specialOffers = [];
-  List<Recommended> _recommendedItems = [];
+  List<RecommendedItem> _recommendedItems = [];
   List<Categories> _categories = [];
   bool _isLoading = false;
   String _errorMessage = '';
-  final logger = Logger();
+  bool _hasError = false;
 
   // Getters
   List<TrendingMake> get trendingMakes => _trendingMakes;
   List<SpecialOffer> get specialOffers => _specialOffers;
-  List<Recommended> get recommendedItems => _recommendedItems;
+  List<RecommendedItem> get recommendedItems => _recommendedItems;
   List<Categories> get categories => _categories;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+  bool get hasError => _hasError;
 
-  // Fetch all data
+  HomeProvider(this._homeService);
+
   Future<void> fetchAllData() async {
+    _recommendedPage = 1;
+    _hasMoreRecommended = true;
+
+
     _isLoading = true;
     _errorMessage = '';
+    _hasError = false;
     notifyListeners();
 
     try {
-      // Fetch data in parallel for better performance
       final results = await Future.wait([
         _homeService.fetchTrendingMakes(),
         _homeService.fetchSpecialOffers(),
@@ -45,27 +82,55 @@ class HomeProvider with ChangeNotifier {
 
       _trendingMakes = results[0] as List<TrendingMake>;
       _specialOffers = results[1] as List<SpecialOffer>;
-      _recommendedItems = results[2] as List<Recommended>;
+      _recommendedItems = results[2] as List<RecommendedItem>;
       _categories = results[3] as List<Categories>;
 
+    } on FormatException catch (e, stackTrace) {
+      _handleError('Data format error. Please try again later.', e, stackTrace);
+    } on http.ClientException catch (e, stackTrace) {
+      if (e.message?.contains('500') ?? false) {
+        _handleError('Server is currently unavailable.', e, stackTrace);
+      } else {
+        _handleError('Network connection failed.', e, stackTrace);
+      }
+    } catch (e, stackTrace) {
+      _handleError('An unexpected error occurred.', e, stackTrace);
+    } finally {
       _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      _errorMessage = 'Failed to load data: ${e.toString()}';
-      logger.e("Failed to load data: ${e.toString()}");
       notifyListeners();
     }
   }
 
-  // Toggle favorite status for recommended items
-  // void toggleFavorite(String itemId) {
-  //   final index = _recommendedItems.indexWhere((item) => item.id == itemId);
-  //   if (index != -1) {
-  //     _recommendedItems[index] = _recommendedItems[index].copyWith(
-  //       isLiked: !_recommendedItems[index].isLiked,
-  //     );
-  //     notifyListeners();
-  //   }
-  // }
+  void _handleError(String message, dynamic error, StackTrace stackTrace) {
+    _errorMessage = message;
+    _hasError = true;
+    logger.e(
+      'Data loading failed',
+      error: error,
+      stackTrace: stackTrace,
+    );
+    
+    // Preserve existing data if we have it
+    if (_trendingMakes.isEmpty &&
+        _specialOffers.isEmpty &&
+        _recommendedItems.isEmpty &&
+        _categories.isEmpty) {
+      // Clear all data if this was the first load
+      _trendingMakes = [];
+      _specialOffers = [];
+      _recommendedItems = [];
+      _categories = [];
+    }
+  }
+
+  Future<void> retryFailedRequest() async {
+    if (!_hasError) return;
+    await fetchAllData();
+  }
+
+  void clearError() {
+    _hasError = false;
+    _errorMessage = '';
+    notifyListeners();
+  }
 }

@@ -11,18 +11,21 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class DetailPage extends StatefulWidget {
   //final List<String> imageUrls;
-  final Map<String, dynamic> offer;
+  final Map<String, dynamic> allJson;
   const DetailPage({
     super.key, 
-    required this.offer,
+    required this.allJson,
     //required this.imageUrls
     });
 
+  
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
@@ -32,6 +35,10 @@ class _DetailPageState extends State<DetailPage> {
   final double _appBarHeight = 300;
   double _lastScrollPosition = 0;
   bool _isAppBarVisible = true;
+
+  late final Map<String, dynamic> item;
+  late final Map<String, dynamic>? product;
+  late final String? type;
 
   List<String> imageUrls = [
     "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
@@ -43,6 +50,9 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
+    item = widget.allJson['item'] as Map<String, dynamic>;
+    product = widget.allJson['product'] as Map<String, dynamic>;
+    type = widget.allJson['type'] as String?;
     _scrollController.addListener(_handleScroll);
   }
 
@@ -67,7 +77,7 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final screenSize = MediaQuery.of(context).size;
+    //final screenSize = MediaQuery.of(context).size
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: CustomScrollView(
@@ -123,27 +133,28 @@ class _DetailPageState extends State<DetailPage> {
                       children: [
                         // verhicle name text
                     TextLarge(
-                      title: 'Honda Civic Sport', 
+                      title: item['name'], 
                       fontWeight: FontWeight.bold, 
                       textColor: ColorGlobalVariables.blackColor
                       ),
                     const SizedBox(height: 5,),
                     // cost of vehicle
                     TextSmall(
-                      title: 'GH₵ 180,000.00', 
+                      title: 'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']))}', 
                       fontWeight: FontWeight.w500, 
                       textColor: ColorGlobalVariables.fadedBlackColor
                       ),
                     const SizedBox(height: 20,),
                     // some descriptions
-                    TextSmall(
-                      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas diam nam eu nulla a. Vestibulum aliquet facillisi interdum nibh blandit", 
+                    item['description'] != null ? TextSmall(
+                      title: item['description'], 
                       fontWeight: FontWeight.normal, 
                       textColor: ColorGlobalVariables.fadedBlackColor
-                      ),
-                    const SizedBox(height: 20,),
+                      ) : const SizedBox(),
+                    item['description'] != null ? const SizedBox(height: 20,) : const SizedBox(),
                     // location icon, location text, date, time
-                    Row(
+                    item['location'] != null ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // location icon
                         CustomIcon(
@@ -155,15 +166,15 @@ class _DetailPageState extends State<DetailPage> {
                         // date and time
                         Expanded(
                           child: TextSmall(
-                            title: 'Greater Accra, Haatso, March 6, 2025 at 5:20pm', 
+                            title: '${item['location']}, ${formatTimeAgo(item['created_at'])}', 
                             fontWeight: FontWeight.normal,
                             overflow: TextOverflow.ellipsis, 
                             textColor: ColorGlobalVariables.blackColor
                             ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 10,),
+                    ) : const SizedBox(),
+                    item['location'] != null ? const SizedBox(height: 10,) : const SizedBox(),
                     // five star, verified container, bell icon and text
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -261,14 +272,14 @@ class _DetailPageState extends State<DetailPage> {
                             const SizedBox(height: 5,),
                               // icon amount
                             TextSmall(
-                              title: '2020', 
+                              title: item['year'], 
                               fontWeight: FontWeight.normal, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
                         ),
                         // mileage
-                        Column(
+                        item['mileage'] != null ? Column(
                           children: [
                             CustomIcon(
                               iconData: Icons.speed, // directions_car 
@@ -285,12 +296,12 @@ class _DetailPageState extends State<DetailPage> {
                             const SizedBox(height: 5,),
                               // icon amount
                             TextSmall(
-                              title: '20,000 km', 
+                              title: '${item['mileage']} km', 
                               fontWeight: FontWeight.normal, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
-                        ),
+                        ) : const SizedBox(),
                         // fuel type
                         Column(
                           children: [
@@ -316,7 +327,7 @@ class _DetailPageState extends State<DetailPage> {
                           ],
                         ),
                         // engine
-                        Column(
+                        item['engine_capacity'] != null ? Column(
                           children: [
                             CustomIcon(
                               iconData: Icons.engineering, // build 
@@ -333,12 +344,12 @@ class _DetailPageState extends State<DetailPage> {
                             const SizedBox(height: 5,),
                               // icon amount
                             TextSmall(
-                              title: '2.0 L', 
+                              title: '${item["engine_capacity"]} L', 
                               fontWeight: FontWeight.normal, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
-                        ),
+                        ) : const SizedBox(),
                         // drive
                         Column(
                           children: [
@@ -390,14 +401,14 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             const SizedBox(height: 5,),
                             TextSmall(
-                              title: 'Honda', 
+                              title: item['category'].name, 
                               fontWeight: FontWeight.w500, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
                         ),
                         // model
-                        Column(
+                        item['brand_model'] != null ? Column(
                           children: [
                             TextExtraSmall(
                               title: 'Model', 
@@ -405,14 +416,14 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             const SizedBox(height: 5,),
                             TextSmall(
-                              title: 'Civic', 
+                              title: item['brand_model'].name, 
                               fontWeight: FontWeight.w500, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
-                        ),
+                        ) : const SizedBox(),
                         // color
-                        Column(
+                        item['color'] != null ? Column(
                           children: [
                             TextExtraSmall(
                               title: 'Color', 
@@ -420,14 +431,14 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             const SizedBox(height: 5,),
                             TextSmall(
-                              title: 'White', 
+                              title: item['color'], 
                               fontWeight: FontWeight.w500, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
-                        ),
+                        ) : const SizedBox(),
                         // seats
-                        Column(
+                        item['number_of_passengers'] != null ? Column(
                           children: [
                             TextExtraSmall(
                               title: 'Seats', 
@@ -435,12 +446,12 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             const SizedBox(height: 5,),
                             TextSmall(
-                              title: '4 seats', 
+                              title: '${item['number_of_passengers'].toString()} seats', 
                               fontWeight: FontWeight.w500, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
                           ],
-                        ),
+                        ) : const SizedBox(),
                         // registered
                         Column(
                           children: [
@@ -611,7 +622,7 @@ class _DetailPageState extends State<DetailPage> {
                                       imageBorderRadius: 8,
                                       imageHeight: 120,
                                       imageWidth: double.infinity,
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                       ),
                                     // product type
                                     Positioned(
@@ -787,10 +798,12 @@ class _DetailPageState extends State<DetailPage> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Main background image -done
+        // Main background image , currently working here
         CustomImage(
-          imagePath: imageUrls[0], 
-          isAssetImage: true, 
+          imagePath: item['images'] is List 
+          ? getImageUrl(item['images'].first) 
+          : '${ImageStringGlobalVariables.imagePath}car_placeholder.png', 
+          isAssetImage: item['images'] is List ? false : true, 
           fit: BoxFit.cover,
           isImageBorderRadiusRequired: false
           ),
@@ -834,16 +847,20 @@ class _DetailPageState extends State<DetailPage> {
             height: 80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: imageUrls.length,
+              itemCount: item['images'].length,
               itemBuilder: (context, index) {
+                final specialOffer = item['images'][index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: CustomImage(
-                      imagePath: imageUrls[index], 
-                      isAssetImage: true, 
+                      imagePath: item['images'] is List 
+                      ? getImageUrl(specialOffer) 
+                      : '${ImageStringGlobalVariables.imagePath}car_placeholder.png', 
+                      isAssetImage: item['images'] is List ? false : true,
                       imageWidth: 120,
+                      useShimmerEffect: false,
                       isImageBorderRadiusRequired: false
                       ),                    
                     // Image.network(

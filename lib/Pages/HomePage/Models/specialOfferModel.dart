@@ -8,8 +8,8 @@ part 'specialOfferModel.g.dart';
 class SpecialOfferResponse with _$SpecialOfferResponse {
   const factory SpecialOfferResponse({
     required List<SpecialOffer> data,
-    required PaginationLinks links,
-    required PaginationMeta meta,
+    required PaginationLinks? links,
+    required PaginationMeta? meta,
   }) = _SpecialOfferResponse;
 
   factory SpecialOfferResponse.fromJson(Map<String, dynamic> json) =>
@@ -27,10 +27,10 @@ class SpecialOffer with _$SpecialOffer {
     required String status,
     required int discount,
     @JsonKey(name: 'discount_type') required String discountType,
-    required String description,
+    String? description, // Changed from required
     @JsonKey(name: 'created_at') required String createdAt,
     @JsonKey(name: 'updated_at') required String updatedAt,
-    required Item? item,
+    Item? item, // Changed from required
   }) = _SpecialOffer;
 
   factory SpecialOffer.fromJson(Map<String, dynamic> json) =>
@@ -42,38 +42,38 @@ class Item with _$Item {
   const factory Item({
     required String id,
     @JsonKey(name: 'user_id') String? userId,
-    @JsonKey(name: 'country_id') required int countryId,
-    @JsonKey(name: 'brand_model_id') required int brandModelId,
-    @JsonKey(name: 'brand_id') required int brandId,
-    @JsonKey(name: 'category_id') required int categoryId,
+    @JsonKey(name: 'country_id') int? countryId, // Changed from required
+    @JsonKey(name: 'brand_model_id') int? brandModelId, // Changed from required
+    @JsonKey(name: 'brand_id') int? brandId, // Changed from required
+    @JsonKey(name: 'category_id') int? categoryId, // Changed from required
     required String name,
-    required String year,
-    required String slug,
-    required String description,
-    required List<String> images,
-    required String location,
+    String? year, // Changed from required
+    String? slug, // Changed from required
+    String? description, // Changed from required
+    List<String>? images, // Changed from required
+    String? location, // Changed from required
     @JsonKey(name: 'serial_number') String? serialNumber,
-    required String condition,
+    String? condition, // Changed from required
     @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity') required String engineCapacity,
+    @JsonKey(name: 'engine_capacity') String? engineCapacity, // Changed from required
     String? transmission,
-    required String color,
+    String? color, // Changed from required
     @JsonKey(name: 'build_type') String? buildType,
-    @JsonKey(name: 'number_of_passengers') required int numberOfPassengers,
-    required List<String> features,
-    required String status,
-    required String price,
-    required String mileage,
-    required int warranty,
+    @JsonKey(name: 'number_of_passengers') int? numberOfPassengers, // Changed from required
+    List<String>? features, // Changed from required
+    String? status, // Changed from required
+    String? price, // Changed from required
+    String? mileage, // Changed from required
+    int? warranty, // Changed from required
     @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
     @JsonKey(name: 'deleted_at') String? deletedAt,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
-    required Brand? brand,
-    required Category? category,
-    @JsonKey(name: 'brand_model') required BrandModel? brandModel,
-    @JsonKey(name: 'BrandModel') BrandModel? brandModelAlt,
-    required dynamic user, // Can be null or object in response
+    @JsonKey(name: 'created_at') String? createdAt, // Changed from required
+    @JsonKey(name: 'updated_at') String? updatedAt, // Changed from required
+    Brand? brand, // Changed from required
+    Category? category, // Changed from required
+    @JsonKey(name: 'brand_model') BrandModel? brandModel,
+    // Removed duplicate BrandModel field
+    @Default(null) Map<String, dynamic>? user, // Replaced dynamic
   }) = _Item;
 
   factory Item.fromJson(Map<String, dynamic> json) => _$ItemFromJson(json);
@@ -85,10 +85,10 @@ class Brand with _$Brand {
     required int id,
     @JsonKey(name: 'user_id') String? userId,
     required String name,
-    required String slug,
-    required String image,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
+    String? slug, // Changed from required
+    String? image, // Changed from required
+    @JsonKey(name: 'created_at') String? createdAt, // Changed from required
+    @JsonKey(name: 'updated_at') String? updatedAt, // Changed from required
   }) = _Brand;
 
   factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
@@ -101,12 +101,12 @@ class Category with _$Category {
     @JsonKey(name: 'user_id') String? userId,
     @JsonKey(name: 'parent_id') String? parentId,
     required String name,
-    required String slug,
-    required String description,
-    required List<String> features,
-    required String image,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
+    String? slug, // Changed from required
+    String? description, // Changed from required
+    List<String>? features, // Changed from required
+    String? image, // Changed from required
+    @JsonKey(name: 'created_at') String? createdAt, // Changed from required
+    @JsonKey(name: 'updated_at') String? updatedAt, // Changed from required
   }) = _Category;
 
   factory Category.fromJson(Map<String, dynamic> json) =>
@@ -117,11 +117,11 @@ class Category with _$Category {
 class BrandModel with _$BrandModel {
   const factory BrandModel({
     required int id,
-    @JsonKey(name: 'brand_id') required int brandId,
+    @JsonKey(name: 'brand_id') int? brandId, // Changed from required
     required String name,
-    required String slug,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
+    String? slug, // Changed from required
+    @JsonKey(name: 'created_at') String? createdAt, // Changed from required
+    @JsonKey(name: 'updated_at') String? updatedAt, // Changed from required
   }) = _BrandModel;
 
   factory BrandModel.fromJson(Map<String, dynamic> json) =>
@@ -145,13 +145,13 @@ class PaginationLinks with _$PaginationLinks {
 class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     @JsonKey(name: 'current_page') required int currentPage,
-    required int from,
-    @JsonKey(name: 'last_page') required int lastPage,
-    required List<PaginationMetaLink> links,
-    required String path,
-    @JsonKey(name: 'per_page') required int perPage,
-    required int to,
-    required int total,
+    int? from, // Changed from required
+    @JsonKey(name: 'last_page') int? lastPage, // Changed from required
+    List<PaginationMetaLink>? links, // Changed from required
+    String? path, // Changed from required
+    @JsonKey(name: 'per_page') int? perPage, // Changed from required
+    int? to, // Changed from required
+    int? total, // Changed from required
   }) = _PaginationMeta;
 
   factory PaginationMeta.fromJson(Map<String, dynamic> json) =>
@@ -162,8 +162,8 @@ class PaginationMeta with _$PaginationMeta {
 class PaginationMetaLink with _$PaginationMetaLink {
   const factory PaginationMetaLink({
     String? url,
-    required String label,
-    required bool active,
+    String? label, // Changed from required
+    bool? active, // Changed from required
   }) = _PaginationMetaLink;
 
   factory PaginationMetaLink.fromJson(Map<String, dynamic> json) =>

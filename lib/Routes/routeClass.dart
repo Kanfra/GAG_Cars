@@ -158,7 +158,16 @@ class RouteClass {
 
     // Home & others
     // GetPage(page: () => const HomePage(), name: homePage, transition: Transition.noTransition),
-    GetPage(page: () => DetailPage(offer: Get.arguments ?? {}), name: detailPage, transition: Transition.noTransition),
+    GetPage(
+      page: () { 
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return DetailPage(
+          allJson: args,
+          );
+        }, 
+      name: detailPage, 
+      transition: Transition.noTransition
+      ),
     GetPage(page: () => const NewsBlogPage(), name: newsBlogPage, transition: Transition.noTransition),
     GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
     GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),

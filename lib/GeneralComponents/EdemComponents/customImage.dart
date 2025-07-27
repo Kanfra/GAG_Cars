@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CustomImage extends StatelessWidget {
   final double? imageWidth;
@@ -11,6 +13,10 @@ class CustomImage extends StatelessWidget {
   final Widget? errorWidget;
   final bool isImageBorderRadiusRequired;
   final BoxFit? fit;
+  final bool useCache;
+  final bool useShimmerEffect;
+  final Color? shimmerBaseColor;
+  final Color? shimmerHighlightColor;
 
   const CustomImage({
     this.imageWidth,
@@ -23,6 +29,10 @@ class CustomImage extends StatelessWidget {
     this.placeholder,
     this.errorWidget,
     this.fit,
+    this.useCache = true,
+    this.useShimmerEffect = true,
+    this.shimmerBaseColor,
+    this.shimmerHighlightColor,
     super.key,
   });
 
@@ -37,7 +47,8 @@ class CustomImage extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(imageBorderRadius ?? 0),
-        child: _buildImageContent()),
+        child: _buildImageContent(),
+      ),
     );
   }
 
@@ -51,28 +62,46 @@ class CustomImage extends StatelessWidget {
         return Image.asset(
           imagePath,
           fit: fit ?? BoxFit.contain,
-          width: imageWidth ?? 45,
-          height: imageHeight ?? 45,
+          width: imageWidth,
+          height: imageHeight,
           errorBuilder: (_, __, ___) {
             debugPrint('Failed to load asset image: $imagePath');
             return errorWidget ?? _defaultErrorWidget();
           },
         );
       } else {
-        return Image.network(
-          imagePath,
-          fit: fit ?? BoxFit.cover,
-          width: imageWidth ?? 45,
-          height: imageHeight ?? 45,
-          loadingBuilder: (_, child, progress) {
-            if (progress == null) return child;
-            return placeholder ?? _defaultPlaceholder();
-          },
-          errorBuilder: (_, __, ___) {
-            debugPrint('Failed to load network image: $imagePath');
-            return errorWidget ?? _defaultErrorWidget();
-          },
-        );
+        if (useCache) {
+          return CachedNetworkImage(
+            imageUrl: imagePath,
+            width: imageWidth,
+            height: imageHeight,
+            fit: fit ?? BoxFit.cover,
+            placeholder: (context, url) => 
+                placeholder ?? _defaultPlaceholder(),
+            errorWidget: (context, url, error) {
+              debugPrint('Failed to load network image: $url, $error');
+              return errorWidget ?? _defaultErrorWidget();
+            },
+            memCacheWidth: imageWidth?.toInt(),
+            memCacheHeight: imageHeight?.toInt(),
+            fadeInDuration: const Duration(milliseconds: 300),
+          );
+        } else {
+          return Image.network(
+            imagePath,
+            fit: fit ?? BoxFit.cover,
+            width: imageWidth,
+            height: imageHeight,
+            loadingBuilder: (_, child, progress) {
+              if (progress == null) return child;
+              return placeholder ?? _defaultPlaceholder();
+            },
+            errorBuilder: (_, __, ___) {
+              debugPrint('Failed to load network image: $imagePath');
+              return errorWidget ?? _defaultErrorWidget();
+            },
+          );
+        }
       }
     } catch (e) {
       debugPrint('Image loading error: $e');
@@ -91,16 +120,28 @@ class CustomImage extends StatelessWidget {
   }
 
   Widget _defaultPlaceholder() {
-    return Center(
-      child: SizedBox(
-        width: (imageWidth ?? 45) * 0.3,
-        height: (imageWidth ?? 45) * 0.3,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Colors.grey[300],
+    if (useShimmerEffect) {
+      return Shimmer.fromColors(
+        baseColor: shimmerBaseColor ?? Colors.grey[300]!,
+        highlightColor: shimmerHighlightColor ?? Colors.grey[100]!,
+        child: Container(
+          color: Colors.white,
+          width: imageWidth ?? 45,
+          height: imageHeight ?? 45,
         ),
-      ),
-    );
+      );
+    } else {
+      return Center(
+        child: SizedBox(
+          width: (imageWidth ?? 45) * 0.3,
+          height: (imageWidth ?? 45) * 0.3,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: Colors.grey[300],
+          ),
+        ),
+      );
+    }
   }
 
   BorderRadius _calculateBorderRadius() {

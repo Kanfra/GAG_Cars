@@ -14,7 +14,7 @@ _$VehicleModelImpl _$$VehicleModelImplFromJson(Map<String, dynamic> json) =>
       vehicleType: json['vehicleType'] as String,
       condition: json['condition'] as String,
       year: (json['year'] as num).toInt(),
-      make: json['make'] as String,
+      make: (json['make'] as num?)?.toInt(),
       model: json['model'] as String,
       location:
           VehicleLocation.fromJson(json['location'] as Map<String, dynamic>),

@@ -112,7 +112,7 @@ class _WishlistPageState extends State<WishlistPage> {
                         isImageBorderRadiusRequired: true,
                         imageBorderRadius: 8,
                         imageHeight: 120,
-                        imageWidth: double.infinity,
+                        imageWidth: screenSize.width,
                         fit: BoxFit.cover,
                         ),
                       // product type

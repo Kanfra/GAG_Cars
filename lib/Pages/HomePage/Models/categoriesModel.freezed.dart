@@ -22,15 +22,18 @@ Categories _$CategoriesFromJson(Map<String, dynamic> json) {
 mixin _$Categories {
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
-  String get userId => throw _privateConstructorUsedError;
+  String? get userId =>
+      throw _privateConstructorUsedError; // Changed to nullable
   @JsonKey(name: 'parent_id')
-  int get parentId => throw _privateConstructorUsedError;
+  int? get parentId =>
+      throw _privateConstructorUsedError; // Changed to nullable
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  List<String?> get features =>
-      throw _privateConstructorUsedError; // Handles null values in array
-  String get image => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError; // Added default value
+  String get description =>
+      throw _privateConstructorUsedError; // Added default value
+  List<String> get features =>
+      throw _privateConstructorUsedError; // Removed nullable items
+  String get image => throw _privateConstructorUsedError; // Added default
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -54,12 +57,12 @@ abstract class $CategoriesCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      @JsonKey(name: 'user_id') String userId,
-      @JsonKey(name: 'parent_id') int parentId,
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'parent_id') int? parentId,
       String name,
       String slug,
       String description,
-      List<String?> features,
+      List<String> features,
       String image,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt});
@@ -81,8 +84,8 @@ class _$CategoriesCopyWithImpl<$Res, $Val extends Categories>
   @override
   $Res call({
     Object? id = null,
-    Object? userId = null,
-    Object? parentId = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
     Object? name = null,
     Object? slug = null,
     Object? description = null,
@@ -96,14 +99,14 @@ class _$CategoriesCopyWithImpl<$Res, $Val extends Categories>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      userId: null == userId
+      userId: freezed == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      parentId: null == parentId
+              as String?,
+      parentId: freezed == parentId
           ? _value.parentId
           : parentId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -119,7 +122,7 @@ class _$CategoriesCopyWithImpl<$Res, $Val extends Categories>
       features: null == features
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String?>,
+              as List<String>,
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -146,12 +149,12 @@ abstract class _$$CategoriesImplCopyWith<$Res>
   @useResult
   $Res call(
       {int id,
-      @JsonKey(name: 'user_id') String userId,
-      @JsonKey(name: 'parent_id') int parentId,
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'parent_id') int? parentId,
       String name,
       String slug,
       String description,
-      List<String?> features,
+      List<String> features,
       String image,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt});
@@ -171,8 +174,8 @@ class __$$CategoriesImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? userId = null,
-    Object? parentId = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
     Object? name = null,
     Object? slug = null,
     Object? description = null,
@@ -186,14 +189,14 @@ class __$$CategoriesImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      userId: null == userId
+      userId: freezed == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      parentId: null == parentId
+              as String?,
+      parentId: freezed == parentId
           ? _value.parentId
           : parentId // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -209,7 +212,7 @@ class __$$CategoriesImplCopyWithImpl<$Res>
       features: null == features
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String?>,
+              as List<String>,
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -231,13 +234,13 @@ class __$$CategoriesImplCopyWithImpl<$Res>
 class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
   const _$CategoriesImpl(
       {required this.id,
-      @JsonKey(name: 'user_id') required this.userId,
-      @JsonKey(name: 'parent_id') required this.parentId,
+      @JsonKey(name: 'user_id') this.userId,
+      @JsonKey(name: 'parent_id') this.parentId,
       required this.name,
-      required this.slug,
-      required this.description,
-      required final List<String?> features,
-      required this.image,
+      this.slug = '',
+      this.description = '',
+      final List<String> features = const [],
+      this.image = 'assets/images/category_placeholder.png',
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'updated_at') required this.updatedAt})
       : _features = features;
@@ -249,27 +252,37 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
   final int id;
   @override
   @JsonKey(name: 'user_id')
-  final String userId;
+  final String? userId;
+// Changed to nullable
   @override
   @JsonKey(name: 'parent_id')
-  final int parentId;
+  final int? parentId;
+// Changed to nullable
   @override
   final String name;
   @override
+  @JsonKey()
   final String slug;
+// Added default value
   @override
+  @JsonKey()
   final String description;
-  final List<String?> _features;
+// Added default value
+  final List<String> _features;
+// Added default value
   @override
-  List<String?> get features {
+  @JsonKey()
+  List<String> get features {
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_features);
   }
 
-// Handles null values in array
+// Removed nullable items
   @override
+  @JsonKey()
   final String image;
+// Added default
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
@@ -354,13 +367,13 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
 abstract class _Categories implements Categories {
   const factory _Categories(
           {required final int id,
-          @JsonKey(name: 'user_id') required final String userId,
-          @JsonKey(name: 'parent_id') required final int parentId,
+          @JsonKey(name: 'user_id') final String? userId,
+          @JsonKey(name: 'parent_id') final int? parentId,
           required final String name,
-          required final String slug,
-          required final String description,
-          required final List<String?> features,
-          required final String image,
+          final String slug,
+          final String description,
+          final List<String> features,
+          final String image,
           @JsonKey(name: 'created_at') required final DateTime createdAt,
           @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
       _$CategoriesImpl;
@@ -372,20 +385,20 @@ abstract class _Categories implements Categories {
   int get id;
   @override
   @JsonKey(name: 'user_id')
-  String get userId;
+  String? get userId; // Changed to nullable
   @override
   @JsonKey(name: 'parent_id')
-  int get parentId;
+  int? get parentId; // Changed to nullable
   @override
   String get name;
   @override
-  String get slug;
+  String get slug; // Added default value
   @override
-  String get description;
+  String get description; // Added default value
   @override
-  List<String?> get features; // Handles null values in array
+  List<String> get features; // Removed nullable items
   @override
-  String get image;
+  String get image; // Added default
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
@@ -494,7 +507,7 @@ class __$$CategoriesResponseImplCopyWithImpl<$Res>
 class _$CategoriesResponseImpl
     with DiagnosticableTreeMixin
     implements _CategoriesResponse {
-  const _$CategoriesResponseImpl({required final List<Categories> data})
+  const _$CategoriesResponseImpl({final List<Categories> data = const []})
       : _data = data;
 
   factory _$CategoriesResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -502,6 +515,7 @@ class _$CategoriesResponseImpl
 
   final List<Categories> _data;
   @override
+  @JsonKey()
   List<Categories> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
@@ -552,7 +566,7 @@ class _$CategoriesResponseImpl
 }
 
 abstract class _CategoriesResponse implements CategoriesResponse {
-  const factory _CategoriesResponse({required final List<Categories> data}) =
+  const factory _CategoriesResponse({final List<Categories> data}) =
       _$CategoriesResponseImpl;
 
   factory _CategoriesResponse.fromJson(Map<String, dynamic> json) =

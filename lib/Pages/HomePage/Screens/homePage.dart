@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
@@ -11,12 +14,16 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/recommendedModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -30,17 +37,61 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   final TextEditingController searchEditingController = TextEditingController();
-
+  final ScrollController _scrollController = ScrollController();
+  Timer? _loadMoreDebouncer;
    SfRangeValues _priceRange = const SfRangeValues(700, 2000);
+
+ 
 
   @override
   void initState(){
     super.initState();
-    // fetch data when the page initializes
+    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_){
-      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
-      homeProvider.fetchAllData();
+      _loadData();
     });
+  }
+
+  void _scrollListener(){
+    final provider = Provider.of<HomeProvider>(context, listen: false);
+    // calculate scroll position(90% threshold)
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final thresholdReached = currentScroll > (maxScroll * 0.9);
+
+  // / Conditions to load more:
+  // 1. Scrolled past threshold
+  // 2. Not already loading
+  // 3. More items available
+  if(thresholdReached && !provider.isLoadingMore && provider.hasMoreRecommended){
+    // optional: add debouncing
+    _loadMoreDebouncer?.cancel();
+    _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), (){
+      provider.loadMoreRecommended();
+    });
+  }
+  }
+
+
+
+  // for top circular refresh widget
+  Future<void> _loadData() async {
+    // final logger = Logger();
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    await homeProvider.fetchAllData();
+  }
+
+  // for top circular refresh widget
+  void _onRefresh() async {
+    await _loadData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener); // clean up
+    _scrollController.dispose();
+    _loadMoreDebouncer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -108,7 +159,9 @@ class _HomePageState extends State<HomePage> {
         ),
       body: SafeArea(
         child: homeProvider.isLoading ? const Center(child: CircularProgressIndicator(),) 
-        : homeProvider.errorMessage.isNotEmpty ? Center(child: Text(homeProvider.errorMessage)) : _buildContent(screenSize, homeProvider), 
+        : homeProvider.errorMessage.isNotEmpty ? Center(child: Text(homeProvider.errorMessage)) : RefreshIndicator(
+          onRefresh: _loadData,
+        child: _buildContent(screenSize, homeProvider)), 
         ),
       );
   }
@@ -157,6 +210,8 @@ class _HomePageState extends State<HomePage> {
               // scrollability starts from here
               Expanded(
                 child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -215,17 +270,27 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 3,),
         // row for trending makes images
-        if(homeProvider.trendingMakes.length > 4)
-          Row(
+        // if(homeProvider.trendingMakes.length > 4)
+          homeProvider.trendingMakes.length > 4 ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: homeProvider.trendingMakes.take(4).map((make) => CustomImage(
-              imagePath: make.image, 
+              imagePath: getImageUrl(make.image), 
               isAssetImage: ColorGlobalVariables.falseValue,
               isImageBorderRadiusRequired: false,
               imageWidth: 40,
               imageHeight: 40,
               ),)
               .toList(),
+          ) : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: homeProvider.trendingMakes.map((make) => CustomImage(
+                  imagePath: getImageUrl(make.image), 
+                  isAssetImage: ColorGlobalVariables.falseValue,
+                  isImageBorderRadiusRequired: false,
+                  imageWidth: 40,
+                  imageHeight: 40,
+                  ),)
+                  .toList(),
           ),
 
           // to be deleted soon
@@ -374,21 +439,22 @@ class _HomePageState extends State<HomePage> {
                     final offer = homeProvider.specialOffers[index];
                     final item = offer.item;
                     final brand = item?.brand;
-                    final category = item?.category;
-                    final firstImage = item?.images.isNotEmpty == true ? item!.images.first : "placeholder_image_path";
+                    // final category = item?.category;
+                    final firstImage = item!.images?.isNotEmpty == true ? item.images?.first : "car_placeholder.png";
                     final brandImage = brand?.image;
-                    final brandName = brand?.name;
-                    final cateogoryName = category?.name;
-                    final price = item?.price;
+                    // final brandName = brand?.name;
+                    // final categoryName = category?.name;
+                    // final price = item?.price;
                     final discount = offer.discount;
-                    final description = offer.description;
+                    // final description = offer.description;
                     // final specialOffer = specialOffers[index]; // to be deleted soon
                     return GestureDetector(
                       onTap: (){
                         Get.toNamed(
                           RouteClass.getDetailPage(),
                           arguments: {
-                            'offer': offer, // Pass the entire object
+                            'product': offer is Map ? offer : offer.toJson(),
+                            'item': item is Map ? item : item.toJson(), // Pass the entire object
                             'type': 'special_offer', // Optional: to identify the type in detail page
                           },
 
@@ -413,7 +479,7 @@ class _HomePageState extends State<HomePage> {
                           child: Container(
                             //padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 8),
                             width: screenSize.width*0.7,
-                            height: 150,
+                            height: 160,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               gradient: LinearGradient(
@@ -426,9 +492,17 @@ class _HomePageState extends State<HomePage> {
                                 stops: [0.6, 1], 
                               ),
                               image: DecorationImage(
-                                // image: AsseImage(specialOffer["image"]), // to be deleted soon
-                                image: NetworkImage(firstImage),
+                                image: CachedNetworkImageProvider(
+                                  getImageUrl(firstImage),
+                                  maxWidth: (screenSize.width * 0.7).toInt(), // Optimize for display size
+                                  maxHeight: 150.toInt(),
+                                ),
                                 fit: BoxFit.cover,
+                                opacity: 1,
+                                filterQuality: FilterQuality.medium,
+                                onError: (exception, stackTrace) {
+                                  debugPrint('Image load error: $exception');
+                                },
                               ),
                               // border: Border.all(
                               //   color: ColorGlobalVariables.blackColor,
@@ -442,14 +516,14 @@ class _HomePageState extends State<HomePage> {
                                   left: 0,
                                   top: 5,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
                                     decoration: BoxDecoration(
                                       color: ColorGlobalVariables.greyColor.withOpacity(0.5),
                                       borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: TextSmall(
                                       title: "${discount.toString()}% discount", 
-                                      fontWeight: FontWeight.normal, 
+                                      fontWeight: FontWeight.w500, 
                                       textColor: ColorGlobalVariables.blackColor
                                       ),
                                   ),
@@ -459,9 +533,10 @@ class _HomePageState extends State<HomePage> {
                                   right: 8,
                                   bottom: 8,
                                   child: CustomImage(
-                                    imagePath: brandImage, 
-                                    isAssetImage: ColorGlobalVariables.trueValue, 
+                                    imagePath: getImageUrl(brandImage), 
+                                    isAssetImage: ColorGlobalVariables.falseValue, 
                                     isImageBorderRadiusRequired: ColorGlobalVariables.falseValue,
+                                    useShimmerEffect: ColorGlobalVariables.trueValue,
                                     ),
                                   ),
                               ],
@@ -516,8 +591,9 @@ class _HomePageState extends State<HomePage> {
       const SizedBox(height: 5,),
       //gridview builder here
         GridView.builder(
+        controller: _scrollController,
         padding: const EdgeInsets.all(8),
-        itemCount: recommendeds.length,
+        itemCount: homeProvider.recommendedItems.length,
         shrinkWrap: ColorGlobalVariables.trueValue,
         primary: ColorGlobalVariables.falseValue,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -527,11 +603,29 @@ class _HomePageState extends State<HomePage> {
           childAspectRatio: 0.75, // Adjust based on your card's height
         ),
         itemBuilder: (context, index) {
-          final recommended = recommendeds[index];
+          // final recommended = recommendeds[index];
+          final recommended = homeProvider.recommendedItems[index];
+          final firstImage = recommended.images?.isNotEmpty == true
+          ? recommended.images!.first
+          : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+          final brandImage = recommended.brand?.image;
           return GestureDetector(
             onTap: (){
               Get.toNamed(
+                          RouteClass.getDetailPage(),
+                          arguments: {
+                            'product': recommended is Map ? recommended : recommended.toJson(),
+                            'item': recommended is Map ? recommended : recommended.toJson(), // Pass the entire object
+                            'type': 'recommended', // Optional: to identify the type in detail page
+                          },
+
+                        );
+              Get.toNamed(
                       RouteClass.getDetailPage(),
+                      arguments: {
+                        'item': recommended,
+                        'type': 'recommended',
+                      },
                     );
             },
             child: Container(
@@ -555,13 +649,15 @@ class _HomePageState extends State<HomePage> {
                   Stack(
                     children: [
                       CustomImage(
-                        imagePath: recommended["productImage"], 
-                        isAssetImage: true, 
+                        imagePath: getImageUrl(firstImage), 
+                        isAssetImage: recommended.images?.isNotEmpty == true ? false : true, 
                         isImageBorderRadiusRequired: true,
                         imageBorderRadius: 8,
+                        imageBackgroundColor: index%2 == 0 ? ColorGlobalVariables.brownColor.withOpacity(0.2) : ColorGlobalVariables.greenColor.withOpacity(0.2),
                         imageHeight: 120,
-                        imageWidth: double.infinity,
-                        fit: BoxFit.cover,
+                        useShimmerEffect: false,
+                        imageWidth: screenSize.width,
+                        fit: BoxFit.fill,
                         ),
                       // product type
                       Positioned(
@@ -575,7 +671,7 @@ class _HomePageState extends State<HomePage> {
                           child: RotatedBox(
                             quarterTurns: 1,
                             child: TextSmall(
-                              title: recommended["productType"], 
+                              title: recommended.category?.name ?? 'Car', 
                               fontWeight: FontWeight.normal, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
@@ -586,10 +682,12 @@ class _HomePageState extends State<HomePage> {
                     Positioned(
                       top: 3, right: 4,
                       child: CustomIcon(
-                        iconData: recommended["isLiked"]  ? Icons.favorite : Icons.favorite_border_outlined, 
+                        // iconData: recommended["isLiked"]  ? Icons.favorite : Icons.favorite_border_outlined, 
+                        iconData: Icons.favorite_border_outlined,
                         isFaIcon: false, 
                         iconSize: 25,
-                        iconColor: recommended["isLiked"] ? ColorGlobalVariables.redColor : ColorGlobalVariables.fadedBlackColor,
+                        iconColor: ColorGlobalVariables.fadedBlackColor,
+                        // iconColor: recommended["isLiked"] ? ColorGlobalVariables.redColor : ColorGlobalVariables.fadedBlackColor,
                         ),
                     ),
                     ],
@@ -601,7 +699,8 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: TextSmall(
-                          title: recommended["productName"], 
+                          // title: recommended["productName"], 
+                          title: recommended.name,
                           fontWeight: FontWeight.normal, 
                           overflow: TextOverflow.ellipsis,
                           textColor: ColorGlobalVariables.blackColor
@@ -609,7 +708,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(width: 4,),
                       TextSmall(
-                        title: recommended["productNature"], 
+                        // title: recommended["productNature"], 
+                        title: recommended.condition ?? 'Used',
                         fontWeight: FontWeight.normal, 
                         textColor: ColorGlobalVariables.blackColor
                         ),
@@ -622,12 +722,13 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: TextMedium(
-                          title: "GH₵${recommended["cost"]}", 
+                          title: 'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommended.price))}', 
                           fontWeight: FontWeight.w500, 
                           textColor: ColorGlobalVariables.redColor,
                           ),
                       ),
                       const SizedBox(width: 4,),
+                      if(recommended.mileage != null)
                       Row(
                         children: [
                           CustomIcon(
@@ -637,7 +738,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           const SizedBox(width: 2,),
                           TextSmall(
-                            title: "${recommended["mileage"]} km", 
+                            title: "${formatNumber(shortenerRequired: true, number: recommended.mileage != null ? int.parse(recommended.mileage!) : 0)} km", 
                             fontWeight: FontWeight.normal, 
                             textColor: ColorGlobalVariables.blackColor
                             ),
@@ -651,14 +752,17 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // product logo
-                      recommended["productLogo"].isEmpty ? const SizedBox(width: 16,) : CustomImage(
-                        imagePath: recommended["productLogo"], 
-                        isAssetImage: true, 
+                      brandImage != null 
+                      ?  CustomImage(
+                        imagePath: getImageUrl(brandImage), 
+                        isAssetImage: false, 
+                        useShimmerEffect: false,
                         imageHeight: 25,
                         imageWidth: 25,
                         isImageBorderRadiusRequired: false
-                        ),
+                        ) : const SizedBox(width: 16,),
                       // row for icon and driveType
+                      if(recommended.transmission != null)
                       Row(
                         children: [
                           CustomIcon(
@@ -669,13 +773,14 @@ class _HomePageState extends State<HomePage> {
                             ),
                           const SizedBox(width: 2,),
                           TextExtraSmall(
-                            title: recommended["driveType"], 
+                            title: recommended.transmission!, 
                             fontWeight: FontWeight.normal, 
                             textColor: ColorGlobalVariables.blackColor,
                             ),
                         ],
                       ),
                       //row for icon and location
+                      if(recommended.location != null)
                       Row(
                         children: [
                           CustomIcon(
@@ -685,7 +790,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           const SizedBox(width: 2,),
                           TextExtraSmall(
-                            title: recommended["location"], 
+                            title: recommended.location!, 
                             fontWeight: FontWeight.normal, 
                             textColor: ColorGlobalVariables.blackColor
                             ),
@@ -707,9 +812,9 @@ class _HomePageState extends State<HomePage> {
  // helper method to get icons for categories
  IconData _getIconForCategory({required String categoryName}){
   switch(categoryName.toLowerCase()){
-    case 'accessories & parts': 
+    case 'parts & accessories': 
       return Icons.construction;
-    case 'motorbikes': 
+    case 'motocycle': 
       return FontAwesomeIcons.motorcycle;
     case 'agricultural machinery':
       return Icons.agriculture;
@@ -720,110 +825,110 @@ class _HomePageState extends State<HomePage> {
   }
  }
 
-  List<Map<String, dynamic>> trendingMakes = [
-    {
-      "icon": Icons.construction,
-      "name": "Accessories & Parts"
-    },
-    {
-      "icon": FontAwesomeIcons.motorcycle,
-      "name": "Motorbikes"
-    },
-    {
-      "icon": Icons.agriculture,
-      "name": "Agricultural Machinery"
-    },
-    {
-      "icon": FontAwesomeIcons.truck,
-      "name": "Trucks"
-    },
-  ];
+  // List<Map<String, dynamic>> trendingMakes = [
+  //   {
+  //     "icon": Icons.construction,
+  //     "name": "Accessories & Parts"
+  //   },
+  //   {
+  //     "icon": FontAwesomeIcons.motorcycle,
+  //     "name": "Motorbikes"
+  //   },
+  //   {
+  //     "icon": Icons.agriculture,
+  //     "name": "Agricultural Machinery"
+  //   },
+  //   {
+  //     "icon": FontAwesomeIcons.truck,
+  //     "name": "Trucks"
+  //   },
+  // ];
 
-  List<Map<String, dynamic>> specialOffers = [
-    {
-      "discount": 5,
-      "image": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
-      "logo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png"
-    },
-    {
-      "discount": 7,
-      "image": "${ImageStringGlobalVariables.imagePath}bmw_temporary.png",
-      "logo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png"
-    },
-  ];
+  // List<Map<String, dynamic>> specialOffers = [
+  //   {
+  //     "discount": 5,
+  //     "image": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
+  //     "logo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png"
+  //   },
+  //   {
+  //     "discount": 7,
+  //     "image": "${ImageStringGlobalVariables.imagePath}bmw_temporary.png",
+  //     "logo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png"
+  //   },
+  // ];
 
-  List<Map<String, dynamic>> recommendeds = [
-    {
-      "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
-      "productType": "featured",
-      "productNature": "New",
-      "isLiked": false,
-      "cost": "400,000",
-      "productName": "BMW 8 Series",
-      "mileage": 3,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"
-    },
-     {
-      "productImage": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
-      "productType": "featured",
-      "productNature": "New",
-      "isLiked": true,
-      "cost": "600,000",
-      "productName": "Mercedes Benz GCL 300",
-      "mileage": 2,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}mercedes_logo_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"
-    },
-     {
-      "productImage": "${ImageStringGlobalVariables.imagePath}kollter_electric_motorbike_temporary.png",
-      "productType": "featured",
-      "productNature": "New",
-      "isLiked": true,
-      "cost": "400,000",
-      "productName": "BMW Bike",
-      "mileage": 2000,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"
-    },
-     {
-      "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
-      "productType": "featured",
-      "productNature": "New",
-      "isLiked": true,
-      "cost": "170,000",
-      "productName": "Honda Civic Sport",
-      "mileage": 3,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"
-    },
-     {
-      "productImage": "${ImageStringGlobalVariables.imagePath}ford_temporary.png",
-      "productType": "featured",
-      "productNature": "New",
-      "isLiked": true,
-      "cost": "400,000",
-      "productName": "Ford Ranger",
-      "mileage": 3,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"
-    },
-     {
-      "productImage": "${ImageStringGlobalVariables.imagePath}driving_mirror_temporary.png",
-      "productType": "featured",
-      "productNature": "Used",
-      "isLiked": false,
-      "cost": "2,000",
-      "productName": "Corolla Side Mirror",
-      "mileage": 3,
-      "productLogo": "",
-      "driveType": "Automatic",
-      "location": "Accra"
-    }
-  ];
+  // List<Map<String, dynamic>> recommendeds = [
+  //   {
+  //     "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
+  //     "productType": "featured",
+  //     "productNature": "New",
+  //     "isLiked": false,
+  //     "cost": "400,000",
+  //     "productName": "BMW 8 Series",
+  //     "mileage": 3,
+  //     "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
+  //     "driveType": "Automatic",
+  //     "location": "Accra"
+  //   },
+  //    {
+  //     "productImage": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
+  //     "productType": "featured",
+  //     "productNature": "New",
+  //     "isLiked": true,
+  //     "cost": "600,000",
+  //     "productName": "Mercedes Benz GCL 300",
+  //     "mileage": 2,
+  //     "productLogo": "${ImageStringGlobalVariables.imagePath}mercedes_logo_temporary.png",
+  //     "driveType": "Automatic",
+  //     "location": "Accra"
+  //   },
+  //    {
+  //     "productImage": "${ImageStringGlobalVariables.imagePath}kollter_electric_motorbike_temporary.png",
+  //     "productType": "featured",
+  //     "productNature": "New",
+  //     "isLiked": true,
+  //     "cost": "400,000",
+  //     "productName": "BMW Bike",
+  //     "mileage": 2000,
+  //     "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
+  //     "driveType": "Automatic",
+  //     "location": "Accra"
+  //   },
+  //    {
+  //     "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
+  //     "productType": "featured",
+  //     "productNature": "New",
+  //     "isLiked": true,
+  //     "cost": "170,000",
+  //     "productName": "Honda Civic Sport",
+  //     "mileage": 3,
+  //     "productLogo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png",
+  //     "driveType": "Automatic",
+  //     "location": "Accra"
+  //   },
+  //    {
+  //     "productImage": "${ImageStringGlobalVariables.imagePath}ford_temporary.png",
+  //     "productType": "featured",
+  //     "productNature": "New",
+  //     "isLiked": true,
+  //     "cost": "400,000",
+  //     "productName": "Ford Ranger",
+  //     "mileage": 3,
+  //     "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
+  //     "driveType": "Automatic",
+  //     "location": "Accra"
+  //   },
+  //    {
+  //     "productImage": "${ImageStringGlobalVariables.imagePath}driving_mirror_temporary.png",
+  //     "productType": "featured",
+  //     "productNature": "Used",
+  //     "isLiked": false,
+  //     "cost": "2,000",
+  //     "productName": "Corolla Side Mirror",
+  //     "mileage": 3,
+  //     "productLogo": "",
+  //     "driveType": "Automatic",
+  //     "location": "Accra"
+  //   }
+  // ];
 }

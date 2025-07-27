@@ -13,7 +13,7 @@ class VehicleModel with _$VehicleModel {
     required String vehicleType,
     required String condition,
     required int year,
-    required String make,
+    required int? make,// well change here back to string again
     required String model,
     required VehicleLocation location,
     required String price,

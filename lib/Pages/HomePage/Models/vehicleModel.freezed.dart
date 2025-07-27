@@ -26,7 +26,8 @@ mixin _$VehicleModel {
   String get vehicleType => throw _privateConstructorUsedError;
   String get condition => throw _privateConstructorUsedError;
   int get year => throw _privateConstructorUsedError;
-  String get make => throw _privateConstructorUsedError;
+  int? get make =>
+      throw _privateConstructorUsedError; // well change here back to string again
   String get model => throw _privateConstructorUsedError;
   VehicleLocation get location => throw _privateConstructorUsedError;
   String get price => throw _privateConstructorUsedError;
@@ -64,7 +65,7 @@ abstract class $VehicleModelCopyWith<$Res> {
       String vehicleType,
       String condition,
       int year,
-      String make,
+      int? make,
       String model,
       VehicleLocation location,
       String price,
@@ -104,7 +105,7 @@ class _$VehicleModelCopyWithImpl<$Res, $Val extends VehicleModel>
     Object? vehicleType = null,
     Object? condition = null,
     Object? year = null,
-    Object? make = null,
+    Object? make = freezed,
     Object? model = null,
     Object? location = null,
     Object? price = null,
@@ -144,10 +145,10 @@ class _$VehicleModelCopyWithImpl<$Res, $Val extends VehicleModel>
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
               as int,
-      make: null == make
+      make: freezed == make
           ? _value.make
           : make // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int?,
       model: null == model
           ? _value.model
           : model // ignore: cast_nullable_to_non_nullable
@@ -239,7 +240,7 @@ abstract class _$$VehicleModelImplCopyWith<$Res>
       String vehicleType,
       String condition,
       int year,
-      String make,
+      int? make,
       String model,
       VehicleLocation location,
       String price,
@@ -279,7 +280,7 @@ class __$$VehicleModelImplCopyWithImpl<$Res>
     Object? vehicleType = null,
     Object? condition = null,
     Object? year = null,
-    Object? make = null,
+    Object? make = freezed,
     Object? model = null,
     Object? location = null,
     Object? price = null,
@@ -319,10 +320,10 @@ class __$$VehicleModelImplCopyWithImpl<$Res>
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
               as int,
-      make: null == make
+      make: freezed == make
           ? _value.make
           : make // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int?,
       model: null == model
           ? _value.model
           : model // ignore: cast_nullable_to_non_nullable
@@ -423,7 +424,8 @@ class _$VehicleModelImpl implements _VehicleModel {
   @override
   final int year;
   @override
-  final String make;
+  final int? make;
+// well change here back to string again
   @override
   final String model;
   @override
@@ -557,7 +559,7 @@ abstract class _VehicleModel implements VehicleModel {
       required final String vehicleType,
       required final String condition,
       required final int year,
-      required final String make,
+      required final int? make,
       required final String model,
       required final VehicleLocation location,
       required final String price,
@@ -588,7 +590,7 @@ abstract class _VehicleModel implements VehicleModel {
   @override
   int get year;
   @override
-  String get make;
+  int? get make; // well change here back to string again
   @override
   String get model;
   @override

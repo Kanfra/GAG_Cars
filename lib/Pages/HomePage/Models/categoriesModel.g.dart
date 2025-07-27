@@ -9,14 +9,17 @@ part of 'categoriesModel.dart';
 _$CategoriesImpl _$$CategoriesImplFromJson(Map<String, dynamic> json) =>
     _$CategoriesImpl(
       id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String,
-      parentId: (json['parent_id'] as num).toInt(),
+      userId: json['user_id'] as String?,
+      parentId: (json['parent_id'] as num?)?.toInt(),
       name: json['name'] as String,
-      slug: json['slug'] as String,
-      description: json['description'] as String,
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String?).toList(),
-      image: json['image'] as String,
+      slug: json['slug'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      features: (json['features'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      image:
+          json['image'] as String? ?? 'assets/images/category_placeholder.png',
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
@@ -38,9 +41,10 @@ Map<String, dynamic> _$$CategoriesImplToJson(_$CategoriesImpl instance) =>
 _$CategoriesResponseImpl _$$CategoriesResponseImplFromJson(
         Map<String, dynamic> json) =>
     _$CategoriesResponseImpl(
-      data: (json['data'] as List<dynamic>)
-          .map((e) => Categories.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      data: (json['data'] as List<dynamic>?)
+              ?.map((e) => Categories.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$$CategoriesResponseImplToJson(

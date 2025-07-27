@@ -1,23 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'trendingMakeModel.dart';
+part of 'makeModel.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TrendingMakeImpl _$$TrendingMakeImplFromJson(Map<String, dynamic> json) =>
-    _$TrendingMakeImpl(
+_$MakeResponseImpl _$$MakeResponseImplFromJson(Map<String, dynamic> json) =>
+    _$MakeResponseImpl(
+      data: (json['data'] as List<dynamic>)
+          .map((e) => Make.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
+      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$$MakeResponseImplToJson(_$MakeResponseImpl instance) =>
+    <String, dynamic>{
+      'data': instance.data,
+      'links': instance.links,
+      'meta': instance.meta,
+    };
+
+_$MakeImpl _$$MakeImplFromJson(Map<String, dynamic> json) => _$MakeImpl(
       id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
+      userId: (json['user_id'] as num?)?.toInt(),
       name: json['name'] as String,
       slug: json['slug'] as String,
-      image: json['image'] as String,
+      image: json['image'] as String?,
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
     );
 
-Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
+Map<String, dynamic> _$$MakeImplToJson(_$MakeImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -26,24 +41,6 @@ Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
       'image': instance.image,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
-    };
-
-_$TrendingMakeResponseImpl _$$TrendingMakeResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TrendingMakeResponseImpl(
-      data: (json['data'] as List<dynamic>)
-          .map((e) => TrendingMake.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$$TrendingMakeResponseImplToJson(
-        _$TrendingMakeResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'links': instance.links,
-      'meta': instance.meta,
     };
 
 _$PaginationLinksImpl _$$PaginationLinksImplFromJson(
@@ -70,7 +67,7 @@ _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
       from: (json['from'] as num).toInt(),
       lastPage: (json['last_page'] as num).toInt(),
       links: (json['links'] as List<dynamic>)
-          .map((e) => PaginationMetaLink.fromJson(e as Map<String, dynamic>))
+          .map((e) => PaginationLink.fromJson(e as Map<String, dynamic>))
           .toList(),
       path: json['path'] as String,
       perPage: (json['per_page'] as num).toInt(),
@@ -91,16 +88,15 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
       'total': instance.total,
     };
 
-_$PaginationMetaLinkImpl _$$PaginationMetaLinkImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PaginationMetaLinkImpl(
+_$PaginationLinkImpl _$$PaginationLinkImplFromJson(Map<String, dynamic> json) =>
+    _$PaginationLinkImpl(
       url: json['url'] as String?,
       label: json['label'] as String,
       active: json['active'] as bool,
     );
 
-Map<String, dynamic> _$$PaginationMetaLinkImplToJson(
-        _$PaginationMetaLinkImpl instance) =>
+Map<String, dynamic> _$$PaginationLinkImplToJson(
+        _$PaginationLinkImpl instance) =>
     <String, dynamic>{
       'url': instance.url,
       'label': instance.label,

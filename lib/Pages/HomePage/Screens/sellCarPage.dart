@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as DatePicker;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -15,11 +14,15 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithRowComponent.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/brandModelModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/makeModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/vehicleModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/vehicleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class SellCarPage extends StatefulWidget {
@@ -30,18 +33,12 @@ class SellCarPage extends StatefulWidget {
 }
 
 class _SellCarPageState extends State<SellCarPage> {
-  //
-  
-  // for validation
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   final TextEditingController _vehicleNameController = TextEditingController();
   final TextEditingController _mileageController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  //TextEditingController _engineCapacityController = TextEditingController();
   final TextEditingController _numberOfPassengersController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-
   final TextEditingController _colorController = TextEditingController();
 
   bool isCarSelected = false;
@@ -54,7 +51,6 @@ class _SellCarPageState extends State<SellCarPage> {
   bool isUsedSelected = false;
   String condition = "";
 
-  
   bool isAlarmSelected = false;
   bool isCruiseControlSelected = false;
   bool isBluetoothSelected = false;
@@ -62,72 +58,57 @@ class _SellCarPageState extends State<SellCarPage> {
   List<String> features = ['Alarm', 'Cruise Control', 'Bluetooth', 'Front Parking Sensor']; 
   List<String> selectedFeatures = [];
 
-  // year
   int year = 2000;
-
-  // color
   Color color = Colors.transparent;
-
-  // location
   String? selectedLocation;
-
-  // steer position
   String? selectedSteerPosition;
   List<String> steerPositionOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
-
-  // engine capacity
   String? selectedEngineCapacity;
   List<String> engineCapacityOptions = ['1.0', '2.0', '3.0'];
-
-  // transmission
   String? selectedTransmission;
   List<String> transmissionOptions = ['Automatic', 'Manual'];
-
-  // buildType
   String? selectedBuildType;
   List<String> buildTypeOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
-
-  // mileage
   String? selectedMileage;
   List<String> mileageOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
 
-
-  // image list
   List<XFile> selectedImages = [];
   final ImagePicker picker = ImagePicker();
+  int? selectedMakeId;
+  String? selectedModel;
+  final logger = Logger();
+  Position? _currentPosition;
 
-  // make and model list
-  List<Map<String, dynamic>> makeAndModels = [
-    {
-      "make": "Toyota",
-      "model": ["Corolla", "Camry", "Highlander"],
-    },
-    {
-      "make": "Kia",
-      "model": ["Sorento", "Morning", "Picanto"],
-    },
-    {
-      "make": "Mercedes Benz",
-      "model": ["C250", "C300", "GLE"],
-    },
-  ]; 
+  @override
+  void initState() {
+    super.initState();
+    // Fetch makes when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final vehicleProvider = Provider.of<VehicleProvider>(context, listen: false);
+      vehicleProvider.fetchMakes();
+    });
+  }
 
-  // selectedMakeModelMap
-  Map<String, dynamic>? selectedMakeAndModelMap; // get selected make from here
-  // selectedModel
-  String? selectedModel; // get selected model from here
+  @override
+  void dispose() {
+    _vehicleNameController.dispose();
+    _mileageController.dispose();
+    _priceController.dispose();
+    _numberOfPassengersController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
 
   Future<void> sellCarFunction() async {
-    // gather data 
     final vehicle = VehicleModel(
       user_id: "",
       vehicle_id: "",
-      vehicleName:  _vehicleNameController.text, 
+      vehicleName: _vehicleNameController.text, 
       vehicleType: vehicleType, 
       condition: condition, 
       year: year, 
-      make: selectedMakeAndModelMap?["make"], 
-      model: selectedModel!, 
+      make: selectedMakeId ?? null, 
+      model: selectedModel ?? "", 
       location: VehicleLocation(latitude: _currentPosition!.latitude, longitude: _currentPosition!.longitude), 
       price: _priceController.text, 
       steerPosition: selectedSteerPosition!, 
@@ -137,145 +118,107 @@ class _SellCarPageState extends State<SellCarPage> {
       buildType: selectedBuildType!, 
       mileage: selectedMileage!, 
       numberOfPassengers: int.tryParse(_numberOfPassengersController.text) ?? 0, 
-      features: selectedFeatures.map((e)=>e).toList(),
+      features: selectedFeatures,
       description: _descriptionController.text,
       images: []
-      );
-      // 
-      await VehicleService.uploadVehicle(
-        vehicle: vehicle, 
-        imageFiles: selectedImages.map((e) =>e).toList(),
-        );
+    );
+    
+    await VehicleService.uploadVehicle(
+      vehicle: vehicle, 
+      imageFiles: selectedImages,
+    );
   }
 
-  // test here
-   Future<void> _formValidation()async{
+  Future<void> _formValidation() async {
     if (_formKey.currentState!.validate()) {
-      // vehicle type test
       if(vehicleType.isEmpty){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select vehicle type", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // condition test
       if(condition.isEmpty){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select condition", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // make test
-      if(selectedMakeAndModelMap == null || selectedMakeAndModelMap!["make"].isEmpty){
+      if(selectedMakeId == null){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select vehicle make", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // model test
       if(selectedModel == null || selectedModel!.isEmpty){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select vehicle model", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // current position test
       if(_currentPosition == null){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select vehicle location", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // Steer position
-      // Engine cpapacity
-      // Transmission
-      // Color
-
-      // BuildType
       if(selectedBuildType == null || selectedBuildType == ""){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select build type", 
           isForFormValidation: false,
-          );
-          return;
+        );
+        return;
       }
-      // Mileage
       if(selectedMileage == null || selectedMileage == ""){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select mileage", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // Features
       if(selectedFeatures.isEmpty){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please select features", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      // Images
       if(selectedImages.isEmpty){
         showSnackbar(
           backgroundColor: ColorGlobalVariables.whiteColor, 
           title: "Please upload at least 2 images and at most 4 images", 
           isForFormValidation: false
-          );
-          return;
+        );
+        return;
       }
-      print("All validations passed");
+      
       await sellCarFunction();
-    }
-    else{
+    } else {
       showSnackbar(
         backgroundColor: ColorGlobalVariables.whiteColor, 
         title: 'Please correct the errors in the form', 
         isForFormValidation: false
-        );
+      );
     }
   }
 
-
-  // for terminal works
-  final logger = Logger();  
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    _vehicleNameController.dispose();
-    _mileageController.dispose();
-    _priceController.dispose();
-    _numberOfPassengersController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
-  }
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    logger.i("color: ${_colorController.text}");
-    logger.i("year: $year");
-    logger.i("vehicle type: $vehicleType");
-    logger.i("condition: $condition");
-    logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
-    logger.i("selectedModel: $selectedModel");
-    logger.i("selected features: $selectedFeatures");
-    for(int i = 0; i<selectedImages.length; i++){
-      logger.i("selected images: ${selectedImages[i].path}");
-    }
+    final vehicleProvider = Provider.of<VehicleProvider>(context);
+
     return Scaffold(
       appBar: CustomAppbar(
         onLeadingIconClickFunction: (){}, 
@@ -283,7 +226,7 @@ class _SellCarPageState extends State<SellCarPage> {
         leadingIconData: Icons.arrow_back_ios, 
         appbarBackgroundColor: ColorGlobalVariables.whiteColor,
         titleText: ''
-        ),
+      ),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -296,10 +239,10 @@ class _SellCarPageState extends State<SellCarPage> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // vehicle name
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TitleWithTextformfieldComponent(
                       title: "Vehicle Name", 
                       fontWeight: FontWeight.w500, 
@@ -319,12 +262,12 @@ class _SellCarPageState extends State<SellCarPage> {
                         }
                         return null;
                       },
-                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // type of vehicle
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TitleWithRowComponent(
                       title: "Type of Vehicle", 
                       fontWeight: FontWeight.w500, 
@@ -334,147 +277,145 @@ class _SellCarPageState extends State<SellCarPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // car 
-                        RoundCheckBox(
-                          checkboxTextType: "Car", 
-                          isChecked: isCarSelected, 
-                          isIconAtFrontRequired: false,
-                          onTap: (){
-                            setState(() {
-                              isCarSelected = true;
-                              isSpaSelected = false;
-                              isMotobikeSelected = false;
-                              isShipSelected = false;
-                              vehicleType = "Car";
-                            });
-                          },
-                          ),
-                        // condition
-                        RoundCheckBox(
-                          checkboxTextType: "Spa", 
-                          isChecked: isSpaSelected, 
-                          isIconAtFrontRequired: false,
-                          onTap: (){
-                            setState(() {
-                              isCarSelected = false;
-                              isSpaSelected = true;
-                              isMotobikeSelected = false;
-                              isShipSelected = false;
-                              vehicleType = "Spa";
-                            });
-                          },
-                          ),
-                        // motobike
-                        RoundCheckBox(
-                          checkboxTextType: "Motobike", 
-                          isChecked: isMotobikeSelected, 
-                          isIconAtFrontRequired: false,
-                          onTap: (){
-                            setState(() {
-                              isCarSelected = false;
-                              isSpaSelected = false;
-                              isMotobikeSelected = true;
-                              isShipSelected = false;
-                              vehicleType = "Motobike";
-                            });
-                          },
-                          ),
-                        // ship
-                        RoundCheckBox(
-                          checkboxTextType: "Ship", 
-                          isChecked: isShipSelected, 
-                          isIconAtFrontRequired: false,
-                          onTap: (){
-                            setState(() {
-                              isCarSelected = false;
-                              isSpaSelected = false;
-                              isMotobikeSelected = false;
-                              isShipSelected = true;
-                              vehicleType = "Ship";
-                            });
-                          },
-                          ),
+                            RoundCheckBox(
+                              checkboxTextType: "Car", 
+                              isChecked: isCarSelected, 
+                              isIconAtFrontRequired: false,
+                              onTap: (){
+                                setState(() {
+                                  isCarSelected = true;
+                                  isSpaSelected = false;
+                                  isMotobikeSelected = false;
+                                  isShipSelected = false;
+                                  vehicleType = "Car";
+                                });
+                              },
+                            ),
+                            // spa
+                            RoundCheckBox(
+                              checkboxTextType: "Spa", 
+                              isChecked: isSpaSelected, 
+                              isIconAtFrontRequired: false,
+                              onTap: (){
+                                setState(() {
+                                  isCarSelected = false;
+                                  isSpaSelected = true;
+                                  isMotobikeSelected = false;
+                                  isShipSelected = false;
+                                  vehicleType = "Spa";
+                                });
+                              },
+                            ),
+                            // motobike
+                            RoundCheckBox(
+                              checkboxTextType: "Motobike", 
+                              isChecked: isMotobikeSelected, 
+                              isIconAtFrontRequired: false,
+                              onTap: (){
+                                setState(() {
+                                  isCarSelected = false;
+                                  isSpaSelected = false;
+                                  isMotobikeSelected = true;
+                                  isShipSelected = false;
+                                  vehicleType = "Motobike";
+                                });
+                              },
+                            ),
+                            // ship
+                            RoundCheckBox(
+                              checkboxTextType: "Ship", 
+                              isChecked: isShipSelected, 
+                              isIconAtFrontRequired: false,
+                              onTap: (){
+                                setState(() {
+                                  isCarSelected = false;
+                                  isSpaSelected = false;
+                                  isMotobikeSelected = false;
+                                  isShipSelected = true;
+                                  vehicleType = "Ship";
+                                });
+                              },
+                            ),
                           ],
                         ),
                       ],
-                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20,),
-                  // row for conditon and year
+                  const SizedBox(height: 20),
+                  // row for condition and year
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // condition
-                          Expanded(
-                            child: TitleWithRowComponent(
-                              title: 'Condition', 
-                              fontWeight: FontWeight.w500, 
-                              textColor: ColorGlobalVariables.blackColor, 
-                              children: [
-                               Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // condition
+                        Expanded(
+                          child: TitleWithRowComponent(
+                            title: 'Condition', 
+                            fontWeight: FontWeight.w500, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            children: [
+                              Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                   // new
-                                RoundCheckBox(
-                                  checkboxTextType: "New", 
-                                  isChecked: isNewSelected, 
-                                  isIconAtFrontRequired: false,
-                                  onTap: (){
-                                    setState(() {
-                                      isNewSelected = true;
-                                      isUsedSelected = false;
-                                      condition = "New";
-                                    });
-                                  },
+                                  // new
+                                  RoundCheckBox(
+                                    checkboxTextType: "New", 
+                                    isChecked: isNewSelected, 
+                                    isIconAtFrontRequired: false,
+                                    onTap: (){
+                                      setState(() {
+                                        isNewSelected = true;
+                                        isUsedSelected = false;
+                                        condition = "New";
+                                      });
+                                    },
                                   ),
-                                // used
-                                RoundCheckBox(
-                                  checkboxTextType: "Used", 
-                                  isChecked: isUsedSelected, 
-                                  isIconAtFrontRequired: false,
-                                  onTap: (){
-                                    setState(() {
-                                      isNewSelected = false;
-                                      isUsedSelected = true;
-                                      condition = "Used";
-                                    });
-                                  },
+                                  // used
+                                  RoundCheckBox(
+                                    checkboxTextType: "Used", 
+                                    isChecked: isUsedSelected, 
+                                    isIconAtFrontRequired: false,
+                                    onTap: (){
+                                      setState(() {
+                                        isNewSelected = false;
+                                        isUsedSelected = true;
+                                        condition = "Used";
+                                      });
+                                    },
                                   ),
-                              
                                 ],
-                               ),
-                              ]
                               ),
+                            ]
                           ),
-                          const SizedBox(width: 20,),
-                          // year
-                          Expanded(
-                            child: TitleWithTextformfieldComponent(
-                              title: "Year", 
-                              fontWeight: FontWeight.w500,
-                              fieldWidth: double.infinity, 
-                              textColor: ColorGlobalVariables.blackColor, 
-                              obscureText: ColorGlobalVariables.falseValue, 
-                              textInputType: TextInputType.datetime, // numbe 
-                              hintText: year.toString(), 
-                              isSuffixIconRequired: false, 
-                              isPrefixIconRequired: false, 
-                              isFieldHeightRequired: false, 
-                              isTitleWithContainerWidgetRequired: true,
-                              onTitleWithContainerWidgetClickFunction: (){
-                                // will be displaying alertDialog here
-                                _showYearPicker();
-                                 },
-                              ),
+                        ),
+                        const SizedBox(width: 20),
+                        // year
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: "Year", 
+                            fontWeight: FontWeight.w500,
+                            fieldWidth: double.infinity, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: ColorGlobalVariables.falseValue, 
+                            textInputType: TextInputType.datetime,
+                            hintText: year.toString(), 
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: (){
+                              _showYearPicker();
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // row for make and model
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         // make
@@ -485,88 +426,75 @@ class _SellCarPageState extends State<SellCarPage> {
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.text, 
-                            hintText: selectedMakeAndModelMap == null ? "" : selectedMakeAndModelMap?["make"]!, 
+                            hintText: vehicleProvider.selectedMake?.name ?? "Select Make",
                             isTitleWithContainerWidgetRequired: true,
                             fieldWidth: double.infinity,
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
-                            onTitleWithContainerWidgetClickFunction: () => _showMakeModelDialog(
-                                context: context,  
-                                options: makeAndModels,
-                                onSelected: (selected){
-                                  selectedMakeAndModelMap = selected;
-                                  selectedModel = null;
-                                  //logger.i("selectedMakeAndModelMap $selectedMakeAndModelMap");
-                                  setState(() {});
-                                }
-                                )
-                      
-                            ),
-                        ),
-                      const SizedBox(width: 20,),
-                      //  model
-                      Expanded(
-                        child: TitleWithTextformfieldComponent(
-                          title: 'Model', 
-                          fontWeight: FontWeight.w500, 
-                          textColor: ColorGlobalVariables.blackColor, 
-                          obscureText: false, 
-                          textInputType: TextInputType.text, 
-                          hintText: selectedModel == null ? "Select a Model" : selectedModel!, 
-                          fieldWidth: double.infinity,
-                          isSuffixIconRequired: false, 
-                          isPrefixIconRequired: false, 
-                          isFieldHeightRequired: false, 
-                          isTitleWithContainerWidgetRequired: true,
-                          onTitleWithContainerWidgetClickFunction: () {
-                            if(selectedMakeAndModelMap != null){
-                               _showSelectionDialog(
-                                context: context,  
-                                options: selectedMakeAndModelMap?['model'],
-                                onSelected: (selected){
+                            onTitleWithContainerWidgetClickFunction: () {
+                              if (vehicleProvider.isLoadingMakes) return;
+                              
+                              _showMakeSelectionDialog(
+                                context: context,
+                                makes: vehicleProvider.makes,
+                                onSelected: (make) async {
                                   setState(() {
-                                    selectedModel = selected;
+                                    selectedMakeId = make.id;
+                                    selectedModel = null;
                                   });
+                                  await vehicleProvider.fetchBrandModels(make.id);
                                 }
-                                );
-                              }else{
-                                 showSnackbar(
+                              );
+                            }
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        // model
+                        Expanded(
+                          child: TitleWithTextformfieldComponent(
+                            title: 'Model', 
+                            fontWeight: FontWeight.w500, 
+                            textColor: ColorGlobalVariables.blackColor, 
+                            obscureText: false, 
+                            textInputType: TextInputType.text, 
+                            hintText: selectedModel ?? "Select Model",
+                            fieldWidth: double.infinity,
+                            isSuffixIconRequired: false, 
+                            isPrefixIconRequired: false, 
+                            isFieldHeightRequired: false, 
+                            isTitleWithContainerWidgetRequired: true,
+                            onTitleWithContainerWidgetClickFunction: () {
+                              if (vehicleProvider.selectedMake == null) {
+                                showSnackbar(
                                   backgroundColor: ColorGlobalVariables.whiteColor, 
                                   isForFormValidation: false,
                                   title: 'Select a Make first'
-                                  );
-                                  logger.e("Select a Make first");
-                            
+                                );
+                                return;
                               }
-                             
+                              
+                              if (vehicleProvider.isLoadingModels) return;
+                              
+                              _showModelSelectionDialog(
+                                context: context,
+                                models: vehicleProvider.brandModels,
+                                onSelected: (model) {
+                                  setState(() {
+                                    selectedModel = model.name;
+                                  });
                                 }
+                              );
+                            }
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20,),
-                  // // mileage
-                  // Align(
-                  //   alignment: Alignment.centerLeft,
-                  //   child: TitleWithTextformfieldComponent(
-                  //     title: title, 
-                  //     fontWeight: fontWeight, 
-                  //     textColor: textColor, 
-                  //     obscureText: obscureText, 
-                  //     textInputType: textInputType, 
-                  //     editingController: editingController, 
-                  //     hintText: hintText, 
-                  //     isSuffixIconRequired: isSuffixIconRequired, 
-                  //     isPrefixIconRequired: isPrefixIconRequired, 
-                  //     isFieldHeightRequired: isFieldHeightRequired
-                  //     ),
-                  // ),
-                  // const SizedBox(height: 15,),
+                  const SizedBox(height: 20),
                   // row for location and price
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         // location
@@ -585,12 +513,11 @@ class _SellCarPageState extends State<SellCarPage> {
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: (){
-                              // show google map location search
                               _getLocation();
                             },
-                            ),
+                          ),
                         ),
-                        const SizedBox(width: 20,),
+                        const SizedBox(width: 20),
                         // price
                         Expanded(
                           child: TitleWithTextformfieldComponent(
@@ -612,18 +539,18 @@ class _SellCarPageState extends State<SellCarPage> {
                               }
                               return null;
                             },
-                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // row for steer position and engine capacity
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        // steer postion
+                        // steer position
                         Expanded(
                           child: TitleWithTextformfieldComponent(
                             title: 'Steer Position', 
@@ -632,25 +559,25 @@ class _SellCarPageState extends State<SellCarPage> {
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.text,
-                            hintText: selectedSteerPosition == null ? "left" : selectedSteerPosition!, 
+                            hintText: selectedSteerPosition ?? "left", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                                context: context,  
-                                options: steerPositionOptions,
-                                onSelected: (selected){
-                                  setState(() {
-                                    selectedSteerPosition = selected;
-                                  });
-                                }
-                                )
-                            ),
+                              context: context,  
+                              options: steerPositionOptions,
+                              onSelected: (selected){
+                                setState(() {
+                                  selectedSteerPosition = selected;
+                                });
+                              }
+                            )
                           ),
-                        const SizedBox(width: 20,),
+                        ),
+                        const SizedBox(width: 20),
                         // engine capacity
-                         Expanded(
+                        Expanded(
                           child: TitleWithTextformfieldComponent(
                             title: 'Engine Capacity', 
                             fontWeight: FontWeight.w500,
@@ -658,29 +585,29 @@ class _SellCarPageState extends State<SellCarPage> {
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.number, 
-                            hintText: selectedEngineCapacity == null ? "1.5" : selectedEngineCapacity!, 
+                            hintText: selectedEngineCapacity ?? "1.5", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                                context: context,  
-                                options: engineCapacityOptions,
-                                onSelected: (selected){
-                                  setState(() {
-                                    selectedEngineCapacity = selected;
-                                  });
-                                }
-                                )
-                            ),
+                              context: context,  
+                              options: engineCapacityOptions,
+                              onSelected: (selected){
+                                setState(() {
+                                  selectedEngineCapacity = selected;
+                                });
+                              }
+                            )
                           ),
+                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15,),
+                  const SizedBox(height: 15),
                   // row for transmission and color
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         // transmission
@@ -692,26 +619,25 @@ class _SellCarPageState extends State<SellCarPage> {
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.text, 
-                            //editingController: _transmissionController, 
-                            hintText: selectedTransmission == null ? "Automatic" : selectedTransmission!, 
+                            hintText: selectedTransmission ?? "Automatic", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                                context: context,  
-                                options: transmissionOptions,
-                                onSelected: (selected){
-                                  setState(() {
-                                    selectedTransmission = selected;
-                                  });
-                                }
-                                ),
+                              context: context,  
+                              options: transmissionOptions,
+                              onSelected: (selected){
+                                setState(() {
+                                  selectedTransmission = selected;
+                                });
+                              }
                             ),
                           ),
-                        const SizedBox(width: 20,),
+                        ),
+                        const SizedBox(width: 20),
                         // color
-                         Expanded(
+                        Expanded(
                           child: TitleWithTextformfieldComponent(
                             title: 'Color', 
                             fontWeight: FontWeight.w500,
@@ -726,18 +652,17 @@ class _SellCarPageState extends State<SellCarPage> {
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: (){
-                              // some color palette here
                               _showColorPicker();
                             },
-                            ),
                           ),
+                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // row for build type and mileage
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         // build type
@@ -749,26 +674,25 @@ class _SellCarPageState extends State<SellCarPage> {
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.text, 
-                            //editingController: _buildTypeController, 
-                            hintText: selectedBuildType == null ? "Sedan" : selectedBuildType!, 
+                            hintText: selectedBuildType ?? "Sedan", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                                context: context,  
-                                options: buildTypeOptions,
-                                onSelected: (selected){
-                                  setState(() {
-                                    selectedBuildType = selected;
-                                  });
-                                }
-                                ),
+                              context: context,  
+                              options: buildTypeOptions,
+                              onSelected: (selected){
+                                setState(() {
+                                  selectedBuildType = selected;
+                                });
+                              }
                             ),
                           ),
-                        const SizedBox(width: 20,),
+                        ),
+                        const SizedBox(width: 20),
                         // mileage
-                         Expanded(
+                        Expanded(
                           child: TitleWithTextformfieldComponent(
                             title: 'Mileage', 
                             fieldWidth: double.infinity,
@@ -777,29 +701,29 @@ class _SellCarPageState extends State<SellCarPage> {
                             obscureText: false, 
                             textInputType: TextInputType.text, 
                             editingController: _mileageController, 
-                            hintText: selectedMileage == null ? "" : selectedMileage!, 
+                            hintText: selectedMileage ?? "", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: () => _showSelectionDialog(
-                                context: context,  
-                                options: mileageOptions,
-                                onSelected: (selected){
-                                  setState(() {
-                                    selectedMileage = selected;
-                                  });
-                                }
-                                ),
+                              context: context,  
+                              options: mileageOptions,
+                              onSelected: (selected){
+                                setState(() {
+                                  selectedMileage = selected;
+                                });
+                              }
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // number of passengers
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         Expanded(
@@ -822,14 +746,14 @@ class _SellCarPageState extends State<SellCarPage> {
                               }
                               return null;
                             },
-                            ),
+                          ),
                         ),
-                        const SizedBox(width: 20,),
-                        Expanded(child: SizedBox(width: double.infinity,))
+                        const SizedBox(width: 20),
+                        Expanded(child: SizedBox(width: double.infinity))
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // features
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -854,9 +778,9 @@ class _SellCarPageState extends State<SellCarPage> {
                                     _toggleFeature('Alarm');
                                   });
                                 },
-                                ),
+                              ),
                             ),
-                            const SizedBox(width: 20,),
+                            const SizedBox(width: 20),
                             // cruise control
                             Expanded(
                               child: TextCheckBox(
@@ -869,11 +793,11 @@ class _SellCarPageState extends State<SellCarPage> {
                                     _toggleFeature('Cruise Control');
                                   });
                                 },
-                                ),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10,),
+                        const SizedBox(height: 10),
                         // second row
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -890,9 +814,9 @@ class _SellCarPageState extends State<SellCarPage> {
                                     _toggleFeature('Bluetooth');
                                   });
                                 },
-                                ),
+                              ),
                             ),
-                            const SizedBox(width: 20,),
+                            const SizedBox(width: 20),
                             // cruise control
                             Expanded(
                               child: TextCheckBox(
@@ -905,17 +829,17 @@ class _SellCarPageState extends State<SellCarPage> {
                                     _toggleFeature('Front Parking Sensor');
                                   });
                                 },
-                                ),
+                              ),
                             ),
                           ],
                         ),
                       ]
-                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // description
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: TitleWithTextformfieldComponent(
                       title: "Description", 
                       fontWeight: FontWeight.w500, 
@@ -935,81 +859,78 @@ class _SellCarPageState extends State<SellCarPage> {
                         }
                         return null;
                       },
-                      //maxLines: 4,
-                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // button for upload images
-                  // Selected images grid
-                  //selectedImages.isNotEmpty ? 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,),
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                       //row product images text and clear button
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                           // Product Images
-                        TextSmall(
-                          title: "Product Images", 
-                          fontWeight: FontWeight.w500, 
-                          textColor: ColorGlobalVariables.blackColor,
-                          ),
-                        // clear images
-                        CustomTextButton(
-                          buttonTextType: "Clear Images", 
-                          textTypeColor: ColorGlobalVariables.maroonColor, 
-                          isFullButtonWidthRequired: false, 
-                          buttonBackgroundColor: Colors.transparent, 
-                          onClickFunction: (){
-                            setState(() {
-                              selectedImages = [];
-                            });
-                          }
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20,),
-                      // images
-                      GestureDetector(
-                        onTap: () => _pickImages(),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 15,),
-                          width: double.infinity,
-                          height: 280,
-                          child: Row(
-                            children: [
-                              // first column for images
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 4,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: ColorGlobalVariables.textFieldColor,
-                                          borderRadius: BorderRadius.circular(12),
-                                          image: selectedImages.isEmpty ? null : DecorationImage(
-                                            image: FileImage(File(selectedImages[0].path)),
-                                            fit: BoxFit.cover,
-                                            colorFilter: ColorFilter.mode(
-                                              Colors.black.withOpacity(0.7), 
+                        //row product images text and clear button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // Product Images
+                            TextSmall(
+                              title: "Product Images", 
+                              fontWeight: FontWeight.w500, 
+                              textColor: ColorGlobalVariables.blackColor,
+                            ),
+                            // clear images
+                            CustomTextButton(
+                              buttonTextType: "Clear Images", 
+                              textTypeColor: ColorGlobalVariables.maroonColor, 
+                              isFullButtonWidthRequired: false, 
+                              buttonBackgroundColor: Colors.transparent, 
+                              onClickFunction: (){
+                                setState(() {
+                                  selectedImages = [];
+                                });
+                              }
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // images
+                        GestureDetector(
+                          onTap: () => _pickImages(),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 15),
+                            width: double.infinity,
+                            height: 280,
+                            child: Row(
+                              children: [
+                                // first column for images
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        flex: 4,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: ColorGlobalVariables.textFieldColor,
+                                            borderRadius: BorderRadius.circular(12),
+                                            image: selectedImages.isEmpty ? null : DecorationImage(
+                                              image: FileImage(File(selectedImages[0].path)),
+                                              fit: BoxFit.cover,
+                                              colorFilter: ColorFilter.mode(
+                                                Colors.black.withOpacity(0.7), 
                                                 BlendMode.darken
                                               )
                                             ),
-                                        ),
-                                        child: selectedImages.isEmpty ? CustomIcon(
-                                          iconData: Icons.photo_library, 
-                                          isFaIcon: false, 
-                                          iconSize: 60,
-                                          iconColor: ColorGlobalVariables.blueColor
+                                          ),
+                                          child: selectedImages.isEmpty ? CustomIcon(
+                                            iconData: Icons.photo_library, 
+                                            isFaIcon: false, 
+                                            iconSize: 60,
+                                            iconColor: ColorGlobalVariables.blueColor
                                           ) : null,
                                         )),
-                                    const SizedBox(height: 15,),
+                                    const SizedBox(height: 15),
                                     Expanded(
                                       flex: 2,
                                       child: Container(
@@ -1022,27 +943,27 @@ class _SellCarPageState extends State<SellCarPage> {
                                             fit: BoxFit.cover,
                                             colorFilter: ColorFilter.mode(
                                               Colors.black.withOpacity(0.7), 
-                                                BlendMode.darken
-                                              )
-                                            ),
+                                              BlendMode.darken
+                                            )
+                                          ),
                                         ),
                                         child: selectedImages.isEmpty ? CustomIcon(
                                           iconData: Icons.photo, 
                                           isFaIcon: false, 
                                           iconSize: 50,
                                           iconColor: ColorGlobalVariables.blueColor
-                                          ) : null,
-                                        )),
+                                        ) : null,
+                                      )),
                                   ],
                                 )
-                                ),
-                              const SizedBox(width: 15,),
+                              ),
+                              const SizedBox(width: 15),
                               // second column for images
-                               Expanded(
+                              Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                     Expanded(
+                                    Expanded(
                                       child: Container(
                                         alignment: Alignment.center,
                                         decoration: BoxDecoration(
@@ -1053,206 +974,212 @@ class _SellCarPageState extends State<SellCarPage> {
                                             fit: BoxFit.cover,
                                             colorFilter: ColorFilter.mode(
                                               Colors.black.withOpacity(0.7), 
-                                                BlendMode.darken
-                                              )
-                                            ),
+                                              BlendMode.darken
+                                            )
+                                          ),
                                         ),
                                         child: selectedImages.isEmpty ? CustomIcon(
                                           iconData: Icons.photo, 
                                           isFaIcon: false, 
                                           iconSize: 60,
                                           iconColor: ColorGlobalVariables.blueColor
-                                          ) : null,
-                                        )),
-                                    const SizedBox(height: 15,),
-                                    Expanded(
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: ColorGlobalVariables.textFieldColor,
-                                          borderRadius: BorderRadius.circular(12),
-                                          image: selectedImages.isEmpty ? null : DecorationImage(
-                                            image: FileImage(File(selectedImages[3].path)),
-                                            fit: BoxFit.cover,
-                                            colorFilter: ColorFilter.mode(
-                                              Colors.black.withOpacity(0.7), 
-                                                BlendMode.darken
-                                              )
-                                            ),
+                                        ) : null,
+                                      )),
+                                  const SizedBox(height: 15),
+                                  Expanded(
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: ColorGlobalVariables.textFieldColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        image: selectedImages.isEmpty ? null : DecorationImage(
+                                          image: FileImage(File(selectedImages[3].path)),
+                                          fit: BoxFit.cover,
+                                          colorFilter: ColorFilter.mode(
+                                            Colors.black.withOpacity(0.7), 
+                                            BlendMode.darken
+                                          )
                                         ),
-                                        child: selectedImages.isEmpty ? CustomIcon(
-                                          iconData: Icons.photo, 
-                                          isFaIcon: false, 
-                                          iconSize: 50,
-                                          iconColor: ColorGlobalVariables.blueColor
-                                          ) : null,
-                                        )),
+                                      ),
+                                      child: selectedImages.isEmpty ? CustomIcon(
+                                        iconData: Icons.photo, 
+                                        isFaIcon: false, 
+                                        iconSize: 50,
+                                        iconColor: ColorGlobalVariables.blueColor
+                                      ) : null,
+                                    )),
                                   ],
                                 )
-                                ),
+                              ),
                             ],
-                            ),
-                        ),
-                      ),
+                          ),
+                        ),),
                       ],
                     ),
                   ),
-                  //: 
-                  // Links(
-                  //   linkTextType: 'Upload images/Video', 
-                  //   linkTextColor: ColorGlobalVariables.blackColor, 
-                  //   isTextSmall: true,
-                  //   iconSize: 40,
-                  //   borderColor: ColorGlobalVariables.buttonColor,
-                  //   linkFontWeight: FontWeight.w500,
-                  //   textDecoration: TextDecoration.none,
-                  //   iconData: Icons.image, // upload, add_photo_alternate, cloud_upload, (fontawesome: upload, image, fileImage, cameraRetro, cloudUploadAlt) 
-                  //   isIconWidgetRequiredAtEnd: false, 
-                  //   isIconWidgetRequiredAtFront: true, 
-                  //   onClickFunction: (){}
-                  //   ),
-            
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                   // sell car button
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20,),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: CustomElevatedButton(
                       buttonTextType: "Sell Car", 
                       textTypeColor: ColorGlobalVariables.whiteColor, 
                       buttonVerticalPadding: 15,
                       borderRadius: 8,
                       isFullButtonWidthRequired: true, 
-                      buttonBackgroundColor: Colors.red, onClickFunction: () => _formValidation(),
-                      //ColorGlobalVariables.brownColor
-                      ),
+                      buttonBackgroundColor: Colors.red, 
+                      onClickFunction: () => _formValidation(),
+                    ),
                   ),
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 20),
                 ],
-                ),
+              ),
             ),
           ),
         ),
-        ),
+      ),
     );
   }
-
-  // 
-  Position? _currentPosition;
 
   Future<void> _getLocation() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-  
-  // Check if location services are enabled
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    showSnackbar(
-      backgroundColor: ColorGlobalVariables.whiteColor,
-      isForFormValidation: false,
-      title: 'Location services are disabled. Please enable them.'
-    );
-    return;
-  }
-
-  // Check location permissions
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.deniedForever) {
-    showSnackbar(
-      backgroundColor: ColorGlobalVariables.whiteColor,
-      isForFormValidation: false,
-      title: 'Location permissions are permanently denied. Please enable them in app settings.'
-    );
-    return;
-  }
-
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+    bool serviceEnabled;
+    LocationPermission permission;
+    
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
       showSnackbar(
         backgroundColor: ColorGlobalVariables.whiteColor,
         isForFormValidation: false,
-        title: 'Location permissions are denied'
+        title: 'Location services are disabled. Please enable them.'
       );
       return;
     }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      showSnackbar(
+        backgroundColor: ColorGlobalVariables.whiteColor,
+        isForFormValidation: false,
+        title: 'Location permissions are permanently denied. Please enable them in app settings.'
+      );
+      return;
+    }
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+        showSnackbar(
+          backgroundColor: ColorGlobalVariables.whiteColor,
+          isForFormValidation: false,
+          title: 'Location permissions are denied'
+        );
+        return;
+      }
+    }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high
+      );
+
+      setState(() {
+        _currentPosition = position;
+      });
+
+      showSnackbar(
+        backgroundColor: ColorGlobalVariables.whiteColor,
+        isForFormValidation: false,
+        title: 'Location updated to your current position'
+      );
+
+    } catch (e) {
+      showSnackbar(
+        backgroundColor: ColorGlobalVariables.whiteColor,
+        isForFormValidation: false,
+        title: 'Error getting location: ${e.toString()}'
+      );
+    }
   }
 
-  try {
-    // Get the current position
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high
-    );
-
-    // Update the state with the new position
-    setState(() {
-      _currentPosition = position;
-    });
-
-    // Optional: You could also show a snackbar to confirm the location was updated
-    showSnackbar(
-      backgroundColor: ColorGlobalVariables.whiteColor,
-      isForFormValidation: false,
-      title: 'Location updated to your current position'
-    );
-
-  } catch (e) {
-    showSnackbar(
-      backgroundColor: ColorGlobalVariables.whiteColor,
-      isForFormValidation: false,
-      title: 'Error getting location: ${e.toString()}'
-    );
-  }
-}
-
-  // for make alertDialog
-  Future<void> _showMakeModelDialog({
+  Future<void> _showMakeSelectionDialog({
     required BuildContext context, 
-    required List<Map<String, dynamic>> options,
-    required void Function(Map<String,dynamic>) onSelected,
-    }) async {
-    final selected = await showDialog<Map<String, dynamic>>(
+    required List<Make> makes,
+    required void Function(Make) onSelected,
+  }) async {
+    final selected = await showDialog<Make>(
       context: context, 
       builder: (BuildContext context) {
         return SimpleDialog(
           title: TextMedium(
-            title: 'Select an option', 
+            title: 'Select Make', 
             fontWeight: FontWeight.normal, 
             textColor: ColorGlobalVariables.blackColor
-            ),
-          children: options.map(
-            (option){
-              return SimpleDialogOption(
-                onPressed: (){
-                  Navigator.pop(context, option);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextSmall(
-                    title: option['make'], 
-                    fontWeight: FontWeight.normal, 
-                    textColor: ColorGlobalVariables.blackColor
-                    ),
-                  ),
-              );
-            }
-            ).toList(),
+          ),
+          children: makes.map((make) {
+            return SimpleDialogOption(
+              onPressed: (){
+                Navigator.pop(context, make);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TextSmall(
+                  title: make.name, 
+                  fontWeight: FontWeight.normal, 
+                  textColor: ColorGlobalVariables.blackColor
+                ),
+              ),
+            );
+          }).toList(),
         );
       });
 
-      if(selected != null){
-        onSelected(selected);
-        // setState(() {
-        //   selectedOption = selected;
-        // });
-      }
+    if (selected != null) {
+      onSelected(selected);
+    }
   }
-  
-  // for general alertDialog
+
+  Future<void> _showModelSelectionDialog({
+    required BuildContext context, 
+    required List<BrandModel> models,
+    required void Function(BrandModel) onSelected,
+  }) async {
+    final selected = await showDialog<BrandModel>(
+      context: context, 
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: TextMedium(
+            title: 'Select Model', 
+            fontWeight: FontWeight.normal, 
+            textColor: ColorGlobalVariables.blackColor
+          ),
+          children: models.map((model) {
+            return SimpleDialogOption(
+              onPressed: (){
+                Navigator.pop(context, model);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TextSmall(
+                  title: model!.name, 
+                  fontWeight: FontWeight.normal, 
+                  textColor: ColorGlobalVariables.blackColor
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      });
+
+    if (selected != null) {
+      onSelected(selected);
+    }
+  }
+
   Future<void> _showSelectionDialog({
     required BuildContext context, 
     required List options,
     required void Function(String) onSelected,
-    }) async {
+  }) async {
     final selected = await showDialog<String>(
       context: context, 
       builder: (BuildContext context) {
@@ -1261,48 +1188,41 @@ class _SellCarPageState extends State<SellCarPage> {
             title: 'Select an option', 
             fontWeight: FontWeight.normal, 
             textColor: ColorGlobalVariables.blackColor
-            ),
-          children: options.map(
-            (option){
-              return SimpleDialogOption(
-                onPressed: (){
-                  Navigator.pop(context, option);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextSmall(
-                    title: option, 
-                    fontWeight: FontWeight.normal, 
-                    textColor: ColorGlobalVariables.blackColor
-                    ),
-                  ),
-              );
-            }
-            ).toList(),
+          ),
+          children: options.map((option) {
+            return SimpleDialogOption(
+              onPressed: (){
+                Navigator.pop(context, option);
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TextSmall(
+                  title: option, 
+                  fontWeight: FontWeight.normal, 
+                  textColor: ColorGlobalVariables.blackColor
+                ),
+              ),
+            );
+          }).toList(),
         );
       });
 
-      if(selected != null){
-        onSelected(selected);
-        // setState(() {
-        //   selectedOption = selected;
-        // });
-      }
+    if (selected != null) {
+      onSelected(selected);
+    }
   }
-  // change color function
-  void _changeColor(Color color){
+
+  void _changeColor(Color color) {
     setState(() {
       color = color;
       _colorController.text = colorToHex(color);
     });
   }
 
-  // to use later
-  String colorToHex(Color color){
+  String colorToHex(Color color) {
     return "#${color.value.toRadixString(16).padLeft(8,'0').toUpperCase()}";
   }
 
-  // show year picker
   void _showYearPicker() {
     showDialog(
       context: context,
@@ -1322,22 +1242,17 @@ class _SellCarPageState extends State<SellCarPage> {
               }
             },
           ),
-          ),
+        ),
       )
     );
   }
 
-  // Validation function
- 
-
-
-  // show snackbar
   void showSnackbar({
     required Color backgroundColor,
     required String title,
     required bool isForFormValidation,
     Color? textColor,
-  }){
+  }) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: backgroundColor,
@@ -1346,13 +1261,13 @@ class _SellCarPageState extends State<SellCarPage> {
           title: isForFormValidation ? "Please enter a/an $title" : title, 
           fontWeight: FontWeight.w500, 
           textColor: textColor ?? ColorGlobalVariables.redColor,
-          )
         )
+      )
     );
   }
-  // pick images
+
   Future<void> _pickImages() async {
-    try{
+    try {
       final List<XFile> pickedFiles = await picker.pickMultiImage(
         maxWidth: 1000,
         maxHeight: 1000,
@@ -1360,9 +1275,7 @@ class _SellCarPageState extends State<SellCarPage> {
       );
 
       setState(() {
-        // combine existing images with new ones
         selectedImages.addAll(pickedFiles);
-        // ensuring we don't exceed 4 images
         if(selectedImages.length > 4){
           selectedImages = selectedImages.sublist(0,4);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1371,44 +1284,42 @@ class _SellCarPageState extends State<SellCarPage> {
                 title: 'Maximum of 4 images allowed', 
                 fontWeight: FontWeight.w500, 
                 textColor: ColorGlobalVariables.redColor
-                )
               )
+            )
           );
         }
       });
-        }catch(e){
+    } catch(e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: TextSmall(
             title: "Error picking images: $e", 
             fontWeight: FontWeight.w500, 
             textColor: ColorGlobalVariables.redColor,
-            ),
-          )
+          ),
+        )
       );
     }
   }
 
-  // toggle feature for features
-  void _toggleFeature(String feature){
+  void _toggleFeature(String feature) {
     if(selectedFeatures.contains(feature)){
       selectedFeatures.remove(feature);
-    }else{
+    } else {
       selectedFeatures.add(feature);
     }
   }
 
-  // show color picker
-  void _showColorPicker(){
+  void _showColorPicker() {
     showDialog(
       context: context, 
-      builder: (BuildContext context){
+      builder: (BuildContext context) {
         return AlertDialog(
           title: const TextSmall(
             title: "Pick a color", 
             fontWeight: FontWeight.w500, 
             textColor: ColorGlobalVariables.blackColor
-            ),
+          ),
           content: SingleChildScrollView(
             child: ColorPicker(
               pickerColor: color, 
@@ -1417,10 +1328,9 @@ class _SellCarPageState extends State<SellCarPage> {
               pickerAreaHeightPercent: 0.8,
               enableAlpha: true,
               displayThumbColor: true,
-              ),
+            ),
           ),
           actions: [
-            // okay button
             CustomTextButton(
               buttonTextType: "OK", 
               textTypeColor: ColorGlobalVariables.whiteColor, 
@@ -1429,10 +1339,10 @@ class _SellCarPageState extends State<SellCarPage> {
               onClickFunction: (){
                 Navigator.of(context).pop();
               }
-              ),
+            ),
           ],
         );
       }
-      );
+    );
   }
 }

@@ -74,6 +74,11 @@ dependencies:
   flutter_libphonenumber: ^2.5.1
   jwt_decoder: ^2.0.1
   flutter_animate: ^4.5.2
+  shimmer: ^3.0.0
+  pull_to_refresh: ^2.0.0
+  infinite_scroll_pagination: ^5.1.0
+  intl: ^0.18.1
+  jiffy: ^6.2.1
 
 
 

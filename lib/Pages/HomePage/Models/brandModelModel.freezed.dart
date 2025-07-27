@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'trendingMakeModel.dart';
+part of 'brandModelModel.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,353 +14,55 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-TrendingMake _$TrendingMakeFromJson(Map<String, dynamic> json) {
-  return _TrendingMake.fromJson(json);
+BrandModelResponse _$BrandModelResponseFromJson(Map<String, dynamic> json) {
+  return _BrandModelResponse.fromJson(json);
 }
 
 /// @nodoc
-mixin _$TrendingMake {
-  int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
-  String? get userId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String get image => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
-  String get createdAt =>
-      throw _privateConstructorUsedError; // Changed to String
-  @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
+mixin _$BrandModelResponse {
+  /// List of brand models
+  List<BrandModel> get data => throw _privateConstructorUsedError;
 
-  /// Serializes this TrendingMake to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of TrendingMake
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $TrendingMakeCopyWith<TrendingMake> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $TrendingMakeCopyWith<$Res> {
-  factory $TrendingMakeCopyWith(
-          TrendingMake value, $Res Function(TrendingMake) then) =
-      _$TrendingMakeCopyWithImpl<$Res, TrendingMake>;
-  @useResult
-  $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
-      String name,
-      String slug,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
-}
-
-/// @nodoc
-class _$TrendingMakeCopyWithImpl<$Res, $Val extends TrendingMake>
-    implements $TrendingMakeCopyWith<$Res> {
-  _$TrendingMakeCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of TrendingMake
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = freezed,
-    Object? name = null,
-    Object? slug = null,
-    Object? image = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$TrendingMakeImplCopyWith<$Res>
-    implements $TrendingMakeCopyWith<$Res> {
-  factory _$$TrendingMakeImplCopyWith(
-          _$TrendingMakeImpl value, $Res Function(_$TrendingMakeImpl) then) =
-      __$$TrendingMakeImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
-      String name,
-      String slug,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
-}
-
-/// @nodoc
-class __$$TrendingMakeImplCopyWithImpl<$Res>
-    extends _$TrendingMakeCopyWithImpl<$Res, _$TrendingMakeImpl>
-    implements _$$TrendingMakeImplCopyWith<$Res> {
-  __$$TrendingMakeImplCopyWithImpl(
-      _$TrendingMakeImpl _value, $Res Function(_$TrendingMakeImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of TrendingMake
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = freezed,
-    Object? name = null,
-    Object? slug = null,
-    Object? image = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_$TrendingMakeImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: null == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
-  const _$TrendingMakeImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
-      required this.name,
-      required this.slug,
-      required this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
-
-  factory _$TrendingMakeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TrendingMakeImplFromJson(json);
-
-  @override
-  final int id;
-  @override
-  @JsonKey(name: 'user_id')
-  final String? userId;
-  @override
-  final String name;
-  @override
-  final String slug;
-  @override
-  final String image;
-  @override
-  @JsonKey(name: 'created_at')
-  final String createdAt;
-// Changed to String
-  @override
-  @JsonKey(name: 'updated_at')
-  final String updatedAt;
-
-  @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrendingMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'TrendingMake'))
-      ..add(DiagnosticsProperty('id', id))
-      ..add(DiagnosticsProperty('userId', userId))
-      ..add(DiagnosticsProperty('name', name))
-      ..add(DiagnosticsProperty('slug', slug))
-      ..add(DiagnosticsProperty('image', image))
-      ..add(DiagnosticsProperty('createdAt', createdAt))
-      ..add(DiagnosticsProperty('updatedAt', updatedAt));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$TrendingMakeImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.slug, slug) || other.slug == slug) &&
-            (identical(other.image, image) || other.image == image) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, id, userId, name, slug, image, createdAt, updatedAt);
-
-  /// Create a copy of TrendingMake
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$TrendingMakeImplCopyWith<_$TrendingMakeImpl> get copyWith =>
-      __$$TrendingMakeImplCopyWithImpl<_$TrendingMakeImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$TrendingMakeImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _TrendingMake implements TrendingMake {
-  const factory _TrendingMake(
-          {required final int id,
-          @JsonKey(name: 'user_id') final String? userId,
-          required final String name,
-          required final String slug,
-          required final String image,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$TrendingMakeImpl;
-
-  factory _TrendingMake.fromJson(Map<String, dynamic> json) =
-      _$TrendingMakeImpl.fromJson;
-
-  @override
-  int get id;
-  @override
-  @JsonKey(name: 'user_id')
-  String? get userId;
-  @override
-  String get name;
-  @override
-  String get slug;
-  @override
-  String get image;
-  @override
-  @JsonKey(name: 'created_at')
-  String get createdAt; // Changed to String
-  @override
-  @JsonKey(name: 'updated_at')
-  String get updatedAt;
-
-  /// Create a copy of TrendingMake
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TrendingMakeImplCopyWith<_$TrendingMakeImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-TrendingMakeResponse _$TrendingMakeResponseFromJson(Map<String, dynamic> json) {
-  return _TrendingMakeResponse.fromJson(json);
-}
-
-/// @nodoc
-mixin _$TrendingMakeResponse {
-  List<TrendingMake> get data => throw _privateConstructorUsedError;
+  /// Pagination links
   PaginationLinks get links => throw _privateConstructorUsedError;
+
+  /// Pagination metadata
   PaginationMeta get meta => throw _privateConstructorUsedError;
 
-  /// Serializes this TrendingMakeResponse to a JSON map.
+  /// Serializes this BrandModelResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $TrendingMakeResponseCopyWith<TrendingMakeResponse> get copyWith =>
+  $BrandModelResponseCopyWith<BrandModelResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $TrendingMakeResponseCopyWith<$Res> {
-  factory $TrendingMakeResponseCopyWith(TrendingMakeResponse value,
-          $Res Function(TrendingMakeResponse) then) =
-      _$TrendingMakeResponseCopyWithImpl<$Res, TrendingMakeResponse>;
+abstract class $BrandModelResponseCopyWith<$Res> {
+  factory $BrandModelResponseCopyWith(
+          BrandModelResponse value, $Res Function(BrandModelResponse) then) =
+      _$BrandModelResponseCopyWithImpl<$Res, BrandModelResponse>;
   @useResult
   $Res call(
-      {List<TrendingMake> data, PaginationLinks links, PaginationMeta meta});
+      {List<BrandModel> data, PaginationLinks links, PaginationMeta meta});
 
   $PaginationLinksCopyWith<$Res> get links;
   $PaginationMetaCopyWith<$Res> get meta;
 }
 
 /// @nodoc
-class _$TrendingMakeResponseCopyWithImpl<$Res,
-        $Val extends TrendingMakeResponse>
-    implements $TrendingMakeResponseCopyWith<$Res> {
-  _$TrendingMakeResponseCopyWithImpl(this._value, this._then);
+class _$BrandModelResponseCopyWithImpl<$Res, $Val extends BrandModelResponse>
+    implements $BrandModelResponseCopyWith<$Res> {
+  _$BrandModelResponseCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -373,7 +75,7 @@ class _$TrendingMakeResponseCopyWithImpl<$Res,
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<TrendingMake>,
+              as List<BrandModel>,
       links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
@@ -385,7 +87,7 @@ class _$TrendingMakeResponseCopyWithImpl<$Res,
     ) as $Val);
   }
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -395,7 +97,7 @@ class _$TrendingMakeResponseCopyWithImpl<$Res,
     });
   }
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -407,15 +109,15 @@ class _$TrendingMakeResponseCopyWithImpl<$Res,
 }
 
 /// @nodoc
-abstract class _$$TrendingMakeResponseImplCopyWith<$Res>
-    implements $TrendingMakeResponseCopyWith<$Res> {
-  factory _$$TrendingMakeResponseImplCopyWith(_$TrendingMakeResponseImpl value,
-          $Res Function(_$TrendingMakeResponseImpl) then) =
-      __$$TrendingMakeResponseImplCopyWithImpl<$Res>;
+abstract class _$$BrandModelResponseImplCopyWith<$Res>
+    implements $BrandModelResponseCopyWith<$Res> {
+  factory _$$BrandModelResponseImplCopyWith(_$BrandModelResponseImpl value,
+          $Res Function(_$BrandModelResponseImpl) then) =
+      __$$BrandModelResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
-      {List<TrendingMake> data, PaginationLinks links, PaginationMeta meta});
+      {List<BrandModel> data, PaginationLinks links, PaginationMeta meta});
 
   @override
   $PaginationLinksCopyWith<$Res> get links;
@@ -424,14 +126,14 @@ abstract class _$$TrendingMakeResponseImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$TrendingMakeResponseImplCopyWithImpl<$Res>
-    extends _$TrendingMakeResponseCopyWithImpl<$Res, _$TrendingMakeResponseImpl>
-    implements _$$TrendingMakeResponseImplCopyWith<$Res> {
-  __$$TrendingMakeResponseImplCopyWithImpl(_$TrendingMakeResponseImpl _value,
-      $Res Function(_$TrendingMakeResponseImpl) _then)
+class __$$BrandModelResponseImplCopyWithImpl<$Res>
+    extends _$BrandModelResponseCopyWithImpl<$Res, _$BrandModelResponseImpl>
+    implements _$$BrandModelResponseImplCopyWith<$Res> {
+  __$$BrandModelResponseImplCopyWithImpl(_$BrandModelResponseImpl _value,
+      $Res Function(_$BrandModelResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -440,11 +142,11 @@ class __$$TrendingMakeResponseImplCopyWithImpl<$Res>
     Object? links = null,
     Object? meta = null,
   }) {
-    return _then(_$TrendingMakeResponseImpl(
+    return _then(_$BrandModelResponseImpl(
       data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<TrendingMake>,
+              as List<BrandModel>,
       links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
@@ -459,51 +161,45 @@ class __$$TrendingMakeResponseImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$TrendingMakeResponseImpl
-    with DiagnosticableTreeMixin
-    implements _TrendingMakeResponse {
-  const _$TrendingMakeResponseImpl(
-      {required final List<TrendingMake> data,
+class _$BrandModelResponseImpl implements _BrandModelResponse {
+  const _$BrandModelResponseImpl(
+      {required final List<BrandModel> data,
       required this.links,
       required this.meta})
       : _data = data;
 
-  factory _$TrendingMakeResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TrendingMakeResponseImplFromJson(json);
+  factory _$BrandModelResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BrandModelResponseImplFromJson(json);
 
-  final List<TrendingMake> _data;
+  /// List of brand models
+  final List<BrandModel> _data;
+
+  /// List of brand models
   @override
-  List<TrendingMake> get data {
+  List<BrandModel> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_data);
   }
 
+  /// Pagination links
   @override
   final PaginationLinks links;
+
+  /// Pagination metadata
   @override
   final PaginationMeta meta;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrendingMakeResponse(data: $data, links: $links, meta: $meta)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'TrendingMakeResponse'))
-      ..add(DiagnosticsProperty('data', data))
-      ..add(DiagnosticsProperty('links', links))
-      ..add(DiagnosticsProperty('meta', meta));
+  String toString() {
+    return 'BrandModelResponse(data: $data, links: $links, meta: $meta)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TrendingMakeResponseImpl &&
+            other is _$BrandModelResponseImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.links, links) || other.links == links) &&
             (identical(other.meta, meta) || other.meta == meta));
@@ -514,46 +210,349 @@ class _$TrendingMakeResponseImpl
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), links, meta);
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$TrendingMakeResponseImplCopyWith<_$TrendingMakeResponseImpl>
-      get copyWith =>
-          __$$TrendingMakeResponseImplCopyWithImpl<_$TrendingMakeResponseImpl>(
-              this, _$identity);
+  _$$BrandModelResponseImplCopyWith<_$BrandModelResponseImpl> get copyWith =>
+      __$$BrandModelResponseImplCopyWithImpl<_$BrandModelResponseImpl>(
+          this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TrendingMakeResponseImplToJson(
+    return _$$BrandModelResponseImplToJson(
       this,
     );
   }
 }
 
-abstract class _TrendingMakeResponse implements TrendingMakeResponse {
-  const factory _TrendingMakeResponse(
-      {required final List<TrendingMake> data,
+abstract class _BrandModelResponse implements BrandModelResponse {
+  const factory _BrandModelResponse(
+      {required final List<BrandModel> data,
       required final PaginationLinks links,
-      required final PaginationMeta meta}) = _$TrendingMakeResponseImpl;
+      required final PaginationMeta meta}) = _$BrandModelResponseImpl;
 
-  factory _TrendingMakeResponse.fromJson(Map<String, dynamic> json) =
-      _$TrendingMakeResponseImpl.fromJson;
+  factory _BrandModelResponse.fromJson(Map<String, dynamic> json) =
+      _$BrandModelResponseImpl.fromJson;
 
+  /// List of brand models
   @override
-  List<TrendingMake> get data;
+  List<BrandModel> get data;
+
+  /// Pagination links
   @override
   PaginationLinks get links;
+
+  /// Pagination metadata
   @override
   PaginationMeta get meta;
 
-  /// Create a copy of TrendingMakeResponse
+  /// Create a copy of BrandModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TrendingMakeResponseImplCopyWith<_$TrendingMakeResponseImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  _$$BrandModelResponseImplCopyWith<_$BrandModelResponseImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
+  return _BrandModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BrandModel {
+  /// Unique identifier for the model
+  int get id => throw _privateConstructorUsedError;
+
+  /// ID of the parent brand
+  @JsonKey(name: 'brand_id')
+  int get brandId => throw _privateConstructorUsedError;
+
+  /// Name of the model (e.g. "Camry")
+  String get name => throw _privateConstructorUsedError;
+
+  /// URL slug for the model
+  String get slug => throw _privateConstructorUsedError;
+
+  /// Creation timestamp
+  @JsonKey(name: 'created_at')
+  String get createdAt => throw _privateConstructorUsedError;
+
+  /// Last update timestamp
+  @JsonKey(name: 'updated_at')
+  String get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this BrandModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BrandModelCopyWith<BrandModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BrandModelCopyWith<$Res> {
+  factory $BrandModelCopyWith(
+          BrandModel value, $Res Function(BrandModel) then) =
+      _$BrandModelCopyWithImpl<$Res, BrandModel>;
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'brand_id') int brandId,
+      String name,
+      String slug,
+      @JsonKey(name: 'created_at') String createdAt,
+      @JsonKey(name: 'updated_at') String updatedAt});
+}
+
+/// @nodoc
+class _$BrandModelCopyWithImpl<$Res, $Val extends BrandModel>
+    implements $BrandModelCopyWith<$Res> {
+  _$BrandModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? brandId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandId: null == brandId
+          ? _value.brandId
+          : brandId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BrandModelImplCopyWith<$Res>
+    implements $BrandModelCopyWith<$Res> {
+  factory _$$BrandModelImplCopyWith(
+          _$BrandModelImpl value, $Res Function(_$BrandModelImpl) then) =
+      __$$BrandModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'brand_id') int brandId,
+      String name,
+      String slug,
+      @JsonKey(name: 'created_at') String createdAt,
+      @JsonKey(name: 'updated_at') String updatedAt});
+}
+
+/// @nodoc
+class __$$BrandModelImplCopyWithImpl<$Res>
+    extends _$BrandModelCopyWithImpl<$Res, _$BrandModelImpl>
+    implements _$$BrandModelImplCopyWith<$Res> {
+  __$$BrandModelImplCopyWithImpl(
+      _$BrandModelImpl _value, $Res Function(_$BrandModelImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? brandId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_$BrandModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandId: null == brandId
+          ? _value.brandId
+          : brandId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BrandModelImpl implements _BrandModel {
+  const _$BrandModelImpl(
+      {required this.id,
+      @JsonKey(name: 'brand_id') required this.brandId,
+      required this.name,
+      required this.slug,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt});
+
+  factory _$BrandModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BrandModelImplFromJson(json);
+
+  /// Unique identifier for the model
+  @override
+  final int id;
+
+  /// ID of the parent brand
+  @override
+  @JsonKey(name: 'brand_id')
+  final int brandId;
+
+  /// Name of the model (e.g. "Camry")
+  @override
+  final String name;
+
+  /// URL slug for the model
+  @override
+  final String slug;
+
+  /// Creation timestamp
+  @override
+  @JsonKey(name: 'created_at')
+  final String createdAt;
+
+  /// Last update timestamp
+  @override
+  @JsonKey(name: 'updated_at')
+  final String updatedAt;
+
+  @override
+  String toString() {
+    return 'BrandModel(id: $id, brandId: $brandId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BrandModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.brandId, brandId) || other.brandId == brandId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, brandId, name, slug, createdAt, updatedAt);
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BrandModelImplCopyWith<_$BrandModelImpl> get copyWith =>
+      __$$BrandModelImplCopyWithImpl<_$BrandModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BrandModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _BrandModel implements BrandModel {
+  const factory _BrandModel(
+          {required final int id,
+          @JsonKey(name: 'brand_id') required final int brandId,
+          required final String name,
+          required final String slug,
+          @JsonKey(name: 'created_at') required final String createdAt,
+          @JsonKey(name: 'updated_at') required final String updatedAt}) =
+      _$BrandModelImpl;
+
+  factory _BrandModel.fromJson(Map<String, dynamic> json) =
+      _$BrandModelImpl.fromJson;
+
+  /// Unique identifier for the model
+  @override
+  int get id;
+
+  /// ID of the parent brand
+  @override
+  @JsonKey(name: 'brand_id')
+  int get brandId;
+
+  /// Name of the model (e.g. "Camry")
+  @override
+  String get name;
+
+  /// URL slug for the model
+  @override
+  String get slug;
+
+  /// Creation timestamp
+  @override
+  @JsonKey(name: 'created_at')
+  String get createdAt;
+
+  /// Last update timestamp
+  @override
+  @JsonKey(name: 'updated_at')
+  String get updatedAt;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BrandModelImplCopyWith<_$BrandModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) {
@@ -562,9 +561,16 @@ PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationLinks {
+  /// URL to the first page
   String get first => throw _privateConstructorUsedError;
+
+  /// URL to the last page
   String get last => throw _privateConstructorUsedError;
+
+  /// URL to the previous page (null if on first page)
   String? get prev => throw _privateConstructorUsedError;
+
+  /// URL to the next page (null if on last page)
   String? get next => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationLinks to a JSON map.
@@ -679,38 +685,35 @@ class __$$PaginationLinksImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$PaginationLinksImpl
-    with DiagnosticableTreeMixin
-    implements _PaginationLinks {
+class _$PaginationLinksImpl implements _PaginationLinks {
   const _$PaginationLinksImpl(
-      {required this.first, required this.last, this.prev, this.next});
+      {required this.first,
+      required this.last,
+      required this.prev,
+      required this.next});
 
   factory _$PaginationLinksImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationLinksImplFromJson(json);
 
+  /// URL to the first page
   @override
   final String first;
+
+  /// URL to the last page
   @override
   final String last;
+
+  /// URL to the previous page (null if on first page)
   @override
   final String? prev;
+
+  /// URL to the next page (null if on last page)
   @override
   final String? next;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'PaginationLinks(first: $first, last: $last, prev: $prev, next: $next)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'PaginationLinks'))
-      ..add(DiagnosticsProperty('first', first))
-      ..add(DiagnosticsProperty('last', last))
-      ..add(DiagnosticsProperty('prev', prev))
-      ..add(DiagnosticsProperty('next', next));
   }
 
   @override
@@ -749,18 +752,25 @@ abstract class _PaginationLinks implements PaginationLinks {
   const factory _PaginationLinks(
       {required final String first,
       required final String last,
-      final String? prev,
-      final String? next}) = _$PaginationLinksImpl;
+      required final String? prev,
+      required final String? next}) = _$PaginationLinksImpl;
 
   factory _PaginationLinks.fromJson(Map<String, dynamic> json) =
       _$PaginationLinksImpl.fromJson;
 
+  /// URL to the first page
   @override
   String get first;
+
+  /// URL to the last page
   @override
   String get last;
+
+  /// URL to the previous page (null if on first page)
   @override
   String? get prev;
+
+  /// URL to the next page (null if on last page)
   @override
   String? get next;
 
@@ -778,16 +788,31 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationMeta {
+  /// Current page number
   @JsonKey(name: 'current_page')
   int get currentPage => throw _privateConstructorUsedError;
+
+  /// Index of first item on current page
   int get from => throw _privateConstructorUsedError;
+
+  /// Last page number
   @JsonKey(name: 'last_page')
   int get lastPage => throw _privateConstructorUsedError;
-  List<PaginationMetaLink> get links => throw _privateConstructorUsedError;
+
+  /// List of pagination links
+  List<PaginationLink> get links => throw _privateConstructorUsedError;
+
+  /// Base path for pagination URLs
   String get path => throw _privateConstructorUsedError;
+
+  /// Number of items per page
   @JsonKey(name: 'per_page')
   int get perPage => throw _privateConstructorUsedError;
+
+  /// Index of last item on current page
   int get to => throw _privateConstructorUsedError;
+
+  /// Total number of items across all pages
   int get total => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMeta to a JSON map.
@@ -810,7 +835,7 @@ abstract class $PaginationMetaCopyWith<$Res> {
       {@JsonKey(name: 'current_page') int currentPage,
       int from,
       @JsonKey(name: 'last_page') int lastPage,
-      List<PaginationMetaLink> links,
+      List<PaginationLink> links,
       String path,
       @JsonKey(name: 'per_page') int perPage,
       int to,
@@ -857,7 +882,7 @@ class _$PaginationMetaCopyWithImpl<$Res, $Val extends PaginationMeta>
       links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationMetaLink>,
+              as List<PaginationLink>,
       path: null == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
@@ -890,7 +915,7 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
       {@JsonKey(name: 'current_page') int currentPage,
       int from,
       @JsonKey(name: 'last_page') int lastPage,
-      List<PaginationMetaLink> links,
+      List<PaginationLink> links,
       String path,
       @JsonKey(name: 'per_page') int perPage,
       int to,
@@ -935,7 +960,7 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
       links: null == links
           ? _value._links
           : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationMetaLink>,
+              as List<PaginationLink>,
       path: null == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
@@ -958,14 +983,12 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$PaginationMetaImpl
-    with DiagnosticableTreeMixin
-    implements _PaginationMeta {
+class _$PaginationMetaImpl implements _PaginationMeta {
   const _$PaginationMetaImpl(
       {@JsonKey(name: 'current_page') required this.currentPage,
       required this.from,
       @JsonKey(name: 'last_page') required this.lastPage,
-      required final List<PaginationMetaLink> links,
+      required final List<PaginationLink> links,
       required this.path,
       @JsonKey(name: 'per_page') required this.perPage,
       required this.to,
@@ -975,50 +998,51 @@ class _$PaginationMetaImpl
   factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaImplFromJson(json);
 
+  /// Current page number
   @override
   @JsonKey(name: 'current_page')
   final int currentPage;
+
+  /// Index of first item on current page
   @override
   final int from;
+
+  /// Last page number
   @override
   @JsonKey(name: 'last_page')
   final int lastPage;
-  final List<PaginationMetaLink> _links;
+
+  /// List of pagination links
+  final List<PaginationLink> _links;
+
+  /// List of pagination links
   @override
-  List<PaginationMetaLink> get links {
+  List<PaginationLink> get links {
     if (_links is EqualUnmodifiableListView) return _links;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_links);
   }
 
+  /// Base path for pagination URLs
   @override
   final String path;
+
+  /// Number of items per page
   @override
   @JsonKey(name: 'per_page')
   final int perPage;
+
+  /// Index of last item on current page
   @override
   final int to;
+
+  /// Total number of items across all pages
   @override
   final int total;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+  String toString() {
     return 'PaginationMeta(currentPage: $currentPage, from: $from, lastPage: $lastPage, links: $links, path: $path, perPage: $perPage, to: $to, total: $total)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'PaginationMeta'))
-      ..add(DiagnosticsProperty('currentPage', currentPage))
-      ..add(DiagnosticsProperty('from', from))
-      ..add(DiagnosticsProperty('lastPage', lastPage))
-      ..add(DiagnosticsProperty('links', links))
-      ..add(DiagnosticsProperty('path', path))
-      ..add(DiagnosticsProperty('perPage', perPage))
-      ..add(DiagnosticsProperty('to', to))
-      ..add(DiagnosticsProperty('total', total));
   }
 
   @override
@@ -1065,7 +1089,7 @@ abstract class _PaginationMeta implements PaginationMeta {
       {@JsonKey(name: 'current_page') required final int currentPage,
       required final int from,
       @JsonKey(name: 'last_page') required final int lastPage,
-      required final List<PaginationMetaLink> links,
+      required final List<PaginationLink> links,
       required final String path,
       @JsonKey(name: 'per_page') required final int perPage,
       required final int to,
@@ -1074,23 +1098,38 @@ abstract class _PaginationMeta implements PaginationMeta {
   factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaImpl.fromJson;
 
+  /// Current page number
   @override
   @JsonKey(name: 'current_page')
   int get currentPage;
+
+  /// Index of first item on current page
   @override
   int get from;
+
+  /// Last page number
   @override
   @JsonKey(name: 'last_page')
   int get lastPage;
+
+  /// List of pagination links
   @override
-  List<PaginationMetaLink> get links;
+  List<PaginationLink> get links;
+
+  /// Base path for pagination URLs
   @override
   String get path;
+
+  /// Number of items per page
   @override
   @JsonKey(name: 'per_page')
   int get perPage;
+
+  /// Index of last item on current page
   @override
   int get to;
+
+  /// Total number of items across all pages
   @override
   int get total;
 
@@ -1102,46 +1141,51 @@ abstract class _PaginationMeta implements PaginationMeta {
       throw _privateConstructorUsedError;
 }
 
-PaginationMetaLink _$PaginationMetaLinkFromJson(Map<String, dynamic> json) {
-  return _PaginationMetaLink.fromJson(json);
+PaginationLink _$PaginationLinkFromJson(Map<String, dynamic> json) {
+  return _PaginationLink.fromJson(json);
 }
 
 /// @nodoc
-mixin _$PaginationMetaLink {
+mixin _$PaginationLink {
+  /// URL for this link (null for inactive links)
   String? get url => throw _privateConstructorUsedError;
+
+  /// Display label for the link
   String get label => throw _privateConstructorUsedError;
+
+  /// Whether this link is active
   bool get active => throw _privateConstructorUsedError;
 
-  /// Serializes this PaginationMetaLink to a JSON map.
+  /// Serializes this PaginationLink to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of PaginationMetaLink
+  /// Create a copy of PaginationLink
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PaginationMetaLinkCopyWith<PaginationMetaLink> get copyWith =>
+  $PaginationLinkCopyWith<PaginationLink> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $PaginationMetaLinkCopyWith<$Res> {
-  factory $PaginationMetaLinkCopyWith(
-          PaginationMetaLink value, $Res Function(PaginationMetaLink) then) =
-      _$PaginationMetaLinkCopyWithImpl<$Res, PaginationMetaLink>;
+abstract class $PaginationLinkCopyWith<$Res> {
+  factory $PaginationLinkCopyWith(
+          PaginationLink value, $Res Function(PaginationLink) then) =
+      _$PaginationLinkCopyWithImpl<$Res, PaginationLink>;
   @useResult
   $Res call({String? url, String label, bool active});
 }
 
 /// @nodoc
-class _$PaginationMetaLinkCopyWithImpl<$Res, $Val extends PaginationMetaLink>
-    implements $PaginationMetaLinkCopyWith<$Res> {
-  _$PaginationMetaLinkCopyWithImpl(this._value, this._then);
+class _$PaginationLinkCopyWithImpl<$Res, $Val extends PaginationLink>
+    implements $PaginationLinkCopyWith<$Res> {
+  _$PaginationLinkCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of PaginationMetaLink
+  /// Create a copy of PaginationLink
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -1168,25 +1212,25 @@ class _$PaginationMetaLinkCopyWithImpl<$Res, $Val extends PaginationMetaLink>
 }
 
 /// @nodoc
-abstract class _$$PaginationMetaLinkImplCopyWith<$Res>
-    implements $PaginationMetaLinkCopyWith<$Res> {
-  factory _$$PaginationMetaLinkImplCopyWith(_$PaginationMetaLinkImpl value,
-          $Res Function(_$PaginationMetaLinkImpl) then) =
-      __$$PaginationMetaLinkImplCopyWithImpl<$Res>;
+abstract class _$$PaginationLinkImplCopyWith<$Res>
+    implements $PaginationLinkCopyWith<$Res> {
+  factory _$$PaginationLinkImplCopyWith(_$PaginationLinkImpl value,
+          $Res Function(_$PaginationLinkImpl) then) =
+      __$$PaginationLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String? url, String label, bool active});
 }
 
 /// @nodoc
-class __$$PaginationMetaLinkImplCopyWithImpl<$Res>
-    extends _$PaginationMetaLinkCopyWithImpl<$Res, _$PaginationMetaLinkImpl>
-    implements _$$PaginationMetaLinkImplCopyWith<$Res> {
-  __$$PaginationMetaLinkImplCopyWithImpl(_$PaginationMetaLinkImpl _value,
-      $Res Function(_$PaginationMetaLinkImpl) _then)
+class __$$PaginationLinkImplCopyWithImpl<$Res>
+    extends _$PaginationLinkCopyWithImpl<$Res, _$PaginationLinkImpl>
+    implements _$$PaginationLinkImplCopyWith<$Res> {
+  __$$PaginationLinkImplCopyWithImpl(
+      _$PaginationLinkImpl _value, $Res Function(_$PaginationLinkImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of PaginationMetaLink
+  /// Create a copy of PaginationLink
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -1195,7 +1239,7 @@ class __$$PaginationMetaLinkImplCopyWithImpl<$Res>
     Object? label = null,
     Object? active = null,
   }) {
-    return _then(_$PaginationMetaLinkImpl(
+    return _then(_$PaginationLinkImpl(
       url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
@@ -1214,42 +1258,35 @@ class __$$PaginationMetaLinkImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$PaginationMetaLinkImpl
-    with DiagnosticableTreeMixin
-    implements _PaginationMetaLink {
-  const _$PaginationMetaLinkImpl(
-      {this.url, required this.label, required this.active});
+class _$PaginationLinkImpl implements _PaginationLink {
+  const _$PaginationLinkImpl(
+      {required this.url, required this.label, required this.active});
 
-  factory _$PaginationMetaLinkImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PaginationMetaLinkImplFromJson(json);
+  factory _$PaginationLinkImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PaginationLinkImplFromJson(json);
 
+  /// URL for this link (null for inactive links)
   @override
   final String? url;
+
+  /// Display label for the link
   @override
   final String label;
+
+  /// Whether this link is active
   @override
   final bool active;
 
   @override
-  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'PaginationMetaLink(url: $url, label: $label, active: $active)';
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties
-      ..add(DiagnosticsProperty('type', 'PaginationMetaLink'))
-      ..add(DiagnosticsProperty('url', url))
-      ..add(DiagnosticsProperty('label', label))
-      ..add(DiagnosticsProperty('active', active));
+  String toString() {
+    return 'PaginationLink(url: $url, label: $label, active: $active)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$PaginationMetaLinkImpl &&
+            other is _$PaginationLinkImpl &&
             (identical(other.url, url) || other.url == url) &&
             (identical(other.label, label) || other.label == label) &&
             (identical(other.active, active) || other.active == active));
@@ -1259,43 +1296,48 @@ class _$PaginationMetaLinkImpl
   @override
   int get hashCode => Object.hash(runtimeType, url, label, active);
 
-  /// Create a copy of PaginationMetaLink
+  /// Create a copy of PaginationLink
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$PaginationMetaLinkImplCopyWith<_$PaginationMetaLinkImpl> get copyWith =>
-      __$$PaginationMetaLinkImplCopyWithImpl<_$PaginationMetaLinkImpl>(
+  _$$PaginationLinkImplCopyWith<_$PaginationLinkImpl> get copyWith =>
+      __$$PaginationLinkImplCopyWithImpl<_$PaginationLinkImpl>(
           this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$PaginationMetaLinkImplToJson(
+    return _$$PaginationLinkImplToJson(
       this,
     );
   }
 }
 
-abstract class _PaginationMetaLink implements PaginationMetaLink {
-  const factory _PaginationMetaLink(
-      {final String? url,
+abstract class _PaginationLink implements PaginationLink {
+  const factory _PaginationLink(
+      {required final String? url,
       required final String label,
-      required final bool active}) = _$PaginationMetaLinkImpl;
+      required final bool active}) = _$PaginationLinkImpl;
 
-  factory _PaginationMetaLink.fromJson(Map<String, dynamic> json) =
-      _$PaginationMetaLinkImpl.fromJson;
+  factory _PaginationLink.fromJson(Map<String, dynamic> json) =
+      _$PaginationLinkImpl.fromJson;
 
+  /// URL for this link (null for inactive links)
   @override
   String? get url;
+
+  /// Display label for the link
   @override
   String get label;
+
+  /// Whether this link is active
   @override
   bool get active;
 
-  /// Create a copy of PaginationMetaLink
+  /// Create a copy of PaginationLink
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PaginationMetaLinkImplCopyWith<_$PaginationMetaLinkImpl> get copyWith =>
+  _$$PaginationLinkImplCopyWith<_$PaginationLinkImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
