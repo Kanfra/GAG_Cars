@@ -4,9 +4,13 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtr
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:provider/provider.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 
@@ -20,6 +24,13 @@ class SettingsPage extends StatefulWidget {
 class _SettingsState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final UserModel? user = userProvider.user;
+    // format the joined date
+    String joinedDate = "Not available";
+    if(user?.createdAt != null){
+      joinedDate = "Joined: ${user!.createdAt!.toLocal().toString().split(' ')[0]}";
+    }
     return  Scaffold(
       appBar: CustomAppbar(
           onLeadingIconClickFunction: (){
@@ -49,8 +60,8 @@ class _SettingsState extends State<SettingsPage> {
           children: [
             // profile image
             CustomImage(
-              imagePath: "assets/images/gordon_image_temporary.png", 
-              isAssetImage: true, 
+              imagePath: getImageUrl("${user?.profileImage}", "assets/images/gordon_image_temporary.png"), 
+              isAssetImage: user?.profileImage == null ? true : false, 
               imageHeight: 115,
               imageWidth: 115,
               imageBorderRadius: 80,
@@ -59,7 +70,7 @@ class _SettingsState extends State<SettingsPage> {
             const SizedBox(height: 10),
             // profile name
             TextSmall(
-              title: "Gordon Auto Garage", 
+              title: user?.name ?? "Guest User", 
               fontWeight: FontWeight.w500, 
               overflow: TextOverflow.ellipsis,
               textColor: ColorGlobalVariables.blackColor,
@@ -67,11 +78,12 @@ class _SettingsState extends State<SettingsPage> {
             const SizedBox(height: 2,),
             // date
             TextExtraSmall(
-              title: "joined: 1st January 2025", 
+              title: joinedDate, 
               textColor: ColorGlobalVariables.blackColor
               ),
             const SizedBox(height: 8,),
             // get verified button
+            if(user != null && !userProvider.isPaidSeller)
             TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(

@@ -4,6 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../GlobalVariables/colorGlobalVariables.dart';
 
@@ -60,7 +61,7 @@ String formatTimeAgo(String isoDate) {
 void showCustomSnackBar({
   String? title,
   String? message,
-  Color? backgroundColor,
+  Color? backgroundColor = ColorGlobalVariables.redColor,
   Color? textColor,
   Duration? duration,
   SnackPosition? position,
@@ -73,9 +74,9 @@ void showCustomSnackBar({
     if (isGetSnackBar) {
       // Using GetX snackbar (recommended)
       Get.snackbar(
-        title ?? '',
+        title ?? 'Error',
         message ?? 'An error occurred',
-        backgroundColor: backgroundColor ?? ColorGlobalVariables.redColor,
+        backgroundColor: backgroundColor,
         colorText: textColor ?? ColorGlobalVariables.whiteColor,
         duration: duration ?? const Duration(seconds: 3),
         snackPosition: position ?? SnackPosition.BOTTOM,
@@ -120,3 +121,15 @@ void showFilterBottomSheet({
       builder: (context) => widget
     );
   }
+
+String createSlug({required String name, required bool isUniqueRandomSlugRequiredOrTimestampSlug}){
+  String input = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s-]'), ''). trim().replaceAll(RegExp(r'\s+'), '-').replaceAll(RegExp(r'-+'), '-');
+  if(isUniqueRandomSlugRequiredOrTimestampSlug){
+    final uniqueId = const Uuid().v4().split('-').first;
+    return '$input-$uniqueId';
+  }
+  else{
+    return '$input-${DateTime.now().millisecondsSinceEpoch}';
+  }
+}
+

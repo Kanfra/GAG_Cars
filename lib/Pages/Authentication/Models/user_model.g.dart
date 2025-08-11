@@ -12,14 +12,20 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String,
       password: json['password'] as String?,
       phoneNumber: json['phone'] as String?,
-      id: json['id'] as String?,
-      profileImage: json['profileImage'] as String?,
+      paidSeller: (json['paid_seller'] as num).toInt(),
+      emailVerifiedAt: json['email_verified_at'] == null
+          ? null
+          : DateTime.parse(json['email_verified_at'] as String),
+      countryId: json['country_id'] as String?,
+      stateId: json['state_id'] as String?,
+      profileImage: json['profile_image'] as String?,
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      id: json['id'] as String?,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -28,8 +34,11 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'email': instance.email,
       'password': instance.password,
       'phone': instance.phoneNumber,
-      'id': instance.id,
-      'profileImage': instance.profileImage,
+      'paid_seller': instance.paidSeller,
+      'email_verified_at': instance.emailVerifiedAt?.toIso8601String(),
+      'country_id': instance.countryId,
+      'state_id': instance.stateId,
+      'profile_image': instance.profileImage,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

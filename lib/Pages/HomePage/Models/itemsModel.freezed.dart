@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'recommendedModel.dart';
+part of 'itemsModel.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -981,7 +981,8 @@ RecommendedItem _$RecommendedItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RecommendedItem {
-  String get id => throw _privateConstructorUsedError;
+  String get id =>
+      throw _privateConstructorUsedError; // Keep required if truly mandatory
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'country_id')
@@ -992,9 +993,9 @@ mixin _$RecommendedItem {
   int? get brandId => throw _privateConstructorUsedError;
   @JsonKey(name: 'category_id')
   int? get categoryId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get year => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError; // Make nullable
+  String? get year => throw _privateConstructorUsedError; // Make nullable
+  String? get slug => throw _privateConstructorUsedError; // Make nullable
   String? get description => throw _privateConstructorUsedError;
   List<String>? get images => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
@@ -1012,18 +1013,20 @@ mixin _$RecommendedItem {
   @JsonKey(name: 'number_of_passengers')
   int? get numberOfPassengers => throw _privateConstructorUsedError;
   List<String>? get features => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
-  String get price => throw _privateConstructorUsedError;
+  String? get status => throw _privateConstructorUsedError; // Make nullable
+  String? get price => throw _privateConstructorUsedError; // Make nullable
   String? get mileage => throw _privateConstructorUsedError;
-  int get warranty => throw _privateConstructorUsedError;
+  int? get warranty => throw _privateConstructorUsedError; // Make nullable
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
   String? get deletedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt =>
+      throw _privateConstructorUsedError; // Make nullable
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt =>
+      throw _privateConstructorUsedError; // Make nullable
   Brand? get brand => throw _privateConstructorUsedError;
   Category? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'brand_model')
@@ -1054,9 +1057,9 @@ abstract class $RecommendedItemCopyWith<$Res> {
       @JsonKey(name: 'brand_model_id') int? brandModelId,
       @JsonKey(name: 'brand_id') int? brandId,
       @JsonKey(name: 'category_id') int? categoryId,
-      String name,
-      String year,
-      String slug,
+      String? name,
+      String? year,
+      String? slug,
       String? description,
       List<String>? images,
       String? location,
@@ -1069,14 +1072,14 @@ abstract class $RecommendedItemCopyWith<$Res> {
       @JsonKey(name: 'build_type') String? buildType,
       @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
       List<String>? features,
-      String status,
-      String price,
+      String? status,
+      String? price,
       String? mileage,
-      int warranty,
+      int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
@@ -1109,9 +1112,9 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
     Object? brandModelId = freezed,
     Object? brandId = freezed,
     Object? categoryId = freezed,
-    Object? name = null,
-    Object? year = null,
-    Object? slug = null,
+    Object? name = freezed,
+    Object? year = freezed,
+    Object? slug = freezed,
     Object? description = freezed,
     Object? images = freezed,
     Object? location = freezed,
@@ -1124,14 +1127,14 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
     Object? buildType = freezed,
     Object? numberOfPassengers = freezed,
     Object? features = freezed,
-    Object? status = null,
-    Object? price = null,
+    Object? status = freezed,
+    Object? price = freezed,
     Object? mileage = freezed,
-    Object? warranty = null,
+    Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
@@ -1162,18 +1165,18 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
               as int?,
-      name: null == name
+      name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      year: null == year
+              as String?,
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
+              as String?,
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -1222,22 +1225,22 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
               as List<String>?,
-      status: null == status
+      status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      price: null == price
+              as String?,
+      price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       mileage: freezed == mileage
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
               as String?,
-      warranty: null == warranty
+      warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
@@ -1246,14 +1249,14 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1345,9 +1348,9 @@ abstract class _$$RecommendedItemImplCopyWith<$Res>
       @JsonKey(name: 'brand_model_id') int? brandModelId,
       @JsonKey(name: 'brand_id') int? brandId,
       @JsonKey(name: 'category_id') int? categoryId,
-      String name,
-      String year,
-      String slug,
+      String? name,
+      String? year,
+      String? slug,
       String? description,
       List<String>? images,
       String? location,
@@ -1360,14 +1363,14 @@ abstract class _$$RecommendedItemImplCopyWith<$Res>
       @JsonKey(name: 'build_type') String? buildType,
       @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
       List<String>? features,
-      String status,
-      String price,
+      String? status,
+      String? price,
       String? mileage,
-      int warranty,
+      int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
@@ -1402,9 +1405,9 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
     Object? brandModelId = freezed,
     Object? brandId = freezed,
     Object? categoryId = freezed,
-    Object? name = null,
-    Object? year = null,
-    Object? slug = null,
+    Object? name = freezed,
+    Object? year = freezed,
+    Object? slug = freezed,
     Object? description = freezed,
     Object? images = freezed,
     Object? location = freezed,
@@ -1417,14 +1420,14 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
     Object? buildType = freezed,
     Object? numberOfPassengers = freezed,
     Object? features = freezed,
-    Object? status = null,
-    Object? price = null,
+    Object? status = freezed,
+    Object? price = freezed,
     Object? mileage = freezed,
-    Object? warranty = null,
+    Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
@@ -1455,18 +1458,18 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
               as int?,
-      name: null == name
+      name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      year: null == year
+              as String?,
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
+              as String?,
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -1515,22 +1518,22 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
               as List<String>?,
-      status: null == status
+      status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      price: null == price
+              as String?,
+      price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       mileage: freezed == mileage
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
               as String?,
-      warranty: null == warranty
+      warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
@@ -1539,14 +1542,14 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1579,9 +1582,9 @@ class _$RecommendedItemImpl
       @JsonKey(name: 'brand_model_id') this.brandModelId,
       @JsonKey(name: 'brand_id') this.brandId,
       @JsonKey(name: 'category_id') this.categoryId,
-      required this.name,
-      required this.year,
-      required this.slug,
+      this.name,
+      this.year,
+      this.slug,
       this.description,
       final List<String>? images,
       this.location,
@@ -1594,14 +1597,14 @@ class _$RecommendedItemImpl
       @JsonKey(name: 'build_type') this.buildType,
       @JsonKey(name: 'number_of_passengers') this.numberOfPassengers,
       final List<String>? features,
-      required this.status,
-      required this.price,
+      this.status,
+      this.price,
       this.mileage,
-      required this.warranty,
+      this.warranty,
       @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
       @JsonKey(name: 'deleted_at') this.deletedAt,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
       this.brand,
       this.category,
       @JsonKey(name: 'brand_model') this.brandModel,
@@ -1614,6 +1617,7 @@ class _$RecommendedItemImpl
 
   @override
   final String id;
+// Keep required if truly mandatory
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
@@ -1630,11 +1634,14 @@ class _$RecommendedItemImpl
   @JsonKey(name: 'category_id')
   final int? categoryId;
   @override
-  final String name;
+  final String? name;
+// Make nullable
   @override
-  final String year;
+  final String? year;
+// Make nullable
   @override
-  final String slug;
+  final String? slug;
+// Make nullable
   @override
   final String? description;
   final List<String>? _images;
@@ -1681,13 +1688,16 @@ class _$RecommendedItemImpl
   }
 
   @override
-  final String status;
+  final String? status;
+// Make nullable
   @override
-  final String price;
+  final String? price;
+// Make nullable
   @override
   final String? mileage;
   @override
-  final int warranty;
+  final int? warranty;
+// Make nullable
   @override
   @JsonKey(name: 'warranty_expiration')
   final String? warrantyExpiration;
@@ -1696,10 +1706,12 @@ class _$RecommendedItemImpl
   final String? deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
+// Make nullable
   @override
   @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
+// Make nullable
   @override
   final Brand? brand;
   @override
@@ -1880,9 +1892,9 @@ abstract class _RecommendedItem implements RecommendedItem {
       @JsonKey(name: 'brand_model_id') final int? brandModelId,
       @JsonKey(name: 'brand_id') final int? brandId,
       @JsonKey(name: 'category_id') final int? categoryId,
-      required final String name,
-      required final String year,
-      required final String slug,
+      final String? name,
+      final String? year,
+      final String? slug,
       final String? description,
       final List<String>? images,
       final String? location,
@@ -1895,14 +1907,14 @@ abstract class _RecommendedItem implements RecommendedItem {
       @JsonKey(name: 'build_type') final String? buildType,
       @JsonKey(name: 'number_of_passengers') final int? numberOfPassengers,
       final List<String>? features,
-      required final String status,
-      required final String price,
+      final String? status,
+      final String? price,
       final String? mileage,
-      required final int warranty,
+      final int? warranty,
       @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') final String? deletedAt,
-      @JsonKey(name: 'created_at') required final DateTime createdAt,
-      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
       final Brand? brand,
       final Category? category,
       @JsonKey(name: 'brand_model') final BrandModel? brandModel,
@@ -1913,7 +1925,7 @@ abstract class _RecommendedItem implements RecommendedItem {
       _$RecommendedItemImpl.fromJson;
 
   @override
-  String get id;
+  String get id; // Keep required if truly mandatory
   @override
   @JsonKey(name: 'user_id')
   String? get userId;
@@ -1930,11 +1942,11 @@ abstract class _RecommendedItem implements RecommendedItem {
   @JsonKey(name: 'category_id')
   int? get categoryId;
   @override
-  String get name;
+  String? get name; // Make nullable
   @override
-  String get year;
+  String? get year; // Make nullable
   @override
-  String get slug;
+  String? get slug; // Make nullable
   @override
   String? get description;
   @override
@@ -1965,13 +1977,13 @@ abstract class _RecommendedItem implements RecommendedItem {
   @override
   List<String>? get features;
   @override
-  String get status;
+  String? get status; // Make nullable
   @override
-  String get price;
+  String? get price; // Make nullable
   @override
   String? get mileage;
   @override
-  int get warranty;
+  int? get warranty; // Make nullable
   @override
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration;
@@ -1980,10 +1992,10 @@ abstract class _RecommendedItem implements RecommendedItem {
   String? get deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  DateTime get createdAt;
+  DateTime? get createdAt; // Make nullable
   @override
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
+  DateTime? get updatedAt; // Make nullable
   @override
   Brand? get brand;
   @override

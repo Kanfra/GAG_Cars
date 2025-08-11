@@ -1,33 +1,51 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-part 'makeModel.freezed.dart';
-part 'makeModel.g.dart';
+part 'makeAndModelModel.freezed.dart';
+part 'makeAndModelModel.g.dart';
 
 @freezed
-class MakeResponse with _$MakeResponse {
-  const factory MakeResponse({
-    required List<Make> data,
+class MakeAndModelResponse with _$MakeAndModelResponse {
+  const factory MakeAndModelResponse({
+    required List<VehicleMake> data,
     required PaginationLinks links,
     required PaginationMeta meta,
-  }) = _MakeResponse;
+  }) = _MakeAndModelResponse;
 
-  factory MakeResponse.fromJson(Map<String, dynamic> json) =>
-      _$MakeResponseFromJson(json);
+  factory MakeAndModelResponse.fromJson(Map<String, dynamic> json) =>
+      _$MakeAndModelResponseFromJson(json);
 }
 
 @freezed
-class Make with _$Make {
-  const factory Make({
+class VehicleMake with _$VehicleMake {
+  const factory VehicleMake({
     required int id,
     @JsonKey(name: 'user_id') int? userId,
     required String name,
     required String slug,
     String? image,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
-  }) = _Make;
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'brand_models') required List<VehicleModel> models,
+  }) = _VehicleMake;
 
-  factory Make.fromJson(Map<String, dynamic> json) => _$MakeFromJson(json);
+  factory VehicleMake.fromJson(Map<String, dynamic> json) =>
+      _$VehicleMakeFromJson(json);
+}
+
+@freezed
+class VehicleModel with _$VehicleModel {
+  const factory VehicleModel({
+    required int id,
+    @JsonKey(name: 'brand_id') required int makeId,
+    required String name,
+    required String slug,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+  }) = _VehicleModel;
+
+  factory VehicleModel.fromJson(Map<String, dynamic> json) =>
+      _$VehicleModelFromJson(json);
 }
 
 @freezed

@@ -1,6 +1,8 @@
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/locationSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
@@ -81,6 +83,8 @@ class RouteClass {
   static String notificationsPage = "/notifications-page";
   static String searchPage = "/search-page";
   static String mainBottomNavigationPage = "/main-bottom-navigation-page";
+  static String locationSearchPage = "/location-search-page";
+  static String postItemPage = "/post-item-page";
 
   //message
   static String messagePage = "/messagePage";
@@ -124,6 +128,8 @@ class RouteClass {
   static String getNotificationsPage() => notificationsPage;
   static String getSearchPage() => searchPage;
   static String getMainBottomNavigationPage() => mainBottomNavigationPage;
+  static String getLocationSearchPage() => locationSearchPage;
+  static String getPostItemPage() => postItemPage;
 
   static String getMessagesPage() => messagePage;
   static String getMockUpScreenPage() => mockUpScreenPage;
@@ -180,7 +186,8 @@ class RouteClass {
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => MainBottomNavigationPage(), name: mainBottomNavigationPage, transition: Transition.noTransition),
-
+    GetPage(page: () => LocationSearchPage(), name: locationSearchPage, transition: Transition.noTransition),
+    GetPage(page: () => PostItemPage(), name: postItemPage, transition: Transition.noTransition),
 
     //message
     GetPage(page: () => const MessagesPage(), name: messagePage, transition: Transition.noTransition),

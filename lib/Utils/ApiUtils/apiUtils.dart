@@ -17,11 +17,16 @@ String get baseApiUrl {
 }
 
 // getImageUrl
-String getImageUrl(String? imagePath){
+String getImageUrl(String? imagePath, String? defaultImagePath){
+  final logger = Logger();
   if(imagePath == null || imagePath.isEmpty){
-    return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    return defaultImagePath ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
   }
-  return '${ApiEndpoint.baseImageUrl}$imagePath';
+  if(imagePath.startsWith("https://res.cloudinary.com")){
+    return imagePath;
+  }
+  final gagCarStorageImage = '${ApiEndpoint.baseImageUrl}$imagePath';
+  return gagCarStorageImage;
 }
 
 dynamic statusCodeResponse<T>({
@@ -53,7 +58,6 @@ dynamic statusCodeResponse<T>({
   }
 }
 
-// generic POST method
 Future<T> postApiData<T>({
   required String endpoint,
   required Map<String, dynamic> body,
@@ -86,6 +90,11 @@ Future<T> postApiData<T>({
       response: response,
       successFunction200: () {
         try {
+          // Handle both bool and normal responses
+          if(T == bool){
+            logger.i("Status code: ${response.statusCode}");
+            return true as T;
+          }
           return fromJson(responseData as Map<String, dynamic>);
         } catch (e) {
           logger.e('Failed to parse success response from $uri: $e');
@@ -94,6 +103,11 @@ Future<T> postApiData<T>({
       },
       successFunction201: () {
         try {
+          if(T == bool){
+            logger.i("Status code: ${response.statusCode}");
+            return false as T;
+          }
+          // Handle both bool and normal responses
           return fromJson(responseData as Map<String, dynamic>);
         } catch (e) {
           logger.e('Failed to parse success response from $uri: $e');
@@ -125,7 +139,6 @@ Future<T> postApiData<T>({
     if (result is T) {
       return result;
     } else {
-      // This should never happen for success cases as we throw exceptions for errors
       throw http.ClientException(result.toString(), uri);
     }
   } on http.ClientException {
@@ -137,6 +150,91 @@ Future<T> postApiData<T>({
     throw Exception('Failed to complete API request: $e');
   }
 }
+
+// // generic POST method
+// Future<T> postApiData<T>({
+//   required String endpoint,
+//   required Map<String, dynamic> body,
+//   Map<String, String>? headers,
+//   required T Function(Map<String, dynamic>) fromJson,
+//   Duration timeout = const Duration(seconds: 10),
+// }) async {
+//   final logger = Logger();
+//   final uri = Uri.parse('$baseApiUrl$endpoint');
+  
+//   try {
+//     logger.i('Sending POST request to $uri');
+//     logger.t('Request body: $body');
+
+//     final response = await http.post(
+//       uri,
+//       headers: {
+//         'Content-Type': 'application/json',
+//         ...?headers,
+//       },
+//       body: jsonEncode(body),
+//     ).timeout(timeout);
+
+//     logger.i('Response status: ${response.statusCode}');
+//     logger.t('Response body: ${response.body}');
+
+//     final responseData = jsonDecode(response.body);
+    
+//     final result = statusCodeResponse<T>(
+//       response: response,
+//       successFunction200: () {
+//         try {
+//           return fromJson(responseData as Map<String, dynamic>);
+//         } catch (e) {
+//           logger.e('Failed to parse success response from $uri: $e');
+//           throw FormatException('Failed to parse response: $e');
+//         }
+//       },
+//       successFunction201: () {
+//         try {
+//           return fromJson(responseData as Map<String, dynamic>);
+//         } catch (e) {
+//           logger.e('Failed to parse success response from $uri: $e');
+//           throw FormatException('Failed to parse response: $e');
+//         }
+//       },
+//       function400: () => throw http.ClientException(
+//         (responseData is Map ? responseData['message'] : null) ?? 'Bad Request', 
+//         uri
+//       ),
+//       function401: () => throw http.ClientException(
+//         (responseData is Map ? responseData['message'] : null) ?? 'Unauthorized', 
+//         uri
+//       ),
+//       function404: () => throw http.ClientException(
+//         (responseData is Map ? responseData['message'] : null) ?? 'Not Found', 
+//         uri
+//       ),
+//       function500: () => throw http.ClientException(
+//         (responseData is Map ? responseData['message'] : null) ?? 'Server Error', 
+//         uri
+//       ),
+//       fallbackFunction: (code) => throw http.ClientException(
+//         (responseData is Map ? responseData['message'] : null) ?? 'Request failed with status: $code', 
+//         uri
+//       ),
+//     );
+
+//     if (result is T) {
+//       return result;
+//     } else {
+//       // This should never happen for success cases as we throw exceptions for errors
+//       throw http.ClientException(result.toString(), uri);
+//     }
+//   } on http.ClientException {
+//     rethrow;
+//   } on FormatException {
+//     rethrow;
+//   } catch (e) {
+//     logger.e('Unexpected error in API call to $uri: $e');
+//     throw Exception('Failed to complete API request: $e');
+//   }
+// }
 
 
 // Future<T> postApiData<T>({
@@ -215,7 +313,7 @@ Future<T> fetchApiData<T>({
     };
 
     final response = await http.get(uri, headers: requestHeaders);
-
+    logger.i("response: ${response.body}");
     if (response.statusCode >= 200 && response.statusCode < 300) {
       try {
         final responseBody = response.body;

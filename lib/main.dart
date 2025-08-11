@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Providers/vehicleProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/brandModelService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/makeService.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/ItemCategoryService/itemCategoryService.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/makeAndModelService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/WishlistService/wishlistService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
@@ -32,10 +38,25 @@ void main() async {
         ChangeNotifierProvider<HomeProvider>(
           create: (context) => HomeProvider(HomeService()),
         ),
-        ChangeNotifierProvider(create: (_) => VehicleProvider(
-          MakeService(),
-          BrandModelService(),
-        )),
+        ChangeNotifierProvider<MakeAndModelProvider>(
+          create: (context) => MakeAndModelProvider(MakeAndModelService()),
+        ),
+        ChangeNotifierProvider<ItemCategoriesProvider>(
+          create: (context) => ItemCategoriesProvider(
+            ItemCategoryService()
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserProvider()
+          ),
+         ChangeNotifierProvider(
+          create: (context) => WishlistToggleProvider(),
+          ),
+         ChangeNotifierProvider(
+          create: (context) => GetWishlistProvider(
+            WishlistService(),
+          )
+          ),
       ],
       child: const MyApp(),
     ),
@@ -57,7 +78,9 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
-      home: MainBottomNavigationPage(),
+      home: SplashPage(),
+      // home: PostItemPage(),
+      // home: MainBottomNavigationPage(),
       getPages: RouteClass.routes,
     );
   }

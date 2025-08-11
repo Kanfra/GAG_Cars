@@ -3,7 +3,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmal
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settingsPage.dart';
@@ -32,7 +32,7 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage> {
   final List<Widget> _pages = [
     const HomePage(),
     const WishlistPage(),
-    const SellCarPage(),
+    const PostItemPage(),
     const MessagesPage(),
     const SettingsPage(),
   ];

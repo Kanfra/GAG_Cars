@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -17,6 +20,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideUpAnimation;
+
+  final logger = Logger();
 
   @override
   void initState() {
@@ -60,7 +65,19 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   Future<void> _checkAuthAndNavigate() async {
     await Future.delayed(const Duration(seconds: 3));
-    final isAuthenticated = await AuthService.isAuthenticated();
+    // wait for widget to be mounted
+    if(!mounted) return;
+
+    // now you can access user data if needed
+    final  userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    final isAuthenticated = await AuthService.isAuthenticated(userProvider);
+    if(!mounted) return;
+    final currentUser = userProvider.user;
+    if(currentUser != null){
+      logger.i("User email: ${currentUser.email}");
+      logger.i("Is paid seller: ${userProvider.isPaidSeller}");
+    }
     Get.offNamed(isAuthenticated ? RouteClass.mainBottomNavigationPage : RouteClass.signInWithPhonePage);
   }
 

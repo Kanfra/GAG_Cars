@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/recommendedModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';

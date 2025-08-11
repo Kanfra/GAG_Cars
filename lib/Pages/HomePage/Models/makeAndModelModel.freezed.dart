@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'makeModel.dart';
+part of 'makeAndModelModel.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,49 +14,51 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-MakeResponse _$MakeResponseFromJson(Map<String, dynamic> json) {
-  return _MakeResponse.fromJson(json);
+MakeAndModelResponse _$MakeAndModelResponseFromJson(Map<String, dynamic> json) {
+  return _MakeAndModelResponse.fromJson(json);
 }
 
 /// @nodoc
-mixin _$MakeResponse {
-  List<Make> get data => throw _privateConstructorUsedError;
+mixin _$MakeAndModelResponse {
+  List<VehicleMake> get data => throw _privateConstructorUsedError;
   PaginationLinks get links => throw _privateConstructorUsedError;
   PaginationMeta get meta => throw _privateConstructorUsedError;
 
-  /// Serializes this MakeResponse to a JSON map.
+  /// Serializes this MakeAndModelResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $MakeResponseCopyWith<MakeResponse> get copyWith =>
+  $MakeAndModelResponseCopyWith<MakeAndModelResponse> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $MakeResponseCopyWith<$Res> {
-  factory $MakeResponseCopyWith(
-          MakeResponse value, $Res Function(MakeResponse) then) =
-      _$MakeResponseCopyWithImpl<$Res, MakeResponse>;
+abstract class $MakeAndModelResponseCopyWith<$Res> {
+  factory $MakeAndModelResponseCopyWith(MakeAndModelResponse value,
+          $Res Function(MakeAndModelResponse) then) =
+      _$MakeAndModelResponseCopyWithImpl<$Res, MakeAndModelResponse>;
   @useResult
-  $Res call({List<Make> data, PaginationLinks links, PaginationMeta meta});
+  $Res call(
+      {List<VehicleMake> data, PaginationLinks links, PaginationMeta meta});
 
   $PaginationLinksCopyWith<$Res> get links;
   $PaginationMetaCopyWith<$Res> get meta;
 }
 
 /// @nodoc
-class _$MakeResponseCopyWithImpl<$Res, $Val extends MakeResponse>
-    implements $MakeResponseCopyWith<$Res> {
-  _$MakeResponseCopyWithImpl(this._value, this._then);
+class _$MakeAndModelResponseCopyWithImpl<$Res,
+        $Val extends MakeAndModelResponse>
+    implements $MakeAndModelResponseCopyWith<$Res> {
+  _$MakeAndModelResponseCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -69,7 +71,7 @@ class _$MakeResponseCopyWithImpl<$Res, $Val extends MakeResponse>
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<Make>,
+              as List<VehicleMake>,
       links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
@@ -81,7 +83,7 @@ class _$MakeResponseCopyWithImpl<$Res, $Val extends MakeResponse>
     ) as $Val);
   }
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -91,7 +93,7 @@ class _$MakeResponseCopyWithImpl<$Res, $Val extends MakeResponse>
     });
   }
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -103,14 +105,15 @@ class _$MakeResponseCopyWithImpl<$Res, $Val extends MakeResponse>
 }
 
 /// @nodoc
-abstract class _$$MakeResponseImplCopyWith<$Res>
-    implements $MakeResponseCopyWith<$Res> {
-  factory _$$MakeResponseImplCopyWith(
-          _$MakeResponseImpl value, $Res Function(_$MakeResponseImpl) then) =
-      __$$MakeResponseImplCopyWithImpl<$Res>;
+abstract class _$$MakeAndModelResponseImplCopyWith<$Res>
+    implements $MakeAndModelResponseCopyWith<$Res> {
+  factory _$$MakeAndModelResponseImplCopyWith(_$MakeAndModelResponseImpl value,
+          $Res Function(_$MakeAndModelResponseImpl) then) =
+      __$$MakeAndModelResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<Make> data, PaginationLinks links, PaginationMeta meta});
+  $Res call(
+      {List<VehicleMake> data, PaginationLinks links, PaginationMeta meta});
 
   @override
   $PaginationLinksCopyWith<$Res> get links;
@@ -119,14 +122,14 @@ abstract class _$$MakeResponseImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$MakeResponseImplCopyWithImpl<$Res>
-    extends _$MakeResponseCopyWithImpl<$Res, _$MakeResponseImpl>
-    implements _$$MakeResponseImplCopyWith<$Res> {
-  __$$MakeResponseImplCopyWithImpl(
-      _$MakeResponseImpl _value, $Res Function(_$MakeResponseImpl) _then)
+class __$$MakeAndModelResponseImplCopyWithImpl<$Res>
+    extends _$MakeAndModelResponseCopyWithImpl<$Res, _$MakeAndModelResponseImpl>
+    implements _$$MakeAndModelResponseImplCopyWith<$Res> {
+  __$$MakeAndModelResponseImplCopyWithImpl(_$MakeAndModelResponseImpl _value,
+      $Res Function(_$MakeAndModelResponseImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -135,11 +138,11 @@ class __$$MakeResponseImplCopyWithImpl<$Res>
     Object? links = null,
     Object? meta = null,
   }) {
-    return _then(_$MakeResponseImpl(
+    return _then(_$MakeAndModelResponseImpl(
       data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
-              as List<Make>,
+              as List<VehicleMake>,
       links: null == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
@@ -154,17 +157,19 @@ class __$$MakeResponseImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$MakeResponseImpl implements _MakeResponse {
-  const _$MakeResponseImpl(
-      {required final List<Make> data, required this.links, required this.meta})
+class _$MakeAndModelResponseImpl implements _MakeAndModelResponse {
+  const _$MakeAndModelResponseImpl(
+      {required final List<VehicleMake> data,
+      required this.links,
+      required this.meta})
       : _data = data;
 
-  factory _$MakeResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$MakeResponseImplFromJson(json);
+  factory _$MakeAndModelResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$MakeAndModelResponseImplFromJson(json);
 
-  final List<Make> _data;
+  final List<VehicleMake> _data;
   @override
-  List<Make> get data {
+  List<VehicleMake> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_data);
@@ -177,14 +182,14 @@ class _$MakeResponseImpl implements _MakeResponse {
 
   @override
   String toString() {
-    return 'MakeResponse(data: $data, links: $links, meta: $meta)';
+    return 'MakeAndModelResponse(data: $data, links: $links, meta: $meta)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$MakeResponseImpl &&
+            other is _$MakeAndModelResponseImpl &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.links, links) || other.links == links) &&
             (identical(other.meta, meta) || other.meta == meta));
@@ -195,52 +200,54 @@ class _$MakeResponseImpl implements _MakeResponse {
   int get hashCode => Object.hash(
       runtimeType, const DeepCollectionEquality().hash(_data), links, meta);
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$MakeResponseImplCopyWith<_$MakeResponseImpl> get copyWith =>
-      __$$MakeResponseImplCopyWithImpl<_$MakeResponseImpl>(this, _$identity);
+  _$$MakeAndModelResponseImplCopyWith<_$MakeAndModelResponseImpl>
+      get copyWith =>
+          __$$MakeAndModelResponseImplCopyWithImpl<_$MakeAndModelResponseImpl>(
+              this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MakeResponseImplToJson(
+    return _$$MakeAndModelResponseImplToJson(
       this,
     );
   }
 }
 
-abstract class _MakeResponse implements MakeResponse {
-  const factory _MakeResponse(
-      {required final List<Make> data,
+abstract class _MakeAndModelResponse implements MakeAndModelResponse {
+  const factory _MakeAndModelResponse(
+      {required final List<VehicleMake> data,
       required final PaginationLinks links,
-      required final PaginationMeta meta}) = _$MakeResponseImpl;
+      required final PaginationMeta meta}) = _$MakeAndModelResponseImpl;
 
-  factory _MakeResponse.fromJson(Map<String, dynamic> json) =
-      _$MakeResponseImpl.fromJson;
+  factory _MakeAndModelResponse.fromJson(Map<String, dynamic> json) =
+      _$MakeAndModelResponseImpl.fromJson;
 
   @override
-  List<Make> get data;
+  List<VehicleMake> get data;
   @override
   PaginationLinks get links;
   @override
   PaginationMeta get meta;
 
-  /// Create a copy of MakeResponse
+  /// Create a copy of MakeAndModelResponse
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MakeResponseImplCopyWith<_$MakeResponseImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  _$$MakeAndModelResponseImplCopyWith<_$MakeAndModelResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }
 
-Make _$MakeFromJson(Map<String, dynamic> json) {
-  return _Make.fromJson(json);
+VehicleMake _$VehicleMakeFromJson(Map<String, dynamic> json) {
+  return _VehicleMake.fromJson(json);
 }
 
 /// @nodoc
-mixin _$Make {
+mixin _$VehicleMake {
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   int? get userId => throw _privateConstructorUsedError;
@@ -248,23 +255,27 @@ mixin _$Make {
   String get slug => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_models')
+  List<VehicleModel> get models => throw _privateConstructorUsedError;
 
-  /// Serializes this Make to a JSON map.
+  /// Serializes this VehicleMake to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of Make
+  /// Create a copy of VehicleMake
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $MakeCopyWith<Make> get copyWith => throw _privateConstructorUsedError;
+  $VehicleMakeCopyWith<VehicleMake> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $MakeCopyWith<$Res> {
-  factory $MakeCopyWith(Make value, $Res Function(Make) then) =
-      _$MakeCopyWithImpl<$Res, Make>;
+abstract class $VehicleMakeCopyWith<$Res> {
+  factory $VehicleMakeCopyWith(
+          VehicleMake value, $Res Function(VehicleMake) then) =
+      _$VehicleMakeCopyWithImpl<$Res, VehicleMake>;
   @useResult
   $Res call(
       {int id,
@@ -272,21 +283,22 @@ abstract class $MakeCopyWith<$Res> {
       String name,
       String slug,
       String? image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'brand_models') List<VehicleModel> models});
 }
 
 /// @nodoc
-class _$MakeCopyWithImpl<$Res, $Val extends Make>
-    implements $MakeCopyWith<$Res> {
-  _$MakeCopyWithImpl(this._value, this._then);
+class _$VehicleMakeCopyWithImpl<$Res, $Val extends VehicleMake>
+    implements $VehicleMakeCopyWith<$Res> {
+  _$VehicleMakeCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of Make
+  /// Create a copy of VehicleMake
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -298,6 +310,7 @@ class _$MakeCopyWithImpl<$Res, $Val extends Make>
     Object? image = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? models = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -323,20 +336,25 @@ class _$MakeCopyWithImpl<$Res, $Val extends Make>
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
       updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
+      models: null == models
+          ? _value.models
+          : models // ignore: cast_nullable_to_non_nullable
+              as List<VehicleModel>,
     ) as $Val);
   }
 }
 
 /// @nodoc
-abstract class _$$MakeImplCopyWith<$Res> implements $MakeCopyWith<$Res> {
-  factory _$$MakeImplCopyWith(
-          _$MakeImpl value, $Res Function(_$MakeImpl) then) =
-      __$$MakeImplCopyWithImpl<$Res>;
+abstract class _$$VehicleMakeImplCopyWith<$Res>
+    implements $VehicleMakeCopyWith<$Res> {
+  factory _$$VehicleMakeImplCopyWith(
+          _$VehicleMakeImpl value, $Res Function(_$VehicleMakeImpl) then) =
+      __$$VehicleMakeImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -345,18 +363,20 @@ abstract class _$$MakeImplCopyWith<$Res> implements $MakeCopyWith<$Res> {
       String name,
       String slug,
       String? image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'brand_models') List<VehicleModel> models});
 }
 
 /// @nodoc
-class __$$MakeImplCopyWithImpl<$Res>
-    extends _$MakeCopyWithImpl<$Res, _$MakeImpl>
-    implements _$$MakeImplCopyWith<$Res> {
-  __$$MakeImplCopyWithImpl(_$MakeImpl _value, $Res Function(_$MakeImpl) _then)
+class __$$VehicleMakeImplCopyWithImpl<$Res>
+    extends _$VehicleMakeCopyWithImpl<$Res, _$VehicleMakeImpl>
+    implements _$$VehicleMakeImplCopyWith<$Res> {
+  __$$VehicleMakeImplCopyWithImpl(
+      _$VehicleMakeImpl _value, $Res Function(_$VehicleMakeImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of Make
+  /// Create a copy of VehicleMake
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -368,8 +388,9 @@ class __$$MakeImplCopyWithImpl<$Res>
     Object? image = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? models = null,
   }) {
-    return _then(_$MakeImpl(
+    return _then(_$VehicleMakeImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -393,29 +414,35 @@ class __$$MakeImplCopyWithImpl<$Res>
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
       updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DateTime,
+      models: null == models
+          ? _value._models
+          : models // ignore: cast_nullable_to_non_nullable
+              as List<VehicleModel>,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$MakeImpl implements _Make {
-  const _$MakeImpl(
+class _$VehicleMakeImpl implements _VehicleMake {
+  const _$VehicleMakeImpl(
       {required this.id,
       @JsonKey(name: 'user_id') this.userId,
       required this.name,
       required this.slug,
       this.image,
       @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'brand_models') required final List<VehicleModel> models})
+      : _models = models;
 
-  factory _$MakeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$MakeImplFromJson(json);
+  factory _$VehicleMakeImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VehicleMakeImplFromJson(json);
 
   @override
   final int id;
@@ -430,21 +457,29 @@ class _$MakeImpl implements _Make {
   final String? image;
   @override
   @JsonKey(name: 'created_at')
-  final String createdAt;
+  final DateTime createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  final DateTime updatedAt;
+  final List<VehicleModel> _models;
+  @override
+  @JsonKey(name: 'brand_models')
+  List<VehicleModel> get models {
+    if (_models is EqualUnmodifiableListView) return _models;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_models);
+  }
 
   @override
   String toString() {
-    return 'Make(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'VehicleMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt, models: $models)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$MakeImpl &&
+            other is _$VehicleMakeImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.name, name) || other.name == name) &&
@@ -453,42 +488,45 @@ class _$MakeImpl implements _Make {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._models, _models));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, userId, name, slug, image, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, userId, name, slug, image,
+      createdAt, updatedAt, const DeepCollectionEquality().hash(_models));
 
-  /// Create a copy of Make
+  /// Create a copy of VehicleMake
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$MakeImplCopyWith<_$MakeImpl> get copyWith =>
-      __$$MakeImplCopyWithImpl<_$MakeImpl>(this, _$identity);
+  _$$VehicleMakeImplCopyWith<_$VehicleMakeImpl> get copyWith =>
+      __$$VehicleMakeImplCopyWithImpl<_$VehicleMakeImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MakeImplToJson(
+    return _$$VehicleMakeImplToJson(
       this,
     );
   }
 }
 
-abstract class _Make implements Make {
-  const factory _Make(
-          {required final int id,
-          @JsonKey(name: 'user_id') final int? userId,
-          required final String name,
-          required final String slug,
-          final String? image,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$MakeImpl;
+abstract class _VehicleMake implements VehicleMake {
+  const factory _VehicleMake(
+      {required final int id,
+      @JsonKey(name: 'user_id') final int? userId,
+      required final String name,
+      required final String slug,
+      final String? image,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      @JsonKey(name: 'brand_models')
+      required final List<VehicleModel> models}) = _$VehicleMakeImpl;
 
-  factory _Make.fromJson(Map<String, dynamic> json) = _$MakeImpl.fromJson;
+  factory _VehicleMake.fromJson(Map<String, dynamic> json) =
+      _$VehicleMakeImpl.fromJson;
 
   @override
   int get id;
@@ -503,16 +541,285 @@ abstract class _Make implements Make {
   String? get image;
   @override
   @JsonKey(name: 'created_at')
-  String get createdAt;
+  DateTime get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  String get updatedAt;
+  DateTime get updatedAt;
+  @override
+  @JsonKey(name: 'brand_models')
+  List<VehicleModel> get models;
 
-  /// Create a copy of Make
+  /// Create a copy of VehicleMake
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MakeImplCopyWith<_$MakeImpl> get copyWith =>
+  _$$VehicleMakeImplCopyWith<_$VehicleMakeImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+VehicleModel _$VehicleModelFromJson(Map<String, dynamic> json) {
+  return _VehicleModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$VehicleModel {
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_id')
+  int get makeId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this VehicleModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of VehicleModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $VehicleModelCopyWith<VehicleModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $VehicleModelCopyWith<$Res> {
+  factory $VehicleModelCopyWith(
+          VehicleModel value, $Res Function(VehicleModel) then) =
+      _$VehicleModelCopyWithImpl<$Res, VehicleModel>;
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'brand_id') int makeId,
+      String name,
+      String slug,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
+}
+
+/// @nodoc
+class _$VehicleModelCopyWithImpl<$Res, $Val extends VehicleModel>
+    implements $VehicleModelCopyWith<$Res> {
+  _$VehicleModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of VehicleModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? makeId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      makeId: null == makeId
+          ? _value.makeId
+          : makeId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$VehicleModelImplCopyWith<$Res>
+    implements $VehicleModelCopyWith<$Res> {
+  factory _$$VehicleModelImplCopyWith(
+          _$VehicleModelImpl value, $Res Function(_$VehicleModelImpl) then) =
+      __$$VehicleModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'brand_id') int makeId,
+      String name,
+      String slug,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
+}
+
+/// @nodoc
+class __$$VehicleModelImplCopyWithImpl<$Res>
+    extends _$VehicleModelCopyWithImpl<$Res, _$VehicleModelImpl>
+    implements _$$VehicleModelImplCopyWith<$Res> {
+  __$$VehicleModelImplCopyWithImpl(
+      _$VehicleModelImpl _value, $Res Function(_$VehicleModelImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of VehicleModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? makeId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_$VehicleModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      makeId: null == makeId
+          ? _value.makeId
+          : makeId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$VehicleModelImpl implements _VehicleModel {
+  const _$VehicleModelImpl(
+      {required this.id,
+      @JsonKey(name: 'brand_id') required this.makeId,
+      required this.name,
+      required this.slug,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt});
+
+  factory _$VehicleModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$VehicleModelImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  @JsonKey(name: 'brand_id')
+  final int makeId;
+  @override
+  final String name;
+  @override
+  final String slug;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
+
+  @override
+  String toString() {
+    return 'VehicleModel(id: $id, makeId: $makeId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$VehicleModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.makeId, makeId) || other.makeId == makeId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, makeId, name, slug, createdAt, updatedAt);
+
+  /// Create a copy of VehicleModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$VehicleModelImplCopyWith<_$VehicleModelImpl> get copyWith =>
+      __$$VehicleModelImplCopyWithImpl<_$VehicleModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$VehicleModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _VehicleModel implements VehicleModel {
+  const factory _VehicleModel(
+          {required final int id,
+          @JsonKey(name: 'brand_id') required final int makeId,
+          required final String name,
+          required final String slug,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
+      _$VehicleModelImpl;
+
+  factory _VehicleModel.fromJson(Map<String, dynamic> json) =
+      _$VehicleModelImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  @JsonKey(name: 'brand_id')
+  int get makeId;
+  @override
+  String get name;
+  @override
+  String get slug;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt;
+
+  /// Create a copy of VehicleModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$VehicleModelImplCopyWith<_$VehicleModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

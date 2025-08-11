@@ -14,8 +14,9 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/recommendedModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
@@ -274,7 +275,7 @@ class _HomePageState extends State<HomePage> {
           homeProvider.trendingMakes.length > 4 ? Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: homeProvider.trendingMakes.take(4).map((make) => CustomImage(
-              imagePath: getImageUrl(make.image), 
+              imagePath: getImageUrl(make.image, null), 
               isAssetImage: ColorGlobalVariables.falseValue,
               isImageBorderRadiusRequired: false,
               imageWidth: 40,
@@ -284,7 +285,7 @@ class _HomePageState extends State<HomePage> {
           ) : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: homeProvider.trendingMakes.map((make) => CustomImage(
-                  imagePath: getImageUrl(make.image), 
+                  imagePath: getImageUrl(make.image, null), 
                   isAssetImage: ColorGlobalVariables.falseValue,
                   isImageBorderRadiusRequired: false,
                   imageWidth: 40,
@@ -493,7 +494,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                               image: DecorationImage(
                                 image: CachedNetworkImageProvider(
-                                  getImageUrl(firstImage),
+                                  getImageUrl(firstImage, null),
                                   maxWidth: (screenSize.width * 0.7).toInt(), // Optimize for display size
                                   maxHeight: 150.toInt(),
                                 ),
@@ -533,7 +534,7 @@ class _HomePageState extends State<HomePage> {
                                   right: 8,
                                   bottom: 8,
                                   child: CustomImage(
-                                    imagePath: getImageUrl(brandImage), 
+                                    imagePath: getImageUrl(brandImage, null), 
                                     isAssetImage: ColorGlobalVariables.falseValue, 
                                     isImageBorderRadiusRequired: ColorGlobalVariables.falseValue,
                                     useShimmerEffect: ColorGlobalVariables.trueValue,
@@ -649,7 +650,7 @@ class _HomePageState extends State<HomePage> {
                   Stack(
                     children: [
                       CustomImage(
-                        imagePath: getImageUrl(firstImage), 
+                        imagePath: getImageUrl(firstImage, null), 
                         isAssetImage: recommended.images?.isNotEmpty == true ? false : true, 
                         isImageBorderRadiusRequired: true,
                         imageBorderRadius: 8,
@@ -681,14 +682,31 @@ class _HomePageState extends State<HomePage> {
                     // liked icon
                     Positioned(
                       top: 3, right: 4,
-                      child: CustomIcon(
-                        // iconData: recommended["isLiked"]  ? Icons.favorite : Icons.favorite_border_outlined, 
-                        iconData: Icons.favorite_border_outlined,
-                        isFaIcon: false, 
-                        iconSize: 25,
-                        iconColor: ColorGlobalVariables.fadedBlackColor,
-                        // iconColor: recommended["isLiked"] ? ColorGlobalVariables.redColor : ColorGlobalVariables.fadedBlackColor,
-                        ),
+                      child: GestureDetector(
+                        onTap: () async {
+                          try {
+                            final success = await Provider.of<WishlistToggleProvider>(context, listen: false).toggleWishlistItem(itemId: recommended.id);
+                            // if(success){
+                            //   setState(() {
+                            //     isLiked = success;
+                            //   });
+                            // }
+                            // else{
+                            //   isLiked = success;
+                            // }
+                          } catch(e){
+
+                          }
+                        },
+                        child: CustomIcon(
+                          // iconData: recommended["isLiked"]  ? Icons.favorite : Icons.favorite_border_outlined, 
+                          iconData: Icons.favorite_border_outlined,
+                          isFaIcon: false, 
+                          iconSize: 25,
+                          iconColor: ColorGlobalVariables.fadedBlackColor,
+                          // iconColor: recommended["isLiked"] ? ColorGlobalVariables.redColor : ColorGlobalVariables.fadedBlackColor,
+                          ),
+                      ),
                     ),
                     ],
                   ),
@@ -700,7 +718,7 @@ class _HomePageState extends State<HomePage> {
                       Expanded(
                         child: TextSmall(
                           // title: recommended["productName"], 
-                          title: recommended.name,
+                          title: recommended.name! ,
                           fontWeight: FontWeight.normal, 
                           overflow: TextOverflow.ellipsis,
                           textColor: ColorGlobalVariables.blackColor
@@ -722,7 +740,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: TextMedium(
-                          title: 'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommended.price))}', 
+                          title: 'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommended.price!))}', 
                           fontWeight: FontWeight.w500, 
                           textColor: ColorGlobalVariables.redColor,
                           ),
@@ -754,13 +772,14 @@ class _HomePageState extends State<HomePage> {
                       // product logo
                       brandImage != null 
                       ?  CustomImage(
-                        imagePath: getImageUrl(brandImage), 
+                        imagePath: getImageUrl(brandImage, null), 
                         isAssetImage: false, 
                         useShimmerEffect: false,
                         imageHeight: 25,
                         imageWidth: 25,
                         isImageBorderRadiusRequired: false
                         ) : const SizedBox(width: 16,),
+                      const SizedBox(width: 5,),
                       // row for icon and driveType
                       if(recommended.transmission != null)
                       Row(
@@ -771,7 +790,7 @@ class _HomePageState extends State<HomePage> {
                             iconSize: 16,
                             iconColor: ColorGlobalVariables.blackColor
                             ),
-                          const SizedBox(width: 2,),
+                          const SizedBox(width: 1,),
                           TextExtraSmall(
                             title: recommended.transmission!, 
                             fontWeight: FontWeight.normal, 
@@ -779,22 +798,28 @@ class _HomePageState extends State<HomePage> {
                             ),
                         ],
                       ),
+                      const SizedBox(width: 5,),
                       //row for icon and location
                       if(recommended.location != null)
-                      Row(
-                        children: [
-                          CustomIcon(
-                            iconData: Icons.location_on, 
-                            isFaIcon: false, 
-                            iconColor: ColorGlobalVariables.redColor
+                      Flexible(
+                        child: Row(
+                          children: [
+                            CustomIcon(
+                              iconData: Icons.location_on, 
+                              isFaIcon: false, 
+                              iconColor: ColorGlobalVariables.redColor
+                              ),
+                            const SizedBox(width: 1,),
+                            Flexible(
+                              child: TextExtraSmall(
+                                title: recommended.location!, 
+                                fontWeight: FontWeight.normal, 
+                                overflow: TextOverflow.ellipsis,
+                                textColor: ColorGlobalVariables.blackColor
+                                ),
                             ),
-                          const SizedBox(width: 2,),
-                          TextExtraSmall(
-                            title: recommended.location!, 
-                            fontWeight: FontWeight.normal, 
-                            textColor: ColorGlobalVariables.blackColor
-                            ),
-                        ],
+                          ],
+                        ),
                       )
                     ],
                   ),

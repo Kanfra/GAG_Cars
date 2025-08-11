@@ -1,47 +1,73 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'brandModelModel.dart';
+part of 'makeAndModelModel.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BrandModelResponseImpl _$$BrandModelResponseImplFromJson(
+_$MakeAndModelResponseImpl _$$MakeAndModelResponseImplFromJson(
         Map<String, dynamic> json) =>
-    _$BrandModelResponseImpl(
+    _$MakeAndModelResponseImpl(
       data: (json['data'] as List<dynamic>)
-          .map((e) => BrandModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => VehicleMake.fromJson(e as Map<String, dynamic>))
           .toList(),
       links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
       meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$BrandModelResponseImplToJson(
-        _$BrandModelResponseImpl instance) =>
+Map<String, dynamic> _$$MakeAndModelResponseImplToJson(
+        _$MakeAndModelResponseImpl instance) =>
     <String, dynamic>{
       'data': instance.data,
       'links': instance.links,
       'meta': instance.meta,
     };
 
-_$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
-    _$BrandModelImpl(
+_$VehicleMakeImpl _$$VehicleMakeImplFromJson(Map<String, dynamic> json) =>
+    _$VehicleMakeImpl(
       id: (json['id'] as num).toInt(),
-      brandId: (json['brand_id'] as num).toInt(),
+      userId: (json['user_id'] as num?)?.toInt(),
       name: json['name'] as String,
       slug: json['slug'] as String,
-      createdAt: json['created_at'] as String,
-      updatedAt: json['updated_at'] as String,
+      image: json['image'] as String?,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      models: (json['brand_models'] as List<dynamic>)
+          .map((e) => VehicleModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
-Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
+Map<String, dynamic> _$$VehicleMakeImplToJson(_$VehicleMakeImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'brand_id': instance.brandId,
+      'user_id': instance.userId,
       'name': instance.name,
       'slug': instance.slug,
-      'created_at': instance.createdAt,
-      'updated_at': instance.updatedAt,
+      'image': instance.image,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+      'brand_models': instance.models,
+    };
+
+_$VehicleModelImpl _$$VehicleModelImplFromJson(Map<String, dynamic> json) =>
+    _$VehicleModelImpl(
+      id: (json['id'] as num).toInt(),
+      makeId: (json['brand_id'] as num).toInt(),
+      name: json['name'] as String,
+      slug: json['slug'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+    );
+
+Map<String, dynamic> _$$VehicleModelImplToJson(_$VehicleModelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'brand_id': instance.makeId,
+      'name': instance.name,
+      'slug': instance.slug,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
     };
 
 _$PaginationLinksImpl _$$PaginationLinksImplFromJson(

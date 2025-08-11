@@ -7,11 +7,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/auth_response_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 
 class AuthService {
   static String get _tokenKey => dotenv.get('TOKEN_KEY');
@@ -93,15 +97,38 @@ class AuthService {
       return false;
     }
   }
-  static Future<bool> isAuthenticated() async {
+
+
+  static Future<bool> isAuthenticated(UserProvider userProvider) async {
     final logger = Logger();
+    final uri = Uri.parse("$baseApiUrl${ApiEndpoint.authenticateUser}");
     try{
       final token = await getToken();
       if(token == null) return false;
-      return _isTokenValid(token);
+
+      // make a request
+      final response = await http.get(
+        uri,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        }
+      );
+
+      if(response.statusCode == 200){
+        final data = jsonDecode(response.body);
+        if(data['user'] != null){
+          final authResponse = AuthResponseModel.fromJson(data);
+          userProvider.setUser(authResponse.user);
+          logger.i("Authenticated user: ${data["user"]["email"]}");
+          return true;
+        }
+        return false;
+      }
+      return false;
     } catch(e){
       // if any error occurs, treat as unauthenticated
-      logger.e("Auth check error: $e");
+      logger.e("Error during auth check: $e");
       return false;
     }
   }
@@ -333,6 +360,7 @@ static Future<bool> sendOtp(
 static Future<AuthResponseModel> verifyOtp({
   required String phone,
   required String otp,
+  required UserProvider userProvider,
   // required String? token,
 }) async {
   final logger = Logger();
@@ -358,7 +386,10 @@ static Future<AuthResponseModel> verifyOtp({
         final token = responseBody['token'];
         final message = responseBody['message'];
         logger.i('test success response: $message and token: $token');
-        // store token securely
+
+        final authResponse = AuthResponseModel.fromJson(responseBody);
+        await userProvider.setUser(authResponse.user);
+       // store token securely
         if(token != null){
           await storage.write(key: 'auth_token', value: token);
           logger.i("Auth token stored securely");

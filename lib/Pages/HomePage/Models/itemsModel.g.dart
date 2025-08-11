@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'recommendedModel.dart';
+part of 'itemsModel.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -86,9 +86,9 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       brandModelId: (json['brand_model_id'] as num?)?.toInt(),
       brandId: (json['brand_id'] as num?)?.toInt(),
       categoryId: (json['category_id'] as num?)?.toInt(),
-      name: json['name'] as String,
-      year: json['year'] as String,
-      slug: json['slug'] as String,
+      name: json['name'] as String?,
+      year: json['year'] as String?,
+      slug: json['slug'] as String?,
       description: json['description'] as String?,
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
@@ -104,14 +104,18 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       features: (json['features'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      status: json['status'] as String,
-      price: json['price'] as String,
+      status: json['status'] as String?,
+      price: json['price'] as String?,
       mileage: json['mileage'] as String?,
-      warranty: (json['warranty'] as num).toInt(),
+      warranty: (json['warranty'] as num?)?.toInt(),
       warrantyExpiration: json['warranty_expiration'] as String?,
       deletedAt: json['deleted_at'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
       brand: json['brand'] == null
           ? null
           : Brand.fromJson(json['brand'] as Map<String, dynamic>),
@@ -156,8 +160,8 @@ Map<String, dynamic> _$$RecommendedItemImplToJson(
       'warranty': instance.warranty,
       'warranty_expiration': instance.warrantyExpiration,
       'deleted_at': instance.deletedAt,
-      'created_at': instance.createdAt.toIso8601String(),
-      'updated_at': instance.updatedAt.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
       'brand': instance.brand,
       'category': instance.category,
       'brand_model': instance.brandModel,

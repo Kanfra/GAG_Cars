@@ -2,8 +2,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
-part 'recommendedModel.freezed.dart';
-part 'recommendedModel.g.dart';
+part 'itemsModel.freezed.dart';
+part 'itemsModel.g.dart';
 
 @freezed
 class Brand with _$Brand {
@@ -57,15 +57,15 @@ class Category with _$Category {
 @freezed
 class RecommendedItem with _$RecommendedItem {
   const factory RecommendedItem({
-    required String id,
+    required String id, // Keep required if truly mandatory
     @JsonKey(name: 'user_id') String? userId,
     @JsonKey(name: 'country_id') int? countryId,
     @JsonKey(name: 'brand_model_id') int? brandModelId,
     @JsonKey(name: 'brand_id') int? brandId,
     @JsonKey(name: 'category_id') int? categoryId,
-    required String name,
-    required String year,
-    required String slug,
+    String? name, // Make nullable
+    String? year, // Make nullable
+    String? slug, // Make nullable
     String? description,
     List<String>? images,
     String? location,
@@ -78,14 +78,14 @@ class RecommendedItem with _$RecommendedItem {
     @JsonKey(name: 'build_type') String? buildType,
     @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
     List<String>? features,
-    required String status,
-    required String price,
+    String? status, // Make nullable
+    String? price, // Make nullable
     String? mileage,
-    required int warranty,
+    int? warranty, // Make nullable
     @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
     @JsonKey(name: 'deleted_at') String? deletedAt,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt, // Make nullable
+    @JsonKey(name: 'updated_at') DateTime? updatedAt, // Make nullable
     Brand? brand,
     Category? category,
     @JsonKey(name: 'brand_model') BrandModel? brandModel,

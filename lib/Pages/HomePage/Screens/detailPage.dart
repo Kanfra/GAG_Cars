@@ -401,7 +401,7 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             const SizedBox(height: 5,),
                             TextSmall(
-                              title: item['category'].name, 
+                              title: item['category']?.name ?? 'N/A', 
                               fontWeight: FontWeight.w500, 
                               textColor: ColorGlobalVariables.blackColor
                               ),
@@ -801,7 +801,7 @@ class _DetailPageState extends State<DetailPage> {
         // Main background image , currently working here
         CustomImage(
           imagePath: item['images'] is List 
-          ? getImageUrl(item['images'].first) 
+          ? getImageUrl(item['images'].first, null) 
           : '${ImageStringGlobalVariables.imagePath}car_placeholder.png', 
           isAssetImage: item['images'] is List ? false : true, 
           fit: BoxFit.cover,
@@ -856,7 +856,7 @@ class _DetailPageState extends State<DetailPage> {
                     borderRadius: BorderRadius.circular(8),
                     child: CustomImage(
                       imagePath: item['images'] is List 
-                      ? getImageUrl(specialOffer) 
+                      ? getImageUrl(specialOffer, null) 
                       : '${ImageStringGlobalVariables.imagePath}car_placeholder.png', 
                       isAssetImage: item['images'] is List ? false : true,
                       imageWidth: 120,

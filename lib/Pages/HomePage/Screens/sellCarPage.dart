@@ -1,29 +1,32 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as DatePicker;
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+
+// Import your custom components and models here
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customElevatedButton.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Checkboxes/roundCheckBox.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Checkboxes/textCheckBox.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithRowComponent.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/brandModelModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/makeModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/vehicleModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Providers/vehicleProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/makeAndModelModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 
 class SellCarPage extends StatefulWidget {
   const SellCarPage({super.key});
@@ -61,31 +64,42 @@ class _SellCarPageState extends State<SellCarPage> {
   int year = 2000;
   Color color = Colors.transparent;
   String? selectedLocation;
+  Position? _currentPosition;
   String? selectedSteerPosition;
-  List<String> steerPositionOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+  List<String> steerPositionOptions = ['Left', 'Right'];
   String? selectedEngineCapacity;
-  List<String> engineCapacityOptions = ['1.0', '2.0', '3.0'];
+  List<String> engineCapacityOptions = ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0'];
   String? selectedTransmission;
   List<String> transmissionOptions = ['Automatic', 'Manual'];
   String? selectedBuildType;
-  List<String> buildTypeOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+  List<String> buildTypeOptions = ['Sedan', 'SUV', 'Hatchback', 'Coupe', 'Convertible', 'Truck'];
   String? selectedMileage;
-  List<String> mileageOptions = ['Option 1', 'Option 2', 'Option 3', 'Option 4'];
+  List<String> mileageOptions = ['0-10,000 km', '10,001-50,000 km', '50,001-100,000 km', '100,001+ km'];
 
   List<XFile> selectedImages = [];
   final ImagePicker picker = ImagePicker();
-  int? selectedMakeId;
+  Map<String?, dynamic>? selectedMakeAndModels;
   String? selectedModel;
+  bool isLoadingMake = false;
   final logger = Logger();
-  Position? _currentPosition;
+
+  bool _isSelling = false; 
 
   @override
   void initState() {
     super.initState();
-    // Fetch makes when the page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final vehicleProvider = Provider.of<VehicleProvider>(context, listen: false);
-      vehicleProvider.fetchMakes();
+      final notifier = Provider.of<MakeAndModelProvider>(context, listen: false);
+      notifier.fetchMakesWithModels().then((_) {
+        setState(() {
+          isLoadingMake = false;
+        });
+      }).catchError((error) {
+        setState(() {
+          isLoadingMake = false;
+        });
+        logger.e("Error loading makes: $error");
+      });
     });
   }
 
@@ -96,129 +110,158 @@ class _SellCarPageState extends State<SellCarPage> {
     _priceController.dispose();
     _numberOfPassengersController.dispose();
     _descriptionController.dispose();
+    _colorController.dispose();
     super.dispose();
   }
 
   Future<void> sellCarFunction() async {
-    final vehicle = VehicleModel(
-      user_id: "",
-      vehicle_id: "",
-      vehicleName: _vehicleNameController.text, 
-      vehicleType: vehicleType, 
-      condition: condition, 
-      year: year, 
-      make: selectedMakeId ?? null, 
-      model: selectedModel ?? "", 
-      location: VehicleLocation(latitude: _currentPosition!.latitude, longitude: _currentPosition!.longitude), 
-      price: _priceController.text, 
-      steerPosition: selectedSteerPosition!, 
-      engineCapacity: selectedEngineCapacity!, 
-      transmission: selectedTransmission!, 
-      color: VehicleColor(hex: _colorController.text, name: _colorController.text), 
-      buildType: selectedBuildType!, 
-      mileage: selectedMileage!, 
-      numberOfPassengers: int.tryParse(_numberOfPassengersController.text) ?? 0, 
-      features: selectedFeatures,
-      description: _descriptionController.text,
-      images: []
-    );
+    final requestBody = {
+  "user_id": "", // Make sure you have this value
+  "brand_model_id": selectedModel != null ? int.tryParse(selectedModel!) ?? 0 : 0,
+  "brand_id": selectedMakeAndModels?['id'] ?? 0,
+  "category_id": 1, // Assuming this is correct for your vehicleType
+  "name": _vehicleNameController.text,
+  "slug": _vehicleNameController.text.toLowerCase().replaceAll(' ', '-'),
+  "description": _descriptionController.text,
+  "images": [],
+  // uploadedImageUrls.join(','), // Convert list to comma-separated string
+  "location": selectedLocation ?? '',
+  "serial_number": "", // You'll need to get this value or generate it
+  "condition": condition.toLowerCase(),
+  "status": "active",
+  "price": _priceController.text,
+  "mileage": selectedMileage ?? '',
+  "warranty": "0", // API expects string
+  "warranty_expiration": "", // You'll need to calculate this if applicable
+  // Omit fields not in the API spec:
+  // - steerPosition
+  // - engineCapacity
+  // - transmission
+  // - color
+  // - buildType
+  // - numberOfPassengers
+  // - features
+  // - brand
+  // - category
+};
     
     await VehicleService.uploadVehicle(
-      vehicle: vehicle, 
-      imageFiles: selectedImages,
+      requestBody: requestBody,
     );
   }
 
   Future<void> _formValidation() async {
     if (_formKey.currentState!.validate()) {
       if(vehicleType.isEmpty){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select vehicle type", 
-          isForFormValidation: false
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error", 
+          message: 'Please select vehicle type'
         );
         return;
       }
       if(condition.isEmpty){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select condition", 
-          isForFormValidation: false
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error", 
+          message: 'Please select condition'
         );
         return;
       }
-      if(selectedMakeId == null){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select vehicle make", 
-          isForFormValidation: false
+      if(selectedMakeAndModels == null){
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error",
+          message: 'Please select vehicle make' 
         );
         return;
       }
       if(selectedModel == null || selectedModel!.isEmpty){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select vehicle model", 
-          isForFormValidation: false
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error",
+          message: 'Please select vehicle model' 
         );
         return;
       }
-      if(_currentPosition == null){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select vehicle location", 
-          isForFormValidation: false
+      if(_currentPosition == null && selectedLocation == null){
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error",
+          message: 'Please select vehicle location' 
         );
         return;
       }
       if(selectedBuildType == null || selectedBuildType == ""){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select build type", 
-          isForFormValidation: false,
+        showCustomSnackBar( 
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error",
+          message: 'Please select build type' 
         );
         return;
       }
       if(selectedMileage == null || selectedMileage == ""){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select mileage", 
-          isForFormValidation: false
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error",
+          message: 'Please select mileage' 
         );
         return;
       }
       if(selectedFeatures.isEmpty){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please select features", 
-          isForFormValidation: false
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error", 
+          message: 'Please select features'
         );
         return;
       }
-      if(selectedImages.isEmpty){
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor, 
-          title: "Please upload at least 2 images and at most 4 images", 
-          isForFormValidation: false
+      if(selectedImages.isEmpty || selectedImages.length < 2){
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor, 
+          title: "Error",
+          message: 'Please upload at least 2 images and at most 4 images', 
         );
         return;
       }
-      
-      await sellCarFunction();
+      setState((){
+        _isSelling = true;
+      });
+      try{
+        await sellCarFunction();
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.greenColor,
+          title: 'Success',
+          message: 'Vehicle listed successfully'
+        );
+
+        // optionally reset form or navigate away
+        // _formKey.currentState?.reset();
+        // Navigate.pop(context);
+      }catch(e){
+        showCustomSnackBar(
+          backgroundColor: ColorGlobalVariables.redColor,
+          title: 'Error',
+          message: 'Failed to list vehicle: ${e.toString()}'
+        );
+      } finally{
+        setState(() {
+          _isSelling = false;
+        });
+      }
     } else {
-      showSnackbar(
-        backgroundColor: ColorGlobalVariables.whiteColor, 
-        title: 'Please correct the errors in the form', 
-        isForFormValidation: false
+      showCustomSnackBar(
+        backgroundColor: ColorGlobalVariables.redColor, 
+        title: 'Error',
+        message: 'Please correct the errors in the form' 
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final makeModelNotifier = Provider.of<MakeAndModelProvider>(context);
     final screenSize = MediaQuery.of(context).size;
-    final vehicleProvider = Provider.of<VehicleProvider>(context);
-
     return Scaffold(
       appBar: CustomAppbar(
         onLeadingIconClickFunction: (){}, 
@@ -420,30 +463,35 @@ class _SellCarPageState extends State<SellCarPage> {
                       children: [
                         // make
                         Expanded(
-                          child: TitleWithTextformfieldComponent(
+                          child: isLoadingMake ? const Center(
+                            child: SpinKitDoubleBounce(
+                              color: ColorGlobalVariables.brownColor,
+                              size: 40,
+                            ),
+                          ) : TitleWithTextformfieldComponent(
                             title: 'Make', 
                             fontWeight: FontWeight.w500, 
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.text, 
-                            hintText: vehicleProvider.selectedMake?.name ?? "Select Make",
+                            hintText: selectedMakeAndModels?['name'] ?? "Select Make",
                             isTitleWithContainerWidgetRequired: true,
                             fieldWidth: double.infinity,
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             onTitleWithContainerWidgetClickFunction: () {
-                              if (vehicleProvider.isLoadingMakes) return;
-                              
                               _showMakeSelectionDialog(
                                 context: context,
-                                makes: vehicleProvider.makes,
+                                makes: makeModelNotifier.makes,
                                 onSelected: (make) async {
                                   setState(() {
-                                    selectedMakeId = make.id;
-                                    selectedModel = null;
+                                    selectedMakeAndModels = {
+                                      'name': make.name,
+                                      'id': make.id,
+                                      'brand_models': makeModelNotifier.getModelsForMake(make.id),
+                                    };
                                   });
-                                  await vehicleProvider.fetchBrandModels(make.id);
                                 }
                               );
                             }
@@ -452,7 +500,12 @@ class _SellCarPageState extends State<SellCarPage> {
                         const SizedBox(width: 20),
                         // model
                         Expanded(
-                          child: TitleWithTextformfieldComponent(
+                          child: isLoadingMake ? const Center(
+                            child: SpinKitDoubleBounce(
+                              color: ColorGlobalVariables.brownColor,
+                              size: 40,
+                            ),
+                          ) : TitleWithTextformfieldComponent(
                             title: 'Model', 
                             fontWeight: FontWeight.w500, 
                             textColor: ColorGlobalVariables.blackColor, 
@@ -465,24 +518,22 @@ class _SellCarPageState extends State<SellCarPage> {
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
                             onTitleWithContainerWidgetClickFunction: () {
-                              if (vehicleProvider.selectedMake == null) {
-                                showSnackbar(
-                                  backgroundColor: ColorGlobalVariables.whiteColor, 
-                                  isForFormValidation: false,
-                                  title: 'Select a Make first'
+                              if (selectedMakeAndModels == null) {
+                                showCustomSnackBar(
+                                  backgroundColor: ColorGlobalVariables.redColor,
+                                  message: 'Select a Make first', 
+                                  title: 'Error'
                                 );
                                 return;
                               }
-                              
-                              if (vehicleProvider.isLoadingModels) return;
-                              
                               _showModelSelectionDialog(
                                 context: context,
-                                models: vehicleProvider.brandModels,
+                                models: selectedMakeAndModels?['brand_models'],
                                 onSelected: (model) {
                                   setState(() {
-                                    selectedModel = model.name;
+                                    selectedModel = model;
                                   });
+                                  logger.i("Selected model: $selectedModel");
                                 }
                               );
                             }
@@ -507,13 +558,23 @@ class _SellCarPageState extends State<SellCarPage> {
                             obscureText: false, 
                             overflow: TextOverflow.ellipsis,
                             textInputType: TextInputType.text, 
-                            hintText: _currentPosition == null ? "Search Location" : "Latitude: ${_currentPosition?.latitude}, Longitude: ${_currentPosition?.longitude}", 
+                            hintText: _currentPosition != null 
+                              ? "Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}, Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}"
+                              : selectedLocation ?? "Search Location", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
                             isTitleWithContainerWidgetRequired: true,
-                            onTitleWithContainerWidgetClickFunction: (){
-                              _getLocation();
+                            onTitleWithContainerWidgetClickFunction: () async {
+                              final result = await Get.toNamed(
+                                RouteClass.getLocationSearchPage(),
+                              );
+                              if (result != null) {
+                                setState(() {
+                                  _currentPosition = result['position'];
+                                  selectedLocation = result['locationName'];
+                                });
+                              }
                             },
                           ),
                         ),
@@ -559,7 +620,7 @@ class _SellCarPageState extends State<SellCarPage> {
                             textColor: ColorGlobalVariables.blackColor, 
                             obscureText: false, 
                             textInputType: TextInputType.text,
-                            hintText: selectedSteerPosition ?? "left", 
+                            hintText: selectedSteerPosition ?? "Left", 
                             isSuffixIconRequired: false, 
                             isPrefixIconRequired: false, 
                             isFieldHeightRequired: false, 
@@ -1027,8 +1088,14 @@ class _SellCarPageState extends State<SellCarPage> {
                       buttonVerticalPadding: 15,
                       borderRadius: 8,
                       isFullButtonWidthRequired: true, 
-                      buttonBackgroundColor: Colors.red, 
-                      onClickFunction: () => _formValidation(),
+                      buttonBackgroundColor: _isSelling ? ColorGlobalVariables.greyColor : ColorGlobalVariables.redColor, 
+                      onClickFunction: _isSelling ? (){
+                        showCustomSnackBar(
+                          title: 'Message',
+                          message: 'Please hold on',
+                          backgroundColor: ColorGlobalVariables.blueColor
+                        );
+                      } : () => _formValidation(),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -1041,72 +1108,12 @@ class _SellCarPageState extends State<SellCarPage> {
     );
   }
 
-  Future<void> _getLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-    
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      showSnackbar(
-        backgroundColor: ColorGlobalVariables.whiteColor,
-        isForFormValidation: false,
-        title: 'Location services are disabled. Please enable them.'
-      );
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      showSnackbar(
-        backgroundColor: ColorGlobalVariables.whiteColor,
-        isForFormValidation: false,
-        title: 'Location permissions are permanently denied. Please enable them in app settings.'
-      );
-      return;
-    }
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
-        showSnackbar(
-          backgroundColor: ColorGlobalVariables.whiteColor,
-          isForFormValidation: false,
-          title: 'Location permissions are denied'
-        );
-        return;
-      }
-    }
-
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high
-      );
-
-      setState(() {
-        _currentPosition = position;
-      });
-
-      showSnackbar(
-        backgroundColor: ColorGlobalVariables.whiteColor,
-        isForFormValidation: false,
-        title: 'Location updated to your current position'
-      );
-
-    } catch (e) {
-      showSnackbar(
-        backgroundColor: ColorGlobalVariables.whiteColor,
-        isForFormValidation: false,
-        title: 'Error getting location: ${e.toString()}'
-      );
-    }
-  }
-
   Future<void> _showMakeSelectionDialog({
     required BuildContext context, 
-    required List<Make> makes,
-    required void Function(Make) onSelected,
+    required List<VehicleMake>? makes,
+    required void Function(VehicleMake) onSelected,
   }) async {
-    final selected = await showDialog<Make>(
+    final selected = await showDialog<VehicleMake>(
       context: context, 
       builder: (BuildContext context) {
         return SimpleDialog(
@@ -1115,7 +1122,7 @@ class _SellCarPageState extends State<SellCarPage> {
             fontWeight: FontWeight.normal, 
             textColor: ColorGlobalVariables.blackColor
           ),
-          children: makes.map((make) {
+          children: makes?.map((make) {
             return SimpleDialogOption(
               onPressed: (){
                 Navigator.pop(context, make);
@@ -1138,42 +1145,42 @@ class _SellCarPageState extends State<SellCarPage> {
     }
   }
 
-  Future<void> _showModelSelectionDialog({
-    required BuildContext context, 
-    required List<BrandModel> models,
-    required void Function(BrandModel) onSelected,
-  }) async {
-    final selected = await showDialog<BrandModel>(
-      context: context, 
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: TextMedium(
-            title: 'Select Model', 
-            fontWeight: FontWeight.normal, 
-            textColor: ColorGlobalVariables.blackColor
-          ),
-          children: models.map((model) {
-            return SimpleDialogOption(
-              onPressed: (){
-                Navigator.pop(context, model);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: TextSmall(
-                  title: model!.name, 
-                  fontWeight: FontWeight.normal, 
-                  textColor: ColorGlobalVariables.blackColor
-                ),
+Future<void> _showModelSelectionDialog({
+  required BuildContext context, 
+  required List<dynamic> models,
+  required void Function(String selected) onSelected,
+}) async {
+  final selected = await showDialog<VehicleModel>(
+    context: context, 
+    builder: (BuildContext context) {
+      return SimpleDialog(
+        title: TextMedium(
+          title: 'Select Model', 
+          fontWeight: FontWeight.normal, 
+          textColor: ColorGlobalVariables.blackColor
+        ),
+        children: models.map((model) {
+          return SimpleDialogOption(
+            onPressed: (){
+              Navigator.pop(context, model);
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: TextSmall(
+                title: model.name, 
+                fontWeight: FontWeight.normal, 
+                textColor: ColorGlobalVariables.blackColor
               ),
-            );
-          }).toList(),
-        );
-      });
+            ),
+          );
+        }).toList(),
+      );
+    });
 
-    if (selected != null) {
-      onSelected(selected);
-    }
+  if (selected != null) {
+    onSelected(selected.name); // Pass the name instead of the whole object
   }
+}
 
   Future<void> _showSelectionDialog({
     required BuildContext context, 
@@ -1243,25 +1250,6 @@ class _SellCarPageState extends State<SellCarPage> {
             },
           ),
         ),
-      )
-    );
-  }
-
-  void showSnackbar({
-    required Color backgroundColor,
-    required String title,
-    required bool isForFormValidation,
-    Color? textColor,
-  }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: backgroundColor,
-        elevation: 1,
-        content: TextSmall(
-          title: isForFormValidation ? "Please enter a/an $title" : title, 
-          fontWeight: FontWeight.w500, 
-          textColor: textColor ?? ColorGlobalVariables.redColor,
-        )
       )
     );
   }

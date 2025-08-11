@@ -2,7 +2,7 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/recommendedModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
@@ -12,7 +12,7 @@ class HomeService {
   // trend makes
    Future<List<TrendingMake>> fetchTrendingMakes() async {
     final response = await fetchApiData<TrendingMakeResponse>(
-      endpoint: ApiEndpoint.makes,
+      endpoint: ApiEndpoint.brands,
       fromJson: (json) => TrendingMakeResponse.fromJson(json),
     );
     return response.data;
@@ -43,7 +43,7 @@ class HomeService {
     int perPage = 10
     }) async {
     final response = await fetchApiData(
-      endpoint: "${ApiEndpoint.recommended}?page=$page&per_page=$perPage", 
+      endpoint: "${ApiEndpoint.items}?page=$page&per_page=$perPage", 
       fromJson: (json) => RecommendedResponse.fromJson(json),
       );
       return response.data;
@@ -52,7 +52,7 @@ class HomeService {
   // category (accessories, motobikes, etc)
   Future<List<Categories>> fetchCategory() async {
     final response = await fetchApiData(
-      endpoint: ApiEndpoint.category, 
+      endpoint: ApiEndpoint.categories, 
       fromJson: (json) => CategoriesResponse.fromJson(json),
       );
       return response.data;

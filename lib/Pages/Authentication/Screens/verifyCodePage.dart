@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:pinput/pinput.dart';
+import 'package:provider/provider.dart';
 
 class VerifyCodePage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -33,7 +35,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   String? _errorMessage;
   bool _otpSent = false;
   late String _phoneNumber;
-  late bool _isSignUp;
+  late bool _isSignIn;
   late String _token;
   late String _email;
   final logger = Logger();
@@ -45,10 +47,9 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     // get phone number from arguments
     final args = Get.arguments as Map<String, dynamic>? ?? {};
     _phoneNumber = args["phone"] ?? "";
-    _isSignUp = args["isSignUp"] ?? false;
+    _isSignIn = args["isSignIn"] ?? false;
     _email = args["email"] ?? "";
-    // _token = args["token"] ?? "";
-    logger.i("Phone number parsed: $_phoneNumber, email: $_email, isSignUp parsed: $_isSignUp");
+    logger.i("Phone number parsed: $_phoneNumber, email: $_email, isSignIn parsed: $_isSignIn");
     if (kIsWeb) BrowserContextMenu.disableContextMenu();
     formKey = GlobalKey<FormState>();
     pinController = TextEditingController();
@@ -102,25 +103,27 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   // verify otp function
   Future<void> _verifyCode() async {
     if(!formKey.currentState!.validate()) return;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
+
+    userProvider.clearError();
     
     try{
+
       final authResponse = await AuthService.verifyOtp(
         phone: _phoneNumber, 
         otp: pinController.text, 
-        // token: _token
+        userProvider: userProvider,
+        );
+        
+        // navigate based on auth status
+        Get.offAllNamed(
+          _isSignIn ? RouteClass.getMainBottomNavigationPage() : RouteClass.getSignInWithPhonePage()
         );
 
-        // handle successful verification
-        if(_isSignUp){
-          // navigate to home page
-          Get.offAllNamed(RouteClass.getMainBottomNavigationPage());
-        } else{
-          Get.offAllNamed(RouteClass.getSignInWithPhonePage());
-        }
     }catch(e){
       setState(() => _errorMessage = e.toString());
       showCustomSnackBar(
@@ -173,6 +176,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final basePinDecoration = BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(12),
@@ -218,7 +222,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     Text('Verify Code',style: TextStyle(fontSize:32, fontWeight: FontWeight.w500 ),),
                     // pinput field
                     SizedBox(height: 50,),
-                    _isLoading && !_otpSent ? CircularProgressIndicator() : Pinput(
+                    (_isLoading || userProvider.isLoading) ? CircularProgressIndicator() : Pinput(
                       controller: pinController,
                       focusNode: focusNode,
                       length: 6,
@@ -260,11 +264,11 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     //   },
                     //   child: const Text('Validate'),
                     // ),
-                    if(_errorMessage != null)
+                    if(_errorMessage != null || userProvider.error != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: TextExtraSmall(
-                        title: _errorMessage!, 
+                        title: _errorMessage! ?? userProvider.error!, 
                         textColor: ColorGlobalVariables.redColor,
                         ),
                     ),
@@ -288,7 +292,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: CustomButton(
-                            isLoading: false, 
+                            isLoading: _isLoading, 
                             buttonName: "Resend Code",
                             backgroundColor: _remainingSeconds == 0 ? Color.fromRGBO(159, 16, 16, 1) : Colors.grey,
                             onPressed: _remainingSeconds == 0 ? _resendOtp : null,
@@ -301,7 +305,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                                 buttonName: 'Verify Code',
                                 backgroundColor: _remainingSeconds == 0 ? Colors.grey : Color.fromRGBO(159, 16, 16, 1), 
                                 onPressed: _verifyCode, 
-                                     isLoading: _isLoading,
+                                     isLoading: (_isLoading || userProvider.isLoading),
                                      ),
                             )
                   ],

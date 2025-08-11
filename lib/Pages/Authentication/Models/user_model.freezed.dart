@@ -24,14 +24,23 @@ mixin _$UserModel {
   String get email => throw _privateConstructorUsedError;
   String? get password => throw _privateConstructorUsedError;
   @JsonKey(name: 'phone')
-  String? get phoneNumber =>
-      throw _privateConstructorUsedError; // @JsonKey(name: 'device_name') required String deviceName,
-  String? get id => throw _privateConstructorUsedError;
+  String? get phoneNumber => throw _privateConstructorUsedError;
+  @JsonKey(name: 'paid_seller')
+  int get paidSeller => throw _privateConstructorUsedError;
+  @JsonKey(name: 'email_verified_at')
+  DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id')
+  String? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'state_id')
+  String? get stateId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_image')
   String? get profileImage => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(includeFromJson: true, includeToJson: false)
+  String? get id => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,10 +62,14 @@ abstract class $UserModelCopyWith<$Res> {
       String email,
       String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
-      String? id,
-      String? profileImage,
+      @JsonKey(name: 'paid_seller') int paidSeller,
+      @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+      @JsonKey(name: 'country_id') String? countryId,
+      @JsonKey(name: 'state_id') String? stateId,
+      @JsonKey(name: 'profile_image') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
-      @JsonKey(name: 'updated_at') DateTime? updatedAt});
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(includeFromJson: true, includeToJson: false) String? id});
 }
 
 /// @nodoc
@@ -78,10 +91,14 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = null,
     Object? password = freezed,
     Object? phoneNumber = freezed,
-    Object? id = freezed,
+    Object? paidSeller = null,
+    Object? emailVerifiedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? id = freezed,
   }) {
     return _then(_value.copyWith(
       name: null == name
@@ -100,9 +117,21 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      id: freezed == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      paidSeller: null == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
               as String?,
       profileImage: freezed == profileImage
           ? _value.profileImage
@@ -116,6 +145,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -133,10 +166,14 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String email,
       String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
-      String? id,
-      String? profileImage,
+      @JsonKey(name: 'paid_seller') int paidSeller,
+      @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+      @JsonKey(name: 'country_id') String? countryId,
+      @JsonKey(name: 'state_id') String? stateId,
+      @JsonKey(name: 'profile_image') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
-      @JsonKey(name: 'updated_at') DateTime? updatedAt});
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(includeFromJson: true, includeToJson: false) String? id});
 }
 
 /// @nodoc
@@ -156,10 +193,14 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? password = freezed,
     Object? phoneNumber = freezed,
-    Object? id = freezed,
+    Object? paidSeller = null,
+    Object? emailVerifiedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? id = freezed,
   }) {
     return _then(_$UserModelImpl(
       name: null == name
@@ -178,9 +219,21 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      id: freezed == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
+      paidSeller: null == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
               as String?,
       profileImage: freezed == profileImage
           ? _value.profileImage
@@ -194,22 +247,32 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$UserModelImpl implements _UserModel {
+
+@JsonSerializable(explicitToJson: true)
+class _$UserModelImpl extends _UserModel {
   const _$UserModelImpl(
       {required this.name,
       required this.email,
-      required this.password,
+      this.password,
       @JsonKey(name: 'phone') this.phoneNumber,
-      this.id,
-      this.profileImage,
+      @JsonKey(name: 'paid_seller') required this.paidSeller,
+      @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
+      @JsonKey(name: 'country_id') this.countryId,
+      @JsonKey(name: 'state_id') this.stateId,
+      @JsonKey(name: 'profile_image') this.profileImage,
       @JsonKey(name: 'created_at') this.createdAt,
-      @JsonKey(name: 'updated_at') this.updatedAt});
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(includeFromJson: true, includeToJson: false) this.id})
+      : super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
@@ -223,10 +286,20 @@ class _$UserModelImpl implements _UserModel {
   @override
   @JsonKey(name: 'phone')
   final String? phoneNumber;
-// @JsonKey(name: 'device_name') required String deviceName,
   @override
-  final String? id;
+  @JsonKey(name: 'paid_seller')
+  final int paidSeller;
   @override
+  @JsonKey(name: 'email_verified_at')
+  final DateTime? emailVerifiedAt;
+  @override
+  @JsonKey(name: 'country_id')
+  final String? countryId;
+  @override
+  @JsonKey(name: 'state_id')
+  final String? stateId;
+  @override
+  @JsonKey(name: 'profile_image')
   final String? profileImage;
   @override
   @JsonKey(name: 'created_at')
@@ -234,10 +307,13 @@ class _$UserModelImpl implements _UserModel {
   @override
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
+  @override
+  @JsonKey(includeFromJson: true, includeToJson: false)
+  final String? id;
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, id: $id, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, paidSeller: $paidSeller, emailVerifiedAt: $emailVerifiedAt, countryId: $countryId, stateId: $stateId, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt, id: $id)';
   }
 
   @override
@@ -251,19 +327,38 @@ class _$UserModelImpl implements _UserModel {
                 other.password == password) &&
             (identical(other.phoneNumber, phoneNumber) ||
                 other.phoneNumber == phoneNumber) &&
-            (identical(other.id, id) || other.id == id) &&
+            (identical(other.paidSeller, paidSeller) ||
+                other.paidSeller == paidSeller) &&
+            (identical(other.emailVerifiedAt, emailVerifiedAt) ||
+                other.emailVerifiedAt == emailVerifiedAt) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
+            (identical(other.stateId, stateId) || other.stateId == stateId) &&
             (identical(other.profileImage, profileImage) ||
                 other.profileImage == profileImage) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.id, id) || other.id == id));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, name, email, password,
-      phoneNumber, id, profileImage, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      name,
+      email,
+      password,
+      phoneNumber,
+      paidSeller,
+      emailVerifiedAt,
+      countryId,
+      stateId,
+      profileImage,
+      createdAt,
+      updatedAt,
+      id);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -281,17 +376,22 @@ class _$UserModelImpl implements _UserModel {
   }
 }
 
-abstract class _UserModel implements UserModel {
+abstract class _UserModel extends UserModel {
   const factory _UserModel(
-          {required final String name,
-          required final String email,
-          required final String? password,
-          @JsonKey(name: 'phone') final String? phoneNumber,
-          final String? id,
-          final String? profileImage,
-          @JsonKey(name: 'created_at') final DateTime? createdAt,
-          @JsonKey(name: 'updated_at') final DateTime? updatedAt}) =
-      _$UserModelImpl;
+      {required final String name,
+      required final String email,
+      final String? password,
+      @JsonKey(name: 'phone') final String? phoneNumber,
+      @JsonKey(name: 'paid_seller') required final int paidSeller,
+      @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
+      @JsonKey(name: 'country_id') final String? countryId,
+      @JsonKey(name: 'state_id') final String? stateId,
+      @JsonKey(name: 'profile_image') final String? profileImage,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      @JsonKey(includeFromJson: true, includeToJson: false)
+      final String? id}) = _$UserModelImpl;
+  const _UserModel._() : super._();
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
@@ -304,11 +404,21 @@ abstract class _UserModel implements UserModel {
   String? get password;
   @override
   @JsonKey(name: 'phone')
-  String?
-      get phoneNumber; // @JsonKey(name: 'device_name') required String deviceName,
+  String? get phoneNumber;
   @override
-  String? get id;
+  @JsonKey(name: 'paid_seller')
+  int get paidSeller;
   @override
+  @JsonKey(name: 'email_verified_at')
+  DateTime? get emailVerifiedAt;
+  @override
+  @JsonKey(name: 'country_id')
+  String? get countryId;
+  @override
+  @JsonKey(name: 'state_id')
+  String? get stateId;
+  @override
+  @JsonKey(name: 'profile_image')
   String? get profileImage;
   @override
   @JsonKey(name: 'created_at')
@@ -316,6 +426,9 @@ abstract class _UserModel implements UserModel {
   @override
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
+  @override
+  @JsonKey(includeFromJson: true, includeToJson: false)
+  String? get id;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

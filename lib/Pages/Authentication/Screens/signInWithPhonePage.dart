@@ -26,9 +26,9 @@ class _SignInWithPhonePageState extends State<SignInWithPhonePage> {
   bool _isLoading = false;
   String? _errorMessage;
   String _countryCode = "+233"; // default to Ghana code
-  String _fullPhoneNumber = "";
+  // String _fullPhoneNumber = "";
 
-  Future<void> _handleSignUp() async {
+  Future<void> _handleSignIn() async {
     // validate phone number
     if(_phoneController.text.isEmpty){
       setState(()=>_errorMessage = "Please enter your phone number");
@@ -42,7 +42,7 @@ class _SignInWithPhonePageState extends State<SignInWithPhonePage> {
 
     try{
       // full phone number  with country code
-      _fullPhoneNumber = "$_countryCode${_phoneController.text}";
+      final _fullPhoneNumber = "$_countryCode${_phoneController.text}";
       Get.offNamed(
         RouteClass.getVerifyCodePage(),
         arguments: {
@@ -133,7 +133,7 @@ textColor: ColorGlobalVariables.redColor,
                                                SizedBox(
                                                 height: 20,
                                                ),
-                  CustomButton(buttonName: 'Sign In', onPressed: _handleSignUp, isLoading: _isLoading,),
+                  CustomButton(buttonName: 'Sign In', onPressed: _handleSignIn, isLoading: _isLoading,),
                   SizedBox(height: 20,),
                   
                   Row(
