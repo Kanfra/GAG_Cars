@@ -2,15 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- Location Permission Descriptions -->
+    <!-- ============ PRIVACY PERMISSIONS ============ -->
+    <!-- Location Permissions -->
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to location when open to provide location-based services.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>This app needs access to your location to provide location-based services.</string>
+    <string>This app needs access to your location to provide location-based services even when closed.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app needs access to your location to provide location-based services.</string>
+    <string>This app needs access to your location to provide background location services.</string>
     
-    <!-- Existing Configuration -->
+    <!-- Phone Call Permission -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Required for making phone calls to customer service</string>
+    
+    <!-- ============ APP CONFIGURATION ============ -->
     <key>CFBundleDisplayName</key>
     <string>Gag Cars Frontend</string>
     <key>CFBundleExecutable</key>
@@ -31,10 +36,63 @@
     <string>$(FLUTTER_BUILD_NUMBER)</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
+
+    <!-- ============ URL SCHEMES & QUERIES ============ -->
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <!-- Core Schemes -->
+        <string>tel</string>
+        <string>telprompt</string>  <!-- For better iOS call handling -->
+        <string>sms</string>
+        <string>mailto</string>
+        <string>http</string>
+        <string>https</string>
+        
+        <!-- Social Media Schemes -->
+        <string>whatsapp</string>
+        <string>fb</string>
+        <string>facebook</string>  <!-- Alternative FB scheme -->
+        <string>twitter</string>
+        <string>instagram</string>
+        
+        <!-- Maps & Navigation -->
+        <string>comgooglemaps</string>
+        <string>maps</string>
+    </array>
+
+    <!-- Enhanced Transport Security -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>gagcars.com</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSExceptionMinimumTLSVersion</key>
+                <string>TLSv1.2</string>
+            </dict>
+            <key>google.com</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSThirdPartyExceptionMinimumTLSVersion</key>
+                <string>TLSv1.2</string>
+            </dict>
+        </dict>
+    </dict>
+
+    <!-- ============ UI CONFIGURATION ============ -->
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>
     <key>UIMainStoryboardFile</key>
     <string>Main</string>
+    
+    <!-- Orientation Settings -->
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>
@@ -48,11 +106,21 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+    
+    <!-- Status Bar Configuration -->
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
+    
+    <!-- Performance Optimizations -->
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+    
+    <!-- Background Modes (if using background location) -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
 </dict>
 </plist>

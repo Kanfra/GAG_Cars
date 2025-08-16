@@ -1,21 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/auth_response_model.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
 
 class AuthService {
   static String get _tokenKey => dotenv.get('TOKEN_KEY');
@@ -76,7 +71,7 @@ class AuthService {
   static Future<void> deleteToken() async {
     final logger = Logger();
     try {
-      await _storage.delete(key: _tokenKey);
+      await _storage.delete(key: "auth_token");
     } catch (e) {
       logger.e('Error deleting token: $e');
       throw Exception('Failed to delete token');
@@ -133,15 +128,6 @@ class AuthService {
     }
   }
 
-  //  // Get token expiration date
-  // static DateTime? getTokenExpiration(String token) {
-  //   try {
-  //     return JwtDecoder.getExpirationDate(token);
-  //   } catch (e) {
-  //     print('Error getting token expiration: $e');
-  //     return null;
-  //   }
-  // }
 
   // // Get user ID from token
   // static String? getUserId(String token) {
@@ -460,10 +446,58 @@ static Future<void> resetPassword({
   // }
 
   // Logout
-  // static Future<void> logout() async {
-  //   await _storage.delete(key: _tokenKey);
-  //   await _storage.delete(key: _userKey);
-  // }
+  static Future<Map<String, dynamic>> logoutUser() async {
+    final logger = Logger();
+    final uri = Uri.parse("$baseApiUrl${ApiEndpoint.logoutUser}");
+    try{
+      // get token
+      final token = await _storage.read(key: 'auth_token');
+      final response = await http.post(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        }
+      );
+      if(response.statusCode == 200){
+        try{
+          // delete token from storage
+          await deleteToken();
+          logger.i("Token deleted successfully");
+          return {
+          "success": true,
+          "message": json.decode(response.body)['message'] ?? 'Logged out successfully'
+        };
+        }catch(e){
+          logger.e("Logout API succeeded but token deletion failed: $e");
+          return {
+            "success": false,
+            "message": "Logged out but failed to clear local data"
+          };
+        } 
+      } else if(response.statusCode == 401){
+        // if token is invalid, still attempt to delete it locally
+        await deleteToken().catchError((e){
+          logger.e("Failed to delete invalid token: $e");
+        });
+        return {
+          "success": false,
+          "message": json.decode(response.body)['message'] ?? 'Session expired'
+        };
+      } else {
+        return {
+          "success": false,
+          "message": "Server error during logout",
+        };
+      }
+    }catch(e){
+      logger.e("Logout process failed: $e");
+      return {
+        "succes": false,
+        "message": "Network error: ${e.toString()}"
+      };
+    }
+  }
 
 // Always verify token exists before use
 // Future<String?> getSafeToken() async {

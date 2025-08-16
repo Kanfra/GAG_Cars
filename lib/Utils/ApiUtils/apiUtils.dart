@@ -17,16 +17,23 @@ String get baseApiUrl {
 }
 
 // getImageUrl
-String getImageUrl(String? imagePath, String? defaultImagePath){
-  final logger = Logger();
-  if(imagePath == null || imagePath.isEmpty){
+String getImageUrl(String? imagePath, String? defaultImagePath) {
+  // Handle null or empty string cases
+  if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
     return defaultImagePath ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
   }
-  if(imagePath.startsWith("https://res.cloudinary.com")){
+
+  // Handle already complete URLs
+  if (imagePath.startsWith("http")) {
     return imagePath;
   }
-  final gagCarStorageImage = '${ApiEndpoint.baseImageUrl}$imagePath';
-  return gagCarStorageImage;
+
+  // Handle relative paths
+  if (!imagePath.startsWith("/")) {
+    imagePath = "/$imagePath";
+  }
+
+  return '${ApiEndpoint.baseImageUrl}$imagePath';
 }
 
 dynamic statusCodeResponse<T>({

@@ -1,13 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'dart:io';
 
 class CustomImage extends StatelessWidget {
   final double? imageWidth;
   final double? imageHeight;
   final Color? imageBackgroundColor;
   final bool isAssetImage;
+  final bool isFileImage; // New parameter
   final String imagePath;
+  final File? imageFile; // New parameter for direct file access
   final double? imageBorderRadius;
   final Widget? placeholder;
   final Widget? errorWidget;
@@ -23,7 +26,9 @@ class CustomImage extends StatelessWidget {
     this.imageHeight,
     this.imageBackgroundColor,
     required this.imagePath,
-    required this.isAssetImage,
+    this.isAssetImage = false,
+    this.isFileImage = false, // Default false
+    this.imageFile, // Optional file
     required this.isImageBorderRadiusRequired,
     this.imageBorderRadius,
     this.placeholder,
@@ -34,7 +39,9 @@ class CustomImage extends StatelessWidget {
     this.shimmerBaseColor,
     this.shimmerHighlightColor,
     super.key,
-  });
+  }) : assert(
+          !(isAssetImage && isFileImage),
+          'Cannot be both asset and file image');
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +60,10 @@ class CustomImage extends StatelessWidget {
   }
 
   Widget _buildImageContent() {
+    if (isFileImage && imageFile != null) {
+      return _buildFileImage();
+    }
+
     if (imagePath.isEmpty) {
       return errorWidget ?? _defaultErrorWidget();
     }
@@ -70,42 +81,58 @@ class CustomImage extends StatelessWidget {
           },
         );
       } else {
-        if (useCache) {
-          return CachedNetworkImage(
-            imageUrl: imagePath,
-            width: imageWidth,
-            height: imageHeight,
-            fit: fit ?? BoxFit.cover,
-            placeholder: (context, url) => 
-                placeholder ?? _defaultPlaceholder(),
-            errorWidget: (context, url, error) {
-              debugPrint('Failed to load network image: $url, $error');
-              return errorWidget ?? _defaultErrorWidget();
-            },
-            memCacheWidth: imageWidth?.toInt(),
-            memCacheHeight: imageHeight?.toInt(),
-            fadeInDuration: const Duration(milliseconds: 300),
-          );
-        } else {
-          return Image.network(
-            imagePath,
-            fit: fit ?? BoxFit.cover,
-            width: imageWidth,
-            height: imageHeight,
-            loadingBuilder: (_, child, progress) {
-              if (progress == null) return child;
-              return placeholder ?? _defaultPlaceholder();
-            },
-            errorBuilder: (_, __, ___) {
-              debugPrint('Failed to load network image: $imagePath');
-              return errorWidget ?? _defaultErrorWidget();
-            },
-          );
-        }
+        return _buildNetworkImage();
       }
     } catch (e) {
       debugPrint('Image loading error: $e');
       return errorWidget ?? _defaultErrorWidget();
+    }
+  }
+
+  Widget _buildFileImage() {
+    return Image.file(
+      imageFile!,
+      fit: fit ?? BoxFit.cover,
+      width: imageWidth,
+      height: imageHeight,
+      errorBuilder: (_, __, ___) {
+        debugPrint('Failed to load file image');
+        return errorWidget ?? _defaultErrorWidget();
+      },
+    );
+  }
+
+  Widget _buildNetworkImage() {
+    if (useCache) {
+      return CachedNetworkImage(
+        imageUrl: imagePath,
+        width: imageWidth,
+        height: imageHeight,
+        fit: fit ?? BoxFit.cover,
+        placeholder: (context, url) => placeholder ?? _defaultPlaceholder(),
+        errorWidget: (context, url, error) {
+          debugPrint('Failed to load network image: $url, $error');
+          return errorWidget ?? _defaultErrorWidget();
+        },
+        memCacheWidth: imageWidth?.toInt(),
+        memCacheHeight: imageHeight?.toInt(),
+        fadeInDuration: const Duration(milliseconds: 300),
+      );
+    } else {
+      return Image.network(
+        imagePath,
+        fit: fit ?? BoxFit.cover,
+        width: imageWidth,
+        height: imageHeight,
+        loadingBuilder: (_, child, progress) {
+          if (progress == null) return child;
+          return placeholder ?? _defaultPlaceholder();
+        },
+        errorBuilder: (_, __, ___) {
+          debugPrint('Failed to load network image: $imagePath');
+          return errorWidget ?? _defaultErrorWidget();
+        },
+      );
     }
   }
 

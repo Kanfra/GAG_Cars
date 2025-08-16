@@ -17,4 +17,5 @@ class ApiEndpoint{
   
   static const String resetPassword = '/reset-password';
   static const String sendResetPasswordOtp = '/send-reset-password-otp';
+  static const String logoutUser = "/auth/logout";
 }

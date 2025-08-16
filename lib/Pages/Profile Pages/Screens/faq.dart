@@ -8,102 +8,167 @@ class Faq extends StatefulWidget {
 }
 
 class _FaqState extends State<Faq> {
-  int selectedIndex = 0;
+  int selectedCategoryIndex = 0;
+  final List<int> _expandedQuestionIndices = [];
+
+  final List<String> categories = ["General", "Account", "Payment"];
+  
+  final Map<String, List<Map<String, String>>> faqs = {
+    "General": [
+      {
+        "question": "What is GAG Cars?",
+        "answer": "GAG Cars is a premium vehicle marketplace connecting buyers and sellers of quality automobiles. We provide a seamless platform to browse, compare, and purchase vehicles with confidence."
+      },
+      {
+        "question": "How to use GAG Cars app?",
+        "answer": "Simply download the app, create an account, and start browsing vehicles. You can save favorites, compare models, and contact sellers directly through our secure messaging system."
+      },
+      {
+        "question": "Is GAG Cars available in my country?",
+        "answer": "We currently operate in multiple countries across Africa. Check our website for the most up-to-date list of supported regions."
+      }
+    ],
+    "Account": [
+      {
+        "question": "How do I create an account?",
+        "answer": "Tap the 'Sign Up' button and follow the prompts. You'll need a valid email address or phone number to verify your account."
+      },
+      {
+        "question": "How do I reset my password?",
+        "answer": "On the login screen, tap 'Forgot Password' and follow the instructions sent to your registered email."
+      }
+    ],
+    "Payment": [
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all major credit cards, bank transfers, and several mobile payment options depending on your region."
+      },
+      {
+        "question": "Is my payment information secure?",
+        "answer": "Absolutely. We use industry-standard encryption and never store your full payment details on our servers."
+      }
+    ]
+  };
+
+  bool _isExpanded(int index) => _expandedQuestionIndices.contains(index);
+
+  void _toggleExpansion(int index) {
+    setState(() {
+      if (_isExpanded(index)) {
+        _expandedQuestionIndices.remove(index);
+      } else {
+        _expandedQuestionIndices.add(index);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Container(
-          padding: const EdgeInsets.all(25.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(3, (index) {
-                    final titles = ["General", "Account", "Payment"];
-                    final isSelected = selectedIndex == index;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final currentFaqs = faqs[categories[selectedCategoryIndex]]!;
 
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF8B0000) : Colors.transparent,
-                          border: Border.all(color: Colors.black, width: 1),
-                          borderRadius: BorderRadius.circular(20),
+    return Scaffold(
+      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+            sliver: SliverToBoxAdapter(
+              child: Text(
+                'Frequently Asked Questions',
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            sliver: SliverToBoxAdapter(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(categories.length, (index) {
+                    final isSelected = selectedCategoryIndex == index;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: ChoiceChip(
+                        label: Text(categories[index]),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          setState(() {
+                            selectedCategoryIndex = index;
+                            _expandedQuestionIndices.clear();
+                          });
+                        },
+                        selectedColor: theme.primaryColor,
+                        labelStyle: TextStyle(
+                          color: isSelected ? Colors.white : theme.textTheme.bodyLarge?.color,
                         ),
-                        child: Text(
-                          titles[index],
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : Colors.black,
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                     );
                   }),
                 ),
-                const SizedBox(height: 30,),
-                Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(
-                    minHeight: 200,
-                  ),
-                  padding: const EdgeInsets.all(10.00),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFE0E0E0),
-                    borderRadius: BorderRadius.circular(10)
-                  ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("What is GAG cars?",
-                        style: TextStyle(fontWeight: FontWeight.bold,
-                            fontSize: 18
-                        ),
-                      ),
-                      SizedBox(height: 15,),
-                      Divider(height: 1,thickness: 1,),
-                      SizedBox(height: 30,),
-                      Text(
-                        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
-                            'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. '
-                    ,)
-
-
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 25,),
-                Container(
-                  width: double.infinity,
-                  constraints: const BoxConstraints(
-                    minHeight: 50,
-                  ),
-                  padding: const EdgeInsets.all(10.00),
-                  decoration: BoxDecoration(
-                       color: const Color(0xFFE0E0E0),
-                      borderRadius: BorderRadius.circular(10)
-                  ),
-                  child:  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                         const Text("How To Use GAG cars app?",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                          GestureDetector(child: const Icon(Icons.keyboard_arrow_down_outlined,size: 25,weight: double.infinity,))
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final faq = currentFaqs[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      color: isDarkMode ? Colors.grey[800] : Colors.white,
+                      child: ExpansionTile(
+                        initiallyExpanded: _isExpanded(index),
+                        onExpansionChanged: (_) => _toggleExpansion(index),
+                        tilePadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                        title: Text(
+                          faq["question"]!,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        trailing: Icon(
+                          _isExpanded(index)
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          color: theme.primaryColor,
+                        ),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                            child: Text(
+                              faq["answer"]!,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: isDarkMode 
+                                    ? Colors.grey[300] 
+                                    : Colors.grey[700],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                childCount: currentFaqs.length,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
