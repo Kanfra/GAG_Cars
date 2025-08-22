@@ -26,6 +26,8 @@ class CustomTextFormField extends StatelessWidget {
   final Color? enabledBorderColor;
   final Color? focusedBorderColor;
   final Color? cursorColor;
+  final double? borderRadius;
+  final double? borderWidth;
 
   const CustomTextFormField({
     required this.obscureText,
@@ -34,6 +36,8 @@ class CustomTextFormField extends StatelessWidget {
     this.enabledBorderColor,
     this.focusedBorderColor,
     this.cursorColor,
+    this.borderWidth,
+    this.borderRadius,
     this.textInputType,
     required this.hintText,
     this.hintTextColor,
@@ -79,31 +83,31 @@ class CustomTextFormField extends StatelessWidget {
           fillColor: fillColor ?? ColorGlobalVariables.textFieldColor.withOpacity(SizeGlobalVariables.zero_point_nine_nine),
           filled: ColorGlobalVariables.trueValue,
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: enabledBorderColor ?? ColorGlobalVariables.greenColor.withOpacity(SizeGlobalVariables.point_one),
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: focusedBorderColor ?? ColorGlobalVariables.greenColor,
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: ColorGlobalVariables.redColor,
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular( borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: ColorGlobalVariables.redColor,
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           errorStyle: TextStyle(
@@ -138,7 +142,7 @@ class CustomTextFormField extends StatelessWidget {
             vertical: fieldHeight ?? SizeGlobalVariables.double_size_ten, // Adjust vertical padding
             horizontal: SizeGlobalVariables.double_size_ten,
           ),
-          fillColor: ColorGlobalVariables.textFieldColor,
+          fillColor: fillColor ?? ColorGlobalVariables.textFieldColor,
           filled: ColorGlobalVariables.trueValue,
           prefixIcon: isPrefixIconRequired ? Icon(
             prefixIconData,
@@ -155,24 +159,24 @@ class CustomTextFormField extends StatelessWidget {
               ),
             ) : null,
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: enabledBorderColor ?? ColorGlobalVariables.greenColor.withOpacity(SizeGlobalVariables.point_one),
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular( borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: ColorGlobalVariables.redColor,
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular( borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: ColorGlobalVariables.redColor,
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           errorStyle: TextStyle(
@@ -180,10 +184,10 @@ class CustomTextFormField extends StatelessWidget {
               fontSize: SizeGlobalVariables.double_size_fourteen,
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(SizeGlobalVariables.double_size_eight),
+            borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
               color: focusedBorderColor ?? ColorGlobalVariables.greenColor,
-              width: SizeGlobalVariables.one_point_two,
+              width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
           hintText: hintText,

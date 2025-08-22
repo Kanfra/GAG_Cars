@@ -248,8 +248,9 @@ VehicleMake _$VehicleMakeFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VehicleMake {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
   int? get userId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
@@ -278,8 +279,8 @@ abstract class $VehicleMakeCopyWith<$Res> {
       _$VehicleMakeCopyWithImpl<$Res, VehicleMake>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') int? userId,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
       String name,
       String slug,
       String? image,
@@ -358,8 +359,8 @@ abstract class _$$VehicleMakeImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') int? userId,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
       String name,
       String slug,
       String? image,
@@ -431,8 +432,8 @@ class __$$VehicleMakeImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$VehicleMakeImpl implements _VehicleMake {
   const _$VehicleMakeImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
+      {@JsonKey(fromJson: _parseInt) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) this.userId,
       required this.name,
       required this.slug,
       this.image,
@@ -445,9 +446,10 @@ class _$VehicleMakeImpl implements _VehicleMake {
       _$$VehicleMakeImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
   final int? userId;
   @override
   final String name;
@@ -515,8 +517,8 @@ class _$VehicleMakeImpl implements _VehicleMake {
 
 abstract class _VehicleMake implements VehicleMake {
   const factory _VehicleMake(
-      {required final int id,
-      @JsonKey(name: 'user_id') final int? userId,
+      {@JsonKey(fromJson: _parseInt) required final int id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) final int? userId,
       required final String name,
       required final String slug,
       final String? image,
@@ -529,9 +531,10 @@ abstract class _VehicleMake implements VehicleMake {
       _$VehicleMakeImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
   int? get userId;
   @override
   String get name;
@@ -563,8 +566,9 @@ VehicleModel _$VehicleModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VehicleModel {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   int get makeId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
@@ -590,8 +594,8 @@ abstract class $VehicleModelCopyWith<$Res> {
       _$VehicleModelCopyWithImpl<$Res, VehicleModel>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'brand_id') int makeId,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int makeId,
       String name,
       String slug,
       @JsonKey(name: 'created_at') DateTime createdAt,
@@ -658,8 +662,8 @@ abstract class _$$VehicleModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'brand_id') int makeId,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int makeId,
       String name,
       String slug,
       @JsonKey(name: 'created_at') DateTime createdAt,
@@ -719,8 +723,8 @@ class __$$VehicleModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$VehicleModelImpl implements _VehicleModel {
   const _$VehicleModelImpl(
-      {required this.id,
-      @JsonKey(name: 'brand_id') required this.makeId,
+      {@JsonKey(fromJson: _parseInt) required this.id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) required this.makeId,
       required this.name,
       required this.slug,
       @JsonKey(name: 'created_at') required this.createdAt,
@@ -730,9 +734,10 @@ class _$VehicleModelImpl implements _VehicleModel {
       _$$VehicleModelImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   final int makeId;
   @override
   final String name;
@@ -788,21 +793,22 @@ class _$VehicleModelImpl implements _VehicleModel {
 
 abstract class _VehicleModel implements VehicleModel {
   const factory _VehicleModel(
-          {required final int id,
-          @JsonKey(name: 'brand_id') required final int makeId,
-          required final String name,
-          required final String slug,
-          @JsonKey(name: 'created_at') required final DateTime createdAt,
-          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
-      _$VehicleModelImpl;
+      {@JsonKey(fromJson: _parseInt) required final int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) required final int makeId,
+      required final String name,
+      required final String slug,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at')
+      required final DateTime updatedAt}) = _$VehicleModelImpl;
 
   factory _VehicleModel.fromJson(Map<String, dynamic> json) =
       _$VehicleModelImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   int get makeId;
   @override
   String get name;
@@ -1035,16 +1041,19 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationMeta {
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseInt)
   int get currentPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
   int get from => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseInt)
   int get lastPage => throw _privateConstructorUsedError;
   List<PaginationLink> get links => throw _privateConstructorUsedError;
   String get path => throw _privateConstructorUsedError;
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseInt)
   int get perPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
   int get to => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
   int get total => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMeta to a JSON map.
@@ -1064,14 +1073,14 @@ abstract class $PaginationMetaCopyWith<$Res> {
       _$PaginationMetaCopyWithImpl<$Res, PaginationMeta>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int from,
-      @JsonKey(name: 'last_page') int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
+      @JsonKey(fromJson: _parseInt) int from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
       List<PaginationLink> links,
       String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int to,
-      int total});
+      @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
+      @JsonKey(fromJson: _parseInt) int to,
+      @JsonKey(fromJson: _parseInt) int total});
 }
 
 /// @nodoc
@@ -1144,14 +1153,14 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int from,
-      @JsonKey(name: 'last_page') int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
+      @JsonKey(fromJson: _parseInt) int from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
       List<PaginationLink> links,
       String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int to,
-      int total});
+      @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
+      @JsonKey(fromJson: _parseInt) int to,
+      @JsonKey(fromJson: _parseInt) int total});
 }
 
 /// @nodoc
@@ -1217,26 +1226,28 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaginationMetaImpl implements _PaginationMeta {
   const _$PaginationMetaImpl(
-      {@JsonKey(name: 'current_page') required this.currentPage,
-      required this.from,
-      @JsonKey(name: 'last_page') required this.lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt)
+      required this.currentPage,
+      @JsonKey(fromJson: _parseInt) required this.from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) required this.lastPage,
       required final List<PaginationLink> links,
       required this.path,
-      @JsonKey(name: 'per_page') required this.perPage,
-      required this.to,
-      required this.total})
+      @JsonKey(name: 'per_page', fromJson: _parseInt) required this.perPage,
+      @JsonKey(fromJson: _parseInt) required this.to,
+      @JsonKey(fromJson: _parseInt) required this.total})
       : _links = links;
 
   factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaImplFromJson(json);
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseInt)
   final int currentPage;
   @override
+  @JsonKey(fromJson: _parseInt)
   final int from;
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseInt)
   final int lastPage;
   final List<PaginationLink> _links;
   @override
@@ -1249,11 +1260,13 @@ class _$PaginationMetaImpl implements _PaginationMeta {
   @override
   final String path;
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseInt)
   final int perPage;
   @override
+  @JsonKey(fromJson: _parseInt)
   final int to;
   @override
+  @JsonKey(fromJson: _parseInt)
   final int total;
 
   @override
@@ -1302,36 +1315,43 @@ class _$PaginationMetaImpl implements _PaginationMeta {
 
 abstract class _PaginationMeta implements PaginationMeta {
   const factory _PaginationMeta(
-      {@JsonKey(name: 'current_page') required final int currentPage,
-      required final int from,
-      @JsonKey(name: 'last_page') required final int lastPage,
-      required final List<PaginationLink> links,
-      required final String path,
-      @JsonKey(name: 'per_page') required final int perPage,
-      required final int to,
-      required final int total}) = _$PaginationMetaImpl;
+          {@JsonKey(name: 'current_page', fromJson: _parseInt)
+          required final int currentPage,
+          @JsonKey(fromJson: _parseInt) required final int from,
+          @JsonKey(name: 'last_page', fromJson: _parseInt)
+          required final int lastPage,
+          required final List<PaginationLink> links,
+          required final String path,
+          @JsonKey(name: 'per_page', fromJson: _parseInt)
+          required final int perPage,
+          @JsonKey(fromJson: _parseInt) required final int to,
+          @JsonKey(fromJson: _parseInt) required final int total}) =
+      _$PaginationMetaImpl;
 
   factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaImpl.fromJson;
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseInt)
   int get currentPage;
   @override
+  @JsonKey(fromJson: _parseInt)
   int get from;
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseInt)
   int get lastPage;
   @override
   List<PaginationLink> get links;
   @override
   String get path;
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseInt)
   int get perPage;
   @override
+  @JsonKey(fromJson: _parseInt)
   int get to;
   @override
+  @JsonKey(fromJson: _parseInt)
   int get total;
 
   /// Create a copy of PaginationMeta

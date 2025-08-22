@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 part 'makeAndModelModel.freezed.dart';
 part 'makeAndModelModel.g.dart';
@@ -19,8 +18,8 @@ class MakeAndModelResponse with _$MakeAndModelResponse {
 @freezed
 class VehicleMake with _$VehicleMake {
   const factory VehicleMake({
-    required int id,
-    @JsonKey(name: 'user_id') int? userId,
+    @JsonKey(fromJson: _parseInt) required int id,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
     required String name,
     required String slug,
     String? image,
@@ -36,8 +35,8 @@ class VehicleMake with _$VehicleMake {
 @freezed
 class VehicleModel with _$VehicleModel {
   const factory VehicleModel({
-    required int id,
-    @JsonKey(name: 'brand_id') required int makeId,
+    @JsonKey(fromJson: _parseInt) required int id,
+    @JsonKey(name: 'brand_id', fromJson: _parseInt) required int makeId,
     required String name,
     required String slug,
     @JsonKey(name: 'created_at') required DateTime createdAt,
@@ -64,14 +63,14 @@ class PaginationLinks with _$PaginationLinks {
 @freezed
 class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
-    @JsonKey(name: 'current_page') required int currentPage,
-    required int from,
-    @JsonKey(name: 'last_page') required int lastPage,
+    @JsonKey(name: 'current_page', fromJson: _parseInt) required int currentPage,
+    @JsonKey(fromJson: _parseInt) required int from,
+    @JsonKey(name: 'last_page', fromJson: _parseInt) required int lastPage,
     required List<PaginationLink> links,
     required String path,
-    @JsonKey(name: 'per_page') required int perPage,
-    required int to,
-    required int total,
+    @JsonKey(name: 'per_page', fromJson: _parseInt) required int perPage,
+    @JsonKey(fromJson: _parseInt) required int to,
+    @JsonKey(fromJson: _parseInt) required int total,
   }) = _PaginationMeta;
 
   factory PaginationMeta.fromJson(Map<String, dynamic> json) =>
@@ -88,4 +87,15 @@ class PaginationLink with _$PaginationLink {
 
   factory PaginationLink.fromJson(Map<String, dynamic> json) =>
       _$PaginationLinkFromJson(json);
+}
+
+// Fixed helper function
+int _parseInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value) ?? 0;
+  if (value is num) return value.toInt();
+  
+  // Fallback for any unexpected type
+  return 0;
 }

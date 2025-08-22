@@ -26,8 +26,8 @@ Map<String, dynamic> _$$MakeAndModelResponseImplToJson(
 
 _$VehicleMakeImpl _$$VehicleMakeImplFromJson(Map<String, dynamic> json) =>
     _$VehicleMakeImpl(
-      id: (json['id'] as num).toInt(),
-      userId: (json['user_id'] as num?)?.toInt(),
+      id: _parseInt(json['id']),
+      userId: _parseInt(json['user_id']),
       name: json['name'] as String,
       slug: json['slug'] as String,
       image: json['image'] as String?,
@@ -52,8 +52,8 @@ Map<String, dynamic> _$$VehicleMakeImplToJson(_$VehicleMakeImpl instance) =>
 
 _$VehicleModelImpl _$$VehicleModelImplFromJson(Map<String, dynamic> json) =>
     _$VehicleModelImpl(
-      id: (json['id'] as num).toInt(),
-      makeId: (json['brand_id'] as num).toInt(),
+      id: _parseInt(json['id']),
+      makeId: _parseInt(json['brand_id']),
       name: json['name'] as String,
       slug: json['slug'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -90,16 +90,16 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
 
 _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
     _$PaginationMetaImpl(
-      currentPage: (json['current_page'] as num).toInt(),
-      from: (json['from'] as num).toInt(),
-      lastPage: (json['last_page'] as num).toInt(),
+      currentPage: _parseInt(json['current_page']),
+      from: _parseInt(json['from']),
+      lastPage: _parseInt(json['last_page']),
       links: (json['links'] as List<dynamic>)
           .map((e) => PaginationLink.fromJson(e as Map<String, dynamic>))
           .toList(),
       path: json['path'] as String,
-      perPage: (json['per_page'] as num).toInt(),
-      to: (json['to'] as num).toInt(),
-      total: (json['total'] as num).toInt(),
+      perPage: _parseInt(json['per_page']),
+      to: _parseInt(json['to']),
+      total: _parseInt(json['total']),
     );
 
 Map<String, dynamic> _$$PaginationMetaImplToJson(

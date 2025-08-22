@@ -1,10 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
@@ -12,12 +8,9 @@ import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.da
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
-import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
-import '../../../GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
+// Import your custom components here...
 
 class ProfileUpdatePage extends StatefulWidget {
   const ProfileUpdatePage({super.key});
@@ -27,35 +20,29 @@ class ProfileUpdatePage extends StatefulWidget {
 }
 
 class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
-  // final TextEditingController nameController = TextEditingController() ;
-  // final TextEditingController phoneController = TextEditingController() ;
-  // final TextEditingController emailController = TextEditingController() ;
-  
-  // values to work with
   String? name;
   String? phoneNumber;
   String? email;
   String? profileImage;
   String joinedDate = "Not available";
-
   final ImagePicker _picker = ImagePicker();
   File? _pendingProfileImage;
   String? _tempImagePath;
 
   @override
-  void dispose(){
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
+    _initializeUserData();
+  }
+
+  void _initializeUserData() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final UserModel? user = userProvider.user;
-    if(user?.createdAt != null){
-      joinedDate = "Joined: ${user!.createdAt!.toLocal().toString().split(' ')[0]}";
+    
+    if (user?.createdAt != null) {
+      joinedDate = "Joined ${user!.createdAt!.toLocal().toString().split(' ')[0]}";
     }
-    // set initial values for controllers and state
+
     setState(() {
       name = user?.name;
       phoneNumber = user?.phoneNumber;
@@ -64,208 +51,268 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     });
   }
 
+  Future<void> _updateProfileImage() async {
+    showImageSourceDialog(
+      picker: _picker,
+      setStateFunction: (pickedFile) {
+        setState(() {
+          _pendingProfileImage = File(pickedFile.path);
+          _tempImagePath = pickedFile.path;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return SafeArea(
-        child: Scaffold(
-          appBar: CustomAppbar(onLeadingIconClickFunction: (){
-            Get.back();
-          },
-              isLeadingWidgetExist: true,
-              leadingIconData: Icons.arrow_back_ios_new_outlined,
-              titleText: "Profile Update",
-              centerTitle: true,
-                      ),
-          body: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            width: size.width,
-            height: size.height,
-            child: Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                     crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Column(
-                              children: [
-                                const SizedBox(height: 15,),
-                                // container for stack
-                                GestureDetector(
-                                  onTap: () => showImageSourceDialog(
-                                    picker: _picker, 
-                                    setStateFunction: (pickedFile){
-                                      setState(() {
-                                        _pendingProfileImage = File(pickedFile.path);
-                                        _tempImagePath = pickedFile.path;
-                                        // _pendingProfileImage = imageFile;
-                                      });
-                                    }
-                                    ),
-                                  child: SizedBox(
-                                    width: 105,
-                                    height: 110,
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        CustomImage(
-                                          imagePath: _tempImagePath ?? getImageUrl("$profileImage", "${ImageStringGlobalVariables.imagePath}gordon_image_temporary.png"), 
-                                          // profileImage == null ? "assets/images/gordon_image_temporary.png", 
-                                          imageFile: _pendingProfileImage,
-                                          isAssetImage: _pendingProfileImage == null && profileImage == null,
-                                          isFileImage: _pendingProfileImage != null,                                      imageHeight: 100,
-                                          imageWidth: 100,
-                                          imageBorderRadius: 50,
-                                          isImageBorderRadiusRequired: true,
-                                          ),
-                                        Positioned(
-                                          top: 4,
-                                          right: 0, // Adjusted to avoid overflow
-                                          child: GestureDetector(
-                                            onTap: () {},
-                                            child: Container(
-                                              padding: const EdgeInsets.all(2.0),
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.rectangle,
-                                                border: Border.all(
-                                                  color: ColorGlobalVariables.blackColor,
-                                                  width: 1,
-                                                ),
-                                                borderRadius: BorderRadius.circular(5),
-                                              ),
-                                              child: const Icon(
-                                                Icons.mode_edit_outline_outlined,
-                                                size: 18,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                // user name text
-                                TextSmall(
-                                  title: name!, 
-                                  fontWeight: FontWeight.w500, 
-                                  overflow: TextOverflow.ellipsis,
-                                  textColor: ColorGlobalVariables.blackColor,
-                                  ),
-                                const SizedBox(height: 2,),
-                                TextExtraSmall(
-                                  title: joinedDate, 
-                                  textColor: ColorGlobalVariables.blackColor
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                                
-                                
-                        const SizedBox(height: 30,),
-                        // name
-                        GestureDetector(
-                          onTap: () => showFieldInputDialog(
-                            fieldLabel: 'Name', 
-                            fieldName: 'Name', 
-                            fieldType: 'string', 
-                            selectedField: name!, 
-                            context: context, 
-                            setStateFunction: (value) { 
-                              setState(() {
-                                name = value;
-                              });
-                             }),
-                          child: TitleWithTextformfieldComponent(
-                            title: 'Name', 
-                            fontWeight: FontWeight.w500, 
-                            textColor: ColorGlobalVariables.blackColor, 
-                            obscureText: false, 
-                            textInputType: TextInputType.text,
-                            isTitleWithContainerWidgetRequired: true, 
-                            hintText:  name ?? "Guest User", 
-                            isSuffixIconRequired: false, 
-                            isPrefixIconRequired: false, 
-                            isFieldHeightRequired: false,
-                            ),
-                        ),
-                        const SizedBox(height: 20,),
-                        // phone number
-                        GestureDetector(
-                          onTap: () => showFieldInputDialog(
-                            fieldLabel: 'Phone Number', 
-                            fieldName: 'Phone Number', 
-                            fieldType: 'number', 
-                            selectedField: phoneNumber!, 
-                            context: context, 
-                            setStateFunction: (value){ 
-                              setState(() {
-                                phoneNumber = value;
-                              });
-                             }),
-                          child: TitleWithTextformfieldComponent(
-                            title: 'Phone Number', 
-                            fontWeight: FontWeight.w500, 
-                            textColor: ColorGlobalVariables.blackColor, 
-                            obscureText: false, 
-                            textInputType: TextInputType.text,
-                            isTitleWithContainerWidgetRequired: true, 
-                            hintText:  phoneNumber!, 
-                            isSuffixIconRequired: false, 
-                            isPrefixIconRequired: false, 
-                            isFieldHeightRequired: false,
-                            ),
-                        ),
-                        const SizedBox(height: 20,),
-                        // email
-                        GestureDetector(
-                          onTap: () => showFieldInputDialog(
-                            fieldLabel: 'Email', 
-                            fieldName: 'Email', 
-                            fieldType: 'string', 
-                            selectedField: email!, 
-                            context: context, 
-                            setStateFunction: (value) { 
-                              setState(() {
-                                email = value;
-                              });
-                             }),
-                          child: TitleWithTextformfieldComponent(
-                            title: 'Email', 
-                            fontWeight: FontWeight.w500, 
-                            textColor: ColorGlobalVariables.blackColor, 
-                            obscureText: false, 
-                            textInputType: TextInputType.text,
-                            isTitleWithContainerWidgetRequired: true, 
-                            hintText:  email!, 
-                            isSuffixIconRequired: false, 
-                            isPrefixIconRequired: false, 
-                            isFieldHeightRequired: false,
-                            ),
-                        ),
-                        const SizedBox(height: 20,),
-                      ],
-                    ),
+    return Scaffold(
+      backgroundColor: Colors.grey[40],
+      appBar: _buildAppBar(),
+      body: _buildProfileForm(),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+        onPressed: () => Get.back(),
+      ),
+      title: Text(
+        "Edit Profile",
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: ColorGlobalVariables.blackColor,
+        ),
+      ),
+      centerTitle: true,
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  Widget _buildProfileForm() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Column(
+        children: [
+          _buildProfileHeader(),
+          const SizedBox(height: 32),
+          _buildEditableField(
+            label: "Full Name",
+            value: name ?? "Guest User",
+            onTap: () => _showEditDialog("Name", name!, (value) => setState(() => name = value)),
+          ),
+          const SizedBox(height: 20),
+          _buildEditableField(
+            label: "Phone Number",
+            value: phoneNumber ?? "Not provided",
+            onTap: () => _showEditDialog("Phone Number", phoneNumber!, (value) => setState(() => phoneNumber = value)),
+          ),
+          const SizedBox(height: 20),
+          _buildEditableField(
+            label: "Email Address",
+            value: email ?? "Not provided",
+            onTap: () => _showEditDialog("Email", email!, (value) => setState(() => email = value)),
+          ),
+          const SizedBox(height: 40),
+          _buildUpdateButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                  width: 2,
+                ),
+              ),
+              child: ClipOval(
+                child: _pendingProfileImage != null
+                    ? Image.file(_pendingProfileImage!, fit: BoxFit.cover)
+                    : profileImage != null
+                        ? CustomImage(
+                            imagePath: getImageUrl(
+                              profileImage!, 
+                              "${ImageStringGlobalVariables.imagePath}gordon_image_temporary.png"),
+                            isAssetImage: false,
+                            imageHeight: 120,
+                            imageWidth: 120, isImageBorderRadiusRequired: false,
+                          )
+                        : Image.asset(
+                            "${ImageStringGlobalVariables.imagePath}gordon_image_temporary.png",
+                            fit: BoxFit.cover,
+                          ),
+              ),
+            ),
+            GestureDetector(
+              onTap: _updateProfileImage,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: ColorGlobalVariables.brownColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
                   ),
                 ),
-                // update button
-                CustomTextButton(buttonTextType: "Update",
-                    textTypeColor: ColorGlobalVariables.whiteColor,
-                    isFullButtonWidthRequired: true,
-                    buttonBackgroundColor: ColorGlobalVariables.brownColor,
-                    buttonVerticalPadding: 18,
-                    onClickFunction: () {  },
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 18,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Text(
+          name ?? "Guest User",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: ColorGlobalVariables.blackColor,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          joinedDate,
+          style: TextStyle(
+            fontSize: 12,
+            color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEditableField({
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+                    ),
                   ),
-                const SizedBox(height: 30,),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: ColorGlobalVariables.blackColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.edit_outlined,
+              size: 20,
+              color: ColorGlobalVariables.brownColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpdateButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          // Handle update logic
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorGlobalVariables.brownColor,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text(
+          "UPDATE PROFILE",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showEditDialog(
+    String fieldName,
+    String currentValue,
+    ValueChanged<String> onSave,
+  ) {
+    final controller = TextEditingController(text: currentValue);
+    
+    Get.dialog(
+      AlertDialog(
+        title: Text("Edit $fieldName"),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
           ),
-        )
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              onSave(controller.text);
+              Get.back();
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
     );
   }
 }

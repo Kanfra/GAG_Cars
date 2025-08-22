@@ -16,6 +16,7 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
   final TextAlign? textAlign;
   final TextDecoration? textDecoration;
   final Color? textDecorationColor;
+  final double? iconSize;
 
   // for customtextformfield
   final bool obscureText;
@@ -40,6 +41,10 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
   final Color? enabledBorderColor;
   final Color? focusedBorderColor;
   final Color? cursorColor;
+  final Color? borderColor;
+  final Color? backgroundColor;
+  final double? borderRadius;
+  final double? borderWidth;
 
   // isTitleWithContainerWidgetRequired
   final bool isTitleWithContainerWidgetRequired;
@@ -54,10 +59,13 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
     required this.fontWeight,
     this.overflow,
     required this.textColor,
+    this.borderColor,
     this.textSize,
+    this.borderRadius,
     this.textAlign,
     this.textDecoration,
     this.textDecorationColor,
+    this.backgroundColor,
 
     required this.obscureText,
     required this.isTitleWithContainerWidgetRequired,
@@ -69,6 +77,7 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
     this.validatorFunction,
     this.onSuffixIconClickFunction,
     this.focusNode,
+    this.borderWidth,
     required this.hintText,
     this.prefixIconData,
     this.suffixIconData,
@@ -77,6 +86,7 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
     this.hintTextColor,
     required this.isFieldHeightRequired,
     this.fieldWidth,
+    this.iconSize,
     this.fieldHeight,
     this.maxLines,
     this.minLines,
@@ -111,23 +121,25 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
           child: Container(
                     width: fieldWidth,
                     padding: EdgeInsets.symmetric(
-                      horizontal: 5, 
+                      horizontal: 10, 
                       vertical: fieldHeight ?? 15
                       ),
                     decoration: BoxDecoration(
-                      color: ColorGlobalVariables.textFieldColor.withOpacity(0.99),
-                      borderRadius: BorderRadius.circular(8),
+                      color: backgroundColor ??ColorGlobalVariables.textFieldColor.withOpacity(0.99),
+                      borderRadius: BorderRadius.circular( borderRadius ?? 8),
                       border: Border.all(
-                        color: ColorGlobalVariables.greenColor,
-                        width: 0.2,
+                        color: borderColor ?? ColorGlobalVariables.greenColor,
+                        width: borderWidth ?? 0.2,
                       )
                     ),
                     child: Row(
                       children: [
+                        // const SizedBox(width: ,)
                         // icon 
                         isIconAtFrontRequiredOfContainerWidgetRequired ? CustomIcon(
                           iconData: iconData ?? Icons.location_on, 
                           isFaIcon: false, 
+                          iconSize: iconSize,
                           iconColor: iconColor ?? ColorGlobalVariables.fadedBlackColor,
                           ) : const SizedBox(),
                         isIconAtFrontRequiredOfContainerWidgetRequired ? const SizedBox(width: 8,) : const SizedBox(),
@@ -152,6 +164,7 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
           onSuffixIconClickFunction: onSuffixIconClickFunction,
           focusNode: focusNode,
           hintText: hintText,
+          borderWidth: borderWidth,
           prefixIconData: prefixIconData,
           suffixIconData: suffixIconData,
           isSuffixIconRequired: isSuffixIconRequired,

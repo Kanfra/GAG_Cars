@@ -434,7 +434,7 @@ class _PostItemPageState extends State<PostItemPage> {
         // setState(() {
         //   getFields = field;
         // });
-        // logger.i("Get item fields from api: $getFields");
+      // logger.i("Get item fields from api: $getFields");
         return TitleWithTextformfieldComponent(
           title: field!.label,
           hintText: (field.options == null || field.options!.isEmpty) ? (field.label.toLowerCase().trim() == "color" ? _colorController.text : field.label.toLowerCase().trim() == "year" ? year.toString() : selectedFields[field.name] ?? "Select ${field.label}") : selectedFields[field.name] ?? "Select ${field.label}",
