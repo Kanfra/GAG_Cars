@@ -5,6 +5,7 @@ class ApiEndpoint{
   // auth
   static const String verifyOtp = "/otp/verify";
   static const String authenticateUser = "/user"; // verifies token to keep user logged in
+  static const String updateProfile = "/update-profile";
 
   // homepage
   static const String items = "/items";

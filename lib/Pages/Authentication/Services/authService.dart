@@ -5,7 +5,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/auth_response_model.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
@@ -140,7 +142,7 @@ class AuthService {
   //   }
   // }
 
-  // Sign up with Phone
+  // Sign up with Phone - done
   static Future<AuthResponseModel> signInWithPhone({
     required String phone
   }) async {
@@ -192,7 +194,7 @@ class AuthService {
     }
   }
 
-  // Sign up with email
+  // Sign up with email 
   static Future<AuthResponseModel?> signUpWithEmail({
     required String name,
     required String email,
@@ -255,7 +257,7 @@ class AuthService {
 
   // sign in with email
   // auth_service.dart
-// Login with Email
+// Login with Email 
   static Future<AuthResponseModel> logInWithEmail({
     required String email,
     required String password,
@@ -304,7 +306,7 @@ class AuthService {
     }
   }
 
-
+// send otp - done
 static Future<bool> sendOtp(
   String phone, 
   String email, 
@@ -445,7 +447,7 @@ static Future<void> resetPassword({
   //   return await _storage.read(key: _tokenKey);
   // }
 
-  // Logout
+  // Logout- done
   static Future<Map<String, dynamic>> logoutUser() async {
     final logger = Logger();
     final uri = Uri.parse("$baseApiUrl${ApiEndpoint.logoutUser}");
@@ -499,13 +501,71 @@ static Future<void> resetPassword({
     }
   }
 
-// Always verify token exists before use
-// Future<String?> getSafeToken() async {
-//   final token = await _storage.read(key: _tokenKey);
-//   if (token == null) {
-//     await _redirectToLogin();
-//     return null;
-//   }
-//   return token;
-// }
+
+  // upload image to cloudinary
+  
+  // update user profile
+  static Future<UserModel> updateUserProfile({
+    required UserModel currentUser,
+    File? profileImage,
+    String? userName,
+    String? phoneNumber,
+    String? email,
+  }) async {
+    final logger = Logger();
+    const endpoint = ApiEndpoint.updateProfile; 
+    final url = Uri.parse('$baseApiUrl$endpoint');
+    const storage = FlutterSecureStorage();
+    try {
+      // first upload the cloudinary if new image exist
+      String? profileImageUrl;
+      if(profileImage != null){
+        final oldImageUrl = currentUser.profileImage;
+        
+        profileImageUrl = await CloudinaryService.uploadImage(
+          profileImage,
+          oldImageUrl: oldImageUrl,
+        ); 
+      }
+      // get auth token
+      final token = await _storage.read(key: 'auth_token');
+      logger.w('Token upon update user profile: $token');
+      if(token == null){
+        throw Exception('User not authenticated');
+      }
+
+      // prepare request body
+      final Map<String, dynamic> requestBody = {};
+      if(userName != null) requestBody['name'] = userName;
+      if(phoneNumber != null) requestBody['phone'] = phoneNumber;
+      if(email != null) requestBody['email'] = email;
+      if(profileImageUrl != null) requestBody['profileImage'] = profileImageUrl;
+
+      // make api request
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      // handle response
+      if(response.statusCode == 200){
+        final responseData = jsonDecode(response.body);
+        logger.i('Response body at update user profile: ${response.body}');
+        return UserModel.fromJson(responseData['user']);
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to update profile');
+      }
+    } catch(e){
+      logger.e('Profile update failed: $e');
+      rethrow;
+    }
+  }
+
+
 }
