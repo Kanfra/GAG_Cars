@@ -17,7 +17,7 @@ class UserModel with _$UserModel {
     @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
     @JsonKey(name: 'country_id') String? countryId,
     @JsonKey(name: 'state_id') String? stateId,
-    @JsonKey(name: 'profile_image') String? profileImage,
+    @JsonKey(name: 'profile_photo') String? profileImage,  // Changed JSON key to 'profile_photo'
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     @JsonKey(includeFromJson: true, includeToJson: false) String? id,

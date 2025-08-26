@@ -539,8 +539,9 @@ static Future<void> resetPassword({
       if(userName != null) requestBody['name'] = userName;
       if(phoneNumber != null) requestBody['phone'] = phoneNumber;
       if(email != null) requestBody['email'] = email;
-      if(profileImageUrl != null) requestBody['profileImage'] = profileImageUrl;
-
+      if(profileImageUrl != null) requestBody['profile_photo'] = profileImageUrl;
+      // request body before api request
+      logger.w("requestBody before api request: $requestBody");
       // make api request
       final response = await http.post(
         url,
@@ -555,7 +556,7 @@ static Future<void> resetPassword({
       // handle response
       if(response.statusCode == 200){
         final responseData = jsonDecode(response.body);
-        logger.i('Response body at update user profile: ${response.body}');
+        logger.i('Response body after update user profile: ${response.body}');
         return UserModel.fromJson(responseData['user']);
       } else {
         final errorData = jsonDecode(response.body);

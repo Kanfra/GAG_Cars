@@ -18,7 +18,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['email_verified_at'] as String),
       countryId: json['country_id'] as String?,
       stateId: json['state_id'] as String?,
-      profileImage: json['profile_image'] as String?,
+      profileImage: json['profile_photo'] as String?,
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -38,7 +38,7 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'email_verified_at': instance.emailVerifiedAt?.toIso8601String(),
       'country_id': instance.countryId,
       'state_id': instance.stateId,
-      'profile_image': instance.profileImage,
+      'profile_photo': instance.profileImage,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
     };

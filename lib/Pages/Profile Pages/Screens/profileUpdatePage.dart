@@ -162,7 +162,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         final user = userProvider.user;
         
         return Scaffold(
-          backgroundColor: Colors.grey[40],
+          backgroundColor: Colors.grey[100],
           appBar: _buildAppBar(),
           body: Stack(
             children: [
@@ -274,7 +274,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: ColorGlobalVariables.brownColor.withOpacity(0.2),
-                  width: 2,
+                  width: 1,
                 ),
               ),
               child: ClipOval(

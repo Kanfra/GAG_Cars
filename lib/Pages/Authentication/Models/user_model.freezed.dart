@@ -33,8 +33,9 @@ mixin _$UserModel {
   String? get countryId => throw _privateConstructorUsedError;
   @JsonKey(name: 'state_id')
   String? get stateId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'profile_image')
-  String? get profileImage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_photo')
+  String? get profileImage =>
+      throw _privateConstructorUsedError; // Changed JSON key to 'profile_photo'
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -66,7 +67,7 @@ abstract class $UserModelCopyWith<$Res> {
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
       @JsonKey(name: 'country_id') String? countryId,
       @JsonKey(name: 'state_id') String? stateId,
-      @JsonKey(name: 'profile_image') String? profileImage,
+      @JsonKey(name: 'profile_photo') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
       @JsonKey(includeFromJson: true, includeToJson: false) String? id});
@@ -170,7 +171,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
       @JsonKey(name: 'country_id') String? countryId,
       @JsonKey(name: 'state_id') String? stateId,
-      @JsonKey(name: 'profile_image') String? profileImage,
+      @JsonKey(name: 'profile_photo') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
       @JsonKey(includeFromJson: true, includeToJson: false) String? id});
@@ -268,7 +269,7 @@ class _$UserModelImpl extends _UserModel {
       @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
       @JsonKey(name: 'country_id') this.countryId,
       @JsonKey(name: 'state_id') this.stateId,
-      @JsonKey(name: 'profile_image') this.profileImage,
+      @JsonKey(name: 'profile_photo') this.profileImage,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       @JsonKey(includeFromJson: true, includeToJson: false) this.id})
@@ -299,8 +300,9 @@ class _$UserModelImpl extends _UserModel {
   @JsonKey(name: 'state_id')
   final String? stateId;
   @override
-  @JsonKey(name: 'profile_image')
+  @JsonKey(name: 'profile_photo')
   final String? profileImage;
+// Changed JSON key to 'profile_photo'
   @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
@@ -386,7 +388,7 @@ abstract class _UserModel extends UserModel {
       @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
       @JsonKey(name: 'country_id') final String? countryId,
       @JsonKey(name: 'state_id') final String? stateId,
-      @JsonKey(name: 'profile_image') final String? profileImage,
+      @JsonKey(name: 'profile_photo') final String? profileImage,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
       @JsonKey(includeFromJson: true, includeToJson: false)
@@ -418,8 +420,8 @@ abstract class _UserModel extends UserModel {
   @JsonKey(name: 'state_id')
   String? get stateId;
   @override
-  @JsonKey(name: 'profile_image')
-  String? get profileImage;
+  @JsonKey(name: 'profile_photo')
+  String? get profileImage; // Changed JSON key to 'profile_photo'
   @override
   @JsonKey(name: 'created_at')
   DateTime? get createdAt;
