@@ -19,24 +19,32 @@ class HomeProvider with ChangeNotifier {
   bool get hasMoreRecommended => _hasMoreRecommended;
 
   Future<void> loadMoreRecommended() async {
-    if(_isLoadingMore || !_hasMoreRecommended) return;
+    if (_isLoadingMore || !_hasMoreRecommended) return;
 
+    print("Loading more items... Page: ${_recommendedPage + 1}");
     _isLoadingMore = true;
     notifyListeners();
 
-    try{
+    try {
       final newItems = await _homeService.fetchRecommended(page: _recommendedPage + 1);
-      if(newItems.isEmpty){
+      print("Received ${newItems.length} new items");
+      
+      if (newItems.isEmpty) {
+        print("No more items available");
         _hasMoreRecommended = false;
-      } else{
-        final newIds = newItems.map((e) => e.id).toSet();
-        _recommendedItems.removeWhere((item) => newIds.contains(item.id));
-        _recommendedItems.addAll(newItems);
+      } else {
+        print("Adding ${newItems.length} items to existing ${_recommendedItems.length}");
+        
+        // FIX: Create a new modifiable list instead of using addAll on unmodifiable list
+        _recommendedItems = [..._recommendedItems, ...newItems];
+        
         _recommendedPage++;
+        print("Total items now: ${_recommendedItems.length}");
       }
-    }catch(e){
+    } catch (e) {
+      print("Error loading more items: $e");
       logger.e("Failed to load more recommended, error: $e");
-    } finally{
+    } finally {
       _isLoadingMore = false;
       notifyListeners();
     }
@@ -66,7 +74,6 @@ class HomeProvider with ChangeNotifier {
     _recommendedPage = 1;
     _hasMoreRecommended = true;
 
-
     _isLoading = true;
     _errorMessage = '';
     _hasError = false;
@@ -82,7 +89,10 @@ class HomeProvider with ChangeNotifier {
 
       _trendingMakes = results[0] as List<TrendingMake>;
       _specialOffers = results[1] as List<SpecialOffer>;
-      _recommendedItems = results[2] as List<RecommendedItem>;
+      
+      // FIX: Ensure recommendedItems is a modifiable list
+      _recommendedItems = List<RecommendedItem>.from(results[2] as List<RecommendedItem>);
+      
       _categories = results[3] as List<Categories>;
 
     } on FormatException catch (e, stackTrace) {

@@ -320,7 +320,9 @@ Future<T> fetchApiData<T>({
     };
 
     final response = await http.get(uri, headers: requestHeaders);
-    logger.i("response: ${response.body}");
+    logger.i("Response status: ${response.statusCode}");
+    logger.i("Response body: ${response.body}");
+    
     if (response.statusCode >= 200 && response.statusCode < 300) {
       try {
         final responseBody = response.body;
@@ -330,10 +332,18 @@ Future<T> fetchApiData<T>({
 
         final decodedJson = json.decode(responseBody);
         
-        // Handle both Map and List responses
-        final jsonData = decodedJson is Map<String, dynamic>
-            ? decodedJson
-            : {'data': decodedJson};
+        // Handle different response formats properly
+        Map<String, dynamic> jsonData;
+        
+        if (decodedJson is Map<String, dynamic>) {
+          // If it's already a map, use it directly
+          jsonData = decodedJson;
+        } else if (decodedJson is List) {
+          // If it's a list, wrap it in a 'data' key (common API pattern)
+          jsonData = {'data': decodedJson};
+        } else {
+          throw FormatException('Unexpected response format: ${decodedJson.runtimeType}');
+        }
 
         logger.i("Successfully parsed response from $uri");
         return fromJson(jsonData);

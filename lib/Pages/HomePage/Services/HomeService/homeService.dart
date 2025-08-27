@@ -42,10 +42,13 @@ class HomeService {
     int page = 1,
     int perPage = 10
     }) async {
+    final logger = Logger();
+    logger.w("Fetching recommended page $page with $perPage items");
     final response = await fetchApiData(
       endpoint: "${ApiEndpoint.items}?page=$page&per_page=$perPage", 
       fromJson: (json) => RecommendedResponse.fromJson(json),
       );
+      logger.w("API response: ${response.data.length} items");
       return response.data;
   }
 

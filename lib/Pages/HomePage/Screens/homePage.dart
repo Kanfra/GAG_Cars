@@ -24,7 +24,7 @@ import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -36,60 +36,47 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   final TextEditingController searchEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Timer? _loadMoreDebouncer;
-   SfRangeValues _priceRange = const SfRangeValues(700, 2000);
-
- 
+  SfRangeValues _priceRange = const SfRangeValues(700, 2000);
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadData();
     });
   }
 
-  void _scrollListener(){
+  void _scrollListener() {
     final provider = Provider.of<HomeProvider>(context, listen: false);
-    // calculate scroll position(90% threshold)
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    final thresholdReached = currentScroll > (maxScroll * 0.9);
-
-  // / Conditions to load more:
-  // 1. Scrolled past threshold
-  // 2. Not already loading
-  // 3. More items available
-  if(thresholdReached && !provider.isLoadingMore && provider.hasMoreRecommended){
-    // optional: add debouncing
-    _loadMoreDebouncer?.cancel();
-    _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), (){
-      provider.loadMoreRecommended();
-    });
-  }
+    
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 100 &&
+        !provider.isLoadingMore &&
+        provider.hasMoreRecommended) {
+      
+      _loadMoreDebouncer?.cancel();
+      _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), () {
+        provider.loadMoreRecommended();
+      });
+    }
   }
 
-
-
-  // for top circular refresh widget
   Future<void> _loadData() async {
-    // final logger = Logger();
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     await homeProvider.fetchAllData();
   }
 
-  // for top circular refresh widget
   void _onRefresh() async {
     await _loadData();
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_scrollListener); // clean up
+    _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     _loadMoreDebouncer?.cancel();
     super.dispose();
@@ -101,859 +88,897 @@ class _HomePageState extends State<HomePage> {
     final homeProvider = Provider.of<HomeProvider>(context);
 
     return Scaffold(
-      appBar: CustomAppbar(
-        onLeadingIconClickFunction: (){}, 
-        isLeadingWidgetExist: ColorGlobalVariables.trueValue, 
-        leadingIconData: FontAwesomeIcons.bars, 
-        leadingIconSize: 18,
-        leadingButtonSize: 35,
-        appbarBackgroundColor: Colors.white,
-        titleText: "GAGcars",
-        elevation: 10,
-        titleTextColor: ColorGlobalVariables.redColor,
-        centerTitle: ColorGlobalVariables.trueValue,
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(FontAwesomeIcons.bars, size: 20, color: Colors.black87),
+          onPressed: () {},
+        ),
+        title: Text(
+          "GAGcars",
+          style: TextStyle(
+            color: ColorGlobalVariables.redColor,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
         actions: [
-          const SizedBox(width: 5,),
-          // globe icon button
-          CustomRoundIconButton(
-            iconData: FontAwesomeIcons.globe, 
-            buttonSize: 35,
-            iconSize: 18,
-            isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
-            onIconButtonClickFunction: (){
-              Get.toNamed(RouteClass.newsBlogPage);
-            }
-            ),
-          const SizedBox(width: 3,),
-          // bell notification icon
+          IconButton(
+            icon: Icon(FontAwesomeIcons.globe, size: 20, color: Colors.black54),
+            onPressed: () => Get.toNamed(RouteClass.newsBlogPage),
+          ),
           Stack(
             children: [
-              CustomRoundIconButton(
-                iconData: Icons.notifications, 
-                iconSize: 18,
-                buttonSize: 35,
-                isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
-                onIconButtonClickFunction: (){
-                  Get.toNamed(RouteClass.notificationsPage);
-                }
-                ),
+              IconButton(
+                icon: Icon(Icons.notifications, size: 22, color: Colors.black54),
+                onPressed: () => Get.toNamed(RouteClass.notificationsPage),
+              ),
               Positioned(
-                right: 2,
-                top: 3,
+                right: 8,
+                top: 8,
                 child: Container(
-                  padding: EdgeInsets.all(2),
+                  width: 8,
+                  height: 8,
                   decoration: BoxDecoration(
-                    color: Colors.red, // Dot color
+                    color: Colors.red,
                     shape: BoxShape.circle,
                   ),
-                  constraints: BoxConstraints(
-                    minWidth: 8,
-                    minHeight: 8,
-                  ),
                 ),
               ),
             ],
           ),
-          //CustomRoundIconButton(iconData: iconData, isBorderSlightlyCurved: isBorderSlightlyCurved, onIconButtonClickFunction: onIconButtonClickFunction)
-          const SizedBox(width: 5,),
+          SizedBox(width: 8),
         ],
-        ),
+      ),
       body: SafeArea(
-        child: homeProvider.isLoading ? const Center(child: CircularProgressIndicator(),) 
-        : homeProvider.errorMessage.isNotEmpty ? Center(child: Text(homeProvider.errorMessage)) : RefreshIndicator(
-          onRefresh: _loadData,
-        child: _buildContent(screenSize, homeProvider)), 
-        ),
-      );
+        child: homeProvider.isLoading 
+            ? _buildLoadingState()
+            : homeProvider.errorMessage.isNotEmpty 
+                ? _buildErrorState(homeProvider)
+                : RefreshIndicator(
+                    onRefresh: _loadData,
+                    child: _buildContent(screenSize, homeProvider),
+                  ),
+      ),
+    );
   }
 
-  Widget _buildContent(Size screenSize, HomeProvider homeProvider){
-    return Container(
-          color: Colors.white,
-          width: screenSize.width,
-          height: screenSize.height,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10,),
-              // search textformfield
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15,),
-                child: CustomTextFormField(
-                  obscureText: ColorGlobalVariables.falseValue, 
-                  textInputType: TextInputType.text, 
-                  hintText: 'Search', 
-                  cursorColor: ColorGlobalVariables.fadedBlackColor,
-                  fillColor: ColorGlobalVariables.textFieldColor,
-                  enabledBorderColor: ColorGlobalVariables.textFieldDeeperShadeColor,
-                  focusedBorderColor: ColorGlobalVariables.textFieldDeeperShadeColor,
-                  prefixIconData: Icons.search,
-                  fieldWidth: double.infinity,
-                  fieldHeight: 14,
-                  suffixIconData: FontAwesomeIcons.sliders,
-                  onSuffixIconClickFunction: () => showFilterBottomSheet(
-                    context: context, 
-                    widget: FilterBottomSheetContent(
-                      priceRange: _priceRange,
-                      onPriceRangeChanged: (newRange) {
-                        setState(() => _priceRange = newRange);
-                      },
-                    ),
-                    ),
-                   
-                  isSuffixIconRequired: ColorGlobalVariables.trueValue, 
-                  isPrefixIconRequired: ColorGlobalVariables.trueValue, 
-                  editingController: searchEditingController, 
-                  isFieldHeightRequired: ColorGlobalVariables.falseValue,
-                  ),
-              ),
-              const SizedBox(height: 5,),
-              // scrollability starts from here
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // column for trending makes
-                      // row for trending makes and view all
-                      _buildTrendingMakes(homeProvider),
-                      const SizedBox(height: 15,),
-                      // column for special offers
-                      _buildSpecialOffers(homeProvider, screenSize),
-                      const SizedBox(height: 15,),
-                      // column for recommended
-                      _buildRecommended(homeProvider, screenSize),
-                    ],
-                    ),
-                ),
-              ),
-
-            ],
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading amazing cars...',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
             ),
-        );
+          ),
+        ],
+      ),
+    );
   }
 
-  // trending makes
-  Widget _buildTrendingMakes(HomeProvider homeProvider){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // title and view all 
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15,),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextMedium(
-                title: 'Trending Makes', 
-                fontWeight: FontWeight.w500, 
-                textColor: ColorGlobalVariables.blackColor,
+  Widget _buildErrorState(HomeProvider homeProvider) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          SizedBox(height: 16),
+          Text(
+            homeProvider.errorMessage,
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: homeProvider.retryFailedRequest,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorGlobalVariables.redColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text('Try Again', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(Size screenSize, HomeProvider homeProvider) {
+    return CustomScrollView(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        // Search Section
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: CustomTextFormField(
+                obscureText: false,
+                textInputType: TextInputType.text,
+                hintText: 'Search for cars, brands, or models...',
+                cursorColor: ColorGlobalVariables.redColor,
+                fillColor: Colors.white,
+                enabledBorderColor: Colors.transparent,
+                focusedBorderColor: ColorGlobalVariables.redColor,
+                prefixIconData: Icons.search,
+                fieldWidth: double.infinity,
+                fieldHeight: 16,
+                suffixIconData: FontAwesomeIcons.sliders,
+                onSuffixIconClickFunction: () => showFilterBottomSheet(
+                  context: context,
+                  widget: FilterBottomSheetContent(
+                    priceRange: _priceRange,
+                    onPriceRangeChanged: (newRange) {
+                      setState(() => _priceRange = newRange);
+                    },
+                  ),
                 ),
-              Links(
-                linkTextType: 'View All', 
-                linkTextColor: ColorGlobalVariables.blackColor, 
-                isTextSmall: ColorGlobalVariables.trueValue, 
-                textDecoration: TextDecoration.none,
-                linkFontWeight: FontWeight.w500,
-                isIconWidgetRequiredAtEnd: ColorGlobalVariables.falseValue, 
-                isIconWidgetRequiredAtFront: ColorGlobalVariables.falseValue, 
-                onClickFunction: (){
-                  Get.toNamed(
-                    RouteClass.getAllMakesPage(),
-                  );
-                }
-                ),
-                                
-            ],
+                isSuffixIconRequired: true,
+                isPrefixIconRequired: true,
+                editingController: searchEditingController,
+                isFieldHeightRequired: false,
+              ),
+            ),
           ),
         ),
-        const SizedBox(height: 3,),
-        // row for trending makes images
-        // if(homeProvider.trendingMakes.length > 4)
-          homeProvider.trendingMakes.length > 4 ? Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: homeProvider.trendingMakes.take(4).map((make) => CustomImage(
-              imagePath: getImageUrl(make.image, null), 
-              isAssetImage: ColorGlobalVariables.falseValue,
-              isImageBorderRadiusRequired: false,
-              imageWidth: 40,
-              imageHeight: 40,
-              ),)
-              .toList(),
-          ) : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: homeProvider.trendingMakes.map((make) => CustomImage(
-                  imagePath: getImageUrl(make.image, null), 
-                  isAssetImage: ColorGlobalVariables.falseValue,
-                  isImageBorderRadiusRequired: false,
-                  imageWidth: 40,
-                  imageHeight: 40,
-                  ),)
-                  .toList(),
-          ),
 
-          // to be deleted soon
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //   children: [
-        //     CustomImage(
-        //       imagePath: '${ImageStringGlobalVariables.imagePath}tesla_temporary.png', 
-        //       isAssetImage: ColorGlobalVariables.trueValue,
-        //       isImageBorderRadiusRequired: false,
-        //       imageWidth: 40,
-        //       imageHeight: 40,
-        //       ),
-        //     CustomImage(
-        //       imagePath: '${ImageStringGlobalVariables.imagePath}renault_temporary.png', 
-        //       isAssetImage: ColorGlobalVariables.trueValue,
-        //       isImageBorderRadiusRequired: false,
-        //       imageWidth: 40,
-        //       imageHeight: 40,
-        //       ),
-        //     CustomImage(
-        //       imagePath: '${ImageStringGlobalVariables.imagePath}mazda_temporary.png', 
-        //       isAssetImage: ColorGlobalVariables.trueValue,
-        //       isImageBorderRadiusRequired: false,
-        //       imageWidth: 40,
-        //       imageHeight: 40,
-        //       ),
-        //     CustomImage(
-        //       imagePath: '${ImageStringGlobalVariables.imagePath}nissan_temporary.png', 
-        //       isAssetImage: ColorGlobalVariables.trueValue,
-        //       isImageBorderRadiusRequired: false,
-        //       imageWidth: 40,
-        //       imageHeight: 40,
-        //       ),
-        //     CustomImage(
-        //       imagePath: '${ImageStringGlobalVariables.imagePath}jeep_temporary.png', 
-        //       isAssetImage: ColorGlobalVariables.trueValue,
-        //       isImageBorderRadiusRequired: false,
-        //       imageWidth: 40,
-        //       imageHeight: 40,
-        //       ),
-        //   ],
-        // ),
-        const SizedBox(height: 20),
-        // horizontal scroll for other container images
-        Container(
-          alignment: Alignment.center,
-          height: 92,
+        // Trending Makes Section
+        SliverToBoxAdapter(
+          child: _buildTrendingMakes(homeProvider),
+        ),
+
+        // Categories Section - ADDED THIS BACK
+        SliverToBoxAdapter(
+          child: _buildCategoriesSection(homeProvider),
+        ),
+
+        // Special Offers Section
+        SliverToBoxAdapter(
+          child: _buildSpecialOffers(homeProvider, screenSize),
+        ),
+
+        // Recommended Header
+        SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.only(top: 2, bottom: 2),
-            child: ListView.builder(
-              itemCount: homeProvider.categories.length,
-              // itemCount: trendingMakes.length, // to be deleted soon
-              shrinkWrap: ColorGlobalVariables.trueValue,
-              primary: ColorGlobalVariables.falseValue,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index){
-                // final trendingMake = trendingMakes[index];
-                final category = homeProvider.categories[index];
-                return GestureDetector(
-                  onTap: (){
-                    // Get.toNamed(
-                    //   RouteClass.getDetailPage(),
-                    // );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 1, bottom: 1, right: 12,),
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      //margin: const EdgeInsets.only(right: 12,),
-                      width: 90,
-                      height: 90,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey,
-                            spreadRadius: 0.1,
-                            blurRadius: 0.1,
-                            offset: Offset(0.1, 0.1)
-                          )
-                        ]
-                        // border: Border.all(
-                        //   color: ColorGlobalVariables.blackColor,
-                        //   width: 0.1
-                        // )
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          // icon type
-                          CustomIcon(
-                            iconData: _getIconForCategory(categoryName: category.name), 
-                            isFaIcon: false, 
-                            iconColor: ColorGlobalVariables.blackColor
-                            ),
-                          const SizedBox(height: 2,),
-                          TextSmall(
-                            title: category.name,
-                            // title: trendingMake["name"], // to be deleted
-                            fontWeight: FontWeight.normal, 
-                            textAlign: TextAlign.center,
-                            textColor: ColorGlobalVariables.blackColor,
-                            ),
-                        ],
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Recommended for You',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                Row(
+                  children: [
+                    CustomRoundIconButton(
+                      iconData: Icons.list,
+                      isBorderSlightlyCurved: true,
+                      onIconButtonClickFunction: () {},
+                      buttonSize: 36,
+                      iconSize: 16,
+                    ),
+                    SizedBox(width: 8),
+                    CustomRoundIconButton(
+                      iconData: Icons.grid_view,
+                      isBorderSlightlyCurved: true,
+                      onIconButtonClickFunction: () {},
+                      buttonSize: 36,
+                      iconSize: 16,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        // Recommended Grid
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.72,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final recommended = homeProvider.recommendedItems[index];
+                return _buildRecommendedItem(recommended, screenSize);
+              },
+              childCount: homeProvider.recommendedItems.length,
+            ),
+          ),
+        ),
+
+        // Loading More Indicator
+        SliverToBoxAdapter(
+          child: homeProvider.isLoadingMore
+              ? Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          ColorGlobalVariables.redColor),
+                    ),
+                  ),
+                )
+              : SizedBox.shrink(),
+        ),
+
+        // No More Items Message
+        SliverToBoxAdapter(
+          child: !homeProvider.hasMoreRecommended &&
+                  homeProvider.recommendedItems.isNotEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Center(
+                    child: Text(
+                      'You\'ve reached the end!',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                   ),
-                );
-              }
-              ),
-          ),
+                )
+              : SizedBox.shrink(),
         ),
-
       ],
     );
   }
 
-  // special offers
-  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize){
+  Widget _buildTrendingMakes(HomeProvider homeProvider) {
     return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15,),
-                child: TextMedium(
-                  title: 'Special Offers', 
-                  fontWeight: FontWeight.w500, 
-                  textColor: ColorGlobalVariables.blackColor
-                  ),
+              Text(
+                'Trending Brands',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
-              const SizedBox(height: 5,),
-              SizedBox(
-                height: 151,
-                child: ListView.builder(
-                  itemCount: homeProvider.specialOffers.length,
-                  // itemCount: specialOffers.length, // to be deleted soon
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: ColorGlobalVariables.trueValue,
-                  primary: ColorGlobalVariables.falseValue,
-                  itemBuilder: (context, index){
-                    final offer = homeProvider.specialOffers[index];
-                    final item = offer.item;
-                    final brand = item?.brand;
-                    // final category = item?.category;
-                    final firstImage = item!.images?.isNotEmpty == true ? item.images?.first : "car_placeholder.png";
-                    final brandImage = brand?.image;
-                    // final brandName = brand?.name;
-                    // final categoryName = category?.name;
-                    // final price = item?.price;
-                    final discount = offer.discount;
-                    // final description = offer.description;
-                    // final specialOffer = specialOffers[index]; // to be deleted soon
-                    return GestureDetector(
-                      onTap: (){
-                        Get.toNamed(
-                          RouteClass.getDetailPage(),
-                          arguments: {
-                            'product': offer is Map ? offer : offer.toJson(),
-                            'item': item is Map ? item : item.toJson(), // Pass the entire object
-                            'type': 'special_offer', // Optional: to identify the type in detail page
-                          },
+              Links(
+                linkTextType: 'View All',
+                linkTextColor: ColorGlobalVariables.redColor,
+                isTextSmall: true,
+                textDecoration: TextDecoration.none,
+                linkFontWeight: FontWeight.w600,
+                isIconWidgetRequiredAtEnd: false,
+                isIconWidgetRequiredAtFront: false,
+                onClickFunction: () {
+                  Get.toNamed(RouteClass.getAllMakesPage());
+                },
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 80,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            itemCount: homeProvider.trendingMakes.length,
+            itemBuilder: (context, index) {
+              final make = homeProvider.trendingMakes[index];
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 6),
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: CustomImage(
+                  imagePath: getImageUrl(make.image, null),
+                  isAssetImage: false,
+                  isImageBorderRadiusRequired: false,
+                  imageWidth: 56,
+                  imageHeight: 56,
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 24),
+      ],
+    );
+  }
 
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 1, bottom: 1, right: 15,),
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey,
-                                blurRadius: 0.1,
-                                spreadRadius: 0.1,
-                                offset: Offset(0.1, 0.1),
-                              )
+  // ADDED: Categories Section with horizontal listview cards
+  Widget _buildCategoriesSection(HomeProvider homeProvider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Text(
+            'Browse Categories',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            itemCount: homeProvider.categories.length,
+            itemBuilder: (context, index) {
+              final category = homeProvider.categories[index];
+              return GestureDetector(
+                onTap: () {
+                  // Navigate to category page or filter by category
+                  print('Category tapped: ${category.name}');
+                },
+                child: Container(
+                  width: 90,
+                  margin: EdgeInsets.symmetric(horizontal: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Category Icon
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: _getCategoryColor(category.name),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _getIconForCategory(categoryName: category.name),
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      // Category Name
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(
+                          category.name,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Text(
+            'Special Offers',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            itemCount: homeProvider.specialOffers.length,
+            itemBuilder: (context, index) {
+              final offer = homeProvider.specialOffers[index];
+              final item = offer.item;
+              final brand = item?.brand;
+              final firstImage = item!.images?.isNotEmpty == true
+                  ? item.images?.first
+                  : "car_placeholder.png";
+              final brandImage = brand?.image;
+              final discount = offer.discount;
+
+              return Container(
+                width: screenSize.width * 0.75,
+                margin: EdgeInsets.symmetric(horizontal: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Stack(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl: getImageUrl(firstImage, null),
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[200],
+                          child: Icon(Icons.error, color: Colors.grey[400]),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.8),
                             ],
                           ),
-                          child: Container(
-                            //padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 8),
-                            width: screenSize.width*0.7,
-                            height: 160,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black.withOpacity(0.6), // Darkens the bottom
-                                ],
-                                stops: [0.6, 1], 
-                              ),
-                              image: DecorationImage(
-                                image: CachedNetworkImageProvider(
-                                  getImageUrl(firstImage, null),
-                                  maxWidth: (screenSize.width * 0.7).toInt(), // Optimize for display size
-                                  maxHeight: 150.toInt(),
-                                ),
-                                fit: BoxFit.cover,
-                                opacity: 1,
-                                filterQuality: FilterQuality.medium,
-                                onError: (exception, stackTrace) {
-                                  debugPrint('Image load error: $exception');
-                                },
-                              ),
-                              // border: Border.all(
-                              //   color: ColorGlobalVariables.blackColor,
-                              //   width: 0.5
-                              // )
-                            ),
-                            child: Stack(
-                              children: [
-                                // discount section
-                                Positioned(
-                                  left: 0,
-                                  top: 5,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: ColorGlobalVariables.greyColor.withOpacity(0.5),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: TextSmall(
-                                      title: "${discount.toString()}% discount", 
-                                      fontWeight: FontWeight.w500, 
-                                      textColor: ColorGlobalVariables.blackColor
-                                      ),
-                                  ),
-                                  ),
-                                // other image logo
-                                if(brandImage != null) Positioned(
-                                  right: 8,
-                                  bottom: 8,
-                                  child: CustomImage(
-                                    imagePath: getImageUrl(brandImage, null), 
-                                    isAssetImage: ColorGlobalVariables.falseValue, 
-                                    isImageBorderRadiusRequired: ColorGlobalVariables.falseValue,
-                                    useShimmerEffect: ColorGlobalVariables.trueValue,
-                                    ),
-                                  ),
-                              ],
+                        ),
+                      ),
+                      Positioned(
+                        left: 12,
+                        top: 12,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: ColorGlobalVariables.redColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${discount.toString()}% OFF',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
-                    );
-                  }
+                      Positioned(
+                        left: 12,
+                        bottom: 12,
+                        right: 12,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (brandImage != null)
+                              Container(
+                                width: 32,
+                                height: 32,
+                                child: CachedNetworkImage(
+                                  imageUrl: getImageUrl(brandImage, null),
+                                  fit: BoxFit.contain,
+                                  errorWidget: (context, url, error) => Icon(
+                                    Icons.business,
+                                    size: 24,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            SizedBox(height: 8),
+                            Text(
+                              item.name ?? 'Special Offer',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Limited Time Offer',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-              ),
-            ],
-          );
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 24),
+      ],
+    );
   }
 
+  Widget _buildRecommendedItem(RecommendedItem recommended, Size screenSize) {
+    final firstImage = recommended.images?.isNotEmpty == true
+        ? recommended.images!.first
+        : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final brandImage = recommended.brand?.image;
 
- // recommended
- Widget _buildRecommended(HomeProvider homeProvider, Size screenSize){
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15,),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          RouteClass.getDetailPage(),
+          arguments: {
+            'product': recommended.toJson(),
+            'item': recommended.toJson(),
+            'type': 'recommended',
+          },
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextMedium(
-              title: 'Recommended', 
-              fontWeight: FontWeight.w500, 
-              textColor: ColorGlobalVariables.blackColor,
-              ),
-            Row(
+            // Image Section
+            Stack(
               children: [
-                // vertical position button
-                CustomRoundIconButton(
-                  iconData: Icons.list, 
-                  isBorderSlightlyCurved: ColorGlobalVariables.trueValue, 
-                  onIconButtonClickFunction: (){}
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  child: Container(
+                    height: 120,
+                    width: double.infinity,
+                    color: Colors.grey[100],
+                    child: _buildRecommendedImage(firstImage, recommended),
                   ),
-                const SizedBox(width: 3,),
-                // horizontal position button
-                CustomRoundIconButton(
-                  iconData: Icons.grid_view, 
-                  isBorderSlightlyCurved: ColorGlobalVariables.trueValue, 
-                  onIconButtonClickFunction: (){}
+                ),
+                
+                // Category Badge
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      recommended.category?.name ?? 'Car',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
+                ),
+                
+                // Wishlist Button
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () async {
+                      try {
+                        await Provider.of<WishlistToggleProvider>(context,
+                                listen: false)
+                            .toggleWishlistItem(itemId: recommended.id);
+                      } catch (e) {
+                        print('Wishlist error: $e');
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.favorite_border,
+                        size: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                ),
               ],
+            ),
+
+            // Content Section
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title and Condition
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          recommended.name ?? 'Unnamed Vehicle',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        recommended.condition ?? 'Used',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 8),
+
+                  // Price and Mileage
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommended.price ?? '0'))}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: ColorGlobalVariables.redColor,
+                        ),
+                      ),
+                      if (recommended.mileage != null)
+                        Row(
+                          children: [
+                            Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                            SizedBox(width: 4),
+                            Text(
+                              "${formatNumber(shortenerRequired: true, number: int.parse(recommended.mileage!))} km",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+
+                  SizedBox(height: 12),
+
+                  // Brand and Details
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (brandImage != null)
+                        Container(
+                          width: 24,
+                          height: 24,
+                          child: CachedNetworkImage(
+                            imageUrl: getImageUrl(brandImage, null),
+                            fit: BoxFit.contain,
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.business,
+                              size: 16,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        )
+                      else
+                        SizedBox(width: 24),
+                      
+                      if (recommended.transmission != null)
+                        Row(
+                          children: [
+                            Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                            SizedBox(width: 4),
+                            Text(
+                              recommended.transmission!,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      
+                      if (recommended.location != null)
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                              SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  recommended.location!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
-      const SizedBox(height: 5,),
-      //gridview builder here
-        GridView.builder(
-        controller: _scrollController,
-        padding: const EdgeInsets.all(8),
-        itemCount: homeProvider.recommendedItems.length,
-        shrinkWrap: ColorGlobalVariables.trueValue,
-        primary: ColorGlobalVariables.falseValue,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // 2 items per row
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-          childAspectRatio: 0.75, // Adjust based on your card's height
-        ),
-        itemBuilder: (context, index) {
-          // final recommended = recommendeds[index];
-          final recommended = homeProvider.recommendedItems[index];
-          final firstImage = recommended.images?.isNotEmpty == true
-          ? recommended.images!.first
-          : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-          final brandImage = recommended.brand?.image;
-          return GestureDetector(
-            onTap: (){
-              Get.toNamed(
-                          RouteClass.getDetailPage(),
-                          arguments: {
-                            'product': recommended is Map ? recommended : recommended.toJson(),
-                            'item': recommended is Map ? recommended : recommended.toJson(), // Pass the entire object
-                            'type': 'recommended', // Optional: to identify the type in detail page
-                          },
+    );
+  }
 
-                        );
-              Get.toNamed(
-                      RouteClass.getDetailPage(),
-                      arguments: {
-                        'item': recommended,
-                        'type': 'recommended',
-                      },
-                    );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              height: 245,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey,
-                    blurRadius: 0.1,
-                    spreadRadius: 0.1,
-                    offset: Offset(0.1, 0.1),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Stack(
-                    children: [
-                      CustomImage(
-                        imagePath: getImageUrl(firstImage, null), 
-                        isAssetImage: recommended.images?.isNotEmpty == true ? false : true, 
-                        isImageBorderRadiusRequired: true,
-                        imageBorderRadius: 8,
-                        imageBackgroundColor: index%2 == 0 ? ColorGlobalVariables.brownColor.withOpacity(0.2) : ColorGlobalVariables.greenColor.withOpacity(0.2),
-                        imageHeight: 120,
-                        useShimmerEffect: false,
-                        imageWidth: screenSize.width,
-                        fit: BoxFit.fill,
-                        ),
-                      // product type
-                      Positioned(
-                        top: 3, left: 4,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: ColorGlobalVariables.textFieldColor,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: RotatedBox(
-                            quarterTurns: 1,
-                            child: TextSmall(
-                              title: recommended.category?.name ?? 'Car', 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ),
-                        ),
-                      ),
-                    // liked icon
-                    Positioned(
-                      top: 3, right: 4,
-                      child: GestureDetector(
-                        onTap: () async {
-                          try {
-                            final success = await Provider.of<WishlistToggleProvider>(context, listen: false).toggleWishlistItem(itemId: recommended.id);
-                            // if(success){
-                            //   setState(() {
-                            //     isLiked = success;
-                            //   });
-                            // }
-                            // else{
-                            //   isLiked = success;
-                            // }
-                          } catch(e){
-
-                          }
-                        },
-                        child: CustomIcon(
-                          // iconData: recommended["isLiked"]  ? Icons.favorite : Icons.favorite_border_outlined, 
-                          iconData: Icons.favorite_border_outlined,
-                          isFaIcon: false, 
-                          iconSize: 25,
-                          iconColor: ColorGlobalVariables.fadedBlackColor,
-                          // iconColor: recommended["isLiked"] ? ColorGlobalVariables.redColor : ColorGlobalVariables.fadedBlackColor,
-                          ),
-                      ),
-                    ),
-                    ],
-                  ),
-                  const SizedBox(height: 8,),
-                  // row for product name and product nature
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: TextSmall(
-                          // title: recommended["productName"], 
-                          title: recommended.name! ,
-                          fontWeight: FontWeight.normal, 
-                          overflow: TextOverflow.ellipsis,
-                          textColor: ColorGlobalVariables.blackColor
-                          ),
-                      ),
-                      const SizedBox(width: 4,),
-                      TextSmall(
-                        // title: recommended["productNature"], 
-                        title: recommended.condition ?? 'Used',
-                        fontWeight: FontWeight.normal, 
-                        textColor: ColorGlobalVariables.blackColor
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 2,),
-                  // row for product cost  and milleage
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: TextMedium(
-                          title: 'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommended.price!))}', 
-                          fontWeight: FontWeight.w500, 
-                          textColor: ColorGlobalVariables.redColor,
-                          ),
-                      ),
-                      const SizedBox(width: 4,),
-                      if(recommended.mileage != null)
-                      Row(
-                        children: [
-                          CustomIcon(
-                            iconData: Icons.speed, 
-                            isFaIcon: false, 
-                            iconColor: ColorGlobalVariables.blackColor
-                            ),
-                          const SizedBox(width: 2,),
-                          TextSmall(
-                            title: "${formatNumber(shortenerRequired: true, number: recommended.mileage != null ? int.parse(recommended.mileage!) : 0)} km", 
-                            fontWeight: FontWeight.normal, 
-                            textColor: ColorGlobalVariables.blackColor
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12,),
-                  // row for product logo product, driveType and location
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // product logo
-                      brandImage != null 
-                      ?  CustomImage(
-                        imagePath: getImageUrl(brandImage, null), 
-                        isAssetImage: false, 
-                        useShimmerEffect: false,
-                        imageHeight: 25,
-                        imageWidth: 25,
-                        isImageBorderRadiusRequired: false
-                        ) : const SizedBox(width: 16,),
-                      const SizedBox(width: 5,),
-                      // row for icon and driveType
-                      if(recommended.transmission != null)
-                      Row(
-                        children: [
-                          CustomIcon(
-                            iconData: Icons.settings,
-                            isFaIcon: false, 
-                            iconSize: 16,
-                            iconColor: ColorGlobalVariables.blackColor
-                            ),
-                          const SizedBox(width: 1,),
-                          TextExtraSmall(
-                            title: recommended.transmission!, 
-                            fontWeight: FontWeight.normal, 
-                            textColor: ColorGlobalVariables.blackColor,
-                            ),
-                        ],
-                      ),
-                      const SizedBox(width: 5,),
-                      //row for icon and location
-                      if(recommended.location != null)
-                      Flexible(
-                        child: Row(
-                          children: [
-                            CustomIcon(
-                              iconData: Icons.location_on, 
-                              isFaIcon: false, 
-                              iconColor: ColorGlobalVariables.redColor
-                              ),
-                            const SizedBox(width: 1,),
-                            Flexible(
-                              child: TextExtraSmall(
-                                title: recommended.location!, 
-                                fontWeight: FontWeight.normal, 
-                                overflow: TextOverflow.ellipsis,
-                                textColor: ColorGlobalVariables.blackColor
-                                ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
+  Widget _buildRecommendedImage(String imageUrl, RecommendedItem recommended) {
+    final bool isAssetImage = recommended.images?.isNotEmpty != true;
+    
+    if (isAssetImage) {
+      return Image.asset(
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorPlaceholder();
+        },
+      );
+    } else {
+      final String fullImageUrl = getImageUrl(imageUrl, null);
+      
+      return CachedNetworkImage(
+        imageUrl: fullImageUrl,
+        fit: BoxFit.cover,
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Center(
+            child: CircularProgressIndicator(
+              value: downloadProgress.progress,
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
             ),
           );
         },
-      ),
-      
-    ],
-  );
- }
-
- // helper method to get icons for categories
- IconData _getIconForCategory({required String categoryName}){
-  switch(categoryName.toLowerCase()){
-    case 'parts & accessories': 
-      return Icons.construction;
-    case 'motocycle': 
-      return FontAwesomeIcons.motorcycle;
-    case 'agricultural machinery':
-      return Icons.agriculture;
-    case 'trucks':
-      return FontAwesomeIcons.truck;
-    default: 
-      return Icons.directions_car;
+        errorWidget: (context, url, error) {
+          return _buildImageErrorPlaceholder();
+        },
+      );
+    }
   }
- }
 
-  // List<Map<String, dynamic>> trendingMakes = [
-  //   {
-  //     "icon": Icons.construction,
-  //     "name": "Accessories & Parts"
-  //   },
-  //   {
-  //     "icon": FontAwesomeIcons.motorcycle,
-  //     "name": "Motorbikes"
-  //   },
-  //   {
-  //     "icon": Icons.agriculture,
-  //     "name": "Agricultural Machinery"
-  //   },
-  //   {
-  //     "icon": FontAwesomeIcons.truck,
-  //     "name": "Trucks"
-  //   },
-  // ];
+  Widget _buildImageErrorPlaceholder() {
+    return Container(
+      color: Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  // List<Map<String, dynamic>> specialOffers = [
-  //   {
-  //     "discount": 5,
-  //     "image": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
-  //     "logo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png"
-  //   },
-  //   {
-  //     "discount": 7,
-  //     "image": "${ImageStringGlobalVariables.imagePath}bmw_temporary.png",
-  //     "logo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png"
-  //   },
-  // ];
+  // Helper method to get colors for different categories
+  Color _getCategoryColor(String categoryName) {
+    switch (categoryName.toLowerCase()) {
+      case 'parts & accessories':
+        return Colors.blue;
+      case 'motocycle':
+        return Colors.orange;
+      case 'agricultural machinery':
+        return Colors.green;
+      case 'trucks':
+        return Colors.red;
+      default:
+        return ColorGlobalVariables.redColor;
+    }
+  }
 
-  // List<Map<String, dynamic>> recommendeds = [
-  //   {
-  //     "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
-  //     "productType": "featured",
-  //     "productNature": "New",
-  //     "isLiked": false,
-  //     "cost": "400,000",
-  //     "productName": "BMW 8 Series",
-  //     "mileage": 3,
-  //     "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-  //     "driveType": "Automatic",
-  //     "location": "Accra"
-  //   },
-  //    {
-  //     "productImage": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
-  //     "productType": "featured",
-  //     "productNature": "New",
-  //     "isLiked": true,
-  //     "cost": "600,000",
-  //     "productName": "Mercedes Benz GCL 300",
-  //     "mileage": 2,
-  //     "productLogo": "${ImageStringGlobalVariables.imagePath}mercedes_logo_temporary.png",
-  //     "driveType": "Automatic",
-  //     "location": "Accra"
-  //   },
-  //    {
-  //     "productImage": "${ImageStringGlobalVariables.imagePath}kollter_electric_motorbike_temporary.png",
-  //     "productType": "featured",
-  //     "productNature": "New",
-  //     "isLiked": true,
-  //     "cost": "400,000",
-  //     "productName": "BMW Bike",
-  //     "mileage": 2000,
-  //     "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-  //     "driveType": "Automatic",
-  //     "location": "Accra"
-  //   },
-  //    {
-  //     "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
-  //     "productType": "featured",
-  //     "productNature": "New",
-  //     "isLiked": true,
-  //     "cost": "170,000",
-  //     "productName": "Honda Civic Sport",
-  //     "mileage": 3,
-  //     "productLogo": "${ImageStringGlobalVariables.imagePath}honda_temporary.png",
-  //     "driveType": "Automatic",
-  //     "location": "Accra"
-  //   },
-  //    {
-  //     "productImage": "${ImageStringGlobalVariables.imagePath}ford_temporary.png",
-  //     "productType": "featured",
-  //     "productNature": "New",
-  //     "isLiked": true,
-  //     "cost": "400,000",
-  //     "productName": "Ford Ranger",
-  //     "mileage": 3,
-  //     "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-  //     "driveType": "Automatic",
-  //     "location": "Accra"
-  //   },
-  //    {
-  //     "productImage": "${ImageStringGlobalVariables.imagePath}driving_mirror_temporary.png",
-  //     "productType": "featured",
-  //     "productNature": "Used",
-  //     "isLiked": false,
-  //     "cost": "2,000",
-  //     "productName": "Corolla Side Mirror",
-  //     "mileage": 3,
-  //     "productLogo": "",
-  //     "driveType": "Automatic",
-  //     "location": "Accra"
-  //   }
-  // ];
+  IconData _getIconForCategory({required String categoryName}) {
+    switch (categoryName.toLowerCase()) {
+      case 'parts & accessories':
+        return Icons.construction;
+      case 'motocycle':
+        return FontAwesomeIcons.motorcycle;
+      case 'agricultural machinery':
+        return Icons.agriculture;
+      case 'trucks':
+        return FontAwesomeIcons.truck;
+      default:
+        return Icons.directions_car;
+    }
+  }
 }
