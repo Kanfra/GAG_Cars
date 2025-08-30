@@ -9,6 +9,7 @@ import 'package:logger/logger.dart';
 
 class HomeProvider with ChangeNotifier {
   final HomeService _homeService;
+  // for terminal logs
   final Logger logger = Logger();
 
   int _recommendedPage = 1;
@@ -18,31 +19,31 @@ class HomeProvider with ChangeNotifier {
   bool get isLoadingMore => _isLoadingMore;
   bool get hasMoreRecommended => _hasMoreRecommended;
 
+  // load more recommended items
   Future<void> loadMoreRecommended() async {
     if (_isLoadingMore || !_hasMoreRecommended) return;
 
-    print("Loading more items... Page: ${_recommendedPage + 1}");
+    logger.w("Loading more items... Page: ${_recommendedPage + 1}");
     _isLoadingMore = true;
     notifyListeners();
 
     try {
       final newItems = await _homeService.fetchRecommended(page: _recommendedPage + 1);
-      print("Received ${newItems.length} new items");
+      logger.w("Received ${newItems.length} new items");
       
       if (newItems.isEmpty) {
-        print("No more items available");
+        logger.w("No more items available");
         _hasMoreRecommended = false;
       } else {
-        print("Adding ${newItems.length} items to existing ${_recommendedItems.length}");
+        logger.w("Adding ${newItems.length} items to existing ${_recommendedItems.length}");
         
         // FIX: Create a new modifiable list instead of using addAll on unmodifiable list
         _recommendedItems = [..._recommendedItems, ...newItems];
         
         _recommendedPage++;
-        print("Total items now: ${_recommendedItems.length}");
+        logger.w("Total items now: ${_recommendedItems.length}");
       }
     } catch (e) {
-      print("Error loading more items: $e");
       logger.e("Failed to load more recommended, error: $e");
     } finally {
       _isLoadingMore = false;
@@ -135,7 +136,7 @@ class HomeProvider with ChangeNotifier {
 
   Future<void> retryFailedRequest() async {
     if (!_hasError) return;
-    await fetchAllData();
+    await fetchAllData(); 
   }
 
   void clearError() {

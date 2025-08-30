@@ -8,12 +8,11 @@ class ApiEndpoint{
   static const String updateProfile = "/update-profile";
 
   // homepage
-  static const String items = "/items";
+  static const String items = "/items"; // recommended items
   static const String brands = "/brands";  // makes and models
   static const String brandModel = "/brand-models";
   static const String specialOffers = "/special-offers";
   static const String myWishlist = "/my/wish-list";
-  // static const String recommended = "/items";  // /items
   static const String categories = "/categories";
   
   static const String resetPassword = '/reset-password';

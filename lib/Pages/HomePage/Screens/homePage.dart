@@ -99,7 +99,7 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           "GAGcars",
           style: TextStyle(
-            color: ColorGlobalVariables.redColor,
+            color: ColorGlobalVariables.brownColor,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
           ),
           SizedBox(height: 16),
           Text(
@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
           ElevatedButton(
             onPressed: homeProvider.retryFailedRequest,
             style: ElevatedButton.styleFrom(
-              backgroundColor: ColorGlobalVariables.redColor,
+              backgroundColor: ColorGlobalVariables.brownColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -220,10 +220,10 @@ class _HomePageState extends State<HomePage> {
                 obscureText: false,
                 textInputType: TextInputType.text,
                 hintText: 'Search for cars, brands, or models...',
-                cursorColor: ColorGlobalVariables.redColor,
+                cursorColor: ColorGlobalVariables.brownColor,
                 fillColor: Colors.white,
                 enabledBorderColor: Colors.transparent,
-                focusedBorderColor: ColorGlobalVariables.redColor,
+                focusedBorderColor: ColorGlobalVariables.brownColor,
                 prefixIconData: Icons.search,
                 fieldWidth: double.infinity,
                 fieldHeight: 16,
@@ -377,14 +377,20 @@ class _HomePageState extends State<HomePage> {
               ),
               Links(
                 linkTextType: 'View All',
-                linkTextColor: ColorGlobalVariables.redColor,
+                linkTextColor: ColorGlobalVariables.brownColor,
                 isTextSmall: true,
                 textDecoration: TextDecoration.none,
                 linkFontWeight: FontWeight.w600,
                 isIconWidgetRequiredAtEnd: false,
                 isIconWidgetRequiredAtFront: false,
                 onClickFunction: () {
-                  Get.toNamed(RouteClass.getAllMakesPage());
+                  Get.toNamed(
+                    RouteClass.getAllMakesPage(),
+                    arguments: {
+                      'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
+                      'type': 'brands'
+                    },
+                    );
                 },
               ),
             ],
