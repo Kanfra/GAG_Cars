@@ -326,11 +326,22 @@ class _HomePageState extends State<HomePage> {
               ? Padding(
                   padding: const EdgeInsets.all(24),
                   child: Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          ColorGlobalVariables.redColor),
-                    ),
-                  ),
+        child: Column(
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Loading more...',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
                 )
               : SizedBox.shrink(),
         ),
@@ -924,7 +935,7 @@ class _HomePageState extends State<HomePage> {
             child: CircularProgressIndicator(
               value: downloadProgress.progress,
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
             ),
           );
         },

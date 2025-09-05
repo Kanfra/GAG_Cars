@@ -79,6 +79,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
       home: SplashPage(),
+      // home: ListingDetailPage(),
       // home: PostItemPage(),
       // home: MainBottomNavigationPage(),
       getPages: RouteClass.routes,

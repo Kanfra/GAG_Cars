@@ -29,15 +29,20 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-class PostItemPage extends StatefulWidget {
-  const PostItemPage({super.key});
+class EditItemPage extends StatefulWidget {
+  final Map<String, dynamic> allJson;
+  const EditItemPage({
+    super.key,
+    required this.allJson,
+  });
 
   @override
-  State<PostItemPage> createState() => _PostItemPageState();
+  State<EditItemPage> createState() => _EditItemPageState();
 }
 
-class _PostItemPageState extends State<PostItemPage> {
+class _EditItemPageState extends State<EditItemPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final Map<String, dynamic> listing;
 
   // textformfield controllers
   final TextEditingController _priceController = TextEditingController();
@@ -73,13 +78,13 @@ class _PostItemPageState extends State<PostItemPage> {
   
   // page loading data from api
   bool _isLoading = false;
-  bool _isSelling = false;
+  bool _isUpdating = false;
 
   // for selected items from options
   Map<String?, dynamic> selectedFields = {};
 
-  // sell car function
-  Future<void> sellCarFunction() async {
+  // update car function
+  Future<void> updateCarFunction() async {
     if(_colorController.text.toString().trim().isNotEmpty){
       selectedFields['color'] = _colorController.text.toString().trim();
     }
@@ -92,15 +97,16 @@ class _PostItemPageState extends State<PostItemPage> {
 
     // converting XFiles to files before sending
     List<File> imageFiles = await Future.wait(
-      selectedImages.map((xFile) async => File(xFile.path))
+      selectedImages.where((xFile) => !xFile.path.startsWith('http')).map((xFile) async => File(xFile.path))
     );
     
     final requestBody = {
+      'id': listing['id'],
       'category_id': selectedCategory?.id,
       'brand_id': selectedMake?["id"],
       'brand_model_id': selectedModel?.id, 
       'name': _itemNameController.text.toString(),
-      'slug': createSlug(name: _itemNameController.text.toString().trim(), isUniqueRandomSlugRequiredOrTimestampSlug: ColorGlobalVariables.trueValue),
+      'slug': listing['slug'], // Keep the same slug for update
       ...normalizedFields,
       'location': selectedLocation,
       'price': _priceController.text.toString(),
@@ -109,11 +115,11 @@ class _PostItemPageState extends State<PostItemPage> {
       'images': imageFiles // sending List<File> instead of List<XFile>
     };
     
-    logger.i("Request body: $requestBody");
+    logger.i("Update request body: $requestBody");
     
-    await VehicleService.uploadVehicle(
-      requestBody: requestBody,
-    );
+    // await VehicleService.updateVehicle(
+    //   requestBody: requestBody,
+    // );
   }
 
   // form validation function
@@ -127,29 +133,28 @@ class _PostItemPageState extends State<PostItemPage> {
         );
         return;
       }
-      setState((){
-        _isSelling = true;
+      setState(() {
+        _isUpdating = true;
       });
       try{
-        await sellCarFunction();
+        await updateCarFunction();
         showCustomSnackBar(
           backgroundColor: ColorGlobalVariables.greenColor,
           title: 'Success',
-          message: 'Vehicle listed successfully'
+          message: 'Vehicle updated successfully'
         );
 
-        // optionally reset form or navigate away
-        // _formKey.currentState?.reset();
-        // Navigate.pop(context);
+        // Navigate back after successful update
+        Navigator.pop(context);
       }catch(e){
         showCustomSnackBar(
           backgroundColor: ColorGlobalVariables.redColor,
           title: 'Error',
-          message: 'Failed to list vehicle: ${e.toString()}'
+          message: 'Failed to update vehicle: ${e.toString()}'
         );
       } finally{
         setState(() {
-          _isSelling = false;
+          _isUpdating = false;
         });
       }
     } else {
@@ -164,6 +169,8 @@ class _PostItemPageState extends State<PostItemPage> {
   @override
   void initState() {
     super.initState();
+    listing = widget.allJson['listing'];
+    logger.w("listing data at editItemPage: $listing");
     _loadInitialData();
   }
 
@@ -186,6 +193,9 @@ class _PostItemPageState extends State<PostItemPage> {
         itemCategoriesProvider.getAllCategories(),
         makeModelProvider.fetchMakesWithModels(),
       ]);
+      
+      // After loading data, populate the form with listing data
+      _populateFormWithListingData(itemCategoriesProvider, makeModelProvider);
     } catch (e) {
       logger.e("Error loading initial data: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -194,6 +204,100 @@ class _PostItemPageState extends State<PostItemPage> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  void _populateFormWithListingData(
+    ItemCategoriesProvider categoriesProvider, 
+    MakeAndModelProvider makeModelProvider
+  ) {
+    // Set category
+    final categoryId = listing['category_id'];
+    if (categoriesProvider.categories?.data != null && categoryId != null) {
+      try {
+        selectedCategory = categoriesProvider.categories!.data
+            .firstWhere((category) => category.id == categoryId);
+      } catch (e) {
+        logger.e("Category not found: $e");
+        selectedCategory = null;
+      }
+    }
+    
+    // Set make and model
+    final makeId = listing['brand_id'];
+    final modelId = listing['brand_model_id'];
+    
+    if (makeId != null && makeModelProvider.makes != null) {
+      try {
+        final make = makeModelProvider.makes!.firstWhere((make) => make.id == makeId);
+        selectedMake = {'id': make.id, 'name': make.name};
+        
+        if (modelId != null) {
+          final models = makeModelProvider.getModelsForMake(makeId);
+          if (models != null) {
+            try {
+              selectedModel = models.firstWhere((model) => model.id == modelId);
+            } catch (e) {
+              logger.e("Model not found: $e");
+              selectedModel = null;
+            }
+          }
+        }
+      } catch (e) {
+        logger.e("Make not found: $e");
+        selectedMake = null;
+      }
+    }
+    
+    // Set text fields
+    _itemNameController.text = listing['name'] ?? '';
+    _itemDescriptionController.text = listing['description'] ?? '';
+    _priceController.text = listing['price']?.toString() ?? '';
+    
+    // Set location
+    selectedLocation = listing['location'];
+    
+    // Set year
+    year = int.tryParse(listing['year']?.toString() ?? '2000') ?? 2000;
+    
+    // Set color
+    if (listing['color'] != null) {
+      _colorController.text = listing['color'];
+      try {
+        color = _parseColorFromHex(listing['color']);
+      } catch (e) {
+        logger.e("Error parsing color: $e");
+      }
+    }
+    
+    // Set features
+    if (listing['features'] is List) {
+      selectedFeatures = List<String>.from(listing['features']);
+    }
+    
+    // Set item fields from the listing
+    if (selectedCategory != null && selectedCategory!.itemFields.isNotEmpty) {
+      for (final field in selectedCategory!.itemFields) {
+        final fieldKey = field.name.toLowerCase().replaceAll(' ', '_');
+        if (listing.containsKey(fieldKey) && listing[fieldKey] != null) {
+          selectedFields[field.name] = listing[fieldKey].toString();
+        }
+      }
+    }
+    
+    // Set images (if they are URLs from the listing)
+    if (listing['images'] is List) {
+      for (final imageUrl in listing['images']) {
+        selectedImages.add(XFile(imageUrl.toString()));
+      }
+    }
+  }
+
+  Color _parseColorFromHex(String hexColor) {
+    hexColor = hexColor.replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF$hexColor";
+    }
+    return Color(int.parse(hexColor, radix: 16));
   }
 
   @override
@@ -207,9 +311,11 @@ class _PostItemPageState extends State<PostItemPage> {
         onLeadingIconClickFunction: () => Navigator.pop(context),
         isLeadingWidgetExist: true,
         leadingIconData: Icons.arrow_back_ios,
-        titleText: 'Post New Item',
+        titleText: 'Update Item',
+        centerTitle: true,
+        titleTextColor: ColorGlobalVariables.brownColor,
       ),   
-      body: (categoriesProvider.isLoading && makeModelProvider.isLoading)
+      body: _isLoading
           ? _buildLoadingIndicator()
           : (categoriesProvider.error != null || makeModelProvider.error != null) 
             ? _buildErrorView(categoriesProvider, makeModelProvider) 
@@ -228,7 +334,7 @@ class _PostItemPageState extends State<PostItemPage> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Loading categories...',
+            'Loading vehicle details...',
             style: TextStyle(
               color: ColorGlobalVariables.brownColor,
               fontSize: 16,
@@ -297,7 +403,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     const SizedBox(height: 20),
                     _buildImagePickerSection(),
                     const SizedBox(height: 30),
-                    _buildSellButton(),
+                    _buildUpdateButton(),
                     const SizedBox(height: 30),
                   ],
                 ) : Container(
@@ -313,13 +419,10 @@ class _PostItemPageState extends State<PostItemPage> {
                           color: ColorGlobalVariables.brownColor.withOpacity(0.5),
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          "Select a Category to continue",
-                          style: TextStyle(
-                            color: ColorGlobalVariables.blackColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                          ),
+                        TextSmall(
+                          title: "Select a Category to continue", 
+                          fontWeight: FontWeight.normal, 
+                          textColor: ColorGlobalVariables.blackColor
                         ),
                       ],
                     ),
@@ -550,7 +653,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildSellButton(){
+  Widget _buildUpdateButton(){
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
@@ -565,15 +668,15 @@ class _PostItemPageState extends State<PostItemPage> {
           ],
         ),
         child: CustomButton(
-          isLoading: _isSelling, 
-          buttonName: 'Sell Vehicle',
+          isLoading: _isUpdating, 
+          buttonName: 'Update Vehicle',
           backgroundColor: ColorGlobalVariables.brownColor,
-          textColor: Colors.white,
+          textColor: ColorGlobalVariables.whiteColor,
           height: 55,
           borderRadius: 12,
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          onPressed: _isSelling ? (){
+          onPressed: _isUpdating ? (){
             showCustomSnackBar(
               title: 'Message',
               message: 'Please hold on',
@@ -637,7 +740,7 @@ class _PostItemPageState extends State<PostItemPage> {
         GestureDetector(
           onTap: () {
             if(field.type == "string" || field.type == "number"){
-              _showFieldInputDialog(field.label, field.name, field.type);
+              _showFieldInputDialog(field.label, field.name, field.type, currentValue);
               return;
             }
             if(field.type == "enum"){
@@ -1092,6 +1195,7 @@ class _PostItemPageState extends State<PostItemPage> {
 
   Widget _buildImageContainer(int index) {
     final hasImage = selectedImages.length > index;
+    final isNetworkImage = hasImage && selectedImages[index].path.startsWith('http');
     
     return Container(
       decoration: BoxDecoration(
@@ -1106,8 +1210,10 @@ class _PostItemPageState extends State<PostItemPage> {
           if (hasImage)
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.file(
-                File(selectedImages[index].path),
+              child: Image(
+                image: isNetworkImage 
+                  ? NetworkImage(selectedImages[index].path) 
+                  : FileImage(File(selectedImages[index].path)) as ImageProvider,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
@@ -1157,11 +1263,41 @@ class _PostItemPageState extends State<PostItemPage> {
   Future<void> _showCategorySelectionDialog(List<ItemCategory> categories) async {
     final selected = await showDialog<ItemCategory>(
       context: context,
-      builder: (context) => _buildSearchableDialog(
-        title: 'Select Category',
-        items: categories,
-        itemBuilder: (category) => category.name,
-        onItemSelected: (category) => Navigator.pop(context, category),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                'Select Category',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: ColorGlobalVariables.blackColor,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: ListView.builder(
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  final category = categories[index];
+                  return ListTile(
+                    title: Text(category.name),
+                    onTap: () => Navigator.pop(context, category),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -1178,11 +1314,41 @@ class _PostItemPageState extends State<PostItemPage> {
   Future<void> _showMakeSelectionDialog(List<VehicleMake> makes) async {
     final selected = await showDialog<VehicleMake>(
       context: context,
-      builder: (context) => _buildSearchableDialog(
-        title: 'Select Make',
-        items: makes,
-        itemBuilder: (make) => make.name,
-        onItemSelected: (make) => Navigator.pop(context, make),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                'Select Make',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: ColorGlobalVariables.blackColor,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: ListView.builder(
+                itemCount: makes.length,
+                itemBuilder: (context, index) {
+                  final make = makes[index];
+                  return ListTile(
+                    title: Text(make.name),
+                    onTap: () => Navigator.pop(context, make),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -1199,11 +1365,41 @@ class _PostItemPageState extends State<PostItemPage> {
 
     final selected = await showDialog<VehicleModel>(
       context: context,
-      builder: (context) => _buildSearchableDialog(
-        title: 'Select Model',
-        items: models,
-        itemBuilder: (model) => model.name,
-        onItemSelected: (model) => Navigator.pop(context, model),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                'Select Model',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: ColorGlobalVariables.blackColor,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: ListView.builder(
+                itemCount: models.length,
+                itemBuilder: (context, index) {
+                  final model = models[index];
+                  return ListTile(
+                    title: Text(model.name),
+                    onTap: () => Navigator.pop(context, model),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
 
@@ -1212,108 +1408,8 @@ class _PostItemPageState extends State<PostItemPage> {
     }
   }
 
-  Widget _buildSearchableDialog<T>({
-    required String title,
-    required List<T> items,
-    required String Function(T) itemBuilder,
-    required Function(T) onItemSelected,
-  }) {
-    final searchController = TextEditingController();
-    final filteredItems = ValueNotifier<List<T>>(items);
-
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: StatefulBuilder(
-        builder: (context, setState) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: ColorGlobalVariables.blackColor,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      filteredItems.value = items.where((item) {
-                        final itemName = itemBuilder(item).toLowerCase();
-                        return itemName.contains(value.toLowerCase());
-                      }).toList();
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Divider(height: 1),
-              SizedBox(
-                height: 300,
-                width: double.infinity,
-                child: ValueListenableBuilder<List<T>>(
-                  valueListenable: filteredItems,
-                  builder: (context, filteredItems, child) {
-                    return ListView.builder(
-                      itemCount: filteredItems.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredItems[index];
-                        return ListTile(
-                          title: Text(itemBuilder(item)),
-                          onTap: () => onItemSelected(item),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _showSelectionDialog({
-    required BuildContext context, 
-    required List<dynamic>? options,
-    required void Function(String) onSelected,
-  }) async {
-    final selected = await showDialog<String>(
-      context: context, 
-      builder: (BuildContext context) {
-        return _buildSearchableDialog<String>(
-          title: 'Select an option',
-          items: options?.map((e) => e.toString()).toList() ?? [],
-          itemBuilder: (item) => item,
-          onItemSelected: (item) => Navigator.pop(context, item),
-        );
-      });
-
-    if (selected != null) {
-      onSelected(selected);
-    }
-  }
-
-  Future<void> _showFieldInputDialog(String fieldLabel, String fieldName, String fieldType) async {
-    final controller = TextEditingController(text: selectedFields[fieldName]);
+  Future<void> _showFieldInputDialog(String fieldLabel, String fieldName, String fieldType, String currentValue) async {
+    final controller = TextEditingController(text: currentValue);
 
     await showDialog<String>(
       context: context,
@@ -1373,6 +1469,56 @@ class _PostItemPageState extends State<PostItemPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showSelectionDialog({
+    required BuildContext context, 
+    required List<dynamic>? options,
+    required void Function(String) onSelected,
+  }) async {
+    final selected = await showDialog<String>(
+      context: context, 
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  'Select an option',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: ColorGlobalVariables.blackColor,
+                  ),
+                ),
+              ),
+              const Divider(height: 1),
+              SizedBox(
+                height: 300,
+                child: ListView.builder(
+                  itemCount: options?.length ?? 0,
+                  itemBuilder: (context, index) {
+                    final option = options![index];
+                    return ListTile(
+                      title: Text(option.toString()),
+                      onTap: () => Navigator.pop(context, option.toString()),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      });
+
+    if (selected != null) {
+      onSelected(selected);
+    }
   }
 
   Future<void> _pickImages() async {

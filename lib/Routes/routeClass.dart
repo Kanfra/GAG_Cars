@@ -1,4 +1,5 @@
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/editItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/locationSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
@@ -7,6 +8,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/selectedBrandPage.dart'
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/listingsDetailPage.dart';
 import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/profileUpdatePage.dart';
 import 'package:get/get.dart';
 
@@ -69,6 +71,7 @@ class RouteClass {
   static String dealerLoginPage = "/dealer-login-page";
   static String customerServicePage = "/customer-service-page";
   static String changePasswordPage = "/change-password-page";
+  static String listingsDetailPage = "/listings-detail-page";
 
   // Homepage
   // static String homePage = "/home-page";
@@ -87,6 +90,7 @@ class RouteClass {
   static String mainBottomNavigationPage = "/main-bottom-navigation-page";
   static String locationSearchPage = "/location-search-page";
   static String postItemPage = "/post-item-page";
+  static String editItemPage = "/edit-item-page";
 
   //message
   static String messagePage = "/messagePage";
@@ -115,6 +119,7 @@ class RouteClass {
   static String getDealerLoginPage() => dealerLoginPage;
   static String getCustomerServicePage() => customerServicePage;
   static String getChangePassword() => changePasswordPage;
+  static String getListingsDetailPage() => listingsDetailPage;
 
 
   // static String getHomePage() => homePage;
@@ -133,7 +138,8 @@ class RouteClass {
   static String getMainBottomNavigationPage() => mainBottomNavigationPage;
   static String getLocationSearchPage() => locationSearchPage;
   static String getPostItemPage() => postItemPage;
-
+  static String getEditItemPage() => editItemPage;
+ 
   static String getMessagesPage() => messagePage;
   static String getMockUpScreenPage() => mockUpScreenPage;
 
@@ -162,6 +168,16 @@ class RouteClass {
     GetPage(page: () => const CustomerServicePage(), name: customerServicePage, transition: Transition.noTransition),
     GetPage(page: () => const ChangePasswordPage(), name: changePasswordPage, transition: Transition.noTransition),
     GetPage(page: () => const ProfileUpdatePage(), name: profileUpdatePage, transition: Transition.noTransition),
+    GetPage(
+      page: () {
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return ListingsDetailPage(
+          allJson: args,
+        );
+      }, 
+      name: listingsDetailPage, 
+      transition: Transition.noTransition
+      ),
 
 
 
@@ -215,6 +231,16 @@ class RouteClass {
     GetPage(page: () => MainBottomNavigationPage(), name: mainBottomNavigationPage, transition: Transition.noTransition),
     GetPage(page: () => LocationSearchPage(), name: locationSearchPage, transition: Transition.noTransition),
     GetPage(page: () => PostItemPage(), name: postItemPage, transition: Transition.noTransition),
+    GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return EditItemPage(
+          allJson: args,
+        );
+      }, 
+      name: editItemPage, 
+      transition: Transition.noTransition
+      ),
 
     //message
     GetPage(page: () => const MessagesPage(), name: messagePage, transition: Transition.noTransition),

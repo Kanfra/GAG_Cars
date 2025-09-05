@@ -6,10 +6,20 @@ class CustomButton extends StatelessWidget {
     super.key, 
     required this.isLoading,
     required this.buttonName, 
+    this.textColor,
+    this.height,
+    this.borderRadius,
+    this.fontSize,
+    this.fontWeight,
     this.backgroundColor,
     this.onPressed
     });
 final String buttonName;
+final double? fontSize;
+final Color? textColor;
+final double? borderRadius;
+final FontWeight? fontWeight;
+final double? height;
 final bool isLoading;
 final Color? backgroundColor;
 final void Function()? onPressed;
@@ -20,18 +30,18 @@ final void Function()? onPressed;
   onPressed: onPressed,
   style: ElevatedButton.styleFrom(
     backgroundColor: backgroundColor ?? Color.fromRGBO(159, 16, 16, 1),
-    minimumSize: Size(double.infinity, 64), // full width, 64 height
+    minimumSize: Size(double.infinity, height ?? 64), // full width, 64 height
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
+      borderRadius: BorderRadius.circular(borderRadius ?? 10),
     ),
     elevation: 0, // optional: remove shadow
   ),
   child: isLoading ? CircularProgressIndicator(color: ColorGlobalVariables.whiteColor,) : Text(
    buttonName,
     style: TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.w600,
-      color: Color.fromRGBO(255, 255, 255, 1),
+      fontSize: fontSize ?? 18,
+      fontWeight: fontWeight ?? FontWeight.w600,
+      color: textColor ?? Color.fromRGBO(255, 255, 255, 1),
     ),
   ),
 );
