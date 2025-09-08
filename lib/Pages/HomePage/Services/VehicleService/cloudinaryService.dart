@@ -1,5 +1,6 @@
 import 'package:cloudinary/cloudinary.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:logger/logger.dart';
@@ -123,6 +124,80 @@ static Future<void> deleteProfileImage(String imageUrl) async {
   } catch(e){
     logger.e("Failed to delete profile image: $e");
     throw Exception('Failed to delete profile image: $e');
+  }
+}
+
+
+// Add this method to your existing CloudinaryService class
+static Future<List<String>> uploadVehicleImages(List<File> imageFiles, {List<String>? oldImageUrls}) async {
+  final logger = Logger();
+  final List<String> uploadedUrls = [];
+  
+  try {
+    logger.i('Starting vehicle image upload. Files: ${imageFiles.length}, Old URLs: ${oldImageUrls?.length ?? 0}');
+
+    // Upload new images
+    for (final file in imageFiles) {
+      try {
+        final response = await _cloudinary.upload(
+          file: file.path,
+          folder: 'vehicle_uploads', // Using the same folder as your existing method
+          resourceType: CloudinaryResourceType.image,
+          optParams: {
+            'transformation': 'w_800,h_600,c_fill,q_auto' // Optimize for vehicle images
+          },
+        );
+
+        if (response.secureUrl != null) {
+          uploadedUrls.add(response.secureUrl!);
+          logger.i('Successfully uploaded vehicle image: ${response.secureUrl}');
+        } else {
+          logger.e('Upload succeeded but no URL returned for file: ${file.path}');
+          throw Exception('Failed to get URL for uploaded image');
+        }
+      } catch (e) {
+        logger.e('Error uploading file ${file.path}: $e');
+        throw Exception('Failed to upload image ${file.path}: $e');
+      }
+    }
+
+    logger.i('Vehicle image upload completed. Total URLs: ${uploadedUrls.length}');
+    return uploadedUrls;
+
+  } catch (e) {
+    logger.e('Vehicle image upload failed: $e');
+    rethrow;
+  }
+}
+
+// Helper method to check if an XFile is a new file (not already uploaded)
+static bool isNewImage(XFile xFile) {
+  return !xFile.path.startsWith('http');
+}
+
+// Helper method to extract public ID from vehicle image URL (if needed for replacement)
+static String? _extractVehiclePublicId(String imageUrl) {
+  try {
+    final uri = Uri.parse(imageUrl);
+    final pathSegments = uri.pathSegments;
+    
+    // Cloudinary URL format: https://res.cloudinary.com/cloudname/image/upload/v1234567/folder/filename.jpg
+    final uploadIndex = pathSegments.indexOf('upload');
+    if (uploadIndex != -1 && uploadIndex + 2 < pathSegments.length) {
+      // The public ID is everything after 'upload' segment
+      final publicIdParts = pathSegments.sublist(uploadIndex + 1);
+      String publicId = publicIdParts.join('/');
+      
+      // Remove file extension if present
+      if (publicId.contains('.')) {
+        publicId = publicId.substring(0, publicId.lastIndexOf('.'));
+      }
+      
+      return publicId;
+    }
+    return null;
+  } catch (e) {
+    return null;
   }
 }
 }

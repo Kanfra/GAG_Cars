@@ -19,6 +19,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/makeAndModelModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/myListingPage.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:geolocator/geolocator.dart';
@@ -84,87 +85,112 @@ class _EditItemPageState extends State<EditItemPage> {
   Map<String?, dynamic> selectedFields = {};
 
   // update car function
-  Future<void> updateCarFunction() async {
-    if(_colorController.text.toString().trim().isNotEmpty){
-      selectedFields['color'] = _colorController.text.toString().trim();
-    }
-    if(year.toString().isNotEmpty){
-      selectedFields['year'] = year.toString().trim();
-    }
-
-    final normalizedFields = selectedFields.map((key, value) => 
-      MapEntry(key?.toLowerCase().replaceAll(' ', '_'), value));
-
-    // converting XFiles to files before sending
-    List<File> imageFiles = await Future.wait(
-      selectedImages.where((xFile) => !xFile.path.startsWith('http')).map((xFile) async => File(xFile.path))
-    );
-    
-    final requestBody = {
-      'id': listing['id'],
-      'category_id': selectedCategory?.id,
-      'brand_id': selectedMake?["id"],
-      'brand_model_id': selectedModel?.id, 
-      'name': _itemNameController.text.toString(),
-      'slug': listing['slug'], // Keep the same slug for update
-      ...normalizedFields,
-      'location': selectedLocation,
-      'price': _priceController.text.toString(),
-      'description': _itemDescriptionController.text.toString(),
-      'features': selectedFeatures ?? [],
-      'images': imageFiles // sending List<File> instead of List<XFile>
-    };
-    
-    logger.i("Update request body: $requestBody");
-    
-    // await VehicleService.updateVehicle(
-    //   requestBody: requestBody,
-    // );
+Future<void> updateCarFunction() async {
+  if(_colorController.text.toString().trim().isNotEmpty){
+    selectedFields['color'] = _colorController.text.toString().trim();
   }
+  if(year.toString().isNotEmpty){
+    selectedFields['year'] = year.toString().trim();
+  }
+
+  final normalizedFields = selectedFields.map((key, value) => 
+    MapEntry(key?.toLowerCase().replaceAll(' ', '_'), value));
+
+  // Process images: separate existing URLs from new files
+  List<dynamic> allImages = [];
+  
+  for (final xFile in selectedImages) {
+    if (xFile.path.startsWith('http')) {
+      // This is an existing image URL from the server
+      allImages.add(xFile.path);
+    } else {
+      // This is a new image file that needs to be uploaded
+      allImages.add(File(xFile.path));
+    }
+  }
+  
+  final Map<String?, dynamic> requestBody = {
+    'id': listing['id'],
+    'category_id': selectedCategory?.id,
+    'brand_id': selectedMake?["id"],
+    'brand_model_id': selectedModel?.id, 
+    'name': _itemNameController.text.toString(),
+    'slug': listing['slug'], // Keep the same slug for update
+    ...normalizedFields,
+    'location': selectedLocation,
+    'price': _priceController.text.toString(),
+    'description': _itemDescriptionController.text.toString(),
+    'features': selectedFeatures ?? [],
+    'images': allImages // This contains mix of URLs (strings) and Files
+  };
+  
+  logger.i("Update request body: $requestBody");
+  
+  await VehicleService.updateVehicle(
+    requestBody: requestBody,
+  );
+}
 
   // form validation function
   Future<void> _formValidation() async {
-    if (_formKey.currentState!.validate()) {
-      if(selectedImages.isEmpty || selectedImages.length < 2){
-        showCustomSnackBar(
-          backgroundColor: ColorGlobalVariables.redColor, 
-          title: "Error",
-          message: 'Please upload at least 2 images and at most 4 images', 
-        );
-        return;
-      }
-      setState(() {
-        _isUpdating = true;
-      });
-      try{
-        await updateCarFunction();
-        showCustomSnackBar(
-          backgroundColor: ColorGlobalVariables.greenColor,
-          title: 'Success',
-          message: 'Vehicle updated successfully'
-        );
-
-        // Navigate back after successful update
-        Navigator.pop(context);
-      }catch(e){
-        showCustomSnackBar(
-          backgroundColor: ColorGlobalVariables.redColor,
-          title: 'Error',
-          message: 'Failed to update vehicle: ${e.toString()}'
-        );
-      } finally{
-        setState(() {
-          _isUpdating = false;
-        });
-      }
-    } else {
+  if (_formKey.currentState!.validate()) {
+    if(selectedImages.isEmpty || selectedImages.length < 2){
       showCustomSnackBar(
         backgroundColor: ColorGlobalVariables.redColor, 
-        title: 'Error',
-        message: 'Please correct the errors in the form' 
+        title: "Error",
+        message: 'Please upload at least 2 images and at most 4 images', 
       );
+      return;
     }
+    setState(() {
+      _isUpdating = true;
+    });
+    try{
+      await updateCarFunction();
+      showCustomSnackBar(
+        backgroundColor: ColorGlobalVariables.greenColor,
+        title: 'Success',
+        message: 'Vehicle updated successfully'
+      );
+
+      // Navigate back after successful update
+      // Navigator.pop(context);
+      Get.offUntil(
+        GetPageRoute(page: () => MyListingPage()),
+        (route) => route.isFirst, // This keeps the very first route (usually home)
+      );
+    } catch(e){
+      String errorMessage = 'Failed to update vehicle';
+      
+      // Handle specific error types
+      if (e.toString().contains('Unauthorized')) {
+        errorMessage = 'Session expired. Please login again.';
+      } else if (e.toString().contains('Forbidden')) {
+        errorMessage = 'You don\'t have permission to update this vehicle.';
+      } else if (e.toString().contains('Validation failed')) {
+        errorMessage = e.toString().replaceFirst('Exception: ', '');
+      } else if (e.toString().contains('Cloudinary')) {
+        errorMessage = 'Failed to upload images. Please try again.';
+      }
+      
+      showCustomSnackBar(
+        backgroundColor: ColorGlobalVariables.redColor,
+        title: 'Error',
+        message: errorMessage
+      );
+    } finally{
+      setState(() {
+        _isUpdating = false;
+      });
+    }
+  } else {
+    showCustomSnackBar(
+      backgroundColor: ColorGlobalVariables.redColor, 
+      title: 'Error',
+      message: 'Please correct the errors in the form' 
+    );
   }
+}
 
   @override
   void initState() {
@@ -669,7 +695,7 @@ class _EditItemPageState extends State<EditItemPage> {
         ),
         child: CustomButton(
           isLoading: _isUpdating, 
-          buttonName: 'Update Vehicle',
+          buttonName: 'Update Item',
           backgroundColor: ColorGlobalVariables.brownColor,
           textColor: ColorGlobalVariables.whiteColor,
           height: 55,

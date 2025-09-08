@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MyListingsService/myListingsService.dart';
+import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/myListingPage.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
@@ -243,8 +244,10 @@ Future<void> _performDelete() async {
       if (mounted) {
         // This will replace the current stack with MyListingPage
         // When user presses back from MyListingPage, it will go back to SettingsPage
-        //Get.offNamed(RouteClass.myListingPage);
-        Get.offNamed(RouteClass.myListingPage);
+        Get.offUntil(
+        GetPageRoute(page: () => MyListingPage()),
+        (route) => route.isFirst, // This keeps the very first route (usually home)
+      );
       }
     } else {
       Get.snackbar(

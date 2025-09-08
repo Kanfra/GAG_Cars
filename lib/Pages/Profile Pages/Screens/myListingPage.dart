@@ -24,6 +24,7 @@ class _MyListingPageState extends State<MyListingPage> {
   Timer? _loadMoreDebouncer;
   late MyListingsProvider _provider;
   final logger = Logger();
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
@@ -31,6 +32,16 @@ class _MyListingPageState extends State<MyListingPage> {
     _provider = MyListingsProvider();
     _loadInitialData();
     _scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh data when page becomes visible again
+    if (!_isFirstLoad) {
+      _refreshListings();
+    }
+    _isFirstLoad = false;
   }
 
   void _scrollListener() {
@@ -359,13 +370,13 @@ class _MyListingPageState extends State<MyListingPage> {
       onTap: () {
         // Navigate to listing detail
         logger.w('item is clicked on');
-                      Get.toNamed(
-                        RouteClass.listingsDetailPage,
-                        arguments: {
-                          'listing': listing.toJson(),
-                          'type': 'listing'
-                        },
-                      );
+        Get.toNamed(
+          RouteClass.listingsDetailPage,
+          arguments: {
+            'listing': listing.toJson(),
+            'type': 'listing'
+          },
+        );
       },
       child: Container(
         decoration: BoxDecoration(
