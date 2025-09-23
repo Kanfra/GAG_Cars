@@ -15,7 +15,7 @@ class ApiEndpoint{
   static const String myWishlist = "/my/wish-list";
   static const String myListings = "/my/listings"; 
   static const String categories = "/categories";
-  static const String posts = "/posts";
+  static const String  posts = "/posts";
   
   static const String resetPassword = '/reset-password';
   static const String sendResetPasswordOtp = '/send-reset-password-otp';

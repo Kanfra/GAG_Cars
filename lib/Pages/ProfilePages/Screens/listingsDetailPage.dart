@@ -1,14 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MyListingsService/myListingsService.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/myListingPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class ListingsDetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -29,6 +29,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   double _appBarHeight = 300;
   double _imageOpacity = 1.0;
   bool _isDeleting = false;
+  bool _isMarkingAsSold = false;
+  bool _isSold = false;
+  bool _isPromoted = false;
 
   // Default car data as fallback with safe values
   final Map<String, dynamic> defaultCar = {
@@ -53,6 +56,8 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     // Safe initialization of listing data
     try {
       listing = widget.allJson['listing'] as Map<String, dynamic>? ?? {};
+      _isSold = listing['status'] == 'sold';
+      _isPromoted = listing['is_promoted'] == true;
       logger.w('listing data: $listing');
     } catch (e) {
       logger.e('Error initializing listing: $e');
@@ -79,6 +84,87 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  // Mark as Sold confirmation dialog
+  void _showMarkAsSoldConfirmationDialog() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.question,
+      animType: AnimType.bottomSlide,
+      title: 'Mark as Sold?',
+      desc: 'Are you sure you want to mark this item as sold? This action cannot be undone.',
+      btnCancelText: 'Cancel',
+      btnOkText: 'Yes, Mark as Sold',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        _performMarkAsSold();
+      },
+      btnOkColor: Colors.green,
+    ).show();
+  }
+
+  // Actual mark as sold operation
+  Future<void> _performMarkAsSold() async {
+    if (_isMarkingAsSold) return;
+
+    setState(() => _isMarkingAsSold = true);
+
+    try {
+      final listingId = listing['id']?.toString();
+      if (listingId == null || listingId.isEmpty) {
+        throw Exception('Invalid listing ID');
+      }
+
+      // Use the service for marking as sold
+      final result = await VehicleService.markAsSold(listingId);
+
+      if (result['success'] == true) {
+        // Show success dialog
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.success,
+          animType: AnimType.bottomSlide,
+          title: 'Success!',
+          desc: 'Item has been marked as sold successfully.',
+          btnOkText: 'OK',
+          btnOkOnPress: () {
+            // Navigate back to MyListingPage after successful marking
+            Get.offAllNamed(RouteClass.myListingPage);
+          },
+          autoHide: Duration(seconds: 3),
+        ).show();
+
+        setState(() {
+          _isSold = true;
+        });
+
+      } else {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.bottomSlide,
+          title: 'Error',
+          desc: result['message'] ?? 'Failed to mark item as sold',
+          btnOkText: 'OK',
+          btnOkOnPress: () {},
+        ).show();
+      }
+    } catch (e) {
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.bottomSlide,
+        title: 'Error',
+        desc: 'Failed to mark item as sold: ${e.toString()}',
+        btnOkText: 'OK',
+        btnOkOnPress: () {},
+      ).show();
+    } finally {
+      if (mounted) {
+        setState(() => _isMarkingAsSold = false);
+      }
+    }
   }
 
   // Delete confirmation dialog
@@ -214,64 +300,58 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   }
 
   // Actual delete operation using the service
-  // Actual delete operation using the service
-Future<void> _performDelete() async {
-  if (_isDeleting) return;
+  Future<void> _performDelete() async {
+    if (_isDeleting) return;
 
-  setState(() => _isDeleting = true);
+    setState(() => _isDeleting = true);
 
-  try {
-    final listingId = listing['id']?.toString();
-    if (listingId == null || listingId.isEmpty) {
-      throw Exception('Invalid listing ID');
-    }
-
-    // Use the service class for deletion
-    final result = await MyListingsService.deleteListing(listingId);
-
-    if (result['success'] == true) {
-      Get.snackbar(
-        'Success',
-        result['message'],
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        duration: const Duration(seconds: 2),
-      );
-      
-      // Navigate to MyListingPage after successful deletion
-      await Future.delayed(const Duration(milliseconds: 800));
-      if (mounted) {
-        // This will replace the current stack with MyListingPage
-        // When user presses back from MyListingPage, it will go back to SettingsPage
-        Get.offUntil(
-        GetPageRoute(page: () => MyListingPage()),
-        (route) => route.isFirst, // This keeps the very first route (usually home)
-      );
+    try {
+      final listingId = listing['id']?.toString();
+      if (listingId == null || listingId.isEmpty) {
+        throw Exception('Invalid listing ID');
       }
-    } else {
+
+      // Use the service class for deletion
+      final result = await MyListingsService.deleteListing(listingId);
+
+      if (result['success'] == true) {
+        Get.snackbar(
+          'Success',
+          result['message'],
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 2),
+        );
+        
+        // Navigate to MyListingPage after successful deletion
+        await Future.delayed(const Duration(milliseconds: 800));
+        if (mounted) {
+          Get.offAllNamed(RouteClass.myListingPage);
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          result['message'],
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    } catch (e) {
       Get.snackbar(
         'Error',
-        result['message'],
+        'Failed to delete listing: ${e.toString()}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
-    }
-  } catch (e) {
-    Get.snackbar(
-      'Error',
-      'Failed to delete listing: ${e.toString()}',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  } finally {
-    if (mounted) {
-      setState(() => _isDeleting = false);
+    } finally {
+      if (mounted) {
+        setState(() => _isDeleting = false);
+      }
     }
   }
-}
 
   // Safe data access methods
   String getListingName() {
@@ -532,6 +612,57 @@ Future<void> _performDelete() async {
                     ),
                   ),
 
+                  // Sold Badge
+                  if (_isSold)
+                    Positioned(
+                      top: 16,
+                      left: 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          'SOLD',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  // Promoted Badge
+                  if (_isPromoted && !_isSold)
+                    Positioned(
+                      top: 16,
+                      left: _isSold ? 70 : 16,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[700],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.star, color: Colors.white, size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'PROMOTED',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                   Positioned(
                     top: 16,
                     right: 16,
@@ -580,7 +711,7 @@ Future<void> _performDelete() async {
                 ),
               ),
               IconButton(
-                onPressed: () {
+                onPressed: _isSold ? null : () {
                   Get.toNamed(
                     RouteClass.getEditItemPage(),
                     arguments: {
@@ -723,6 +854,7 @@ Future<void> _performDelete() async {
                     children: [
                       _buildTag("Warranty", ColorGlobalVariables.greyColor),
                       _buildVerifiedSellerTag(),
+                      if (_isPromoted && !_isSold) _buildPromotedTag(),
                     ],
                   ),
                   const SizedBox(height: 28),
@@ -737,19 +869,35 @@ Future<void> _performDelete() async {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildActionButton(
-                          "Mark as Sold",
-                          Icons.check,
-                          Colors.blue,
-                        ),
+                        child: _isSold 
+                          ? _buildSoldButton()
+                          : _buildActionButton(
+                              "Mark as Sold",
+                              Icons.check,
+                              Colors.green,
+                              onPressed: _showMarkAsSoldConfirmationDialog,
+                              isLoading: _isMarkingAsSold,
+                            ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: _buildActionButton(
-                          "Promote",
-                          FontAwesomeIcons.bullhorn,
-                          Colors.green,
-                        ),
+                        child: _isSold 
+                          ? _buildSoldPromoteButton()
+                          : _isPromoted 
+                            ? _buildPromotedButton()
+                            : _buildActionButton(
+                                "Promote",
+                                FontAwesomeIcons.bullhorn,
+                                Colors.blue,
+                                onPressed: (){
+                                  Get.toNamed(
+                                    RouteClass.getPromotionsPage(),
+                                    arguments: {
+                                      'listing': listing,
+                                    }
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
@@ -792,6 +940,31 @@ Future<void> _performDelete() async {
           fontSize: 14.0,
           fontWeight: FontWeight.w500,
         ),
+      ),
+    );
+  }
+
+  Widget _buildPromotedTag() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.amber[100],
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.star, color: Colors.amber[700], size: 16),
+          const SizedBox(width: 6),
+          Text(
+            "Promoted",
+            style: TextStyle(
+              color: Colors.amber[800],
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -867,9 +1040,98 @@ Future<void> _performDelete() async {
     );
   }
 
-  Widget _buildActionButton(String text, IconData icon, Color color) {
+  Widget _buildSoldButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            "Sold",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 16.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPromotedButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.amber[700]!, Colors.orange[700]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withOpacity(0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.star, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            "Promoted",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 16.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSoldPromoteButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.grey[400],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.block, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            "Cannot Promote",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 14.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(String text, IconData icon, Color color, {
+    VoidCallback? onPressed,
+    bool isLoading = false,
+  }) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -878,21 +1140,30 @@ Future<void> _performDelete() async {
         ),
         elevation: 2,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 16.0,
+      child: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.0,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(icon, size: 20, color: Colors.white),
+              ],
             ),
-          ),
-          const SizedBox(width: 8),
-          Icon(icon, size: 20, color: Colors.white),
-        ],
-      ),
     );
   }
 }

@@ -6,23 +6,67 @@ part of 'postResponse.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
+_$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
+    _$CategoryImpl(
       id: (json['id'] as num).toInt(),
-      title: json['title'] as String,
-      content: json['content'] as String,
-      image: json['image'] as String,
+      userId: json['user_id'] as String?,
+      parentId: (json['parent_id'] as num?)?.toInt(),
+      name: json['name'] as String,
+      slug: json['slug'] as String,
+      description: json['description'] as String?,
+      image: json['image'] as String?,
+      status: json['status'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+    );
+
+Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user_id': instance.userId,
+      'parent_id': instance.parentId,
+      'name': instance.name,
+      'slug': instance.slug,
+      'description': instance.description,
+      'image': instance.image,
+      'status': instance.status,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
+    };
+
+_$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
+      countryId: (json['country_id'] as num).toInt(),
+      title: json['title'] as String,
+      slug: json['slug'] as String?,
+      description: json['description'] as String?,
+      image: json['image'] as String,
+      status: json['status'] as String,
+      content: json['content'] as String,
+      tags: json['tags'] as List<dynamic>,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      categoryId: (json['category_id'] as num).toInt(),
+      category: Category.fromJson(json['category'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'user_id': instance.userId,
+      'country_id': instance.countryId,
       'title': instance.title,
-      'content': instance.content,
+      'slug': instance.slug,
+      'description': instance.description,
       'image': instance.image,
+      'status': instance.status,
+      'content': instance.content,
+      'tags': instance.tags,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt.toIso8601String(),
+      'category_id': instance.categoryId,
+      'category': instance.category,
     };
 
 _$PaginationLinkImpl _$$PaginationLinkImplFromJson(Map<String, dynamic> json) =>

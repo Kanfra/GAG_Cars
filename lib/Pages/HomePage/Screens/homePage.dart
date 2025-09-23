@@ -251,7 +251,7 @@ class _HomePageState extends State<HomePage> {
           child: _buildTrendingMakes(homeProvider),
         ),
 
-        // Categories Section - ADDED THIS BACK
+        // Categories Section
         SliverToBoxAdapter(
           child: _buildCategoriesSection(homeProvider),
         ),
@@ -326,22 +326,22 @@ class _HomePageState extends State<HomePage> {
               ? Padding(
                   padding: const EdgeInsets.all(24),
                   child: Center(
-        child: Column(
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Loading more...',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Loading more...',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 )
               : SizedBox.shrink(),
         ),
@@ -399,9 +399,9 @@ class _HomePageState extends State<HomePage> {
                     RouteClass.getAllMakesPage(),
                     arguments: {
                       'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
-                      'type': 'brands'
+                      'type': 'brands',
                     },
-                    );
+                  );
                 },
               ),
             ],
@@ -415,26 +415,38 @@ class _HomePageState extends State<HomePage> {
             itemCount: homeProvider.trendingMakes.length,
             itemBuilder: (context, index) {
               final make = homeProvider.trendingMakes[index];
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 6),
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: CustomImage(
-                  imagePath: getImageUrl(make.image, null),
-                  isAssetImage: false,
-                  isImageBorderRadiusRequired: false,
-                  imageWidth: 56,
-                  imageHeight: 56,
+              final brand = make;
+              return GestureDetector(
+                onTap: (){
+                  Get.toNamed(
+                    RouteClass.getSelectedBrandPage(),
+                    arguments: {
+                      'selectedBrand': brand.toJson(),
+                      'type': 'selectedBrand'
+                    }
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 6),
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CustomImage(
+                    imagePath: getImageUrl(make.image, null),
+                    isAssetImage: false,
+                    isImageBorderRadiusRequired: false,
+                    imageWidth: 56,
+                    imageHeight: 56,
+                  ),
                 ),
               );
             },
@@ -445,7 +457,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ADDED: Categories Section with horizontal listview cards
   Widget _buildCategoriesSection(HomeProvider homeProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -682,6 +693,7 @@ class _HomePageState extends State<HomePage> {
         ? recommended.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     final brandImage = recommended.brand?.image;
+    final isPromoted = recommended.isPromoted == true;
 
     return GestureDetector(
       onTap: () {
@@ -722,7 +734,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 
-                // Category Badge
+                // CATEGORY BADGE - Added back the category badge
                 Positioned(
                   top: 8,
                   left: 8,
@@ -743,9 +755,38 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 
-                // Wishlist Button
+                // PROMOTED BADGE - Added promoted badge on top right
+                if (isPromoted)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[700],
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, color: Colors.white, size: 12),
+                          SizedBox(width: 2),
+                          Text(
+                            'FEATURED',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                
+                // Wishlist Button - Moved to bottom right
                 Positioned(
-                  top: 8,
+                  bottom: 8,
                   right: 8,
                   child: GestureDetector(
                     onTap: () async {

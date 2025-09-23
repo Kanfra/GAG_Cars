@@ -4,14 +4,40 @@ part 'postResponse.freezed.dart';
 part 'postResponse.g.dart';
 
 @freezed
-class Post with _$Post {
-  const factory Post({
+class Category with _$Category {
+  const factory Category({
     required int id,
-    required String title,
-    required String content,
-    required String image,
+    @JsonKey(name: 'user_id') required String? userId,
+    @JsonKey(name: 'parent_id') required int? parentId,
+    required String name,
+    required String slug,
+    required String? description,
+    required String? image,
+    required String status,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
+  }) = _Category;
+
+  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
+}
+
+@freezed
+class Post with _$Post {
+  const factory Post({
+    required String id,
+    @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(name: 'country_id') required int countryId,
+    required String title,
+    required String? slug,
+    required String? description,
+    required String image,
+    required String status,
+    required String content,
+    required List<dynamic> tags,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'category_id') required int categoryId,
+    required Category category,
   }) = _Post;
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);

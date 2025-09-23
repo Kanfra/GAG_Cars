@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow cleartext traffic for Paystack and your domains -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">api.paystack.co</domain>
+        <domain includeSubdomains="true">standard.paystack.co</domain>
+        <domain includeSubdomains="true">js.paystack.co</domain>
+        <domain includeSubdomains="true">checkout.paystack.com</domain>
+        <domain includeSubdomains="true">dashboard.paystack.com</domain>
+        <domain includeSubdomains="true">gagcars.com</domain>
+        <domain includeSubdomains="true">www.gagcars.com</domain>
+        <domain includeSubdomains="true">your-backend.com</domain> <!-- Add your backend domain -->
+    </domain-config>
+    
+    <!-- Default strict security for all other domains -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

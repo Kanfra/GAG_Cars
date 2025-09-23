@@ -1,12 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/DotSeparator/dotSeparator.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
+import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/allPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/evPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/popularPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/postResponse.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class NewsBlogPage extends StatefulWidget {
   const NewsBlogPage({super.key});
@@ -15,117 +27,295 @@ class NewsBlogPage extends StatefulWidget {
   State<NewsBlogPage> createState() => _NewsBlogPageState();
 }
 
-class _NewsBlogPageState extends State<NewsBlogPage> { 
-  final PageController _pageController = PageController();
-  int _currentIndex = 0;
-
-  final List<Widget> newsBlogTabPages = const [
-    AllPage(),
-    PopularPage(),
-    EVPage()
-  ];
+class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMixin {
+  late TabController _tabController;
+  List<String> _tabTitles = ['All News'];
+  List<Widget> _tabPages = [];
+  bool _isInitialLoad = true;
+  bool _hasFetchedData = false;
+  
+  // Use RefreshController for pull-to-refresh
+  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final Map<String, RefreshController> _tabRefreshControllers = {};
+  
+  // Keep your existing scroll controllers for backward compatibility
+  final ScrollController _scrollController = ScrollController();
+  final Map<String, ScrollController> _tabScrollControllers = {};
 
   @override
   void initState() {
     super.initState();
-    _pageController.addListener(_handlePageChange);
+    
+    _tabController = TabController(length: 1, vsync: this);
+    _tabPages = [_buildAllNewsPage()];
+    
+    // Initialize scroll controller and refresh controller for initial tab
+    _tabScrollControllers['All News'] = ScrollController();
+    _tabRefreshControllers['All News'] = RefreshController();
+    
+    // Add scroll listener for lazy loading
+    _tabScrollControllers['All News']!.addListener(_handleScroll);
   }
 
-  void _handlePageChange() {
-    final newPage = _pageController.page?.round() ?? 0;
-    if (_currentIndex != newPage) {
-      setState(() => _currentIndex = newPage);
+  void _fetchPostsAfterBuild() {
+    if (_hasFetchedData) return;
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
+        
+        if (blogPostProvider.posts.isEmpty && !blogPostProvider.isLoading) {
+          await blogPostProvider.fetchPosts(refresh: true);
+        }
+        
+        _updateTabsWithCategories(blogPostProvider.posts);
+        _hasFetchedData = true;
+      } catch (e) {
+        print('Error fetching posts: $e');
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isInitialLoad = false;
+          });
+        }
+      }
+    });
+  }
+
+  void _updateTabsWithCategories(List<Post> posts) {
+    if (!mounted) return;
+
+    final categories = <String>{};
+    for (final post in posts) {
+      categories.add(post.category.name);
+    }
+
+    final newTabTitles = ['All News', ...categories.toList()];
+    
+    // Initialize scroll controllers and refresh controllers for new tabs
+    for (final title in newTabTitles) {
+      if (!_tabScrollControllers.containsKey(title)) {
+        _tabScrollControllers[title] = ScrollController();
+        _tabRefreshControllers[title] = RefreshController();
+        _tabScrollControllers[title]!.addListener(_handleScroll);
+      }
+    }
+
+    final newTabPages = [
+      _buildAllNewsPage(),
+      for (final category in categories)
+        _buildCategoryPage(category),
+    ];
+
+    if (newTabTitles.length != _tabTitles.length || !listEquals(newTabTitles, _tabTitles)) {
+      setState(() {
+        _tabTitles = newTabTitles;
+        _tabPages = newTabPages;
+        
+        _tabController.dispose();
+        _tabController = TabController(length: _tabTitles.length, vsync: this);
+      });
     }
   }
 
-  void _onTabTapped(int index) {
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
+  // Handle scroll for lazy loading
+  void _handleScroll() {
+    final currentTab = _tabTitles[_tabController.index];
+    final scrollController = _tabScrollControllers[currentTab];
+    final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
+    
+    if (scrollController == null) return;
+    
+    if (scrollController.offset >= scrollController.position.maxScrollExtent - 200 &&
+        !blogPostProvider.isLoadingMore &&
+        blogPostProvider.hasMore) {
+      _loadMorePosts(currentTab);
+    }
+  }
+
+  // Load more posts for a specific tab
+  Future<void> _loadMorePosts(String tabTitle) async {
+    final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
+    
+    if (blogPostProvider.isLoadingMore || !blogPostProvider.hasMore) return;
+    
+    try {
+      await blogPostProvider.loadMorePosts(category: tabTitle == 'All News' ? null : tabTitle);
+      
+    } catch (e) {
+      print('Error loading more posts for $tabTitle: $e');
+    }
+  }
+
+  // Handle pull-to-refresh
+  Future<void> _onRefresh(String tabTitle) async {
+    try {
+      final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
+      
+      if (tabTitle == 'All News') {
+        await blogPostProvider.fetchPosts(refresh: true);
+      } else {
+        await blogPostProvider.fetchPosts(refresh: true, category: tabTitle);
+      }
+      
+      _tabRefreshControllers[tabTitle]?.refreshCompleted();
+      
+    } catch (e) {
+      print('Refresh error: $e');
+      _tabRefreshControllers[tabTitle]?.refreshFailed();
+    }
+  }
+
+  bool get _shouldTabsBeScrollable {
+    return _tabTitles.length > 3;
+  }
+
+  double? get _tabWidth {
+    if (!_shouldTabsBeScrollable && _tabTitles.isNotEmpty) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      return screenWidth / _tabTitles.length;
+    }
+    return null;
+  }
+
+  Widget _buildAllNewsPage() {
+    return Consumer<BlogPostProvider>(
+      builder: (context, blogPostProvider, child) {
+        return _buildSmartRefresher(
+          'All News',
+          _buildPostList(blogPostProvider.posts, 'All News', blogPostProvider),
+          blogPostProvider,
+        );
+      },
     );
   }
 
-  @override
-  void dispose() {
-    _pageController.removeListener(_handlePageChange);
-    _pageController.dispose();
-    super.dispose();
+  Widget _buildCategoryPage(String categoryName) {
+    return Consumer<BlogPostProvider>(
+      builder: (context, blogPostProvider, child) {
+        final categoryPosts = blogPostProvider.getPostsByCategoryNameFromCache(categoryName);
+        return _buildSmartRefresher(
+          categoryName,
+          _buildPostList(categoryPosts, categoryName, blogPostProvider),
+          blogPostProvider,
+        );
+      },
+    );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        onLeadingIconClickFunction: (){}, 
-        isLeadingWidgetExist: ColorGlobalVariables.trueValue, 
-        leadingIconData: Icons.menu,
-        leadingIconDataColor: ColorGlobalVariables.fadedBlackColor,
-        titleText: 'GAG News',
-        titleTextColor: ColorGlobalVariables.redColor,
-        centerTitle: ColorGlobalVariables.trueValue,
-        actions: [
-          const SizedBox(width: 5,),
-          // globe icon button
-          CustomRoundIconButton(
-            iconData: FontAwesomeIcons.globe, 
-            buttonSize: 35,
-            iconSize: 18,
-            isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
-            onIconButtonClickFunction: (){}
-            ),
-          const SizedBox(width: 3,),
-          // bell notification icon
-          Stack(
-            children: [
-              CustomRoundIconButton(
-                iconData: Icons.notifications, 
-                iconSize: 18,
-                buttonSize: 35,
-                isBorderSlightlyCurved: ColorGlobalVariables.falseValue, 
-                onIconButtonClickFunction: (){}
-                ),
-              Positioned(
-                right: 2,
-                top: 3,
-                child: Container(
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red, // Dot color
-                    shape: BoxShape.circle,
-                  ),
-                  constraints: BoxConstraints(
-                    minWidth: 8,
-                    minHeight: 8,
-                  ),
-                ),
-              ),
-            ],
+  Widget _buildSmartRefresher(String tabTitle, Widget content, BlogPostProvider provider) {
+    return SmartRefresher(
+      controller: _tabRefreshControllers[tabTitle]!,
+      onRefresh: () => _onRefresh(tabTitle),
+      onLoading: () => _loadMorePosts(tabTitle),
+      enablePullDown: true,
+      enablePullUp: provider.hasMore,
+      header: ClassicHeader(
+        height: 60,
+        completeIcon: Icon(Icons.check, color: ColorGlobalVariables.brownColor),
+        completeText: 'Refresh Complete',
+        refreshingIcon: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(
+            strokeWidth: 2.0,
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
           ),
-          const SizedBox(width: 5,),
-        ],
+        ),
+        refreshingText: 'Refreshing...',
+        releaseIcon: Icon(Icons.arrow_upward, color: ColorGlobalVariables.brownColor),
+        releaseText: 'Release to refresh',
+        idleIcon: Icon(Icons.arrow_downward, color: Colors.grey.shade400),
+        idleText: 'Pull down to refresh',
+        textStyle: TextStyle(color: Colors.grey.shade600, fontSize: 12),
       ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Tab Links Row
-            Row(
+      footer: CustomFooter(
+        height: 60,
+        builder: (context, mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("Pull up to load more", 
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12));
+          } else if (mode == LoadStatus.loading) {
+            body = Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTabLink(0, "All"),
-                const SizedBox(width: 15),
-                _buildTabLink(1, "Popular"),
-                const SizedBox(width: 15),
-                _buildTabLink(2, "EV"),
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                    valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                  ),
+                ),
+                SizedBox(width: 8),
+                Text("Loading more...", 
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
               ],
+            );
+          } else if (mode == LoadStatus.failed) {
+            body = Text("Load failed! Click retry!", 
+              style: TextStyle(color: Colors.red.shade600, fontSize: 12));
+          } else if (mode == LoadStatus.canLoading) {
+            body = Text("Release to load more", 
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12));
+          } else {
+            body = Text("No more articles", 
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 12));
+          }
+          return Container(
+            height: 60,
+            child: Center(child: body),
+          );
+        },
+      ),
+      child: content,
+    );
+  }
+
+  Widget _buildPostList(List<Post> posts, String tabTitle, BlogPostProvider blogPostProvider) {
+    final isLoadingMore = blogPostProvider.isLoadingMore;
+
+    if (posts.isEmpty && !blogPostProvider.isLoading) {
+      return _buildEmptyState();
+    }
+
+    return ListView.builder(
+      controller: _tabScrollControllers[tabTitle],
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: posts.length + (isLoadingMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index < posts.length) {
+          final post = posts[index];
+          return _buildPostCard(post, tabTitle != 'All News', index);
+        } else {
+          return _buildLoadMoreIndicator();
+        }
+      },
+    );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Column(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0,
+                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              ),
             ),
-            
-            // PageView Content - Takes full width
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentIndex = index),
-                children: newsBlogTabPages,
+            const SizedBox(height: 8),
+            Text(
+              'Loading more articles...',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
               ),
             ),
           ],
@@ -134,33 +324,666 @@ class _NewsBlogPageState extends State<NewsBlogPage> {
     );
   }
 
-  Widget _buildTabLink(int tabIndex, String text) {
-    final isSelected = _currentIndex == tabIndex;
-    return Links(
-            linkTextType: text, 
-            isTextSmall: ColorGlobalVariables.trueValue, 
-            linkTextColor: isSelected ? ColorGlobalVariables.blackColor : ColorGlobalVariables.fadedBlackColor, 
-            textDecoration: isSelected ? TextDecoration.underline : TextDecoration.none,
-            linkFontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            isIconWidgetRequiredAtEnd: ColorGlobalVariables.falseValue, 
-            isIconWidgetRequiredAtFront: ColorGlobalVariables.falseValue, 
-            onClickFunction: () => _onTabTapped(tabIndex)
-                    );
-    // GestureDetector(
-    //   onTap: () => _onTabTapped(tabIndex),
-    //   child: Text(
-    //     text,
-    //     style: TextStyle(
-    //       color: isSelected 
-    //           ? ColorGlobalVariables.blackColor 
-    //           : ColorGlobalVariables.fadedBlackColor,
-    //       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-    //       fontSize: isSelected ? 16 : 14,
-    //       decoration: isSelected 
-    //           ? TextDecoration.underline 
-    //           : TextDecoration.none,
-    //     ),
-    //   ),
-    // );
+  Widget _buildImageShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // KEEP ALL YOUR EXISTING UI METHODS EXACTLY AS THEY WERE
+  Widget _buildPostCard(Post post, bool showCategoryBadge, int index) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300 + (index * 100)),
+      curve: Curves.easeOut,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              Get.toNamed(RouteClass.getMainNewsPage(), arguments: post);
+            },
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image with gradient overlay
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                        child: CachedNetworkImage(
+                          imageUrl: getImageUrl(post.image, null),
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => _buildImageShimmer(),
+                          errorWidget: (context, url, error) {
+                            return Container(
+                              height: 200,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    ColorGlobalVariables.brownColor.withOpacity(0.1),
+                                    ColorGlobalVariables.brownColor.withOpacity(0.3),
+                                  ],
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.article_outlined,
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      
+                      // Gradient overlay
+                      Container(
+                        height: 200,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.3),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      // Category badge on image
+                      if (showCategoryBadge)
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: ColorGlobalVariables.redColor,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              post.category.name.toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      
+                      // Reading time indicator
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.schedule, color: Colors.white, size: 12),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${_calculateReadingTime(post.content)} min',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  // Content section
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          post.title,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: ColorGlobalVariables.blackColor,
+                            height: 1.3,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        
+                        const SizedBox(height: 12),
+                        
+                        Text(
+                          post.description ?? 'Discover the latest insights in automotive innovation...',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade700,
+                            height: 1.5,
+                          ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.person,
+                                    color: ColorGlobalVariables.brownColor,
+                                    size: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'GAG Editorial',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: ColorGlobalVariables.blackColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      _formatDate(post.createdAt),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            
+                            Row(
+                              children: [
+                                _buildEngagementStat(
+                                  icon: Icons.favorite_outline,
+                                  count: _calculateLikes(post),
+                                  color: Colors.red.shade400,
+                                ),
+                                const SizedBox(width: 16),
+                                _buildEngagementStat(
+                                  icon: Icons.comment_outlined,
+                                  count: post.tags.length.toString(),
+                                  color: Colors.blue.shade400,
+                                ),
+                                const SizedBox(width: 16),
+                                _buildEngagementStat(
+                                  icon: Icons.share_outlined,
+                                  count: 0.toString(),
+                                  color: Colors.green.shade400,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEngagementStat({required IconData icon, required String count, required Color color}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 4),
+        Text(
+          count,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.article_outlined,
+              size: 50,
+              color: Colors.grey.shade400,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No Articles Yet',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Check back later for new content',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+    
+    if (difference.inDays > 365) return '${(difference.inDays / 365).floor()}y ago';
+    if (difference.inDays > 30) return '${(difference.inDays / 30).floor()}mo ago';
+    if (difference.inDays > 0) return '${difference.inDays}d ago';
+    if (difference.inHours > 0) return '${difference.inHours}h ago';
+    return 'Just now';
+  }
+
+  String _calculateLikes(Post post) {
+    final hoursSincePosted = DateTime.now().difference(post.createdAt).inHours;
+    return '${(hoursSincePosted * 0.1).ceil()}';
+  }
+
+  int _calculateReadingTime(String content) {
+    final wordCount = content.split(RegExp(r'\s+')).length;
+    return (wordCount / 200).ceil();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    _refreshController.dispose();
+    
+    // Dispose all scroll controllers and refresh controllers
+    for (final controller in _tabScrollControllers.values) {
+      controller.dispose();
+    }
+    for (final controller in _tabRefreshControllers.values) {
+      controller.dispose();
+    }
+    
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isInitialLoad) {
+      _fetchPostsAfterBuild();
+    }
+
+    return Scaffold(
+      backgroundColor: Colors.grey.shade50,
+      body: NestedScrollView(
+        controller: _scrollController,
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              elevation: innerBoxIsScrolled ? 4 : 0,
+              pinned: true,
+              floating: true,
+              snap: true,
+              expandedHeight: 140,
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.white,
+                        Colors.grey.shade50,
+                      ],
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 70, left: 24, right: 24, bottom: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            'GAG News',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: ColorGlobalVariables.redColor,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            'Latest automotive insights & industry news',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              leading: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CustomRoundIconButton(
+                  iconData: Icons.arrow_back_ios,
+                  buttonSize: 40,
+                  iconSize: 20,
+                  backgroundColor: Colors.grey.shade100,
+                  iconDataColor: ColorGlobalVariables.fadedBlackColor,
+                  isBorderSlightlyCurved: false,
+                  onIconButtonClickFunction: () {
+                    Get.back();
+                  },
+                ),
+              ),
+              actions: _buildAppBarActions(),
+            ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search articles, brands, topics...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 8),
+                        child: Icon(Icons.search_rounded, color: Colors.grey.shade500, size: 20),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    style: TextStyle(
+                      color: ColorGlobalVariables.blackColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            SliverToBoxAdapter(
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TabBar(
+                        controller: _tabController,
+                        isScrollable: _shouldTabsBeScrollable,
+                        indicator: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          gradient: LinearGradient(
+                            colors: [
+                              ColorGlobalVariables.brownColor,
+                              ColorGlobalVariables.brownColor.withOpacity(0.8),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.grey.shade600,
+                        labelStyle: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.2,
+                        ),
+                        unselectedLabelStyle: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade600,
+                        ),
+                        tabAlignment: _shouldTabsBeScrollable ? TabAlignment.start : TabAlignment.fill,
+                        tabs: _tabTitles.map((title) => Tab(
+                          child: Container(
+                            width: _tabWidth,
+                            constraints: _shouldTabsBeScrollable 
+                                ? const BoxConstraints(minWidth: 80)
+                                : null,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            child: Text(
+                              title,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ];
+        },
+        body: Consumer<BlogPostProvider>(
+          builder: (context, blogPostProvider, child) {
+            return _isInitialLoad || blogPostProvider.isLoading
+                ? _buildLoadingState()
+                : TabBarView(
+                    controller: _tabController,
+                    children: _tabPages,
+                  );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              backgroundColor: Colors.grey.shade200,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Loading Articles',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Discovering the latest automotive news',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildAppBarActions() {
+    return [
+      _buildAppBarAction(
+        icon: Icons.notifications_outlined,
+        badge: true,
+        onTap: () {},
+      ),
+      const SizedBox(width: 16),
+    ];
+  }
+
+  Widget _buildAppBarAction({required IconData icon, required bool badge, required VoidCallback onTap}) {
+    return Stack(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 18, color: Colors.grey.shade700),
+        ),
+        if (badge)
+          Positioned(
+            right: 2,
+            top: 2,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }

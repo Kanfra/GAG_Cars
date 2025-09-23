@@ -50,7 +50,7 @@ mixin _$MyListing {
   String? get buildType => throw _privateConstructorUsedError;
   @JsonKey(name: 'number_of_passengers')
   int? get numberOfPassengers => throw _privateConstructorUsedError;
-  List<String> get features => throw _privateConstructorUsedError;
+  List<dynamic> get features => throw _privateConstructorUsedError;
   dynamic get status => throw _privateConstructorUsedError;
   String get price => throw _privateConstructorUsedError;
   String? get mileage => throw _privateConstructorUsedError;
@@ -65,6 +65,8 @@ mixin _$MyListing {
   String get updatedAt => throw _privateConstructorUsedError;
   dynamic get Height => throw _privateConstructorUsedError;
   dynamic get VIN => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_promoted')
+  bool? get isPromoted => throw _privateConstructorUsedError;
 
   /// Serializes this MyListing to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -102,7 +104,7 @@ abstract class $MyListingCopyWith<$Res> {
       String? color,
       @JsonKey(name: 'build_type') String? buildType,
       @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
-      List<String> features,
+      List<dynamic> features,
       dynamic status,
       String price,
       String? mileage,
@@ -112,7 +114,8 @@ abstract class $MyListingCopyWith<$Res> {
       @JsonKey(name: 'created_at') String createdAt,
       @JsonKey(name: 'updated_at') String updatedAt,
       dynamic Height,
-      dynamic VIN});
+      dynamic VIN,
+      @JsonKey(name: 'is_promoted') bool? isPromoted});
 }
 
 /// @nodoc
@@ -161,6 +164,7 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
     Object? updatedAt = null,
     Object? Height = freezed,
     Object? VIN = freezed,
+    Object? isPromoted = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -246,7 +250,7 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
       features: null == features
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<dynamic>,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -287,6 +291,10 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
           ? _value.VIN
           : VIN // ignore: cast_nullable_to_non_nullable
               as dynamic,
+      isPromoted: freezed == isPromoted
+          ? _value.isPromoted
+          : isPromoted // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 }
@@ -320,7 +328,7 @@ abstract class _$$MyListingImplCopyWith<$Res>
       String? color,
       @JsonKey(name: 'build_type') String? buildType,
       @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
-      List<String> features,
+      List<dynamic> features,
       dynamic status,
       String price,
       String? mileage,
@@ -330,7 +338,8 @@ abstract class _$$MyListingImplCopyWith<$Res>
       @JsonKey(name: 'created_at') String createdAt,
       @JsonKey(name: 'updated_at') String updatedAt,
       dynamic Height,
-      dynamic VIN});
+      dynamic VIN,
+      @JsonKey(name: 'is_promoted') bool? isPromoted});
 }
 
 /// @nodoc
@@ -377,6 +386,7 @@ class __$$MyListingImplCopyWithImpl<$Res>
     Object? updatedAt = null,
     Object? Height = freezed,
     Object? VIN = freezed,
+    Object? isPromoted = freezed,
   }) {
     return _then(_$MyListingImpl(
       id: null == id
@@ -462,7 +472,7 @@ class __$$MyListingImplCopyWithImpl<$Res>
       features: null == features
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<dynamic>,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -503,6 +513,10 @@ class __$$MyListingImplCopyWithImpl<$Res>
           ? _value.VIN
           : VIN // ignore: cast_nullable_to_non_nullable
               as dynamic,
+      isPromoted: freezed == isPromoted
+          ? _value.isPromoted
+          : isPromoted // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -531,7 +545,7 @@ class _$MyListingImpl implements _MyListing {
       this.color,
       @JsonKey(name: 'build_type') this.buildType,
       @JsonKey(name: 'number_of_passengers') this.numberOfPassengers,
-      required final List<String> features,
+      required final List<dynamic> features,
       this.status,
       required this.price,
       this.mileage,
@@ -541,7 +555,8 @@ class _$MyListingImpl implements _MyListing {
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'updated_at') required this.updatedAt,
       this.Height,
-      this.VIN})
+      this.VIN,
+      @JsonKey(name: 'is_promoted') this.isPromoted})
       : _images = images,
         _features = features;
 
@@ -604,9 +619,9 @@ class _$MyListingImpl implements _MyListing {
   @override
   @JsonKey(name: 'number_of_passengers')
   final int? numberOfPassengers;
-  final List<String> _features;
+  final List<dynamic> _features;
   @override
-  List<String> get features {
+  List<dynamic> get features {
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_features);
@@ -636,10 +651,13 @@ class _$MyListingImpl implements _MyListing {
   final dynamic Height;
   @override
   final dynamic VIN;
+  @override
+  @JsonKey(name: 'is_promoted')
+  final bool? isPromoted;
 
   @override
   String toString() {
-    return 'MyListing(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, Height: $Height, VIN: $VIN)';
+    return 'MyListing(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, Height: $Height, VIN: $VIN, isPromoted: $isPromoted)';
   }
 
   @override
@@ -690,7 +708,9 @@ class _$MyListingImpl implements _MyListing {
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             const DeepCollectionEquality().equals(other.Height, Height) &&
-            const DeepCollectionEquality().equals(other.VIN, VIN));
+            const DeepCollectionEquality().equals(other.VIN, VIN) &&
+            (identical(other.isPromoted, isPromoted) ||
+                other.isPromoted == isPromoted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -727,7 +747,8 @@ class _$MyListingImpl implements _MyListing {
         createdAt,
         updatedAt,
         const DeepCollectionEquality().hash(Height),
-        const DeepCollectionEquality().hash(VIN)
+        const DeepCollectionEquality().hash(VIN),
+        isPromoted
       ]);
 
   /// Create a copy of MyListing
@@ -768,7 +789,7 @@ abstract class _MyListing implements MyListing {
       final String? color,
       @JsonKey(name: 'build_type') final String? buildType,
       @JsonKey(name: 'number_of_passengers') final int? numberOfPassengers,
-      required final List<String> features,
+      required final List<dynamic> features,
       final dynamic status,
       required final String price,
       final String? mileage,
@@ -778,7 +799,8 @@ abstract class _MyListing implements MyListing {
       @JsonKey(name: 'created_at') required final String createdAt,
       @JsonKey(name: 'updated_at') required final String updatedAt,
       final dynamic Height,
-      final dynamic VIN}) = _$MyListingImpl;
+      final dynamic VIN,
+      @JsonKey(name: 'is_promoted') final bool? isPromoted}) = _$MyListingImpl;
 
   factory _MyListing.fromJson(Map<String, dynamic> json) =
       _$MyListingImpl.fromJson;
@@ -834,7 +856,7 @@ abstract class _MyListing implements MyListing {
   @JsonKey(name: 'number_of_passengers')
   int? get numberOfPassengers;
   @override
-  List<String> get features;
+  List<dynamic> get features;
   @override
   dynamic get status;
   @override
@@ -859,6 +881,9 @@ abstract class _MyListing implements MyListing {
   dynamic get Height;
   @override
   dynamic get VIN;
+  @override
+  @JsonKey(name: 'is_promoted')
+  bool? get isPromoted;
 
   /// Create a copy of MyListing
   /// with the given fields replaced by the non-null parameter values.

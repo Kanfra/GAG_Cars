@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/myListingsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getMyListingsProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
 
 class MyListingPage extends StatefulWidget {
@@ -19,19 +17,35 @@ class MyListingPage extends StatefulWidget {
   State<MyListingPage> createState() => _MyListingPageState();
 }
 
-class _MyListingPageState extends State<MyListingPage> {
+class _MyListingPageState extends State<MyListingPage> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   Timer? _loadMoreDebouncer;
   late MyListingsProvider _provider;
   final logger = Logger();
   bool _isFirstLoad = true;
+  
+  // Tab controller and state variables
+  late TabController _tabController;
+  List<MyListing> _liveListings = [];
+  List<MyListing> _soldListings = [];
+  int _currentTabIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _provider = MyListingsProvider();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
     _loadInitialData();
     _scrollController.addListener(_scrollListener);
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      setState(() {
+        _currentTabIndex = _tabController.index;
+      });
+    }
   }
 
   @override
@@ -48,7 +62,8 @@ class _MyListingPageState extends State<MyListingPage> {
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 100 &&
         !_provider.isLoading &&
-        _provider.hasMore) {
+        _provider.hasMore &&
+        _currentTabIndex == 0) { // Only load more for Live tab
       
       _loadMoreDebouncer?.cancel();
       _loadMoreDebouncer = Timer(const Duration(milliseconds: 500), () {
@@ -65,11 +80,18 @@ class _MyListingPageState extends State<MyListingPage> {
     await _provider.refreshListings();
   }
 
+  // Separate listings into live and sold
+  void _separateListings(List<MyListing> allListings) {
+    _liveListings = allListings.where((listing) => listing.status != 'sold').toList();
+    _soldListings = allListings.where((listing) => listing.status == 'sold').toList();
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     _loadMoreDebouncer?.cancel();
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -80,56 +102,166 @@ class _MyListingPageState extends State<MyListingPage> {
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Scaffold(
-        appBar: CustomAppbar(
-          onLeadingIconClickFunction: () => Get.back(),
-          isLeadingWidgetExist: true,
-          leadingIconData: Icons.arrow_back_ios,
-          appbarBackgroundColor: ColorGlobalVariables.whiteColor,
-          leadingIconDataColor: ColorGlobalVariables.fadedBlackColor,
-          titleText: "My Listings",
-          titleTextColor: ColorGlobalVariables.brownColor,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 1,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios, color: ColorGlobalVariables.brownColor, size: 20),
+            onPressed: () => Get.back(),
+          ),
+          title: Text(
+            "My Listings",
+            style: TextStyle(
+              color: ColorGlobalVariables.brownColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+            ),
+          ),
           centerTitle: true,
           actions: [
-            const SizedBox(width: 5),
-            Stack(
-              children: [
-                CustomRoundIconButton(
-                  iconData: Icons.notifications,
-                  iconSize: 18,
-                  buttonSize: 35,
-                  isBorderSlightlyCurved: false,
-                  onIconButtonClickFunction: () {}
-                ),
-                Positioned(
-                  right: 2,
-                  top: 3,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 8,
-                      minHeight: 8,
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.notifications_none, color: ColorGlobalVariables.brownColor, size: 24),
+                    onPressed: () {},
+                  ),
+                  Positioned(
+                    right: 12,
+                    top: 12,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const SizedBox(width: 5),
           ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(60),
+            child: Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Container(
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    indicator: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.grey[600],
+                    labelStyle: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.local_offer_outlined, size: 18),
+                            const SizedBox(width: 6),
+                            const Text('Live'),
+                          ],
+                        ),
+                      ),
+                      Tab(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.verified_outlined, size: 18),
+                            const SizedBox(width: 6),
+                            const Text('Sold'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         body: SafeArea(
           child: Consumer<MyListingsProvider>(
             builder: (context, provider, child) {
+              // Separate listings whenever provider data changes
+              if (provider.listings.isNotEmpty && (_liveListings.isEmpty && _soldListings.isEmpty)) {
+                _separateListings(provider.listings);
+              }
+
               return Container(
                 width: screenSize.width,
                 height: screenSize.height,
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
                 ),
-                child: _buildContent(provider),
+                child: Column(
+                  children: [
+                    // Tab Bar Stats
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      color: Colors.white,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem(_liveListings.length, 'Active', Colors.blue),
+                          _buildStatItem(_soldListings.length, 'Sold', Colors.green),
+                          _buildStatItem(_liveListings.length + _soldListings.length, 'Total', ColorGlobalVariables.brownColor),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 1),
+                    
+                    // Tab Content
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [
+                          // Live Tab
+                          _buildTabContent(_liveListings, provider, isLiveTab: true),
+                          
+                          // Sold Tab
+                          _buildTabContent(_soldListings, provider, isLiveTab: false),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -138,49 +270,80 @@ class _MyListingPageState extends State<MyListingPage> {
     );
   }
 
-  Widget _buildContent(MyListingsProvider provider) {
+  Widget _buildStatItem(int count, String label, Color color) {
+    return Column(
+      children: [
+        Text(
+          count.toString(),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTabContent(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab}) {
     if (provider.isInitialLoad && provider.isLoading) {
       return _buildLoadingState();
     }
 
-    if (provider.error != null && provider.listings.isEmpty) {
+    if (provider.error != null && listings.isEmpty) {
       return _buildErrorState(provider);
     }
 
-    return RefreshIndicator(
-      onRefresh: _refreshListings,
-      child: CustomScrollView(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        slivers: [
-          // Header with item count
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'My Vehicles',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
+    return isLiveTab 
+      ? RefreshIndicator(
+          onRefresh: _refreshListings,
+          child: _buildListView(listings, provider, isLiveTab: isLiveTab),
+        )
+      : _buildListView(listings, provider, isLiveTab: isLiveTab);
+  }
+
+  Widget _buildListView(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab}) {
+    return CustomScrollView(
+      controller: isLiveTab ? _scrollController : null,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        // Header with item count
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isLiveTab ? 'My Vehicles' : 'Sold Vehicles',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                  Text(
-                    '${provider.loadedCount}${provider.totalCount > 0 ? '/${provider.totalCount}' : ''} items',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                ),
+                Text(
+                  '${listings.length}${isLiveTab && provider.totalCount > 0 ? '/${provider.totalCount}' : ''} items',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
+        ),
 
-          // Grid View
+        // Grid View
+        if (listings.isNotEmpty)
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             sliver: SliverGrid(
@@ -192,35 +355,32 @@ class _MyListingPageState extends State<MyListingPage> {
               ),
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final listing = provider.listings[index];
-                  return _buildListingItem(listing);
+                  final listing = listings[index];
+                  return _buildListingItem(listing, isLiveTab: isLiveTab);
                 },
-                childCount: provider.listings.length,
+                childCount: listings.length,
               ),
             ),
           ),
 
-          // Loading More Indicator
+        // Loading More Indicator (only for Live tab)
+        if (isLiveTab && provider.isLoading)
           SliverToBoxAdapter(
-            child: provider.isLoading
-                ? _buildLoadMoreIndicator()
-                : const SizedBox.shrink(),
+            child: _buildLoadMoreIndicator(),
           ),
 
-          // No More Items Message
+        // No More Items Message (only for Live tab)
+        if (isLiveTab && !provider.hasMore && listings.isNotEmpty)
           SliverToBoxAdapter(
-            child: !provider.hasMore && provider.listings.isNotEmpty
-                ? _buildNoMoreItems()
-                : const SizedBox.shrink(),
+            child: _buildNoMoreItems(),
           ),
 
-          // Empty State
-          if (provider.listings.isEmpty && !provider.isLoading)
-            SliverToBoxAdapter(
-              child: _buildEmptyState(),
-            ),
-        ],
-      ),
+        // Empty State
+        if (listings.isEmpty && !provider.isLoading)
+          SliverToBoxAdapter(
+            child: _buildEmptyState(isLiveTab: isLiveTab),
+          ),
+      ],
     );
   }
 
@@ -313,7 +473,7 @@ class _MyListingPageState extends State<MyListingPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState({required bool isLiveTab}) {
     return Padding(
       padding: const EdgeInsets.all(40),
       child: Center(
@@ -323,7 +483,7 @@ class _MyListingPageState extends State<MyListingPage> {
             Icon(Icons.car_repair, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
-              'No listings yet',
+              isLiveTab ? 'No listings yet' : 'No sold items',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -332,39 +492,43 @@ class _MyListingPageState extends State<MyListingPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Start by adding your first vehicle listing',
+              isLiveTab 
+                ? 'Start by adding your first vehicle listing'
+                : 'Items you mark as sold will appear here',
               style: TextStyle(
                 color: Colors.grey[500],
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to create listing page
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorGlobalVariables.redColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            if (isLiveTab) const SizedBox(height: 20),
+            if (isLiveTab)
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to create listing page
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorGlobalVariables.redColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                child: const Text('Add Listing', style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('Add Listing', style: TextStyle(color: Colors.white)),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildListingItem(MyListing listing) {
+  Widget _buildListingItem(MyListing listing, {required bool isLiveTab}) {
     final price = _parseSafeDouble(listing.price) ?? 0;
     final mileage = _parseSafeDouble(listing.mileage) ?? 0;
     final condition = listing.condition?.toString() ?? "Used";
     final transmission = listing.transmission ?? "Manual";
     final location = listing.location.isNotEmpty ? listing.location : "Unknown";
+    final isPromoted = listing.isPromoted == true;
 
     return GestureDetector(
       onTap: () {
@@ -426,6 +590,74 @@ class _MyListingPageState extends State<MyListingPage> {
                     ),
                   ),
                 ),
+
+                // Sold Badge for sold items
+                if (!isLiveTab)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        'SOLD',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Promoted Badge for promoted items (only on live tab)
+                if (isPromoted && isLiveTab)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[700],
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, color: Colors.white, size: 12),
+                          const SizedBox(width: 2),
+                          Text(
+                            'FEATURED',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                // Promoted Gradient Overlay (subtle visual indicator)
+                if (isPromoted && isLiveTab)
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.amber.withOpacity(0.1),
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.5],
+                      ),
+                    ),
+                  ),
               ],
             ),
 
@@ -442,10 +674,10 @@ class _MyListingPageState extends State<MyListingPage> {
                       Expanded(
                         child: Text(
                           listing.name.isNotEmpty ? listing.name : 'Unnamed Vehicle',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: isLiveTab ? Colors.black87 : Colors.grey[600],
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -472,7 +704,7 @@ class _MyListingPageState extends State<MyListingPage> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: ColorGlobalVariables.redColor,
+                          color: isLiveTab ? ColorGlobalVariables.redColor : Colors.grey[600],
                         ),
                       ),
                       Row(
@@ -534,6 +766,33 @@ class _MyListingPageState extends State<MyListingPage> {
                       ),
                     ],
                   ),
+
+                  // Promoted indicator ribbon (below content)
+                  // if (isPromoted && isLiveTab)
+                  //   Container(
+                  //     margin: const EdgeInsets.only(top: 8),
+                  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.amber[50],
+                  //       borderRadius: BorderRadius.circular(4),
+                  //       border: Border.all(color: Colors.amber[200]!, width: 1),
+                  //     ),
+                  //     child: Row(
+                  //       mainAxisSize: MainAxisSize.min,
+                  //       children: [
+                  //         Icon(Icons.star, color: Colors.amber[700], size: 12),
+                  //         const SizedBox(width: 4),
+                  //         Text(
+                  //           'Promoted Listing',
+                  //           style: TextStyle(
+                  //             color: Colors.amber[800],
+                  //             fontSize: 10,
+                  //             fontWeight: FontWeight.w600,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
                 ],
               ),
             ),

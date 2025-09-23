@@ -29,8 +29,7 @@ _$MyListingImpl _$$MyListingImplFromJson(Map<String, dynamic> json) =>
       color: json['color'] as String?,
       buildType: json['build_type'] as String?,
       numberOfPassengers: (json['number_of_passengers'] as num?)?.toInt(),
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
+      features: json['features'] as List<dynamic>,
       status: json['status'],
       price: json['price'] as String,
       mileage: json['mileage'] as String?,
@@ -41,6 +40,7 @@ _$MyListingImpl _$$MyListingImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] as String,
       Height: json['Height'],
       VIN: json['VIN'],
+      isPromoted: json['is_promoted'] as bool?,
     );
 
 Map<String, dynamic> _$$MyListingImplToJson(_$MyListingImpl instance) =>
@@ -76,4 +76,5 @@ Map<String, dynamic> _$$MyListingImplToJson(_$MyListingImpl instance) =>
       'updated_at': instance.updatedAt,
       'Height': instance.Height,
       'VIN': instance.VIN,
+      'is_promoted': instance.isPromoted,
     };

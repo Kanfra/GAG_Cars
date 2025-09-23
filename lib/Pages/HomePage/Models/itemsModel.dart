@@ -6,6 +6,26 @@ part 'itemsModel.freezed.dart';
 part 'itemsModel.g.dart';
 
 @freezed
+class User with _$User {
+  const factory User({
+    required String id,
+    required String name,
+    required String email,
+    String? phone,
+    @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+    @JsonKey(name: 'paid_seller') int? paidSeller,
+    @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'country_id') int? countryId,
+    @JsonKey(name: 'state_id') int? stateId,
+    @JsonKey(name: 'profile_photo') String? profilePhoto,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+
+@freezed
 class Brand with _$Brand {
   const factory Brand({
     required int id,
@@ -13,8 +33,8 @@ class Brand with _$Brand {
     required String name,
     required String slug,
     String? image,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Brand;
 
   factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
@@ -27,8 +47,8 @@ class BrandModel with _$BrandModel {
     @JsonKey(name: 'brand_id') required int brandId,
     required String name,
     required String slug,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _BrandModel;
 
   factory BrandModel.fromJson(Map<String, dynamic> json) => 
@@ -46,8 +66,8 @@ class Category with _$Category {
     String? description,
     List<String>? features,
     String? image,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Category;
 
   factory Category.fromJson(Map<String, dynamic> json) => 
@@ -57,15 +77,15 @@ class Category with _$Category {
 @freezed
 class RecommendedItem with _$RecommendedItem {
   const factory RecommendedItem({
-    required String id, // Keep required if truly mandatory
+    required String id,
     @JsonKey(name: 'user_id') String? userId,
     @JsonKey(name: 'country_id') int? countryId,
     @JsonKey(name: 'brand_model_id') int? brandModelId,
     @JsonKey(name: 'brand_id') int? brandId,
     @JsonKey(name: 'category_id') int? categoryId,
-    String? name, // Make nullable
-    String? year, // Make nullable
-    String? slug, // Make nullable
+    String? name,
+    String? year,
+    String? slug,
     String? description,
     List<String>? images,
     String? location,
@@ -78,18 +98,21 @@ class RecommendedItem with _$RecommendedItem {
     @JsonKey(name: 'build_type') String? buildType,
     @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
     List<String>? features,
-    String? status, // Make nullable
-    String? price, // Make nullable
+    String? status,
+    String? price,
     String? mileage,
-    int? warranty, // Make nullable
-    @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
-    @JsonKey(name: 'deleted_at') String? deletedAt,
-    @JsonKey(name: 'created_at') DateTime? createdAt, // Make nullable
-    @JsonKey(name: 'updated_at') DateTime? updatedAt, // Make nullable
+    int? warranty,
+    @JsonKey(name: 'warranty_expiration') DateTime? warrantyExpiration,
+    @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    String? height,
+    String? vin,
     Brand? brand,
     Category? category,
     @JsonKey(name: 'brand_model') BrandModel? brandModel,
-    @JsonKey(name: 'brandModel') BrandModel? brandModelAlt,
+    User? user,
+    @JsonKey(name: 'is_promoted') bool? isPromoted,
   }) = _RecommendedItem;
 
   factory RecommendedItem.fromJson(Map<String, dynamic> json) => 

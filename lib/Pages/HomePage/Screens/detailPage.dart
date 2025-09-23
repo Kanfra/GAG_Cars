@@ -11,41 +11,33 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class DetailPage extends StatefulWidget {
-  //final List<String> imageUrls;
   final Map<String, dynamic> allJson;
   const DetailPage({
     super.key, 
     required this.allJson,
-    //required this.imageUrls
-    });
+  });
 
-  
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
   final ScrollController _scrollController = ScrollController();
-  final double _appBarHeight = 300;
-  double _lastScrollPosition = 0;
-  bool _isAppBarVisible = true;
+  double _appBarHeight = 300;
+  double _imageOpacity = 1.0;
+  int selectedIndex = 0;
 
   late final Map<String, dynamic> item;
   late final Map<String, dynamic>? product;
   late final String? type;
-
-  List<String> imageUrls = [
-    "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
-    "${ImageStringGlobalVariables.imagePath}red_car_temporary.png",
-    "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
-    "${ImageStringGlobalVariables.imagePath}ford_temporary.png",
-    ];
 
   @override
   void initState() {
@@ -53,718 +45,1157 @@ class _DetailPageState extends State<DetailPage> {
     item = widget.allJson['item'] as Map<String, dynamic>;
     product = widget.allJson['product'] as Map<String, dynamic>;
     type = widget.allJson['type'] as String?;
-    _scrollController.addListener(_handleScroll);
+    
+    // Use WidgetsBinding to ensure build is complete before loading category details
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadCategoryDetails();
+    });
+    
+    _scrollController.addListener(() {
+      if (mounted) {
+        setState(() {
+          final scrollOffset = _scrollController.offset;
+          _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
+          
+          if (scrollOffset > 0) {
+            _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
+          } else {
+            _appBarHeight = 300.0;
+          }
+        });
+      }
+    });
   }
 
-  void _handleScroll() {
-    final currentPosition = _scrollController.position.pixels;
-    final scrollDirection = currentPosition > _lastScrollPosition ? 'down' : 'up';
-    _lastScrollPosition = currentPosition;
-
-    if (scrollDirection == 'down' && _isAppBarVisible) {
-      setState(() => _isAppBarVisible = false);
-    } else if (scrollDirection == 'up' && !_isAppBarVisible) {
-      setState(() => _isAppBarVisible = true);
+  void _preloadCategoryDetails() {
+    if (!mounted) return;
+    
+    final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    if (categoryId != null) {
+      final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: false);
+      // Check if we already have the data to avoid unnecessary API calls
+      if (!categoryDetailProvider.categoryDetails.containsKey(categoryId)) {
+        categoryDetailProvider.fetchCategoryDetail(categoryId);
+      }
     }
+  }
+
+  // Helper method to safely extract category ID from various formats
+  int? _extractCategoryId(dynamic category) {
+    if (category == null) return null;
+    
+    if (category is Map<String, dynamic>) {
+      return category['id'] as int?;
+    } else if (category is num) {
+      return category.toInt();
+    } else {
+      try {
+        return category.id as int?;
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    return null;
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
+  Widget _buildShimmerPlaceholder(double? width, double? height) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: width,
+        height: height,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildCustomErrorWidget(double? width, double? height) {
+    return Container(
+      width: width,
+      height: height,
+      color: Colors.grey[300],
+      child: Center(
+        child: Icon(
+          Icons.broken_image,
+          size: (width ?? 45) * 0.4,
+          color: Colors.grey[400],
+        ),
+      ),
+    );
+  }
+
+  Widget buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+    try {
+      if (imagePath.startsWith('http')) {
+        return Image.network(
+          imagePath,
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return _buildShimmerPlaceholder(width, height);
+          },
+          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+            if (wasSynchronouslyLoaded) return child;
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: frame != null ? child : _buildShimmerPlaceholder(width, height),
+            );
+          },
+        );
+      } else if (imagePath.startsWith('assets/')) {
+        return Image.asset(
+          imagePath,
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height),
+          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+            if (wasSynchronouslyLoaded) return child;
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: frame != null ? child : _buildShimmerPlaceholder(width, height),
+            );
+          },
+        );
+      } else {
+        return _buildCustomErrorWidget(width, height);
+      }
+    } catch (e) {
+      return _buildCustomErrorWidget(width, height);
+    }
+  }
+
+  List<dynamic> getItemImages() {
+    try {
+      final images = item['images'];
+      if (images is List && images.isNotEmpty) {
+        return images.whereType<String>().toList();
+      }
+    } catch (e) {
+      // Handle error
+    }
+    return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
+  }
+
+  // Get highlights data dynamically based on category configuration
+  List<Map<String, String>> getHighlights() {
+    final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    if (categoryId == null) {
+      return _getDefaultHighlights();
+    }
+    
+    final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: true);
+    return categoryDetailProvider.buildHighlights(categoryId, item);
+  }
+
+  // Get specifications data dynamically based on category configuration
+  List<Map<String, String>> getSpecifications() {
+    final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    if (categoryId == null) {
+      return _getDefaultSpecifications();
+    }
+    
+    final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: true);
+    return categoryDetailProvider.buildSpecifications(categoryId, item);
+  }
+
+  // Safe method to extract string value from dynamic objects
+  String? _safeGetString(dynamic obj, String key) {
+    if (obj == null) return null;
+    
+    if (obj is Map<String, dynamic>) {
+      final value = obj[key];
+      return value?.toString();
+    }
+    
+    // Try direct property access for custom objects
+    try {
+      switch (key) {
+        case 'name':
+          return obj.name?.toString();
+        case 'id':
+          return obj.id?.toString();
+        case 'label':
+          return obj.label?.toString();
+        case 'createdAt':
+          return obj.createdAt?.toString();
+        case 'profilePhoto':
+          return obj.profilePhoto?.toString();
+        default:
+          return obj.toString();
+      }
+    } catch (e) {
+      // Fallback if property doesn't exist
+      return obj.toString();
+    }
+  }
+
+  // Default highlights fallback - SAFELY ACCESSING DATA
+  List<Map<String, String>> _getDefaultHighlights() {
+    final List<Map<String, String>> highlights = [];
+    
+    if (item['year'] != null) {
+      highlights.add({'title': 'Model Year', 'value': item['year'].toString()});
+    }
+    if (item['mileage'] != null) {
+      highlights.add({'title': 'Mileage', 'value': '${item['mileage']} km'});
+    }
+    if (item['engine_capacity'] != null) {
+      highlights.add({'title': 'Engine', 'value': '${item['engine_capacity']} L'});
+    }
+    if (item['condition'] != null) {
+      highlights.add({'title': 'Condition', 'value': item['condition'].toString()});
+    }
+    
+    return highlights.isNotEmpty ? highlights : [
+      {'title': 'Model Year', 'value': 'N/A'},
+      {'title': 'Mileage', 'value': 'N/A'},
+      {'title': 'Engine', 'value': 'N/A'},
+    ];
+  }
+
+  // Default specifications fallback - SAFELY ACCESSING DATA
+  List<Map<String, String>> _getDefaultSpecifications() {
+    final List<Map<String, String>> specifications = [];
+    
+    final categoryName = _safeGetString(item['category'], 'name') ?? 
+                        _safeGetString(item['brand'], 'name');
+    if (categoryName != null) {
+      specifications.add({'title': 'Make', 'value': categoryName});
+    }
+    
+    final modelName = _safeGetString(item['brand_model'], 'name');
+    if (modelName != null) {
+      specifications.add({'title': 'Model', 'value': modelName});
+    }
+    
+    if (item['color'] != null) {
+      specifications.add({'title': 'Color', 'value': item['color'].toString()});
+    }
+    
+    if (item['number_of_passengers'] != null) {
+      specifications.add({'title': 'Seats', 'value': '${item['number_of_passengers']} seats'});
+    }
+    
+    if (item['transmission'] != null) {
+      specifications.add({'title': 'Transmission', 'value': item['transmission'].toString()});
+    }
+    
+    return specifications.isNotEmpty ? specifications : [
+      {'title': 'Make', 'value': 'N/A'},
+      {'title': 'Model', 'value': 'N/A'},
+      {'title': 'Color', 'value': 'N/A'},
+    ];
+  }
+
+  // Helper widget for building highlight/specification items
+  Widget _buildInfoItem(String title, String value, {bool isSpecification = false}) {
+    return IntrinsicWidth(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14.0,
+              color: isSpecification ? Colors.black54 : Colors.black87,
+              fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper widget for building section titles
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20.0,
+        fontWeight: FontWeight.w600,
+      ),
+    );
+  }
+
+  // Helper widget for building info rows
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.grey[600], size: 20),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontSize: 15.0,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Helper widget for building tags
+  Widget _buildTag(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 13.0,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  // Build recommended item card matching homepage style
+  Widget _buildRecommendedItem(Map<String, dynamic> recommended, Size screenSize) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to detail page
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image Section
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: Container(
+                    height: 110,
+                    width: double.infinity,
+                    color: Colors.grey[100],
+                    child: buildSafeImage(
+                      recommended["productImage"],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                
+                // Category Badge
+                Positioned(
+                  top: 6,
+                  left: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      recommended["productType"] ?? 'Car',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Promoted Badge
+                if (recommended["productType"] == "PROMOTION")
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[700],
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.star, color: Colors.white, size: 10),
+                          SizedBox(width: 2),
+                          Text(
+                            'FEATURED',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 7,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                
+                // Wishlist Button
+                Positioned(
+                  bottom: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () {
+                      // Toggle wishlist
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 3,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        recommended["isLiked"] ? Icons.favorite : Icons.favorite_border,
+                        size: 16,
+                        color: recommended["isLiked"] ? ColorGlobalVariables.redColor : Colors.black54,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // Content Section
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title and Condition
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          recommended["productName"] ?? 'Unnamed Vehicle',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        recommended["productNature"] ?? 'Used',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  // Price and Mileage
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'GH₵${recommended["cost"]}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: ColorGlobalVariables.redColor,
+                        ),
+                      ),
+                      if (recommended["mileage"] != null)
+                        Row(
+                          children: [
+                            Icon(Icons.speed, size: 12, color: Colors.grey[600]),
+                            const SizedBox(width: 2),
+                            Text(
+                              "${recommended["mileage"]} km",
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Brand and Details
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Brand Logo
+                      recommended["productLogo"].toString().isNotEmpty 
+                          ? Container(
+                              width: 20,
+                              height: 20,
+                              child: CustomImage(
+                                imagePath: recommended["productLogo"],
+                                isAssetImage: true,
+                                isImageBorderRadiusRequired: false,
+                                fit: BoxFit.contain,
+                              ),
+                            )
+                          : const SizedBox(width: 20),
+                      
+                      // Transmission
+                      Row(
+                        children: [
+                          Icon(Icons.settings, size: 12, color: Colors.grey[600]),
+                          const SizedBox(width: 2),
+                          Text(
+                            recommended["driveType"] ?? 'Automatic',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                      
+                      // Location
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_on, size: 12, color: Colors.grey[600]),
+                            const SizedBox(width: 2),
+                            Flexible(
+                              child: Text(
+                                recommended["location"] ?? 'Location',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    //final screenSize = MediaQuery.of(context).size
+    final images = getItemImages();
+    final currentImage = images.isNotEmpty && selectedIndex < images.length 
+        ? images[selectedIndex] 
+        : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+
+    final highlights = getHighlights();
+    final specifications = getSpecifications();
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
-      extendBodyBehindAppBar: true,
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          // Animated AppBar
           SliverAppBar(
-            expandedHeight: _appBarHeight,
+            expandedHeight: 350,
+            floating: false,
             pinned: true,
-            floating: true,
-            centerTitle: true,
-            title: TextLarge(
-              title: 'Details', 
-              fontWeight: FontWeight.w500, 
-              textColor: ColorGlobalVariables.blackColor
-              ),
-            leading: CustomRoundIconButton(
-              iconData: Icons.arrow_back_ios, 
-              isBorderSlightlyCurved: false, 
-              iconDataColor: ColorGlobalVariables.fadedBlackColor,
-              //backgroundColor: ,
-              onIconButtonClickFunction: (){
-                Get.back();
-              }
-              ),
-            actions: [
-              CustomRoundIconButton(
-                iconData: Icons.share, 
-                isBorderSlightlyCurved: false, 
-                onIconButtonClickFunction: (){}
+            backgroundColor: Colors.black,
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              const SizedBox(width: 5,),
-            ],
-            flexibleSpace: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: _isAppBarVisible ? 1 : 0,
-              child: _buildFlexibleSpace(),
+                child: const Icon(Icons.arrow_back_ios_new_outlined, 
+                    color: Colors.white, size: 18),
+              ),
+              onPressed: () => Get.back(),
             ),
-          ),
+            title: AnimatedOpacity(
+              opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                item['name'] ?? 'Item Details',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16.0,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                children: [
+                  Opacity(
+                    opacity: _imageOpacity,
+                    child: buildSafeImage(
+                      currentImage,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.8),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.3),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
+                  Positioned(
+                    left: 20,
+                    bottom: 80,
+                    child: AnimatedOpacity(
+                      opacity: _imageOpacity,
+                      duration: const Duration(milliseconds: 200),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item['name'] ?? 'Unnamed Item',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 26.0,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
 
-          // Content
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: AnimatedOpacity(
+                      opacity: _imageOpacity,
+                      duration: const Duration(milliseconds: 200),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${selectedIndex + 1}/${images.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(Icons.share, color: Colors.white, size: 18),
+                ),
+              ),
+            ],
+          ),
+          
           SliverToBoxAdapter(
             child: Container(
-              decoration: BoxDecoration(
-                color: ColorGlobalVariables.whiteColor
-              ),
+              color: Colors.grey[50],
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 30,),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15,),
-                    child: Column(
-                      children: [
-                        // verhicle name text
-                    TextLarge(
-                      title: item['name'], 
-                      fontWeight: FontWeight.bold, 
-                      textColor: ColorGlobalVariables.blackColor
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16, bottom: 8),
+                    child: Text(
+                      "Gallery",
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
                       ),
-                    const SizedBox(height: 5,),
-                    // cost of vehicle
-                    TextSmall(
-                      title: 'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']))}', 
-                      fontWeight: FontWeight.w500, 
-                      textColor: ColorGlobalVariables.fadedBlackColor
-                      ),
-                    const SizedBox(height: 20,),
-                    // some descriptions
-                    item['description'] != null ? TextSmall(
-                      title: item['description'], 
-                      fontWeight: FontWeight.normal, 
-                      textColor: ColorGlobalVariables.fadedBlackColor
-                      ) : const SizedBox(),
-                    item['description'] != null ? const SizedBox(height: 20,) : const SizedBox(),
-                    // location icon, location text, date, time
-                    item['location'] != null ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // location icon
-                        CustomIcon(
-                          iconData: Icons.location_on, 
-                          isFaIcon: false, 
-                          iconColor: ColorGlobalVariables.blackColor
-                          ),
-                        const SizedBox(width: 3,),
-                        // date and time
-                        Expanded(
-                          child: TextSmall(
-                            title: '${item['location']}, ${formatTimeAgo(item['created_at'])}', 
-                            fontWeight: FontWeight.normal,
-                            overflow: TextOverflow.ellipsis, 
-                            textColor: ColorGlobalVariables.blackColor
-                            ),
-                        ),
-                      ],
-                    ) : const SizedBox(),
-                    item['location'] != null ? const SizedBox(height: 10,) : const SizedBox(),
-                    // five star, verified container, bell icon and text
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // stars
-                        SizedBox(
-                          height: 19,
-                          child: ListView.builder(
-                            itemCount: 5,
-                            scrollDirection: Axis.horizontal,
-                            primary: false,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.only(right: 1),
-                              child: CustomIcon(
-                                iconData: Icons.star, 
-                                isFaIcon: false, 
-                                iconSize: 14,
-                                iconColor: ColorGlobalVariables.goldColor
-                                ),
-                            ),
-                            ),
-                        ),
-                        // verified dealer container
-                        Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            color: ColorGlobalVariables.greenColor,
-                          ),
-                          child: Row(
-                            children: [
-                              // check icon
-                              CustomImage(
-                                imagePath: '${ImageStringGlobalVariables.iconPath}check_verified.png', 
-                                isAssetImage: true,
-                                imageHeight: 15,
-                                imageWidth: 15, 
-                                isImageBorderRadiusRequired: false
-                                ),
-                              const SizedBox(width: 3,),
-                              TextSmall(
-                                title: 'Verified Dealer', 
-                                fontWeight: FontWeight.normal, 
-                                textColor: ColorGlobalVariables.blackColor
-                                ),
-                            ],
-                          ),
-                        ),
-                        // notify me ... text
-                        Links(
-                          linkTextType: 'Notify (Price Drops)', 
-                          linkTextColor: ColorGlobalVariables.blackColor, 
-                          isTextSmall: true, 
-                          textDecorationColor: ColorGlobalVariables.blackColor,
-                          isIconWidgetRequiredAtEnd: false, 
-                          isIconWidgetRequiredAtFront: true, 
-                          iconData: Icons.notifications_outlined,
-                          iconColor: ColorGlobalVariables.blackColor,
-                          onClickFunction: (){},
-                          ),
-                      ],
                     ),
-                    const SizedBox(height: 30,),
-                    // Highlights text
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextSmall(
-                        title: 'Highlights:',  
-                        fontWeight: FontWeight.w500, 
-                        textColor: ColorGlobalVariables.blackColor
-                        ),
-                    ),
-                    const SizedBox(height: 8,),
-                    // row for model year, mileage, fuel type, engine, drive
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // model year
-                        Column(
-                          children: [
-                            CustomIcon(
-                              iconData: Icons.event, 
-                              isFaIcon: false, 
-                              iconSize: 25,
-                              iconColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 3,),
-                            //icon name
-                            TextExtraSmall(
-                              title: 'Model Year', 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 5,),
-                              // icon amount
-                            TextSmall(
-                              title: item['year'], 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ),
-                        // mileage
-                        item['mileage'] != null ? Column(
-                          children: [
-                            CustomIcon(
-                              iconData: Icons.speed, // directions_car 
-                              isFaIcon: false, 
-                              iconSize: 25,
-                              iconColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 3,),
-                            //icon name
-                            TextExtraSmall(
-                              title: 'Mileage', 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 5,),
-                              // icon amount
-                            TextSmall(
-                              title: '${item['mileage']} km', 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ) : const SizedBox(),
-                        // fuel type
-                        Column(
-                          children: [
-                            CustomIcon(
-                              iconData: Icons.local_gas_station, 
-                              iconSize: 25,
-                              isFaIcon: false, 
-                              iconColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 3,),
-                            //icon name
-                            TextExtraSmall(
-                              title: 'Fuel Type', 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 5,),
-                              // icon amount
-                            TextSmall(
-                              title: 'Petrol', 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ),
-                        // engine
-                        item['engine_capacity'] != null ? Column(
-                          children: [
-                            CustomIcon(
-                              iconData: Icons.engineering, // build 
-                              iconSize: 25,
-                              isFaIcon: false, 
-                              iconColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 3,),
-                            //icon name
-                            TextExtraSmall(
-                              title: 'Engine', 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 5,),
-                              // icon amount
-                            TextSmall(
-                              title: '${item["engine_capacity"]} L', 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ) : const SizedBox(),
-                        // drive
-                        Column(
-                          children: [
-                            CustomIcon(
-                              iconData: Icons.directions_car, // settings 
-                              iconSize: 25,
-                              isFaIcon: false, 
-                              iconColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 3,),
-                            //icon name
-                            TextExtraSmall(
-                              title: 'Drive', 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 5,),
-                              // icon amount
-                            TextSmall(
-                              title: 'AWD', 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30,),
-                    // specification header text
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextSmall(
-                        title: 'Specifications', 
-                        fontWeight: FontWeight.w500, 
-                        textColor: ColorGlobalVariables.blackColor
-                        ),
-                    ),
-                    const SizedBox(height: 8,),
-                    // row for make, model, color, seats, registered
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // make
-                        Column(
-                          children: [
-                            TextExtraSmall(
-                              title: 'Make', 
-                              textColor: ColorGlobalVariables.blackColor,
-                              ),
-                            const SizedBox(height: 5,),
-                            TextSmall(
-                              title: item['category']?.name ?? 'N/A', 
-                              fontWeight: FontWeight.w500, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ),
-                        // model
-                        item['brand_model'] != null ? Column(
-                          children: [
-                            TextExtraSmall(
-                              title: 'Model', 
-                              textColor: ColorGlobalVariables.blackColor,
-                              ),
-                            const SizedBox(height: 5,),
-                            TextSmall(
-                              title: item['brand_model'].name, 
-                              fontWeight: FontWeight.w500, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ) : const SizedBox(),
-                        // color
-                        item['color'] != null ? Column(
-                          children: [
-                            TextExtraSmall(
-                              title: 'Color', 
-                              textColor: ColorGlobalVariables.blackColor,
-                              ),
-                            const SizedBox(height: 5,),
-                            TextSmall(
-                              title: item['color'], 
-                              fontWeight: FontWeight.w500, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ) : const SizedBox(),
-                        // seats
-                        item['number_of_passengers'] != null ? Column(
-                          children: [
-                            TextExtraSmall(
-                              title: 'Seats', 
-                              textColor: ColorGlobalVariables.blackColor,
-                              ),
-                            const SizedBox(height: 5,),
-                            TextSmall(
-                              title: '${item['number_of_passengers'].toString()} seats', 
-                              fontWeight: FontWeight.w500, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ) : const SizedBox(),
-                        // registered
-                        Column(
-                          children: [
-                            TextExtraSmall(
-                              title: 'Registered', 
-                              textColor: ColorGlobalVariables.blackColor,
-                              ),
-                            const SizedBox(height: 5,),
-                            TextSmall(
-                              title: 'No', 
-                              fontWeight: FontWeight.w500, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20,),
-                    // show more link button
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Links(
-                        linkTextType: 'Show more', 
-                        linkFontWeight: FontWeight.w500,
-                        linkTextColor: ColorGlobalVariables.redColor, 
-                        isTextSmall: ColorGlobalVariables.trueValue, 
-                        textDecorationColor: ColorGlobalVariables.redColor,
-                        isIconWidgetRequiredAtEnd: ColorGlobalVariables.falseValue, 
-                        isIconWidgetRequiredAtFront: ColorGlobalVariables.falseValue, 
-                        onClickFunction: (){}
-                        ),
-                    ),
-                    const Divider(
-                      color: ColorGlobalVariables.fadedBlackColor,
-                      height: 15,
-                      thickness: 0.5,
-                    ),
-                    // row for user image and details
-                    Row(
-                      children: [
-                        // user image
-                        CustomImage(
-                          imagePath: '${ImageStringGlobalVariables.imagePath}user_profile_temporary.png', 
-                          isAssetImage: true,
-                          imageBackgroundColor: Colors.transparent, // for size testing purpose
-                          imageWidth: 80,
-                          imageHeight: 80,
-                          imageBorderRadius: 40,
-                          fit: BoxFit.contain, 
-                          isImageBorderRadiusRequired: ColorGlobalVariables.trueValue
-                          ),
-                        const SizedBox(width: 8,),
-                        // user details
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // row for user name & check image
-                            Row(
-                              children: [
-                                TextSmall(
-                                  title: 'Gordon Auto Garage', 
-                                  fontWeight: FontWeight.bold,
-                                  //overflow: TextOverflow.ellipsis, 
-                                  textColor: ColorGlobalVariables.blackColor
-                                  ),
-                                const SizedBox(width: 3,),
-                                CustomImage(
-                                  imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
-                                  imageWidth: 18,
-                                  imageHeight: 18,
-                                  fit: BoxFit.cover, 
-                                  isAssetImage: true, 
-                                  isImageBorderRadiusRequired: false,
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 5,),
-                            // joined ... text
-                            TextSmall(
-                              title: 'Joined: 3 years ago', 
-                              fontWeight: FontWeight.normal, 
-                              textColor: ColorGlobalVariables.blackColor
-                              ),
-                            const SizedBox(height: 3,),
-                            // number of ads
-                            TextSmall(
-                              title: '34 Ads',
-                              textDecoration: TextDecoration.underline,
-                              textDecorationColor: ColorGlobalVariables.greenColor,
-                              fontWeight: FontWeight.bold, 
-                              textColor: ColorGlobalVariables.greenColor
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 15,),
-                    // row for chat and show contact button
-                    Row(
-                      children: [
-                        // chat button
-                        Expanded(
-                          child: CustomTextButton(
-                          buttonTextType: 'Chat', 
-                          textTypeColor: ColorGlobalVariables.redColor, 
-                          borderColor: ColorGlobalVariables.fadedBlackColor,
-                          isFullButtonWidthRequired: ColorGlobalVariables.falseValue, 
-                          buttonBackgroundColor: Colors.transparent, 
-                          onClickFunction: (){}
-                          ),
-                        ),
-                        const SizedBox(width: 20,),
-                        // show contact button
-                        Expanded(
-                          child: CustomTextButton(
-                            buttonTextType: 'Show contact', 
-                            borderColor: ColorGlobalVariables.fadedBlackColor,
-                            textTypeColor: ColorGlobalVariables.redColor, 
-                            isFullButtonWidthRequired: ColorGlobalVariables.falseValue, 
-                            buttonBackgroundColor: Colors.transparent, 
-                            onClickFunction: (){}
-                            ),
-                        )
-                      ],
-                    ),
-                    
-                    
-                    ],),
                   ),
-                  const SizedBox(height: 15,),
-                  GridView.builder(
-                        padding: const EdgeInsets.all(8),
-                        itemCount: recommendeds.length,
-                        shrinkWrap: ColorGlobalVariables.trueValue,
-                        primary: ColorGlobalVariables.falseValue,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2, // 2 items per row
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15,
-                          childAspectRatio: 0.75, // Adjust based on your card's height
-                        ),
-                        itemBuilder: (context, index) {
-                          final recommended = recommendeds[index];
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                            height: 245,
+                  SizedBox(
+                    height: 80,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: images.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemBuilder: (context, index) {
+                        final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                        return GestureDetector(
+                          onTap: () {
+                            if (mounted) {
+                              setState(() {
+                                selectedIndex = index;
+                              });
+                            }
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: index == selectedIndex 
+                                    ? ColorGlobalVariables.redColor 
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.grey,
-                                  blurRadius: 0.1,
-                                  spreadRadius: 0.1,
-                                  offset: Offset(0.1, 0.1),
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
                                 ),
                               ],
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Stack(
-                                  children: [
-                                    CustomImage(
-                                      imagePath: recommended["productImage"], 
-                                      isAssetImage: true, 
-                                      isImageBorderRadiusRequired: true,
-                                      imageBorderRadius: 8,
-                                      imageHeight: 120,
-                                      imageWidth: double.infinity,
-                                      fit: BoxFit.contain,
-                                      ),
-                                    // product type
-                                    Positioned(
-                                      top: 3, left: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: ColorGlobalVariables.textFieldColor,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: RotatedBox(
-                                          quarterTurns: 1,
-                                          child: TextSmall(
-                                            title: recommended["productType"], 
-                                            fontWeight: FontWeight.normal, 
-                                            textColor: ColorGlobalVariables.blackColor
-                                            ),
-                                        ),
-                                      ),
-                                    ),
-                                  // liked icon
-                                  Positioned(
-                                    top: 3, right: 4,
-                                    child: CustomIcon(
-                                      iconData: recommended["isLiked"]  ? Icons.favorite : Icons.favorite_border_outlined, 
-                                      isFaIcon: false, 
-                                      iconSize: 25,
-                                      iconColor: recommended["isLiked"] ? ColorGlobalVariables.redColor : ColorGlobalVariables.fadedBlackColor,
-                                      ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Stack(
+                                children: [
+                                  buildSafeImage(
+                                    image,
+                                    width: 100,
+                                    height: 80,
+                                    fit: BoxFit.cover,
                                   ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8,),
-                                // row for product name and product nature
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: TextSmall(
-                                        title: recommended["productName"], 
-                                        fontWeight: FontWeight.normal, 
-                                        overflow: TextOverflow.ellipsis,
-                                        textColor: ColorGlobalVariables.blackColor
+                                  if (index == selectedIndex)
+                                    Container(
+                                      color: Colors.black.withOpacity(0.3),
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.check_circle,
+                                          color: Colors.white,
+                                          size: 20,
                                         ),
-                                    ),
-                                    const SizedBox(width: 4,),
-                                    TextSmall(
-                                      title: recommended["productNature"], 
-                                      fontWeight: FontWeight.normal, 
-                                      textColor: ColorGlobalVariables.blackColor
                                       ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2,),
-                                // row for product cost  and milleage
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: TextMedium(
-                                        title: "GH₵${recommended["cost"]}", 
-                                        fontWeight: FontWeight.w500, 
-                                        textColor: ColorGlobalVariables.redColor,
-                                        ),
                                     ),
-                                    const SizedBox(width: 4,),
-                                    Row(
-                                      children: [
-                                        CustomIcon(
-                                          iconData: Icons.speed, 
-                                          isFaIcon: false, 
-                                          iconColor: ColorGlobalVariables.blackColor
-                                          ),
-                                        const SizedBox(width: 2,),
-                                        TextSmall(
-                                          title: "${recommended["mileage"]} km", 
-                                          fontWeight: FontWeight.normal, 
-                                          textColor: ColorGlobalVariables.blackColor
-                                          ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12,),
-                                // row for product logo product, driveType and location
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    // product logo
-                                    recommended["productLogo"].isEmpty ? const SizedBox(width: 16,) : CustomImage(
-                                      imagePath: recommended["productLogo"], 
-                                      isAssetImage: true, 
-                                      imageHeight: 25,
-                                      imageWidth: 25,
-                                      isImageBorderRadiusRequired: false
-                                      ),
-                                    // row for icon and driveType
-                                    Row(
-                                      children: [
-                                        CustomIcon(
-                                          iconData: Icons.settings,
-                                          isFaIcon: false, 
-                                          iconSize: 16,
-                                          iconColor: ColorGlobalVariables.blackColor
-                                          ),
-                                        const SizedBox(width: 2,),
-                                        TextExtraSmall(
-                                          title: recommended["driveType"], 
-                                          fontWeight: FontWeight.normal, 
-                                          textColor: ColorGlobalVariables.blackColor,
-                                          ),
-                                      ],
-                                    ),
-                                    //row for icon and location
-                                    Row(
-                                      children: [
-                                        CustomIcon(
-                                          iconData: Icons.location_on, 
-                                          isFaIcon: false, 
-                                          iconColor: ColorGlobalVariables.redColor
-                                          ),
-                                        const SizedBox(width: 2,),
-                                        TextExtraSmall(
-                                          title: recommended["location"], 
-                                          fontWeight: FontWeight.normal, 
-                                          textColor: ColorGlobalVariables.blackColor
-                                          ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                ]
                           ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
+          
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Vehicle name
+                        Text(
+                          item['name'] ?? 'Unnamed Item',
+                          style: const TextStyle(
+                            fontSize: 22.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        // Price
+                        Text(
+                          'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
+                          style: const TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Description
+                        if (item['description'] != null) ...[
+                          Text(
+                            item['description'],
+                            style: const TextStyle(
+                              fontSize: 15.0,
+                              height: 1.5,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        // Location and date info
+                        if (item['location'] != null) ...[
+                          _buildInfoRow(Icons.location_on_outlined, item['location']),
+                          const SizedBox(height: 8),
+                        ],
+                        _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item['created_at'] ?? '')),
+                        const SizedBox(height: 16),
+                        
+                        // Rating, Verified Dealer, and Notify Price Drops row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // verified dealer
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.lightBlue[100],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Verified Dealer",
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  CircleAvatar(
+                                    radius: 8,
+                                    backgroundColor: Colors.blue,
+                                    child: Icon(Icons.check, size: 12, color: Colors.white),
+                                  )
+                                ],
+                              ),
+                            ),
+                            // Stars rating
+                            SizedBox(
+                              height: 16,
+                              child: ListView.builder(
+                                itemCount: 5,
+                                scrollDirection: Axis.horizontal,
+                                primary: false,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) => Padding(
+                                  padding: const EdgeInsets.only(right: 1),
+                                  child: CustomIcon(
+                                    iconData: Icons.star, 
+                                    isFaIcon: false, 
+                                    iconSize: 12,
+                                    iconColor: ColorGlobalVariables.goldColor
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Notify Price Drops button
+                            Links(
+                              linkTextType: 'Notify price drops', 
+                              linkTextColor: ColorGlobalVariables.blackColor, 
+                              isTextSmall: true, 
+                              textDecorationColor: ColorGlobalVariables.blackColor,
+                              isIconWidgetRequiredAtEnd: false, 
+                              isIconWidgetRequiredAtFront: true, 
+                              iconData: Icons.notifications_outlined,
+                              iconColor: ColorGlobalVariables.blackColor,
+                              onClickFunction: (){},
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Tags section
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            if(item["warranty"] != null)
+                            _buildTag(
+                              "Warranty", 
+                              Colors.grey[300]!),
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.lightBlue[100],
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Verified",
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  SizedBox(width: 4),
+                                  CircleAvatar(
+                                    radius: 8,
+                                    backgroundColor: Colors.blue,
+                                    child: Icon(Icons.check, size: 12, color: Colors.white),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Highlights section - NOW DYNAMIC
+                        _buildSectionTitle("Highlights"),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 20.0,
+                          runSpacing: 12.0,
+                          children: highlights.map((highlight) {
+                            return _buildInfoItem(
+                              highlight['title'] ?? 'N/A',
+                              highlight['value'] ?? 'N/A',
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        // Specifications section - NOW DYNAMIC
+                        _buildSectionTitle("Specifications"),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 20.0,
+                          runSpacing: 12.0,
+                          children: specifications.map((spec) {
+                            return _buildInfoItem(
+                              spec['title'] ?? 'N/A',
+                              spec['value'] ?? 'N/A',
+                              isSpecification: true,
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        // Show more link button
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Links(
+                            linkTextType: 'Show more', 
+                            linkFontWeight: FontWeight.w500,
+                            linkTextColor: ColorGlobalVariables.redColor, 
+                            isTextSmall: true, 
+                            textDecorationColor: ColorGlobalVariables.redColor,
+                            isIconWidgetRequiredAtEnd: false, 
+                            isIconWidgetRequiredAtFront: false, 
+                            onClickFunction: (){}
+                          ),
+                        ),
+                        const Divider(
+                          color: ColorGlobalVariables.fadedBlackColor,
+                          height: 12,
+                          thickness: 0.5,
+                        ),
+                        const SizedBox(height: 16),
+                        // Seller information section
+                        Row(
+                          children: [
+                            // User image
+                            CustomImage(
+                              imagePath: item['user'] == null ? '${ImageStringGlobalVariables.imagePath}user_profile_temporary.png' : getImageUrl(_safeGetString(item["user"], 'profilePhoto'), null), 
+                              isAssetImage: item['user'] == null ? true : false,
+                              imageBackgroundColor: Colors.transparent,
+                              useShimmerEffect: true,
+                              imageWidth: 60,
+                              imageHeight: 60,
+                              imageBorderRadius: 30,
+                              fit: BoxFit.contain, 
+                              isImageBorderRadiusRequired: true
+                            ),
+                            const SizedBox(width: 12),
+                            // User details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Seller name with verification
+                                  Row(
+                                    children: [
+                                      Text(
+                                        item["user"] == null ? "User name" : _safeGetString(item["user"], 'name') ?? "User name",
+                                        style: const TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      CustomImage(
+                                        imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
+                                        imageWidth: 16,
+                                        imageHeight: 16,
+                                        fit: BoxFit.cover, 
+                                        isAssetImage: true, 
+                                        isImageBorderRadiusRequired: false,
+                                      ),
+                                    ],
+                                  ),
+                                    const SizedBox(height: 6),
+                                  // Joined date
+                                  Text(
+                                    item["user"] == null ? "No date" : "Joined: ${formatTimeAgo(_safeGetString(item['user'], 'createdAt') ?? '')}",
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // Number of ads
+                                  Text(
+                                    '34 Ads',
+                                    style: const TextStyle(
+                                      fontSize: 13.0,
+                                      fontWeight: FontWeight.w600,
+                                      color: ColorGlobalVariables.greenColor,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        // Action buttons
+                        Row(
+                          children: [
+                            // Chat button
+                            Expanded(
+                              child: CustomTextButton(
+                                buttonTextType: 'Chat', 
+                                textTypeColor: ColorGlobalVariables.redColor, 
+                                borderColor: ColorGlobalVariables.fadedBlackColor,
+                                isFullButtonWidthRequired: false, 
+                                buttonBackgroundColor: Colors.transparent, 
+                                onClickFunction: (){}
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            // Show contact button
+                            Expanded(
+                              child: CustomTextButton(
+                                buttonTextType: 'Show contact', 
+                                borderColor: ColorGlobalVariables.fadedBlackColor,
+                                textTypeColor: ColorGlobalVariables.redColor, 
+                                isFullButtonWidthRequired: false, 
+                                buttonBackgroundColor: Colors.transparent, 
+                                onClickFunction: (){}
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Recommended Items Header
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(8, 0, 8, 12),
+                    child: Text(
+                      'Recommended for You',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                  
+                  // Recommended items grid view
+                  GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    itemCount: recommendeds.length,
+                    shrinkWrap: true,
+                    primary: false,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemBuilder: (context, index) {
+                      final recommended = recommendeds[index];
+                      return _buildRecommendedItem(recommended, screenSize);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-        ]
-    ));
+    );
   }
 
   List<Map<String, dynamic>> recommendeds = [
@@ -780,7 +1211,7 @@ class _DetailPageState extends State<DetailPage> {
       "driveType": "Automatic",
       "location": "Accra"  
     },
-     {
+    {
       "productImage": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
       "productType": "PROMOTION",
       "productNature": "New",
@@ -793,88 +1224,4 @@ class _DetailPageState extends State<DetailPage> {
       "location": "Accra"
     },
   ];
-
-  Widget _buildFlexibleSpace() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Main background image , currently working here
-        CustomImage(
-          imagePath: item['images'] is List 
-          ? getImageUrl(item['images'].first, null) 
-          : '${ImageStringGlobalVariables.imagePath}car_placeholder.png', 
-          isAssetImage: item['images'] is List ? false : true, 
-          fit: BoxFit.cover,
-          isImageBorderRadiusRequired: false
-          ),
-
-        // Gradient overlay
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-              colors: [
-                Colors.black.withOpacity(0.4),
-                Colors.transparent,
-              ],
-            ),
-          ),
-        ),
-
-        // Title
-        // const Align(
-        //   alignment: Alignment.bottomLeft,
-        //   child: Padding(
-        //     padding: EdgeInsets.all(16.0),
-        //     child: Text(
-        //       '2023 Tesla Model S',
-        //       style: TextStyle(
-        //         color: Colors.white,
-        //         fontSize: 24,
-        //         fontWeight: FontWeight.bold,
-        //       ),
-        //     ),
-        //   ),
-        // ),
-
-        // Horizontal image stack
-        Positioned(
-          bottom: 20,
-          left: 0,
-          right: 0,
-          child: SizedBox(
-            height: 80,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: item['images'].length,
-              itemBuilder: (context, index) {
-                final specialOffer = item['images'][index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: CustomImage(
-                      imagePath: item['images'] is List 
-                      ? getImageUrl(specialOffer, null) 
-                      : '${ImageStringGlobalVariables.imagePath}car_placeholder.png', 
-                      isAssetImage: item['images'] is List ? false : true,
-                      imageWidth: 120,
-                      useShimmerEffect: false,
-                      isImageBorderRadiusRequired: false
-                      ),                    
-                    // Image.network(
-                    //   imageUrlList[index],
-                    //   width: 120,
-                    //   fit: BoxFit.cover,
-                    // ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }

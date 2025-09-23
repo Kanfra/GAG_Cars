@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class ItemCategoryService {
-  // Fetch all categories with pagination support
+  // Fetch all categories (used)
   Future<ItemCategoryResponse> getAllCategories({
     int page = 1,
     int perPage = 15,

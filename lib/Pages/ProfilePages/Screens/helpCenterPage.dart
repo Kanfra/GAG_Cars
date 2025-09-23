@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/contactUs.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/faq.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/contactUs.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/faq.dart';
 import 'package:get/get.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 

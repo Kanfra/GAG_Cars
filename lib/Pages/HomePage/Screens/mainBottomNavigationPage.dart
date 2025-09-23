@@ -6,7 +6,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settingsPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/settingsPage.dart';
 
 void main() => runApp(MyApp());
 

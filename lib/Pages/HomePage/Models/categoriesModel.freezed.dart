@@ -22,18 +22,14 @@ Categories _$CategoriesFromJson(Map<String, dynamic> json) {
 mixin _$Categories {
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
-  String? get userId =>
-      throw _privateConstructorUsedError; // Changed to nullable
+  String? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'parent_id')
-  int? get parentId =>
-      throw _privateConstructorUsedError; // Changed to nullable
+  int? get parentId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError; // Added default value
-  String get description =>
-      throw _privateConstructorUsedError; // Added default value
-  List<String> get features =>
-      throw _privateConstructorUsedError; // Removed nullable items
-  String get image => throw _privateConstructorUsedError; // Added default
+  String get slug => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
+  List<String> get features => throw _privateConstructorUsedError;
+  String get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -253,23 +249,18 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
-// Changed to nullable
   @override
   @JsonKey(name: 'parent_id')
   final int? parentId;
-// Changed to nullable
   @override
   final String name;
   @override
   @JsonKey()
   final String slug;
-// Added default value
   @override
   @JsonKey()
   final String description;
-// Added default value
   final List<String> _features;
-// Added default value
   @override
   @JsonKey()
   List<String> get features {
@@ -278,11 +269,9 @@ class _$CategoriesImpl with DiagnosticableTreeMixin implements _Categories {
     return EqualUnmodifiableListView(_features);
   }
 
-// Removed nullable items
   @override
   @JsonKey()
   final String image;
-// Added default
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
@@ -385,20 +374,20 @@ abstract class _Categories implements Categories {
   int get id;
   @override
   @JsonKey(name: 'user_id')
-  String? get userId; // Changed to nullable
+  String? get userId;
   @override
   @JsonKey(name: 'parent_id')
-  int? get parentId; // Changed to nullable
+  int? get parentId;
   @override
   String get name;
   @override
-  String get slug; // Added default value
+  String get slug;
   @override
-  String get description; // Added default value
+  String get description;
   @override
-  List<String> get features; // Removed nullable items
+  List<String> get features;
   @override
-  String get image; // Added default
+  String get image;
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
@@ -411,6 +400,904 @@ abstract class _Categories implements Categories {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CategoriesImplCopyWith<_$CategoriesImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+ItemField _$ItemFieldFromJson(Map<String, dynamic> json) {
+  return _ItemField.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ItemField {
+  int get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get label => throw _privateConstructorUsedError;
+  String get type => throw _privateConstructorUsedError;
+  @JsonKey(name: 'required')
+  int get isRequired => throw _privateConstructorUsedError;
+  int get unique => throw _privateConstructorUsedError;
+  int get nullable => throw _privateConstructorUsedError;
+  dynamic get options => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get pivot => throw _privateConstructorUsedError;
+  @JsonKey(name: 'options_keys')
+  List<String>? get optionsKeys => throw _privateConstructorUsedError;
+
+  /// Serializes this ItemField to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ItemField
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ItemFieldCopyWith<ItemField> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ItemFieldCopyWith<$Res> {
+  factory $ItemFieldCopyWith(ItemField value, $Res Function(ItemField) then) =
+      _$ItemFieldCopyWithImpl<$Res, ItemField>;
+  @useResult
+  $Res call(
+      {int id,
+      String name,
+      String label,
+      String type,
+      @JsonKey(name: 'required') int isRequired,
+      int unique,
+      int nullable,
+      dynamic options,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      Map<String, dynamic>? pivot,
+      @JsonKey(name: 'options_keys') List<String>? optionsKeys});
+}
+
+/// @nodoc
+class _$ItemFieldCopyWithImpl<$Res, $Val extends ItemField>
+    implements $ItemFieldCopyWith<$Res> {
+  _$ItemFieldCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ItemField
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? label = null,
+    Object? type = null,
+    Object? isRequired = null,
+    Object? unique = null,
+    Object? nullable = null,
+    Object? options = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? pivot = freezed,
+    Object? optionsKeys = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      isRequired: null == isRequired
+          ? _value.isRequired
+          : isRequired // ignore: cast_nullable_to_non_nullable
+              as int,
+      unique: null == unique
+          ? _value.unique
+          : unique // ignore: cast_nullable_to_non_nullable
+              as int,
+      nullable: null == nullable
+          ? _value.nullable
+          : nullable // ignore: cast_nullable_to_non_nullable
+              as int,
+      options: freezed == options
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      pivot: freezed == pivot
+          ? _value.pivot
+          : pivot // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      optionsKeys: freezed == optionsKeys
+          ? _value.optionsKeys
+          : optionsKeys // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$ItemFieldImplCopyWith<$Res>
+    implements $ItemFieldCopyWith<$Res> {
+  factory _$$ItemFieldImplCopyWith(
+          _$ItemFieldImpl value, $Res Function(_$ItemFieldImpl) then) =
+      __$$ItemFieldImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      String name,
+      String label,
+      String type,
+      @JsonKey(name: 'required') int isRequired,
+      int unique,
+      int nullable,
+      dynamic options,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      Map<String, dynamic>? pivot,
+      @JsonKey(name: 'options_keys') List<String>? optionsKeys});
+}
+
+/// @nodoc
+class __$$ItemFieldImplCopyWithImpl<$Res>
+    extends _$ItemFieldCopyWithImpl<$Res, _$ItemFieldImpl>
+    implements _$$ItemFieldImplCopyWith<$Res> {
+  __$$ItemFieldImplCopyWithImpl(
+      _$ItemFieldImpl _value, $Res Function(_$ItemFieldImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of ItemField
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? label = null,
+    Object? type = null,
+    Object? isRequired = null,
+    Object? unique = null,
+    Object? nullable = null,
+    Object? options = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? pivot = freezed,
+    Object? optionsKeys = freezed,
+  }) {
+    return _then(_$ItemFieldImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      label: null == label
+          ? _value.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _value.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as String,
+      isRequired: null == isRequired
+          ? _value.isRequired
+          : isRequired // ignore: cast_nullable_to_non_nullable
+              as int,
+      unique: null == unique
+          ? _value.unique
+          : unique // ignore: cast_nullable_to_non_nullable
+              as int,
+      nullable: null == nullable
+          ? _value.nullable
+          : nullable // ignore: cast_nullable_to_non_nullable
+              as int,
+      options: freezed == options
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as dynamic,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      pivot: freezed == pivot
+          ? _value._pivot
+          : pivot // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      optionsKeys: freezed == optionsKeys
+          ? _value._optionsKeys
+          : optionsKeys // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ItemFieldImpl with DiagnosticableTreeMixin implements _ItemField {
+  const _$ItemFieldImpl(
+      {required this.id,
+      required this.name,
+      required this.label,
+      required this.type,
+      @JsonKey(name: 'required') required this.isRequired,
+      required this.unique,
+      required this.nullable,
+      this.options,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      final Map<String, dynamic>? pivot,
+      @JsonKey(name: 'options_keys') final List<String>? optionsKeys})
+      : _pivot = pivot,
+        _optionsKeys = optionsKeys;
+
+  factory _$ItemFieldImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ItemFieldImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  final String name;
+  @override
+  final String label;
+  @override
+  final String type;
+  @override
+  @JsonKey(name: 'required')
+  final int isRequired;
+  @override
+  final int unique;
+  @override
+  final int nullable;
+  @override
+  final dynamic options;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
+  final Map<String, dynamic>? _pivot;
+  @override
+  Map<String, dynamic>? get pivot {
+    final value = _pivot;
+    if (value == null) return null;
+    if (_pivot is EqualUnmodifiableMapView) return _pivot;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
+
+  final List<String>? _optionsKeys;
+  @override
+  @JsonKey(name: 'options_keys')
+  List<String>? get optionsKeys {
+    final value = _optionsKeys;
+    if (value == null) return null;
+    if (_optionsKeys is EqualUnmodifiableListView) return _optionsKeys;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'ItemField(id: $id, name: $name, label: $label, type: $type, isRequired: $isRequired, unique: $unique, nullable: $nullable, options: $options, createdAt: $createdAt, updatedAt: $updatedAt, pivot: $pivot, optionsKeys: $optionsKeys)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'ItemField'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('label', label))
+      ..add(DiagnosticsProperty('type', type))
+      ..add(DiagnosticsProperty('isRequired', isRequired))
+      ..add(DiagnosticsProperty('unique', unique))
+      ..add(DiagnosticsProperty('nullable', nullable))
+      ..add(DiagnosticsProperty('options', options))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('pivot', pivot))
+      ..add(DiagnosticsProperty('optionsKeys', optionsKeys));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ItemFieldImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.isRequired, isRequired) ||
+                other.isRequired == isRequired) &&
+            (identical(other.unique, unique) || other.unique == unique) &&
+            (identical(other.nullable, nullable) ||
+                other.nullable == nullable) &&
+            const DeepCollectionEquality().equals(other.options, options) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._pivot, _pivot) &&
+            const DeepCollectionEquality()
+                .equals(other._optionsKeys, _optionsKeys));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      label,
+      type,
+      isRequired,
+      unique,
+      nullable,
+      const DeepCollectionEquality().hash(options),
+      createdAt,
+      updatedAt,
+      const DeepCollectionEquality().hash(_pivot),
+      const DeepCollectionEquality().hash(_optionsKeys));
+
+  /// Create a copy of ItemField
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ItemFieldImplCopyWith<_$ItemFieldImpl> get copyWith =>
+      __$$ItemFieldImplCopyWithImpl<_$ItemFieldImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ItemFieldImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _ItemField implements ItemField {
+  const factory _ItemField(
+          {required final int id,
+          required final String name,
+          required final String label,
+          required final String type,
+          @JsonKey(name: 'required') required final int isRequired,
+          required final int unique,
+          required final int nullable,
+          final dynamic options,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+          final Map<String, dynamic>? pivot,
+          @JsonKey(name: 'options_keys') final List<String>? optionsKeys}) =
+      _$ItemFieldImpl;
+
+  factory _ItemField.fromJson(Map<String, dynamic> json) =
+      _$ItemFieldImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  String get name;
+  @override
+  String get label;
+  @override
+  String get type;
+  @override
+  @JsonKey(name: 'required')
+  int get isRequired;
+  @override
+  int get unique;
+  @override
+  int get nullable;
+  @override
+  dynamic get options;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt;
+  @override
+  Map<String, dynamic>? get pivot;
+  @override
+  @JsonKey(name: 'options_keys')
+  List<String>? get optionsKeys;
+
+  /// Create a copy of ItemField
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ItemFieldImplCopyWith<_$ItemFieldImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+DetailedCategory _$DetailedCategoryFromJson(Map<String, dynamic> json) {
+  return _DetailedCategory.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DetailedCategory {
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
+  String? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parent_id')
+  int? get parentId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError;
+  String get description => throw _privateConstructorUsedError;
+  List<String> get features => throw _privateConstructorUsedError;
+  String get image => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'item_fields')
+  List<ItemField> get itemFields => throw _privateConstructorUsedError;
+  @JsonKey(name: 'highlighted_fields')
+  List<ItemField> get highlightedFields => throw _privateConstructorUsedError;
+
+  /// Serializes this DetailedCategory to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DetailedCategory
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DetailedCategoryCopyWith<DetailedCategory> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DetailedCategoryCopyWith<$Res> {
+  factory $DetailedCategoryCopyWith(
+          DetailedCategory value, $Res Function(DetailedCategory) then) =
+      _$DetailedCategoryCopyWithImpl<$Res, DetailedCategory>;
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'parent_id') int? parentId,
+      String name,
+      String slug,
+      String description,
+      List<String> features,
+      String image,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'item_fields') List<ItemField> itemFields,
+      @JsonKey(name: 'highlighted_fields') List<ItemField> highlightedFields});
+}
+
+/// @nodoc
+class _$DetailedCategoryCopyWithImpl<$Res, $Val extends DetailedCategory>
+    implements $DetailedCategoryCopyWith<$Res> {
+  _$DetailedCategoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DetailedCategory
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
+    Object? name = null,
+    Object? slug = null,
+    Object? description = null,
+    Object? features = null,
+    Object? image = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? itemFields = null,
+    Object? highlightedFields = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      features: null == features
+          ? _value.features
+          : features // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      image: null == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      itemFields: null == itemFields
+          ? _value.itemFields
+          : itemFields // ignore: cast_nullable_to_non_nullable
+              as List<ItemField>,
+      highlightedFields: null == highlightedFields
+          ? _value.highlightedFields
+          : highlightedFields // ignore: cast_nullable_to_non_nullable
+              as List<ItemField>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$DetailedCategoryImplCopyWith<$Res>
+    implements $DetailedCategoryCopyWith<$Res> {
+  factory _$$DetailedCategoryImplCopyWith(_$DetailedCategoryImpl value,
+          $Res Function(_$DetailedCategoryImpl) then) =
+      __$$DetailedCategoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'parent_id') int? parentId,
+      String name,
+      String slug,
+      String description,
+      List<String> features,
+      String image,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'item_fields') List<ItemField> itemFields,
+      @JsonKey(name: 'highlighted_fields') List<ItemField> highlightedFields});
+}
+
+/// @nodoc
+class __$$DetailedCategoryImplCopyWithImpl<$Res>
+    extends _$DetailedCategoryCopyWithImpl<$Res, _$DetailedCategoryImpl>
+    implements _$$DetailedCategoryImplCopyWith<$Res> {
+  __$$DetailedCategoryImplCopyWithImpl(_$DetailedCategoryImpl _value,
+      $Res Function(_$DetailedCategoryImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DetailedCategory
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
+    Object? name = null,
+    Object? slug = null,
+    Object? description = null,
+    Object? features = null,
+    Object? image = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? itemFields = null,
+    Object? highlightedFields = null,
+  }) {
+    return _then(_$DetailedCategoryImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      features: null == features
+          ? _value._features
+          : features // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      image: null == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      itemFields: null == itemFields
+          ? _value._itemFields
+          : itemFields // ignore: cast_nullable_to_non_nullable
+              as List<ItemField>,
+      highlightedFields: null == highlightedFields
+          ? _value._highlightedFields
+          : highlightedFields // ignore: cast_nullable_to_non_nullable
+              as List<ItemField>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DetailedCategoryImpl
+    with DiagnosticableTreeMixin
+    implements _DetailedCategory {
+  const _$DetailedCategoryImpl(
+      {required this.id,
+      @JsonKey(name: 'user_id') this.userId,
+      @JsonKey(name: 'parent_id') this.parentId,
+      required this.name,
+      this.slug = '',
+      this.description = '',
+      final List<String> features = const [],
+      this.image = 'assets/images/category_placeholder.png',
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'item_fields') final List<ItemField> itemFields = const [],
+      @JsonKey(name: 'highlighted_fields')
+      final List<ItemField> highlightedFields = const []})
+      : _features = features,
+        _itemFields = itemFields,
+        _highlightedFields = highlightedFields;
+
+  factory _$DetailedCategoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DetailedCategoryImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  @JsonKey(name: 'user_id')
+  final String? userId;
+  @override
+  @JsonKey(name: 'parent_id')
+  final int? parentId;
+  @override
+  final String name;
+  @override
+  @JsonKey()
+  final String slug;
+  @override
+  @JsonKey()
+  final String description;
+  final List<String> _features;
+  @override
+  @JsonKey()
+  List<String> get features {
+    if (_features is EqualUnmodifiableListView) return _features;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_features);
+  }
+
+  @override
+  @JsonKey()
+  final String image;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
+  final List<ItemField> _itemFields;
+  @override
+  @JsonKey(name: 'item_fields')
+  List<ItemField> get itemFields {
+    if (_itemFields is EqualUnmodifiableListView) return _itemFields;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_itemFields);
+  }
+
+  final List<ItemField> _highlightedFields;
+  @override
+  @JsonKey(name: 'highlighted_fields')
+  List<ItemField> get highlightedFields {
+    if (_highlightedFields is EqualUnmodifiableListView)
+      return _highlightedFields;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_highlightedFields);
+  }
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'DetailedCategory(id: $id, userId: $userId, parentId: $parentId, name: $name, slug: $slug, description: $description, features: $features, image: $image, createdAt: $createdAt, updatedAt: $updatedAt, itemFields: $itemFields, highlightedFields: $highlightedFields)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'DetailedCategory'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('userId', userId))
+      ..add(DiagnosticsProperty('parentId', parentId))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('slug', slug))
+      ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('features', features))
+      ..add(DiagnosticsProperty('image', image))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('itemFields', itemFields))
+      ..add(DiagnosticsProperty('highlightedFields', highlightedFields));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DetailedCategoryImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            const DeepCollectionEquality().equals(other._features, _features) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality()
+                .equals(other._itemFields, _itemFields) &&
+            const DeepCollectionEquality()
+                .equals(other._highlightedFields, _highlightedFields));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      parentId,
+      name,
+      slug,
+      description,
+      const DeepCollectionEquality().hash(_features),
+      image,
+      createdAt,
+      updatedAt,
+      const DeepCollectionEquality().hash(_itemFields),
+      const DeepCollectionEquality().hash(_highlightedFields));
+
+  /// Create a copy of DetailedCategory
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DetailedCategoryImplCopyWith<_$DetailedCategoryImpl> get copyWith =>
+      __$$DetailedCategoryImplCopyWithImpl<_$DetailedCategoryImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DetailedCategoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DetailedCategory implements DetailedCategory {
+  const factory _DetailedCategory(
+      {required final int id,
+      @JsonKey(name: 'user_id') final String? userId,
+      @JsonKey(name: 'parent_id') final int? parentId,
+      required final String name,
+      final String slug,
+      final String description,
+      final List<String> features,
+      final String image,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      @JsonKey(name: 'item_fields') final List<ItemField> itemFields,
+      @JsonKey(name: 'highlighted_fields')
+      final List<ItemField> highlightedFields}) = _$DetailedCategoryImpl;
+
+  factory _DetailedCategory.fromJson(Map<String, dynamic> json) =
+      _$DetailedCategoryImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  @JsonKey(name: 'user_id')
+  String? get userId;
+  @override
+  @JsonKey(name: 'parent_id')
+  int? get parentId;
+  @override
+  String get name;
+  @override
+  String get slug;
+  @override
+  String get description;
+  @override
+  List<String> get features;
+  @override
+  String get image;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt;
+  @override
+  @JsonKey(name: 'item_fields')
+  List<ItemField> get itemFields;
+  @override
+  @JsonKey(name: 'highlighted_fields')
+  List<ItemField> get highlightedFields;
+
+  /// Create a copy of DetailedCategory
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DetailedCategoryImplCopyWith<_$DetailedCategoryImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -581,4 +1468,185 @@ abstract class _CategoriesResponse implements CategoriesResponse {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$CategoriesResponseImplCopyWith<_$CategoriesResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+DetailedCategoryResponse _$DetailedCategoryResponseFromJson(
+    Map<String, dynamic> json) {
+  return _DetailedCategoryResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DetailedCategoryResponse {
+  DetailedCategory get data => throw _privateConstructorUsedError;
+
+  /// Serializes this DetailedCategoryResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DetailedCategoryResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DetailedCategoryResponseCopyWith<DetailedCategoryResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DetailedCategoryResponseCopyWith<$Res> {
+  factory $DetailedCategoryResponseCopyWith(DetailedCategoryResponse value,
+          $Res Function(DetailedCategoryResponse) then) =
+      _$DetailedCategoryResponseCopyWithImpl<$Res, DetailedCategoryResponse>;
+  @useResult
+  $Res call({DetailedCategory data});
+
+  $DetailedCategoryCopyWith<$Res> get data;
+}
+
+/// @nodoc
+class _$DetailedCategoryResponseCopyWithImpl<$Res,
+        $Val extends DetailedCategoryResponse>
+    implements $DetailedCategoryResponseCopyWith<$Res> {
+  _$DetailedCategoryResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DetailedCategoryResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+  }) {
+    return _then(_value.copyWith(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as DetailedCategory,
+    ) as $Val);
+  }
+
+  /// Create a copy of DetailedCategoryResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DetailedCategoryCopyWith<$Res> get data {
+    return $DetailedCategoryCopyWith<$Res>(_value.data, (value) {
+      return _then(_value.copyWith(data: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$DetailedCategoryResponseImplCopyWith<$Res>
+    implements $DetailedCategoryResponseCopyWith<$Res> {
+  factory _$$DetailedCategoryResponseImplCopyWith(
+          _$DetailedCategoryResponseImpl value,
+          $Res Function(_$DetailedCategoryResponseImpl) then) =
+      __$$DetailedCategoryResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({DetailedCategory data});
+
+  @override
+  $DetailedCategoryCopyWith<$Res> get data;
+}
+
+/// @nodoc
+class __$$DetailedCategoryResponseImplCopyWithImpl<$Res>
+    extends _$DetailedCategoryResponseCopyWithImpl<$Res,
+        _$DetailedCategoryResponseImpl>
+    implements _$$DetailedCategoryResponseImplCopyWith<$Res> {
+  __$$DetailedCategoryResponseImplCopyWithImpl(
+      _$DetailedCategoryResponseImpl _value,
+      $Res Function(_$DetailedCategoryResponseImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of DetailedCategoryResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? data = null,
+  }) {
+    return _then(_$DetailedCategoryResponseImpl(
+      data: null == data
+          ? _value.data
+          : data // ignore: cast_nullable_to_non_nullable
+              as DetailedCategory,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DetailedCategoryResponseImpl
+    with DiagnosticableTreeMixin
+    implements _DetailedCategoryResponse {
+  const _$DetailedCategoryResponseImpl({required this.data});
+
+  factory _$DetailedCategoryResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DetailedCategoryResponseImplFromJson(json);
+
+  @override
+  final DetailedCategory data;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'DetailedCategoryResponse(data: $data)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'DetailedCategoryResponse'))
+      ..add(DiagnosticsProperty('data', data));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DetailedCategoryResponseImpl &&
+            (identical(other.data, data) || other.data == data));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, data);
+
+  /// Create a copy of DetailedCategoryResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DetailedCategoryResponseImplCopyWith<_$DetailedCategoryResponseImpl>
+      get copyWith => __$$DetailedCategoryResponseImplCopyWithImpl<
+          _$DetailedCategoryResponseImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DetailedCategoryResponseImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _DetailedCategoryResponse implements DetailedCategoryResponse {
+  const factory _DetailedCategoryResponse(
+      {required final DetailedCategory data}) = _$DetailedCategoryResponseImpl;
+
+  factory _DetailedCategoryResponse.fromJson(Map<String, dynamic> json) =
+      _$DetailedCategoryResponseImpl.fromJson;
+
+  @override
+  DetailedCategory get data;
+
+  /// Create a copy of DetailedCategoryResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DetailedCategoryResponseImplCopyWith<_$DetailedCategoryResponseImpl>
+      get copyWith => throw _privateConstructorUsedError;
 }

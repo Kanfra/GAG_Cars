@@ -1,15 +1,26 @@
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/editItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/locationSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/selectedBrandPage.dart';
-import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/listingsDetailPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/profileUpdatePage.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/paymentFailedPage.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/paymentProcessingPage.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/paymentSuccessPage.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/webViewPaymentPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/changePasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/customerServicePage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/dealerLoginPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/editItemPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/getVerifiedPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/helpCenterPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/listingsDetailPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/myListingPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/profileUpdatePage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/promotionsPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/securityOnePage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/securityPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/settingsOnePage.dart';
 import 'package:get/get.dart';
 
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
@@ -23,7 +34,6 @@ import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePa
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/NewsBlog/newsBlogPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/allMakesPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/detailPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainNewsPage.dart';
 
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/notificationPage.dart';
@@ -31,19 +41,6 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
-
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/customerServicePage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/dealerLoginPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/getVerifiedPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/helpCenterPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/promotionsPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/securityOnePage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/securityPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settingsOnePage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/myListingPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/settingsPage.dart';
-
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 
 class RouteClass {
@@ -59,7 +56,7 @@ class RouteClass {
   static String enterOtpPage = "/enter-otp-page";
 
   // Profile pages
-  static String settingsPage = "/settings-page";
+  // static String settingsPage = "/settings-page";
   static String settingsOnePage = "/settings-one-page";
   static String securityPage = "/security-page";
   static String securityOnePage = "/security-one-page";
@@ -80,7 +77,7 @@ class RouteClass {
   static String mainNewsPage = "/main-news-page";
   static String myListingsPage = "/my-listings-page";
   static String selectedBrandPage = "/selected-brand-page";
-  static String wishlistPage = "/wishlist-page";
+  // static String wishlistPage = "/wishlist-page";
   static String sellCarPage = "/sell-car-page";
   static String sellCarTwoPage = "/sell-car-two-page";
   static String allMakesPage = "/all-makes-page";
@@ -89,12 +86,18 @@ class RouteClass {
   static String searchPage = "/search-page";
   static String mainBottomNavigationPage = "/main-bottom-navigation-page";
   static String locationSearchPage = "/location-search-page";
-  static String postItemPage = "/post-item-page";
+  // static String postItemPage = "/post-item-page";
   static String editItemPage = "/edit-item-page";
 
   //message
-  static String messagePage = "/messagePage";
+  // static String messagePage = "/messagePage";
   static String mockUpScreenPage = "/mockUpScreenPage";
+
+  // transaction
+  static String webViewPaymentPage = "/webview-payment-page";
+  static String paymentSuccessPage = "/payment-success-page";
+  static String paymentProcessingPage = "/payment-processing-page";
+  static String paymentFailedPage = "/payment-failed-page";
 
   // Getters
   static String getSignUpWithEmailPage() => signUpWithEmailPage;
@@ -107,7 +110,7 @@ class RouteClass {
   static String getResetPasswordPage() => resetPasswordPage;
   static String getEnterOtpPage() => enterOtpPage;
 
-  static String getSettingsPage() => settingsPage;
+  // static String getSettingsPage() => settingsPage;
   static String getSettingsOnePage() => settingsOnePage;
   static String getSecurityPage() => securityPage;
   static String getSecurityOnePage() => securityOnePage;
@@ -126,7 +129,7 @@ class RouteClass {
   static String getDetailPage() => detailPage;
   static String getNewsBlogPage() => newsBlogPage;
   static String getMainNewsPage() => mainNewsPage;
-  static String getWishlistPage() => wishlistPage;
+  // static String getWishlistPage() => wishlistPage;
   static String getMyListingsPage() => myListingsPage;
   static String getSelectedBrandPage() => selectedBrandPage;
   static String getSellCarPage() => sellCarPage;
@@ -137,11 +140,16 @@ class RouteClass {
   static String getSearchPage() => searchPage;
   static String getMainBottomNavigationPage() => mainBottomNavigationPage;
   static String getLocationSearchPage() => locationSearchPage;
-  static String getPostItemPage() => postItemPage;
+  // static String getPostItemPage() => postItemPage;
   static String getEditItemPage() => editItemPage;
  
-  static String getMessagesPage() => messagePage;
+  // static String getMessagesPage() => messagePage;
   static String getMockUpScreenPage() => mockUpScreenPage;
+
+  static String getWebViewPaymentPage() => webViewPaymentPage;
+  static String getPaymentSuccessPage() => paymentSuccessPage;
+  static String getPaymentProcessingPage() => paymentProcessingPage;
+  static String getPaymentFailedPage() => paymentFailedPage;
 
   // Routes
   static List<GetPage> routes = [
@@ -156,11 +164,19 @@ class RouteClass {
     GetPage(page: () => EnterOtpPage(email: Get.arguments ?? ""), name: enterOtpPage, transition: Transition.noTransition),
 
     // Profile
-    GetPage(page: () => const SettingsPage(), name: settingsPage, transition: Transition.noTransition),
+    // GetPage(page: () => const SettingsPage(), name: settingsPage, transition: Transition.noTransition),
     GetPage(page: () => const SettingsOnePage(), name: settingsOnePage, transition: Transition.noTransition),
     GetPage(page: () => const SecurityPage(), name: securityPage, transition: Transition.noTransition),
     GetPage(page: () => const SecurityOnePage(), name: securityOnePage, transition: Transition.noTransition),
-    GetPage(page: () => const PromotionsPage(), name: promotionsPage, transition: Transition.noTransition),
+    GetPage(page: (){
+      final args = Get.arguments as Map<String, dynamic>? ?? {};
+      return PromotionsPage(
+        allJson: args,
+      );
+    }, 
+    name: promotionsPage, 
+    transition: Transition.noTransition
+    ),
     GetPage(page: () => const MyListingPage(), name: myListingPage, transition: Transition.noTransition),
     GetPage(page: () => const HelpCenterPage(), name: helpCenterPage, transition: Transition.noTransition),
     GetPage(page: () => const GetVerifiedPage(), name: getVerifiedPage, transition: Transition.noTransition),
@@ -195,7 +211,7 @@ class RouteClass {
       ),
     GetPage(page: () => const NewsBlogPage(), name: newsBlogPage, transition: Transition.noTransition),
     GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
-    GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),
+    // GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),
     GetPage(page: () => const SellCarPage(), name: sellCarPage, transition: Transition.noTransition),
     GetPage(page: () => const MyListingsPage(), name: myListingsPage, transition: Transition.noTransition),
     GetPage(
@@ -230,7 +246,7 @@ class RouteClass {
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => MainBottomNavigationPage(), name: mainBottomNavigationPage, transition: Transition.noTransition),
     GetPage(page: () => LocationSearchPage(), name: locationSearchPage, transition: Transition.noTransition),
-    GetPage(page: () => PostItemPage(), name: postItemPage, transition: Transition.noTransition),
+    // GetPage(page: () => PostItemPage(), name: postItemPage, transition: Transition.noTransition),
     GetPage(
       page: (){
         final args = Get.arguments as Map<String, dynamic>? ?? {};
@@ -243,8 +259,49 @@ class RouteClass {
       ),
 
     //message
-    GetPage(page: () => const MessagesPage(), name: messagePage, transition: Transition.noTransition),
+    // GetPage(page: () => const MessagesPage(), name: messagePage, transition: Transition.noTransition),
     GetPage(page: () => const MockUpScreenPage(), name: mockUpScreenPage, transition: Transition.noTransition),
+
+    // transaction
+     GetPage(page: (){
+      final args = Get.arguments as Map<String, dynamic>? ?? {};
+      return WebViewPaymentPage(
+        allJson: args,
+      );
+     }, 
+     name: webViewPaymentPage, 
+     transition: Transition.noTransition),
+     
+     GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return PaymentFailedPage(
+          allJson: args,
+        );
+      }, 
+      name: paymentFailedPage, 
+      transition: Transition.noTransition),
+
+      GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return PaymentSuccessPage(
+          allJson: args,
+        );
+      }, 
+      name: paymentSuccessPage, 
+      transition: Transition.noTransition),
+
+      GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return PaymentProcessingPage(
+          allJson: args,
+        );
+      }, 
+      name: paymentSuccessPage, 
+      transition: Transition.noTransition),
+
   ];
 }
 

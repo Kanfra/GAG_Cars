@@ -12,90 +12,111 @@ class MyListingsService {
   final logger = Logger();
 
   /// Fetches listings with pagination support using simple HTTP methods
-  Future<({List<MyListing> listings, bool hasMore, int totalCount})> fetchListings(int page) async {
-    final uri = Uri.parse('$baseApiUrl${ApiEndpoint.myListings}?page=$page&per_page=$_perPage');
+Future<({List<MyListing> listings, bool hasMore, int totalCount})> fetchListings(int page) async {
+  final uri = Uri.parse('$baseApiUrl${ApiEndpoint.myListings}?page=$page&per_page=$_perPage');
+  
+  try {
+    // getToken
+    final token = await AuthService.getToken();
     
-    try {
-      // getToken
-      final token = await AuthService.getToken();
+    // Make the HTTP GET request directly
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ).timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      // DECODE THE RESPONSE PROPERLY - THIS IS THE FIX
+      final responseData = json.decode(response.body);
       
-      // Make the HTTP GET request directly
-      final response = await http.get(
-        uri,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
+      // Extract the actual listings array from the 'data' field
+      final List<dynamic> jsonData;
+      if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
+        jsonData = responseData['data'] as List<dynamic>;
+      } else if (responseData is List<dynamic>) {
+        // Fallback: if API directly returns array (backward compatibility)
+        jsonData = responseData;
+      } else {
+        jsonData = [];
+      }
+      
+      final listings = jsonData
+          .map((item) => MyListing.fromJson(item as Map<String, dynamic>))
+          .toList();
 
-      if (response.statusCode == 200) {
-        // Try to get pagination info from headers (common API patterns)
-        final totalCountHeader = response.headers['x-total-count'];
-        final totalPagesHeader = response.headers['x-total-pages'];
-        final currentPageHeader = response.headers['x-current-page'];
+      // Enhanced pagination logic - ALSO UPDATE THIS TO EXTRACT FROM RESPONSE
+      bool hasMore;
+      int totalCount = 0;
+
+      // Try to get pagination info from the response body (common in JSON APIs)
+      if (responseData is Map<String, dynamic>) {
+        // Check for common pagination fields in the response
+        totalCount = responseData['total']?.toInt() ?? 
+                    responseData['meta']?['total']?.toInt() ?? 
+                    int.tryParse(response.headers['x-total-count'] ?? '') ?? 
+                    0;
         
-        final jsonData = json.decode(response.body) as List;
+        final totalPages = responseData['last_page']?.toInt() ?? 
+                          responseData['meta']?['last_page']?.toInt() ?? 
+                          int.tryParse(response.headers['x-total-pages'] ?? '') ?? 
+                          0;
         
-        final listings = jsonData
-            .map((item) => MyListing.fromJson(item as Map<String, dynamic>))
-            .toList();
+        final currentPage = responseData['current_page']?.toInt() ?? 
+                           responseData['meta']?['current_page']?.toInt() ?? 
+                           int.tryParse(response.headers['x-current-page'] ?? '') ?? 
+                           page;
 
-        // Enhanced pagination logic
-        bool hasMore;
-        int totalCount = 0;
-
-        if (totalCountHeader != null) {
-          // If API provides total count in headers
-          totalCount = int.tryParse(totalCountHeader) ?? 0;
-          hasMore = (page * _perPage) < totalCount;
-        } else if (totalPagesHeader != null) {
-          // If API provides total pages in headers
-          final totalPages = int.tryParse(totalPagesHeader) ?? 0;
-          hasMore = page < totalPages;
-        } else if (currentPageHeader != null) {
-          // If API provides current page in headers
-          final currentPage = int.tryParse(currentPageHeader) ?? page;
-          hasMore = listings.length == _perPage;
+        if (totalCount > 0) {
+          hasMore = (currentPage * _perPage) < totalCount;
+        } else if (totalPages > 0) {
+          hasMore = currentPage < totalPages;
         } else {
           // Fallback: check if we got a full page of results
           hasMore = listings.length == _perPage;
-          
-          // Additional safety: if page > 1 and we get 0 items, assume no more
-          if (page > 1 && listings.isEmpty) {
-            hasMore = false;
-          }
         }
-
-        logger.i('Page: $page, Items: ${listings.length}, HasMore: $hasMore, TotalCount: $totalCount');
-        return (listings: listings, hasMore: hasMore, totalCount: totalCount);
-      
-      } else if (response.statusCode == 401) {
-        logger.e('Authentication failed. Please login again');
-        throw Exception('Authentication failed. Please login again.');
-      
-      } else if (response.statusCode >= 500) {
-        logger.e('Server error. Please try again later');
-        throw Exception('Server error. Please try again later.');
-      
       } else {
-        logger.e('Failed to load listings. Status code: ${response.statusCode}');
-        throw Exception('Failed to load listings. Status code: ${response.statusCode}');
+        // Fallback for array responses without pagination info
+        hasMore = listings.length == _perPage;
+        
+        // Additional safety: if page > 1 and we get 0 items, assume no more
+        if (page > 1 && listings.isEmpty) {
+          hasMore = false;
+        }
       }
+
+      logger.i('Page: $page, Items: ${listings.length}, HasMore: $hasMore, TotalCount: $totalCount');
+      return (listings: listings, hasMore: hasMore, totalCount: totalCount);
     
-    } on http.ClientException {
-      logger.e('Network error. Please check your internet connection');
-      throw Exception('Network error. Please check your internet connection.');
+    } else if (response.statusCode == 401) {
+      logger.e('Authentication failed. Please login again');
+      throw Exception('Authentication failed. Please login again.');
     
-    } on TimeoutException {
-      logger.e('Request timeout. Please try again');
-      throw Exception('Request timeout. Please try again.');
+    } else if (response.statusCode >= 500) {
+      logger.e('Server error. Please try again later');
+      throw Exception('Server error. Please try again later.');
     
-    } catch (e) {
-      logger.e('Failed to load listings: ${e.toString()}');
-      throw Exception('Failed to load listings: ${e.toString()}');
+    } else {
+      logger.e('Failed to load listings. Status code: ${response.statusCode}');
+      throw Exception('Failed to load listings. Status code: ${response.statusCode}');
     }
+  
+  } on http.ClientException {
+    logger.e('Network error. Please check your internet connection');
+    throw Exception('Network error. Please check your internet connection.');
+  
+  } on TimeoutException {
+    logger.e('Request timeout. Please try again');
+    throw Exception('Request timeout. Please try again.');
+  
+  } catch (e) {
+    logger.e('Failed to load listings: ${e.toString()}');
+    throw Exception('Failed to load listings: ${e.toString()}');
   }
+}
 
   // delete item by id
   static Future<Map<String, dynamic>> deleteListing(String itemId) async {

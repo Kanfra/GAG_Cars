@@ -14,20 +14,381 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+Category _$CategoryFromJson(Map<String, dynamic> json) {
+  return _Category.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Category {
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
+  String? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parent_id')
+  int? get parentId => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get slug => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  String? get image => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this Category to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $CategoryCopyWith<Category> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CategoryCopyWith<$Res> {
+  factory $CategoryCopyWith(Category value, $Res Function(Category) then) =
+      _$CategoryCopyWithImpl<$Res, Category>;
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'parent_id') int? parentId,
+      String name,
+      String slug,
+      String? description,
+      String? image,
+      String status,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
+}
+
+/// @nodoc
+class _$CategoryCopyWithImpl<$Res, $Val extends Category>
+    implements $CategoryCopyWith<$Res> {
+  _$CategoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
+    Object? name = null,
+    Object? slug = null,
+    Object? description = freezed,
+    Object? image = freezed,
+    Object? status = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CategoryImplCopyWith<$Res>
+    implements $CategoryCopyWith<$Res> {
+  factory _$$CategoryImplCopyWith(
+          _$CategoryImpl value, $Res Function(_$CategoryImpl) then) =
+      __$$CategoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {int id,
+      @JsonKey(name: 'user_id') String? userId,
+      @JsonKey(name: 'parent_id') int? parentId,
+      String name,
+      String slug,
+      String? description,
+      String? image,
+      String status,
+      @JsonKey(name: 'created_at') DateTime createdAt,
+      @JsonKey(name: 'updated_at') DateTime updatedAt});
+}
+
+/// @nodoc
+class __$$CategoryImplCopyWithImpl<$Res>
+    extends _$CategoryCopyWithImpl<$Res, _$CategoryImpl>
+    implements _$$CategoryImplCopyWith<$Res> {
+  __$$CategoryImplCopyWithImpl(
+      _$CategoryImpl _value, $Res Function(_$CategoryImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
+    Object? name = null,
+    Object? slug = null,
+    Object? description = freezed,
+    Object? image = freezed,
+    Object? status = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_$CategoryImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CategoryImpl implements _Category {
+  const _$CategoryImpl(
+      {required this.id,
+      @JsonKey(name: 'user_id') required this.userId,
+      @JsonKey(name: 'parent_id') required this.parentId,
+      required this.name,
+      required this.slug,
+      required this.description,
+      required this.image,
+      required this.status,
+      @JsonKey(name: 'created_at') required this.createdAt,
+      @JsonKey(name: 'updated_at') required this.updatedAt});
+
+  factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CategoryImplFromJson(json);
+
+  @override
+  final int id;
+  @override
+  @JsonKey(name: 'user_id')
+  final String? userId;
+  @override
+  @JsonKey(name: 'parent_id')
+  final int? parentId;
+  @override
+  final String name;
+  @override
+  final String slug;
+  @override
+  final String? description;
+  @override
+  final String? image;
+  @override
+  final String status;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
+
+  @override
+  String toString() {
+    return 'Category(id: $id, userId: $userId, parentId: $parentId, name: $name, slug: $slug, description: $description, image: $image, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CategoryImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, userId, parentId, name, slug,
+      description, image, status, createdAt, updatedAt);
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CategoryImplCopyWith<_$CategoryImpl> get copyWith =>
+      __$$CategoryImplCopyWithImpl<_$CategoryImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CategoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Category implements Category {
+  const factory _Category(
+          {required final int id,
+          @JsonKey(name: 'user_id') required final String? userId,
+          @JsonKey(name: 'parent_id') required final int? parentId,
+          required final String name,
+          required final String slug,
+          required final String? description,
+          required final String? image,
+          required final String status,
+          @JsonKey(name: 'created_at') required final DateTime createdAt,
+          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
+      _$CategoryImpl;
+
+  factory _Category.fromJson(Map<String, dynamic> json) =
+      _$CategoryImpl.fromJson;
+
+  @override
+  int get id;
+  @override
+  @JsonKey(name: 'user_id')
+  String? get userId;
+  @override
+  @JsonKey(name: 'parent_id')
+  int? get parentId;
+  @override
+  String get name;
+  @override
+  String get slug;
+  @override
+  String? get description;
+  @override
+  String? get image;
+  @override
+  String get status;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime get updatedAt;
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CategoryImplCopyWith<_$CategoryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Post _$PostFromJson(Map<String, dynamic> json) {
   return _Post.fromJson(json);
 }
 
 /// @nodoc
 mixin _$Post {
-  int get id => throw _privateConstructorUsedError;
+  String get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id')
+  String get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id')
+  int get countryId => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
-  String get content => throw _privateConstructorUsedError;
+  String? get slug => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
   String get image => throw _privateConstructorUsedError;
+  String get status => throw _privateConstructorUsedError;
+  String get content => throw _privateConstructorUsedError;
+  List<dynamic> get tags => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'category_id')
+  int get categoryId => throw _privateConstructorUsedError;
+  Category get category => throw _privateConstructorUsedError;
 
   /// Serializes this Post to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -44,12 +405,22 @@ abstract class $PostCopyWith<$Res> {
       _$PostCopyWithImpl<$Res, Post>;
   @useResult
   $Res call(
-      {int id,
+      {String id,
+      @JsonKey(name: 'user_id') String userId,
+      @JsonKey(name: 'country_id') int countryId,
       String title,
-      String content,
+      String? slug,
+      String? description,
       String image,
+      String status,
+      String content,
+      List<dynamic> tags,
       @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'category_id') int categoryId,
+      Category category});
+
+  $CategoryCopyWith<$Res> get category;
 }
 
 /// @nodoc
@@ -68,29 +439,61 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   @override
   $Res call({
     Object? id = null,
+    Object? userId = null,
+    Object? countryId = null,
     Object? title = null,
-    Object? content = null,
+    Object? slug = freezed,
+    Object? description = freezed,
     Object? image = null,
+    Object? status = null,
+    Object? content = null,
+    Object? tags = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? categoryId = null,
+    Object? category = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      countryId: null == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
               as int,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: null == content
+          ? _value.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String,
+      tags: null == tags
+          ? _value.tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<dynamic>,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -99,7 +502,25 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      categoryId: null == categoryId
+          ? _value.categoryId
+          : categoryId // ignore: cast_nullable_to_non_nullable
+              as int,
+      category: null == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as Category,
     ) as $Val);
+  }
+
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CategoryCopyWith<$Res> get category {
+    return $CategoryCopyWith<$Res>(_value.category, (value) {
+      return _then(_value.copyWith(category: value) as $Val);
+    });
   }
 }
 
@@ -111,12 +532,23 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {String id,
+      @JsonKey(name: 'user_id') String userId,
+      @JsonKey(name: 'country_id') int countryId,
       String title,
-      String content,
+      String? slug,
+      String? description,
       String image,
+      String status,
+      String content,
+      List<dynamic> tags,
       @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'updated_at') DateTime updatedAt,
+      @JsonKey(name: 'category_id') int categoryId,
+      Category category});
+
+  @override
+  $CategoryCopyWith<$Res> get category;
 }
 
 /// @nodoc
@@ -132,29 +564,61 @@ class __$$PostImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
+    Object? userId = null,
+    Object? countryId = null,
     Object? title = null,
-    Object? content = null,
+    Object? slug = freezed,
+    Object? description = freezed,
     Object? image = null,
+    Object? status = null,
+    Object? content = null,
+    Object? tags = null,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? categoryId = null,
+    Object? category = null,
   }) {
     return _then(_$PostImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      countryId: null == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
               as int,
       title: null == title
           ? _value.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as String,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
       image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String,
+      status: null == status
+          ? _value.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      content: null == content
+          ? _value.content
+          : content // ignore: cast_nullable_to_non_nullable
+              as String,
+      tags: null == tags
+          ? _value._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<dynamic>,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -163,6 +627,14 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      categoryId: null == categoryId
+          ? _value.categoryId
+          : categoryId // ignore: cast_nullable_to_non_nullable
+              as int,
+      category: null == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as Category,
     ));
   }
 }
@@ -172,33 +644,67 @@ class __$$PostImplCopyWithImpl<$Res>
 class _$PostImpl implements _Post {
   const _$PostImpl(
       {required this.id,
+      @JsonKey(name: 'user_id') required this.userId,
+      @JsonKey(name: 'country_id') required this.countryId,
       required this.title,
-      required this.content,
+      required this.slug,
+      required this.description,
       required this.image,
+      required this.status,
+      required this.content,
+      required final List<dynamic> tags,
       @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'category_id') required this.categoryId,
+      required this.category})
+      : _tags = tags;
 
   factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
       _$$PostImplFromJson(json);
 
   @override
-  final int id;
+  final String id;
+  @override
+  @JsonKey(name: 'user_id')
+  final String userId;
+  @override
+  @JsonKey(name: 'country_id')
+  final int countryId;
   @override
   final String title;
   @override
-  final String content;
+  final String? slug;
+  @override
+  final String? description;
   @override
   final String image;
+  @override
+  final String status;
+  @override
+  final String content;
+  final List<dynamic> _tags;
+  @override
+  List<dynamic> get tags {
+    if (_tags is EqualUnmodifiableListView) return _tags;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_tags);
+  }
+
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @override
   @JsonKey(name: 'updated_at')
   final DateTime updatedAt;
+  @override
+  @JsonKey(name: 'category_id')
+  final int categoryId;
+  @override
+  final Category category;
 
   @override
   String toString() {
-    return 'Post(id: $id, title: $title, content: $content, image: $image, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Post(id: $id, userId: $userId, countryId: $countryId, title: $title, slug: $slug, description: $description, image: $image, status: $status, content: $content, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt, categoryId: $categoryId, category: $category)';
   }
 
   @override
@@ -207,19 +713,45 @@ class _$PostImpl implements _Post {
         (other.runtimeType == runtimeType &&
             other is _$PostImpl &&
             (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.content, content) || other.content == content) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             (identical(other.image, image) || other.image == image) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.content, content) || other.content == content) &&
+            const DeepCollectionEquality().equals(other._tags, _tags) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.categoryId, categoryId) ||
+                other.categoryId == categoryId) &&
+            (identical(other.category, category) ||
+                other.category == category));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, title, content, image, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      countryId,
+      title,
+      slug,
+      description,
+      image,
+      status,
+      content,
+      const DeepCollectionEquality().hash(_tags),
+      createdAt,
+      updatedAt,
+      categoryId,
+      category);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -239,30 +771,56 @@ class _$PostImpl implements _Post {
 
 abstract class _Post implements Post {
   const factory _Post(
-          {required final int id,
-          required final String title,
-          required final String content,
-          required final String image,
-          @JsonKey(name: 'created_at') required final DateTime createdAt,
-          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
-      _$PostImpl;
+      {required final String id,
+      @JsonKey(name: 'user_id') required final String userId,
+      @JsonKey(name: 'country_id') required final int countryId,
+      required final String title,
+      required final String? slug,
+      required final String? description,
+      required final String image,
+      required final String status,
+      required final String content,
+      required final List<dynamic> tags,
+      @JsonKey(name: 'created_at') required final DateTime createdAt,
+      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
+      @JsonKey(name: 'category_id') required final int categoryId,
+      required final Category category}) = _$PostImpl;
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
 
   @override
-  int get id;
+  String get id;
+  @override
+  @JsonKey(name: 'user_id')
+  String get userId;
+  @override
+  @JsonKey(name: 'country_id')
+  int get countryId;
   @override
   String get title;
   @override
-  String get content;
+  String? get slug;
+  @override
+  String? get description;
   @override
   String get image;
+  @override
+  String get status;
+  @override
+  String get content;
+  @override
+  List<dynamic> get tags;
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
   @override
   @JsonKey(name: 'updated_at')
   DateTime get updatedAt;
+  @override
+  @JsonKey(name: 'category_id')
+  int get categoryId;
+  @override
+  Category get category;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.

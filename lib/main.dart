@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
@@ -14,13 +16,13 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/BlogPostService/blogPostService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/ItemCategoryService/itemCategoryService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/makeAndModelService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/WishlistService/wishlistService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
-import 'package:gag_cars_frontend/Pages/Profile%20Pages/Screens/changePasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
@@ -57,6 +59,10 @@ void main() async {
             WishlistService(),
           )
           ),
+         ChangeNotifierProvider(create: (context) => CategoryDetailProvider()),
+          ChangeNotifierProvider<BlogPostProvider>(
+          create: (context) => BlogPostProvider(BlogPostService()),
+        ),      
       ],
       child: const MyApp(),
     ),

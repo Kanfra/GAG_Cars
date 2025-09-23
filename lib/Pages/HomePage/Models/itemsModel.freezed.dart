@@ -14,6 +14,437 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+User _$UserFromJson(Map<String, dynamic> json) {
+  return _User.fromJson(json);
+}
+
+/// @nodoc
+mixin _$User {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
+  @JsonKey(name: 'email_verified_at')
+  DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'paid_seller')
+  int? get paidSeller => throw _privateConstructorUsedError;
+  @JsonKey(name: 'deleted_at')
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id')
+  int? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'state_id')
+  int? get stateId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto => throw _privateConstructorUsedError;
+
+  /// Serializes this User to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UserCopyWith<User> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserCopyWith<$Res> {
+  factory $UserCopyWith(User value, $Res Function(User) then) =
+      _$UserCopyWithImpl<$Res, User>;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String email,
+      String? phone,
+      @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') int? paidSeller,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'state_id') int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto});
+}
+
+/// @nodoc
+class _$UserCopyWithImpl<$Res, $Val extends User>
+    implements $UserCopyWith<$Res> {
+  _$UserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = null,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
+  factory _$$UserImplCopyWith(
+          _$UserImpl value, $Res Function(_$UserImpl) then) =
+      __$$UserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String email,
+      String? phone,
+      @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') int? paidSeller,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'state_id') int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto});
+}
+
+/// @nodoc
+class __$$UserImplCopyWithImpl<$Res>
+    extends _$UserCopyWithImpl<$Res, _$UserImpl>
+    implements _$$UserImplCopyWith<$Res> {
+  __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = null,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+  }) {
+    return _then(_$UserImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UserImpl with DiagnosticableTreeMixin implements _User {
+  const _$UserImpl(
+      {required this.id,
+      required this.name,
+      required this.email,
+      this.phone,
+      @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') this.paidSeller,
+      @JsonKey(name: 'deleted_at') this.deletedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'country_id') this.countryId,
+      @JsonKey(name: 'state_id') this.stateId,
+      @JsonKey(name: 'profile_photo') this.profilePhoto});
+
+  factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String email;
+  @override
+  final String? phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  final DateTime? emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller')
+  final int? paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  final DateTime? deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
+  @override
+  @JsonKey(name: 'country_id')
+  final int? countryId;
+  @override
+  @JsonKey(name: 'state_id')
+  final int? stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  final String? profilePhoto;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'User(id: $id, name: $name, email: $email, phone: $phone, emailVerifiedAt: $emailVerifiedAt, paidSeller: $paidSeller, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, countryId: $countryId, stateId: $stateId, profilePhoto: $profilePhoto)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'User'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('email', email))
+      ..add(DiagnosticsProperty('phone', phone))
+      ..add(DiagnosticsProperty('emailVerifiedAt', emailVerifiedAt))
+      ..add(DiagnosticsProperty('paidSeller', paidSeller))
+      ..add(DiagnosticsProperty('deletedAt', deletedAt))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('countryId', countryId))
+      ..add(DiagnosticsProperty('stateId', stateId))
+      ..add(DiagnosticsProperty('profilePhoto', profilePhoto));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.emailVerifiedAt, emailVerifiedAt) ||
+                other.emailVerifiedAt == emailVerifiedAt) &&
+            (identical(other.paidSeller, paidSeller) ||
+                other.paidSeller == paidSeller) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
+            (identical(other.stateId, stateId) || other.stateId == stateId) &&
+            (identical(other.profilePhoto, profilePhoto) ||
+                other.profilePhoto == profilePhoto));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      email,
+      phone,
+      emailVerifiedAt,
+      paidSeller,
+      deletedAt,
+      createdAt,
+      updatedAt,
+      countryId,
+      stateId,
+      profilePhoto);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      __$$UserImplCopyWithImpl<_$UserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _User implements User {
+  const factory _User(
+      {required final String id,
+      required final String name,
+      required final String email,
+      final String? phone,
+      @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') final int? paidSeller,
+      @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      @JsonKey(name: 'country_id') final int? countryId,
+      @JsonKey(name: 'state_id') final int? stateId,
+      @JsonKey(name: 'profile_photo') final String? profilePhoto}) = _$UserImpl;
+
+  factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String get email;
+  @override
+  String? get phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  DateTime? get emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller')
+  int? get paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  DateTime? get deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt;
+  @override
+  @JsonKey(name: 'country_id')
+  int? get countryId;
+  @override
+  @JsonKey(name: 'state_id')
+  int? get stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Brand _$BrandFromJson(Map<String, dynamic> json) {
   return _Brand.fromJson(json);
 }
@@ -27,9 +458,9 @@ mixin _$Brand {
   String get slug => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Brand to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,8 +482,8 @@ abstract class $BrandCopyWith<$Res> {
       String name,
       String slug,
       String? image,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -75,8 +506,8 @@ class _$BrandCopyWithImpl<$Res, $Val extends Brand>
     Object? name = null,
     Object? slug = null,
     Object? image = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -99,14 +530,14 @@ class _$BrandCopyWithImpl<$Res, $Val extends Brand>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -124,8 +555,8 @@ abstract class _$$BrandImplCopyWith<$Res> implements $BrandCopyWith<$Res> {
       String name,
       String slug,
       String? image,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -146,8 +577,8 @@ class __$$BrandImplCopyWithImpl<$Res>
     Object? name = null,
     Object? slug = null,
     Object? image = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$BrandImpl(
       id: null == id
@@ -170,14 +601,14 @@ class __$$BrandImplCopyWithImpl<$Res>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ));
   }
 }
@@ -191,8 +622,8 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
       required this.name,
       required this.slug,
       this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$BrandImpl.fromJson(Map<String, dynamic> json) =>
       _$$BrandImplFromJson(json);
@@ -210,10 +641,10 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
   final String? image;
   @override
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -273,14 +704,13 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
 
 abstract class _Brand implements Brand {
   const factory _Brand(
-          {required final int id,
-          @JsonKey(name: 'user_id') final String? userId,
-          required final String name,
-          required final String slug,
-          final String? image,
-          @JsonKey(name: 'created_at') required final DateTime createdAt,
-          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
-      _$BrandImpl;
+      {required final int id,
+      @JsonKey(name: 'user_id') final String? userId,
+      required final String name,
+      required final String slug,
+      final String? image,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt}) = _$BrandImpl;
 
   factory _Brand.fromJson(Map<String, dynamic> json) = _$BrandImpl.fromJson;
 
@@ -297,10 +727,10 @@ abstract class _Brand implements Brand {
   String? get image;
   @override
   @JsonKey(name: 'created_at')
-  DateTime get createdAt;
+  DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
+  DateTime? get updatedAt;
 
   /// Create a copy of Brand
   /// with the given fields replaced by the non-null parameter values.
@@ -322,9 +752,9 @@ mixin _$BrandModel {
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this BrandModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -347,8 +777,8 @@ abstract class $BrandModelCopyWith<$Res> {
       @JsonKey(name: 'brand_id') int brandId,
       String name,
       String slug,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -370,8 +800,8 @@ class _$BrandModelCopyWithImpl<$Res, $Val extends BrandModel>
     Object? brandId = null,
     Object? name = null,
     Object? slug = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -390,14 +820,14 @@ class _$BrandModelCopyWithImpl<$Res, $Val extends BrandModel>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -415,8 +845,8 @@ abstract class _$$BrandModelImplCopyWith<$Res>
       @JsonKey(name: 'brand_id') int brandId,
       String name,
       String slug,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -436,8 +866,8 @@ class __$$BrandModelImplCopyWithImpl<$Res>
     Object? brandId = null,
     Object? name = null,
     Object? slug = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$BrandModelImpl(
       id: null == id
@@ -456,14 +886,14 @@ class __$$BrandModelImplCopyWithImpl<$Res>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ));
   }
 }
@@ -476,8 +906,8 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
       @JsonKey(name: 'brand_id') required this.brandId,
       required this.name,
       required this.slug,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$BrandModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$BrandModelImplFromJson(json);
@@ -493,10 +923,10 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
   final String slug;
   @override
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -558,8 +988,8 @@ abstract class _BrandModel implements BrandModel {
           @JsonKey(name: 'brand_id') required final int brandId,
           required final String name,
           required final String slug,
-          @JsonKey(name: 'created_at') required final DateTime createdAt,
-          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
+          @JsonKey(name: 'created_at') final DateTime? createdAt,
+          @JsonKey(name: 'updated_at') final DateTime? updatedAt}) =
       _$BrandModelImpl;
 
   factory _BrandModel.fromJson(Map<String, dynamic> json) =
@@ -576,10 +1006,10 @@ abstract class _BrandModel implements BrandModel {
   String get slug;
   @override
   @JsonKey(name: 'created_at')
-  DateTime get createdAt;
+  DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
+  DateTime? get updatedAt;
 
   /// Create a copy of BrandModel
   /// with the given fields replaced by the non-null parameter values.
@@ -606,9 +1036,9 @@ mixin _$Category {
   List<String>? get features => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Category to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -634,8 +1064,8 @@ abstract class $CategoryCopyWith<$Res> {
       String? description,
       List<String>? features,
       String? image,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -661,8 +1091,8 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
     Object? description = freezed,
     Object? features = freezed,
     Object? image = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -697,14 +1127,14 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -726,8 +1156,8 @@ abstract class _$$CategoryImplCopyWith<$Res>
       String? description,
       List<String>? features,
       String? image,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
 
 /// @nodoc
@@ -751,8 +1181,8 @@ class __$$CategoryImplCopyWithImpl<$Res>
     Object? description = freezed,
     Object? features = freezed,
     Object? image = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
   }) {
     return _then(_$CategoryImpl(
       id: null == id
@@ -787,14 +1217,14 @@ class __$$CategoryImplCopyWithImpl<$Res>
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
+              as DateTime?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
     ));
   }
 }
@@ -811,8 +1241,8 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
       this.description,
       final List<String>? features,
       this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt})
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt})
       : _features = features;
 
   factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
@@ -846,10 +1276,10 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   final String? image;
   @override
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -927,17 +1357,16 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-          {required final int id,
-          @JsonKey(name: 'user_id') final String? userId,
-          @JsonKey(name: 'parent_id') final int? parentId,
-          required final String name,
-          required final String slug,
-          final String? description,
-          final List<String>? features,
-          final String? image,
-          @JsonKey(name: 'created_at') required final DateTime createdAt,
-          @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
-      _$CategoryImpl;
+      {required final int id,
+      @JsonKey(name: 'user_id') final String? userId,
+      @JsonKey(name: 'parent_id') final int? parentId,
+      required final String name,
+      required final String slug,
+      final String? description,
+      final List<String>? features,
+      final String? image,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt}) = _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
       _$CategoryImpl.fromJson;
@@ -962,10 +1391,10 @@ abstract class _Category implements Category {
   String? get image;
   @override
   @JsonKey(name: 'created_at')
-  DateTime get createdAt;
+  DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
+  DateTime? get updatedAt;
 
   /// Create a copy of Category
   /// with the given fields replaced by the non-null parameter values.
@@ -981,8 +1410,7 @@ RecommendedItem _$RecommendedItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RecommendedItem {
-  String get id =>
-      throw _privateConstructorUsedError; // Keep required if truly mandatory
+  String get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'country_id')
@@ -993,9 +1421,9 @@ mixin _$RecommendedItem {
   int? get brandId => throw _privateConstructorUsedError;
   @JsonKey(name: 'category_id')
   int? get categoryId => throw _privateConstructorUsedError;
-  String? get name => throw _privateConstructorUsedError; // Make nullable
-  String? get year => throw _privateConstructorUsedError; // Make nullable
-  String? get slug => throw _privateConstructorUsedError; // Make nullable
+  String? get name => throw _privateConstructorUsedError;
+  String? get year => throw _privateConstructorUsedError;
+  String? get slug => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   List<String>? get images => throw _privateConstructorUsedError;
   String? get location => throw _privateConstructorUsedError;
@@ -1013,26 +1441,27 @@ mixin _$RecommendedItem {
   @JsonKey(name: 'number_of_passengers')
   int? get numberOfPassengers => throw _privateConstructorUsedError;
   List<String>? get features => throw _privateConstructorUsedError;
-  String? get status => throw _privateConstructorUsedError; // Make nullable
-  String? get price => throw _privateConstructorUsedError; // Make nullable
+  String? get status => throw _privateConstructorUsedError;
+  String? get price => throw _privateConstructorUsedError;
   String? get mileage => throw _privateConstructorUsedError;
-  int? get warranty => throw _privateConstructorUsedError; // Make nullable
+  int? get warranty => throw _privateConstructorUsedError;
   @JsonKey(name: 'warranty_expiration')
-  String? get warrantyExpiration => throw _privateConstructorUsedError;
+  DateTime? get warrantyExpiration => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
-  String? get deletedAt => throw _privateConstructorUsedError;
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime? get createdAt =>
-      throw _privateConstructorUsedError; // Make nullable
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt =>
-      throw _privateConstructorUsedError; // Make nullable
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  String? get height => throw _privateConstructorUsedError;
+  String? get vin => throw _privateConstructorUsedError;
   Brand? get brand => throw _privateConstructorUsedError;
   Category? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'brand_model')
   BrandModel? get brandModel => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brandModel')
-  BrandModel? get brandModelAlt => throw _privateConstructorUsedError;
+  User? get user => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_promoted')
+  bool? get isPromoted => throw _privateConstructorUsedError;
 
   /// Serializes this RecommendedItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1076,19 +1505,22 @@ abstract class $RecommendedItemCopyWith<$Res> {
       String? price,
       String? mileage,
       int? warranty,
-      @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
-      @JsonKey(name: 'deleted_at') String? deletedAt,
+      @JsonKey(name: 'warranty_expiration') DateTime? warrantyExpiration,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      String? height,
+      String? vin,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
-      @JsonKey(name: 'brandModel') BrandModel? brandModelAlt});
+      User? user,
+      @JsonKey(name: 'is_promoted') bool? isPromoted});
 
   $BrandCopyWith<$Res>? get brand;
   $CategoryCopyWith<$Res>? get category;
   $BrandModelCopyWith<$Res>? get brandModel;
-  $BrandModelCopyWith<$Res>? get brandModelAlt;
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1135,10 +1567,13 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
     Object? deletedAt = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? height = freezed,
+    Object? vin = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
-    Object? brandModelAlt = freezed,
+    Object? user = freezed,
+    Object? isPromoted = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -1244,11 +1679,11 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as DateTime?,
       deletedAt: freezed == deletedAt
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as DateTime?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -1257,6 +1692,14 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      height: freezed == height
+          ? _value.height
+          : height // ignore: cast_nullable_to_non_nullable
+              as String?,
+      vin: freezed == vin
+          ? _value.vin
+          : vin // ignore: cast_nullable_to_non_nullable
+              as String?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1269,10 +1712,14 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
           ? _value.brandModel
           : brandModel // ignore: cast_nullable_to_non_nullable
               as BrandModel?,
-      brandModelAlt: freezed == brandModelAlt
-          ? _value.brandModelAlt
-          : brandModelAlt // ignore: cast_nullable_to_non_nullable
-              as BrandModel?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
+      isPromoted: freezed == isPromoted
+          ? _value.isPromoted
+          : isPromoted // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 
@@ -1322,13 +1769,13 @@ class _$RecommendedItemCopyWithImpl<$Res, $Val extends RecommendedItem>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $BrandModelCopyWith<$Res>? get brandModelAlt {
-    if (_value.brandModelAlt == null) {
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
       return null;
     }
 
-    return $BrandModelCopyWith<$Res>(_value.brandModelAlt!, (value) {
-      return _then(_value.copyWith(brandModelAlt: value) as $Val);
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
     });
   }
 }
@@ -1367,14 +1814,17 @@ abstract class _$$RecommendedItemImplCopyWith<$Res>
       String? price,
       String? mileage,
       int? warranty,
-      @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
-      @JsonKey(name: 'deleted_at') String? deletedAt,
+      @JsonKey(name: 'warranty_expiration') DateTime? warrantyExpiration,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      String? height,
+      String? vin,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
-      @JsonKey(name: 'brandModel') BrandModel? brandModelAlt});
+      User? user,
+      @JsonKey(name: 'is_promoted') bool? isPromoted});
 
   @override
   $BrandCopyWith<$Res>? get brand;
@@ -1383,7 +1833,7 @@ abstract class _$$RecommendedItemImplCopyWith<$Res>
   @override
   $BrandModelCopyWith<$Res>? get brandModel;
   @override
-  $BrandModelCopyWith<$Res>? get brandModelAlt;
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1428,10 +1878,13 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
     Object? deletedAt = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? height = freezed,
+    Object? vin = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
-    Object? brandModelAlt = freezed,
+    Object? user = freezed,
+    Object? isPromoted = freezed,
   }) {
     return _then(_$RecommendedItemImpl(
       id: null == id
@@ -1537,11 +1990,11 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as DateTime?,
       deletedAt: freezed == deletedAt
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as DateTime?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -1550,6 +2003,14 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      height: freezed == height
+          ? _value.height
+          : height // ignore: cast_nullable_to_non_nullable
+              as String?,
+      vin: freezed == vin
+          ? _value.vin
+          : vin // ignore: cast_nullable_to_non_nullable
+              as String?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1562,10 +2023,14 @@ class __$$RecommendedItemImplCopyWithImpl<$Res>
           ? _value.brandModel
           : brandModel // ignore: cast_nullable_to_non_nullable
               as BrandModel?,
-      brandModelAlt: freezed == brandModelAlt
-          ? _value.brandModelAlt
-          : brandModelAlt // ignore: cast_nullable_to_non_nullable
-              as BrandModel?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
+      isPromoted: freezed == isPromoted
+          ? _value.isPromoted
+          : isPromoted // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -1605,10 +2070,13 @@ class _$RecommendedItemImpl
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
+      this.height,
+      this.vin,
       this.brand,
       this.category,
       @JsonKey(name: 'brand_model') this.brandModel,
-      @JsonKey(name: 'brandModel') this.brandModelAlt})
+      this.user,
+      @JsonKey(name: 'is_promoted') this.isPromoted})
       : _images = images,
         _features = features;
 
@@ -1617,7 +2085,6 @@ class _$RecommendedItemImpl
 
   @override
   final String id;
-// Keep required if truly mandatory
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
@@ -1635,13 +2102,10 @@ class _$RecommendedItemImpl
   final int? categoryId;
   @override
   final String? name;
-// Make nullable
   @override
   final String? year;
-// Make nullable
   @override
   final String? slug;
-// Make nullable
   @override
   final String? description;
   final List<String>? _images;
@@ -1689,29 +2153,28 @@ class _$RecommendedItemImpl
 
   @override
   final String? status;
-// Make nullable
   @override
   final String? price;
-// Make nullable
   @override
   final String? mileage;
   @override
   final int? warranty;
-// Make nullable
   @override
   @JsonKey(name: 'warranty_expiration')
-  final String? warrantyExpiration;
+  final DateTime? warrantyExpiration;
   @override
   @JsonKey(name: 'deleted_at')
-  final String? deletedAt;
+  final DateTime? deletedAt;
   @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
-// Make nullable
   @override
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
-// Make nullable
+  @override
+  final String? height;
+  @override
+  final String? vin;
   @override
   final Brand? brand;
   @override
@@ -1720,12 +2183,14 @@ class _$RecommendedItemImpl
   @JsonKey(name: 'brand_model')
   final BrandModel? brandModel;
   @override
-  @JsonKey(name: 'brandModel')
-  final BrandModel? brandModelAlt;
+  final User? user;
+  @override
+  @JsonKey(name: 'is_promoted')
+  final bool? isPromoted;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'RecommendedItem(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, brand: $brand, category: $category, brandModel: $brandModel, brandModelAlt: $brandModelAlt)';
+    return 'RecommendedItem(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, height: $height, vin: $vin, brand: $brand, category: $category, brandModel: $brandModel, user: $user, isPromoted: $isPromoted)';
   }
 
   @override
@@ -1762,10 +2227,13 @@ class _$RecommendedItemImpl
       ..add(DiagnosticsProperty('deletedAt', deletedAt))
       ..add(DiagnosticsProperty('createdAt', createdAt))
       ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('height', height))
+      ..add(DiagnosticsProperty('vin', vin))
       ..add(DiagnosticsProperty('brand', brand))
       ..add(DiagnosticsProperty('category', category))
       ..add(DiagnosticsProperty('brandModel', brandModel))
-      ..add(DiagnosticsProperty('brandModelAlt', brandModelAlt));
+      ..add(DiagnosticsProperty('user', user))
+      ..add(DiagnosticsProperty('isPromoted', isPromoted));
   }
 
   @override
@@ -1819,13 +2287,16 @@ class _$RecommendedItemImpl
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
+            (identical(other.height, height) || other.height == height) &&
+            (identical(other.vin, vin) || other.vin == vin) &&
             (identical(other.brand, brand) || other.brand == brand) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.brandModel, brandModel) ||
                 other.brandModel == brandModel) &&
-            (identical(other.brandModelAlt, brandModelAlt) ||
-                other.brandModelAlt == brandModelAlt));
+            (identical(other.user, user) || other.user == user) &&
+            (identical(other.isPromoted, isPromoted) ||
+                other.isPromoted == isPromoted));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1861,10 +2332,13 @@ class _$RecommendedItemImpl
         deletedAt,
         createdAt,
         updatedAt,
+        height,
+        vin,
         brand,
         category,
         brandModel,
-        brandModelAlt
+        user,
+        isPromoted
       ]);
 
   /// Create a copy of RecommendedItem
@@ -1911,21 +2385,24 @@ abstract class _RecommendedItem implements RecommendedItem {
       final String? price,
       final String? mileage,
       final int? warranty,
-      @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
-      @JsonKey(name: 'deleted_at') final String? deletedAt,
+      @JsonKey(name: 'warranty_expiration') final DateTime? warrantyExpiration,
+      @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      final String? height,
+      final String? vin,
       final Brand? brand,
       final Category? category,
       @JsonKey(name: 'brand_model') final BrandModel? brandModel,
-      @JsonKey(name: 'brandModel')
-      final BrandModel? brandModelAlt}) = _$RecommendedItemImpl;
+      final User? user,
+      @JsonKey(name: 'is_promoted')
+      final bool? isPromoted}) = _$RecommendedItemImpl;
 
   factory _RecommendedItem.fromJson(Map<String, dynamic> json) =
       _$RecommendedItemImpl.fromJson;
 
   @override
-  String get id; // Keep required if truly mandatory
+  String get id;
   @override
   @JsonKey(name: 'user_id')
   String? get userId;
@@ -1942,11 +2419,11 @@ abstract class _RecommendedItem implements RecommendedItem {
   @JsonKey(name: 'category_id')
   int? get categoryId;
   @override
-  String? get name; // Make nullable
+  String? get name;
   @override
-  String? get year; // Make nullable
+  String? get year;
   @override
-  String? get slug; // Make nullable
+  String? get slug;
   @override
   String? get description;
   @override
@@ -1977,25 +2454,29 @@ abstract class _RecommendedItem implements RecommendedItem {
   @override
   List<String>? get features;
   @override
-  String? get status; // Make nullable
+  String? get status;
   @override
-  String? get price; // Make nullable
+  String? get price;
   @override
   String? get mileage;
   @override
-  int? get warranty; // Make nullable
+  int? get warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
-  String? get warrantyExpiration;
+  DateTime? get warrantyExpiration;
   @override
   @JsonKey(name: 'deleted_at')
-  String? get deletedAt;
+  DateTime? get deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  DateTime? get createdAt; // Make nullable
+  DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt; // Make nullable
+  DateTime? get updatedAt;
+  @override
+  String? get height;
+  @override
+  String? get vin;
   @override
   Brand? get brand;
   @override
@@ -2004,8 +2485,10 @@ abstract class _RecommendedItem implements RecommendedItem {
   @JsonKey(name: 'brand_model')
   BrandModel? get brandModel;
   @override
-  @JsonKey(name: 'brandModel')
-  BrandModel? get brandModelAlt;
+  User? get user;
+  @override
+  @JsonKey(name: 'is_promoted')
+  bool? get isPromoted;
 
   /// Create a copy of RecommendedItem
   /// with the given fields replaced by the non-null parameter values.

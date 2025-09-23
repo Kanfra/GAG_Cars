@@ -28,7 +28,7 @@ class MyListing with _$MyListing {
     String? color,
     @JsonKey(name: 'build_type') String? buildType,
     @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
-    required List<String> features,
+    required List<dynamic> features,
     dynamic status,
     required String price,
     String? mileage,
@@ -39,6 +39,7 @@ class MyListing with _$MyListing {
     @JsonKey(name: 'updated_at') required String updatedAt,
     dynamic Height,
     dynamic VIN,
+    @JsonKey(name: 'is_promoted') bool? isPromoted, // New field
   }) = _MyListing;
 
   factory MyListing.fromJson(Map<String, dynamic> json) =>

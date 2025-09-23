@@ -121,9 +121,11 @@ class _SettingsState extends State<SettingsPage> {
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => Get.back(),
-        isLeadingWidgetExist: true,
+        isLeadingWidgetExist: false,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
+        // leadingIconDataColor: ColorGlobalVariables.brownColor,
         titleText: "Settings",
+        titleTextColor: ColorGlobalVariables.brownColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -132,7 +134,7 @@ class _SettingsState extends State<SettingsPage> {
               Icons.notifications_none_outlined,
               color: isDarkMode 
                   ? Colors.white 
-                  : ColorGlobalVariables.blackColor,
+                  : ColorGlobalVariables.brownColor,
             ),
           ),
         ],

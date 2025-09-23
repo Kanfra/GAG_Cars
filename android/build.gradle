@@ -20,11 +20,22 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(':app')
+
+    // ✅ Force all subprojects (like rive_common) to use minSdkVersion 21
+    if (project.hasProperty("android")) {
+        project.android {
+            defaultConfig {
+                minSdkVersion 21
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

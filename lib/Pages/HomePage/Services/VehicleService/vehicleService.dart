@@ -187,6 +187,7 @@ static Future<void> uploadVehicle({
   }
 }
 
+  // helper function
   static String _parseValidationErrors(Map<String, dynamic> errors) {
     final errorMessages = <String>[];
     
@@ -199,6 +200,47 @@ static Future<void> uploadVehicle({
     });
     
     return errorMessages.join('; ');
+  }
+
+  // mark as sold
+  static Future<Map<String, dynamic>> markAsSold(String itemId) async {
+    final uri = Uri.parse('$baseApiUrl${ApiEndpoint.items}/$itemId');
+    try{
+      final token = await AuthService.getToken();
+      final response = await http.put(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'status': 'sold',
+        }),
+      );
+
+      if(response.statusCode == 200){
+        final responseData = json.decode(response.body);
+        logger.i('Item marked as sold successfully');
+        return {
+          'success': true,
+          'message': responseData['message'] ?? 'Item marked as sold successfully',
+          'data': responseData['data'],
+        };
+      } else {
+        final errorData = json.decode(response.body);
+        logger.e('Failed to mark item as sold');
+        return {
+          'success': false,
+          'message': errorData['message'] ?? 'Failed to mark item as sold',
+          'error': errorData,
+        };
+      }
+    } catch(e){
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+      };
+    }
   }
 
 }

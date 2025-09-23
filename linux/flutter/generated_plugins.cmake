@@ -5,6 +5,9 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_linux
   flutter_secure_storage_linux
+  open_file_linux
+  printing
+  rive_common
   url_launcher_linux
 )
 
