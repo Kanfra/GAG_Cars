@@ -134,9 +134,9 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
     try {
-      if (imagePath.startsWith('http')) {
+      if (imagePath.isNotEmpty) {
         return Image.network(
-          imagePath,
+          getImageUrl(imagePath, null),
           width: width,
           height: height,
           fit: fit,
@@ -153,7 +153,8 @@ class _DetailPageState extends State<DetailPage> {
             );
           },
         );
-      } else if (imagePath.startsWith('assets/')) {
+      }
+      else if (imagePath.startsWith('assets/')) {
         return Image.asset(
           imagePath,
           width: width,
@@ -675,7 +676,7 @@ class _DetailPageState extends State<DetailPage> {
                   Opacity(
                     opacity: _imageOpacity,
                     child: buildSafeImage(
-                      currentImage,
+                      getImageUrl(currentImage, null),
                       width: double.infinity,
                       height: double.infinity,
                       fit: BoxFit.cover,

@@ -16,6 +16,7 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
@@ -313,7 +314,10 @@ class _HomePageState extends State<HomePage> {
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 final recommended = homeProvider.recommendedItems[index];
-                return _buildRecommendedItem(recommended, screenSize);
+                return _RecommendedItemWidget(
+                  recommended: recommended,
+                  screenSize: screenSize,
+                );
               },
               childCount: homeProvider.recommendedItems.length,
             ),
@@ -688,20 +692,221 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRecommendedItem(RecommendedItem recommended, Size screenSize) {
-    final firstImage = recommended.images?.isNotEmpty == true
-        ? recommended.images!.first
+  // Helper method to get colors for different categories
+  Color _getCategoryColor(String categoryName) {
+    switch (categoryName.toLowerCase()) {
+      case 'parts & accessories':
+        return Colors.blue;
+      case 'motocycle':
+        return Colors.orange;
+      case 'agricultural machinery':
+        return Colors.green;
+      case 'trucks':
+        return Colors.red;
+      default:
+        return ColorGlobalVariables.redColor;
+    }
+  }
+
+  IconData _getIconForCategory({required String categoryName}) {
+    switch (categoryName.toLowerCase()) {
+      case 'parts & accessories':
+        return Icons.construction;
+      case 'motocycle':
+        return FontAwesomeIcons.motorcycle;
+      case 'agricultural machinery':
+        return Icons.agriculture;
+      case 'trucks':
+        return FontAwesomeIcons.truck;
+      default:
+        return Icons.directions_car;
+    }
+  }
+}
+
+class _RecommendedItemWidget extends StatefulWidget {
+  final RecommendedItem recommended;
+  final Size screenSize;
+
+  const _RecommendedItemWidget({
+    required this.recommended,
+    required this.screenSize,
+  });
+
+  @override
+  __RecommendedItemWidgetState createState() => __RecommendedItemWidgetState();
+}
+
+class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Color?> _colorAnimation;
+  
+  bool _isLiked = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _colorAnimation = ColorTween(
+      begin: Colors.grey[400],
+      end: Colors.red,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _initializeLikeStatus();
+  }
+
+  void _initializeLikeStatus() {
+    // FIX: Check global wishlist status instead of setting to false
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkWishlistStatus();
+    });
+  }
+
+  void _checkWishlistStatus() {
+    try {
+      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final isInWishlist = wishlistManager.isLiked(widget.recommended.id);
+      
+      setState(() {
+        _isLiked = isInWishlist;
+        if (_isLiked) {
+          _animationController.value = 1.0; // Set to liked state
+        }
+      });
+    } catch (e) {
+      print('Error checking wishlist status: $e');
+    }
+  }
+
+  Future<void> _toggleLike() async {
+    if (_isLoading) return;
+    
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Toggle the animation
+      if (_isLiked) {
+        _animationController.reverse();
+      } else {
+        _animationController.forward();
+      }
+
+      // Get the wishlist provider and call toggleWishlistItem
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      
+      final result = await wishlistProvider.toggleWishlistItem(
+        itemId: widget.recommended.id, context: context,
+      );
+
+      if (result) {
+        // Update local state - WishlistManager will handle the global sync
+        setState(() {
+          _isLiked = !_isLiked;
+        });
+        
+        // Show success feedback
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isLiked ? 'Added to wishlist!' : 'Removed from wishlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: _isLiked ? Colors.green : Colors.orange,
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      } else {
+        // Failure - revert the animation
+        if (_isLiked) {
+          _animationController.forward();
+        } else {
+          _animationController.reverse();
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to update wishlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Wishlist error: $e');
+      // Revert animation on error
+      if (_isLiked) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error: ${e.toString()}',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final firstImage = widget.recommended.images?.isNotEmpty == true
+        ? widget.recommended.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-    final brandImage = recommended.brand?.image;
-    final isPromoted = recommended.isPromoted == true;
+    final brandImage = widget.recommended.brand?.image;
+    final isPromoted = widget.recommended.isPromoted == true;
 
     return GestureDetector(
       onTap: () {
         Get.toNamed(
           RouteClass.getDetailPage(),
           arguments: {
-            'product': recommended.toJson(),
-            'item': recommended.toJson(),
+            'product': widget.recommended.toJson(),
+            'item': widget.recommended.toJson(),
             'type': 'recommended',
           },
         );
@@ -730,11 +935,11 @@ class _HomePageState extends State<HomePage> {
                     height: 120,
                     width: double.infinity,
                     color: Colors.grey[100],
-                    child: _buildRecommendedImage(firstImage, recommended),
+                    child: _buildRecommendedImage(firstImage),
                   ),
                 ),
                 
-                // CATEGORY BADGE - Added back the category badge
+                // CATEGORY BADGE
                 Positioned(
                   top: 8,
                   left: 8,
@@ -745,7 +950,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      recommended.category?.name ?? 'Car',
+                      widget.recommended.category?.name ?? 'Car',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -755,7 +960,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 
-                // PROMOTED BADGE - Added promoted badge on top right
+                // PROMOTED BADGE
                 if (isPromoted)
                   Positioned(
                     top: 8,
@@ -784,37 +989,57 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 
-                // Wishlist Button - Moved to bottom right
+                // Animated Wishlist Button
                 Positioned(
                   bottom: 8,
                   right: 8,
                   child: GestureDetector(
-                    onTap: () async {
-                      try {
-                        await Provider.of<WishlistToggleProvider>(context,
-                                listen: false)
-                            .toggleWishlistItem(itemId: recommended.id);
-                      } catch (e) {
-                        print('Wishlist error: $e');
-                      }
+                    onTap: () {
+                      // Prevent tap if already loading
+                      if (_isLoading) return;
+                      _toggleLike();
                     },
-                    child: Container(
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.favorite_border,
-                        size: 18,
-                        color: Colors.black54,
+                          child: _isLoading
+                              ? SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.grey,
+                                    ),
+                                  ),
+                                )
+                              : AnimatedBuilder(
+                                  animation: _colorAnimation,
+                                  builder: (context, child) {
+                                    return Icon(
+                                      _isLiked ? Icons.favorite : Icons.favorite_border,
+                                      size: 18,
+                                      color: _isLiked 
+                                          ? _colorAnimation.value 
+                                          : Colors.grey[600],
+                                    );
+                                  },
+                                ),
+                        ),
                       ),
                     ),
                   ),
@@ -834,7 +1059,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Expanded(
                         child: Text(
-                          recommended.name ?? 'Unnamed Vehicle',
+                          widget.recommended.name ?? 'Unnamed Vehicle',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -845,7 +1070,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Text(
-                        recommended.condition ?? 'Used',
+                        widget.recommended.condition ?? 'Used',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -861,20 +1086,20 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommended.price ?? '0'))}',
+                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: ColorGlobalVariables.redColor,
                         ),
                       ),
-                      if (recommended.mileage != null)
+                      if (widget.recommended.mileage != null)
                         Row(
                           children: [
                             Icon(Icons.speed, size: 14, color: Colors.grey[600]),
                             SizedBox(width: 4),
                             Text(
-                              "${formatNumber(shortenerRequired: true, number: int.parse(recommended.mileage!))} km",
+                              "${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.mileage!))} km",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -908,13 +1133,13 @@ class _HomePageState extends State<HomePage> {
                       else
                         SizedBox(width: 24),
                       
-                      if (recommended.transmission != null)
+                      if (widget.recommended.transmission != null)
                         Row(
                           children: [
                             Icon(Icons.settings, size: 14, color: Colors.grey[600]),
                             SizedBox(width: 4),
                             Text(
-                              recommended.transmission!,
+                              widget.recommended.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey[600],
@@ -923,7 +1148,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
                       
-                      if (recommended.location != null)
+                      if (widget.recommended.location != null)
                         Flexible(
                           child: Row(
                             children: [
@@ -931,7 +1156,7 @@ class _HomePageState extends State<HomePage> {
                               SizedBox(width: 4),
                               Flexible(
                                 child: Text(
-                                  recommended.location!,
+                                  widget.recommended.location!,
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.grey[600],
@@ -954,8 +1179,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRecommendedImage(String imageUrl, RecommendedItem recommended) {
-    final bool isAssetImage = recommended.images?.isNotEmpty != true;
+  Widget _buildRecommendedImage(String imageUrl) {
+    final bool isAssetImage = widget.recommended.images?.isNotEmpty != true;
     
     if (isAssetImage) {
       return Image.asset(
@@ -1007,36 +1232,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  // Helper method to get colors for different categories
-  Color _getCategoryColor(String categoryName) {
-    switch (categoryName.toLowerCase()) {
-      case 'parts & accessories':
-        return Colors.blue;
-      case 'motocycle':
-        return Colors.orange;
-      case 'agricultural machinery':
-        return Colors.green;
-      case 'trucks':
-        return Colors.red;
-      default:
-        return ColorGlobalVariables.redColor;
-    }
-  }
-
-  IconData _getIconForCategory({required String categoryName}) {
-    switch (categoryName.toLowerCase()) {
-      case 'parts & accessories':
-        return Icons.construction;
-      case 'motocycle':
-        return FontAwesomeIcons.motorcycle;
-      case 'agricultural machinery':
-        return Icons.agriculture;
-      case 'trucks':
-        return FontAwesomeIcons.truck;
-      default:
-        return Icons.directions_car;
-    }
   }
 }

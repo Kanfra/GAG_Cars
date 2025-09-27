@@ -9,6 +9,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvid
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
@@ -55,14 +56,15 @@ void main() async {
           create: (context) => WishlistToggleProvider(),
           ),
          ChangeNotifierProvider(
-          create: (context) => GetWishlistProvider(
-            WishlistService(),
-          )
+          create: (context) => WishlistFetchProvider()
           ),
          ChangeNotifierProvider(create: (context) => CategoryDetailProvider()),
           ChangeNotifierProvider<BlogPostProvider>(
           create: (context) => BlogPostProvider(BlogPostService()),
-        ),      
+        ), 
+        ChangeNotifierProvider( // ADD THIS NEW PROVIDER
+          create: (context) => WishlistManager(),
+        ),           
       ],
       child: const MyApp(),
     ),

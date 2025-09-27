@@ -9,8 +9,8 @@ part of 'verifyDealerModel.dart';
 _$VerificationRequestImpl _$$VerificationRequestImplFromJson(
         Map<String, dynamic> json) =>
     _$VerificationRequestImpl(
-      document_type: json['document_type'] as String,
-      document_number: json['document_number'] as String,
+      document_type: json['document_type'] as String?,
+      document_number: json['document_number'] as String?,
       document_front: json['document_front'] as String,
       document_back: json['document_back'] as String,
       selfie: json['selfie'] as String,
@@ -46,6 +46,7 @@ _$VerificationResponseImpl _$$VerificationResponseImplFromJson(
       data: json['data'] == null
           ? null
           : VerificationData.fromJson(json['data'] as Map<String, dynamic>),
+      error: json['error'] as String?,
     );
 
 Map<String, dynamic> _$$VerificationResponseImplToJson(
@@ -54,25 +55,26 @@ Map<String, dynamic> _$$VerificationResponseImplToJson(
       'success': instance.success,
       'message': instance.message,
       'data': instance.data,
+      'error': instance.error,
     };
 
 _$VerificationDataImpl _$$VerificationDataImplFromJson(
         Map<String, dynamic> json) =>
     _$VerificationDataImpl(
       id: (json['id'] as num).toInt(),
-      document_type: json['document_type'] as String,
-      document_number: json['document_number'] as String,
+      document_type: json['document_type'] as String?,
+      document_number: json['document_number'] as String?,
       document_front: json['document_front'] as String,
       document_back: json['document_back'] as String,
       selfie: json['selfie'] as String,
-      status: json['status'] as String,
+      status: json['status'] as String?,
       comment: json['comment'] as String?,
       verified_by: json['verified_by'] as String?,
       rejected_by: json['rejected_by'] as String?,
       approved_at: json['approved_at'] as String?,
       rejected_at: json['rejected_at'] as String?,
-      created_at: json['created_at'] as String,
-      updated_at: json['updated_at'] as String,
+      created_at: json['created_at'] as String?,
+      updated_at: json['updated_at'] as String?,
     );
 
 Map<String, dynamic> _$$VerificationDataImplToJson(

@@ -7,11 +7,14 @@ part 'verifyDealerModel.g.dart';
 @freezed
 class VerificationRequest with _$VerificationRequest {
   const factory VerificationRequest({
-    required String document_type,
-    required String document_number,
+    String? document_type,
+    String? document_number,
+    // String? dealer_name,  // Temporarily commented out
+    // String? location,     // Temporarily commented out
     required String document_front,
     required String document_back,
     required String selfie,
+    // String? company_registration_document,  // Temporarily commented out
     String? status,
     String? comment,
     String? verified_by,
@@ -24,13 +27,14 @@ class VerificationRequest with _$VerificationRequest {
       _$VerificationRequestFromJson(json);
 }
 
-// Response Model (what you get from API)
+// Response Model (what you get from API) - UPDATED
 @freezed
 class VerificationResponse with _$VerificationResponse {
   const factory VerificationResponse({
     required bool success,
     String? message,
     VerificationData? data,
+    String? error, // Added this field to match your service
   }) = _VerificationResponse;
 
   factory VerificationResponse.fromJson(Map<String, dynamic> json) =>
@@ -42,19 +46,22 @@ class VerificationResponse with _$VerificationResponse {
 class VerificationData with _$VerificationData {
   const factory VerificationData({
     required int id,
-    required String document_type,
-    required String document_number,
+    String? document_type,
+    String? document_number,
+    // String? dealer_name,  // Temporarily commented out
+    // String? location,     // Temporarily commented out
     required String document_front,
     required String document_back,
     required String selfie,
-    required String status,
+    String? status,
+    // String? company_registration_document,  // Temporarily commented out
     String? comment,
     String? verified_by,
     String? rejected_by,
     String? approved_at,
     String? rejected_at,
-    required String created_at,
-    required String updated_at,
+    String? created_at,
+    String? updated_at,
   }) = _VerificationData;
 
   factory VerificationData.fromJson(Map<String, dynamic> json) =>
