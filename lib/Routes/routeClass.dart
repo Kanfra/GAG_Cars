@@ -10,6 +10,7 @@ import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/paymentSuccessPage.d
 import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/webViewPaymentPage.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/changePasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/customerServicePage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/dealerDashboard.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/dealerLoginPage.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/editItemPage.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/getVerifiedPage.dart';
@@ -66,6 +67,7 @@ class RouteClass {
   static String helpCenterPage = "/help-center-page";
   static String getVerifiedPage = "/get-verified-page";
   static String dealerLoginPage = "/dealer-login-page";
+  static String dealerDashboardPage = "/dealer-dashboard-page";
   static String customerServicePage = "/customer-service-page";
   static String changePasswordPage = "/change-password-page";
   static String listingsDetailPage = "/listings-detail-page";
@@ -120,6 +122,7 @@ class RouteClass {
   static String getHelpCenterPage() => helpCenterPage;
   static String getGetVerifiedPage() => getVerifiedPage;
   static String getDealerLoginPage() => dealerLoginPage;
+  static String getDealerDashboardPage() => dealerDashboardPage;
   static String getCustomerServicePage() => customerServicePage;
   static String getChangePassword() => changePasswordPage;
   static String getListingsDetailPage() => listingsDetailPage;
@@ -180,7 +183,17 @@ class RouteClass {
     GetPage(page: () => const MyListingPage(), name: myListingPage, transition: Transition.noTransition),
     GetPage(page: () => const HelpCenterPage(), name: helpCenterPage, transition: Transition.noTransition),
     GetPage(page: () => const GetVerifiedPage(), name: getVerifiedPage, transition: Transition.noTransition),
-    GetPage(page: () => const DealerLoginPage(), name: dealerLoginPage, transition: Transition.noTransition),
+    GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return DealerLoginPage(
+          allJson: args,
+        );
+      }, 
+      name: dealerLoginPage, 
+      transition: Transition.noTransition
+      ),
+    GetPage(page: () => const DealerDashboardPage(), name: dealerDashboardPage, transition: Transition.noTransition),
     GetPage(page: () => const CustomerServicePage(), name: customerServicePage, transition: Transition.noTransition),
     GetPage(page: () => const ChangePasswordPage(), name: changePasswordPage, transition: Transition.noTransition),
     GetPage(page: () => const ProfileUpdatePage(), name: profileUpdatePage, transition: Transition.noTransition),

@@ -11,6 +11,8 @@ _$AuthResponseModelImpl _$$AuthResponseModelImplFromJson(
     _$AuthResponseModelImpl(
       token: json['token'] as String?,
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      verified: json['verified'] as bool?,
+      verifiedDealer: json['verified_dealer'] as bool?,
     );
 
 Map<String, dynamic> _$$AuthResponseModelImplToJson(
@@ -18,4 +20,6 @@ Map<String, dynamic> _$$AuthResponseModelImplToJson(
     <String, dynamic>{
       'token': instance.token,
       'user': instance.user,
+      'verified': instance.verified,
+      'verified_dealer': instance.verifiedDealer,
     };

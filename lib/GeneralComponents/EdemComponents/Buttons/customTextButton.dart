@@ -17,7 +17,8 @@ class CustomTextButton extends StatelessWidget {
   final double? containerMarginHorizontal;
   final double? buttonHorizontalPadding;
   final double? buttonVerticalPadding;
-  final VoidCallback onClickFunction;
+  final VoidCallback? onClickFunction; // Changed to nullable
+
   const CustomTextButton({
     required this.buttonTextType,
     required this.textTypeColor,
@@ -33,7 +34,7 @@ class CustomTextButton extends StatelessWidget {
     this.containerMarginHorizontal,
     this.buttonHorizontalPadding,
     this.buttonVerticalPadding,
-    required this.onClickFunction,
+    this.onClickFunction, // Made optional
     super.key
   });
 
@@ -42,7 +43,7 @@ class CustomTextButton extends StatelessWidget {
     return isFullButtonWidthRequired ? Padding(
       padding: EdgeInsets.symmetric(
         horizontal: containerMarginHorizontal ?? SizeGlobalVariables.zero,
-        ),
+      ),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -50,11 +51,14 @@ class CustomTextButton extends StatelessWidget {
           color: Colors.transparent,
         ),
         child: TextButton(
-          onPressed: onClickFunction,
+          onPressed: onClickFunction, // Now accepts null
           style: TextButton.styleFrom(
             elevation: SizeGlobalVariables.one_point_two,
             backgroundColor: buttonBackgroundColor,
-            padding: EdgeInsets.symmetric(horizontal: buttonHorizontalPadding ?? 5, vertical: buttonVerticalPadding ?? 5),
+            padding: EdgeInsets.symmetric(
+              horizontal: buttonHorizontalPadding ?? 5, 
+              vertical: buttonVerticalPadding ?? 5
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
               side: BorderSide(
@@ -79,9 +83,12 @@ class CustomTextButton extends StatelessWidget {
         color: Colors.transparent,
       ),
       child: TextButton(
-        onPressed: onClickFunction,
+        onPressed: onClickFunction, // Now accepts null
         style: TextButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: buttonHorizontalPadding ?? 5, vertical: buttonVerticalPadding ?? 5), // make future correction here
+          padding: EdgeInsets.symmetric(
+            horizontal: buttonHorizontalPadding ?? 5, 
+            vertical: buttonVerticalPadding ?? 5
+          ),
           elevation: SizeGlobalVariables.one_point_two,
           backgroundColor: buttonBackgroundColor,
           shape: RoundedRectangleBorder(
@@ -94,9 +101,11 @@ class CustomTextButton extends StatelessWidget {
         ),
         child: TextSmall(
           title: buttonTextType,
-          textColor: textTypeColor, fontWeight: FontWeight.normal,
+          textColor: textTypeColor, 
+          fontWeight: fontWeight ?? FontWeight.normal,
           textSize: textSize,
         ),
-      ),);
+      ),
+    );
   }
 }

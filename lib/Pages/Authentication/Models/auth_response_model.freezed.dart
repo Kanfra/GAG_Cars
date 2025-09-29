@@ -22,6 +22,10 @@ AuthResponseModel _$AuthResponseModelFromJson(Map<String, dynamic> json) {
 mixin _$AuthResponseModel {
   String? get token => throw _privateConstructorUsedError;
   UserModel get user => throw _privateConstructorUsedError;
+  bool? get verified =>
+      throw _privateConstructorUsedError; // ← Changed to nullable
+  @JsonKey(name: 'verified_dealer')
+  bool? get verifiedDealer => throw _privateConstructorUsedError;
 
   /// Serializes this AuthResponseModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -39,7 +43,11 @@ abstract class $AuthResponseModelCopyWith<$Res> {
           AuthResponseModel value, $Res Function(AuthResponseModel) then) =
       _$AuthResponseModelCopyWithImpl<$Res, AuthResponseModel>;
   @useResult
-  $Res call({String? token, UserModel user});
+  $Res call(
+      {String? token,
+      UserModel user,
+      bool? verified,
+      @JsonKey(name: 'verified_dealer') bool? verifiedDealer});
 
   $UserModelCopyWith<$Res> get user;
 }
@@ -61,6 +69,8 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
   $Res call({
     Object? token = freezed,
     Object? user = null,
+    Object? verified = freezed,
+    Object? verifiedDealer = freezed,
   }) {
     return _then(_value.copyWith(
       token: freezed == token
@@ -71,6 +81,14 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as UserModel,
+      verified: freezed == verified
+          ? _value.verified
+          : verified // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      verifiedDealer: freezed == verifiedDealer
+          ? _value.verifiedDealer
+          : verifiedDealer // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ) as $Val);
   }
 
@@ -93,7 +111,11 @@ abstract class _$$AuthResponseModelImplCopyWith<$Res>
       __$$AuthResponseModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? token, UserModel user});
+  $Res call(
+      {String? token,
+      UserModel user,
+      bool? verified,
+      @JsonKey(name: 'verified_dealer') bool? verifiedDealer});
 
   @override
   $UserModelCopyWith<$Res> get user;
@@ -114,6 +136,8 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
   $Res call({
     Object? token = freezed,
     Object? user = null,
+    Object? verified = freezed,
+    Object? verifiedDealer = freezed,
   }) {
     return _then(_$AuthResponseModelImpl(
       token: freezed == token
@@ -124,6 +148,14 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
               as UserModel,
+      verified: freezed == verified
+          ? _value.verified
+          : verified // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      verifiedDealer: freezed == verifiedDealer
+          ? _value.verifiedDealer
+          : verifiedDealer // ignore: cast_nullable_to_non_nullable
+              as bool?,
     ));
   }
 }
@@ -131,7 +163,11 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$AuthResponseModelImpl implements _AuthResponseModel {
-  const _$AuthResponseModelImpl({this.token, required this.user});
+  const _$AuthResponseModelImpl(
+      {this.token,
+      required this.user,
+      this.verified,
+      @JsonKey(name: 'verified_dealer') this.verifiedDealer});
 
   factory _$AuthResponseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$AuthResponseModelImplFromJson(json);
@@ -140,10 +176,16 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
   final String? token;
   @override
   final UserModel user;
+  @override
+  final bool? verified;
+// ← Changed to nullable
+  @override
+  @JsonKey(name: 'verified_dealer')
+  final bool? verifiedDealer;
 
   @override
   String toString() {
-    return 'AuthResponseModel(token: $token, user: $user)';
+    return 'AuthResponseModel(token: $token, user: $user, verified: $verified, verifiedDealer: $verifiedDealer)';
   }
 
   @override
@@ -152,12 +194,17 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
         (other.runtimeType == runtimeType &&
             other is _$AuthResponseModelImpl &&
             (identical(other.token, token) || other.token == token) &&
-            (identical(other.user, user) || other.user == user));
+            (identical(other.user, user) || other.user == user) &&
+            (identical(other.verified, verified) ||
+                other.verified == verified) &&
+            (identical(other.verifiedDealer, verifiedDealer) ||
+                other.verifiedDealer == verifiedDealer));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, token, user);
+  int get hashCode =>
+      Object.hash(runtimeType, token, user, verified, verifiedDealer);
 
   /// Create a copy of AuthResponseModel
   /// with the given fields replaced by the non-null parameter values.
@@ -178,8 +225,11 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
 
 abstract class _AuthResponseModel implements AuthResponseModel {
   const factory _AuthResponseModel(
-      {final String? token,
-      required final UserModel user}) = _$AuthResponseModelImpl;
+          {final String? token,
+          required final UserModel user,
+          final bool? verified,
+          @JsonKey(name: 'verified_dealer') final bool? verifiedDealer}) =
+      _$AuthResponseModelImpl;
 
   factory _AuthResponseModel.fromJson(Map<String, dynamic> json) =
       _$AuthResponseModelImpl.fromJson;
@@ -188,6 +238,11 @@ abstract class _AuthResponseModel implements AuthResponseModel {
   String? get token;
   @override
   UserModel get user;
+  @override
+  bool? get verified; // ← Changed to nullable
+  @override
+  @JsonKey(name: 'verified_dealer')
+  bool? get verifiedDealer;
 
   /// Create a copy of AuthResponseModel
   /// with the given fields replaced by the non-null parameter values.

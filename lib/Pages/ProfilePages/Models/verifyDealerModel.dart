@@ -9,12 +9,13 @@ class VerificationRequest with _$VerificationRequest {
   const factory VerificationRequest({
     String? document_type,
     String? document_number,
-    // String? dealer_name,  // Temporarily commented out
-    // String? location,     // Temporarily commented out
+    String? dealership_name,  // Temporarily commented out
+    String? address,     // Temporarily commented out
     required String document_front,
     required String document_back,
     required String selfie,
-    // String? company_registration_document,  // Temporarily commented out
+    String? verification_type,
+    String? dealership_registration_document,  // Temporarily commented out
     String? status,
     String? comment,
     String? verified_by,
@@ -48,15 +49,16 @@ class VerificationData with _$VerificationData {
     required int id,
     String? document_type,
     String? document_number,
-    // String? dealer_name,  // Temporarily commented out
-    // String? location,     // Temporarily commented out
+    String? dealership_name,  // Temporarily commented out
+    String? address,     // Temporarily commented out
     required String document_front,
     required String document_back,
     required String selfie,
     String? status,
-    // String? company_registration_document,  // Temporarily commented out
+    String? dealership_registration_document,  // Temporarily commented out
     String? comment,
     String? verified_by,
+    String? verification_type,
     String? rejected_by,
     String? approved_at,
     String? rejected_at,

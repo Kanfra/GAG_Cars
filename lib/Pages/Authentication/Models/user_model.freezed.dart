@@ -26,7 +26,7 @@ mixin _$UserModel {
   @JsonKey(name: 'phone')
   String? get phoneNumber => throw _privateConstructorUsedError;
   @JsonKey(name: 'paid_seller')
-  int get paidSeller => throw _privateConstructorUsedError;
+  int? get paidSeller => throw _privateConstructorUsedError; // Made nullable
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'country_id')
@@ -34,12 +34,25 @@ mixin _$UserModel {
   @JsonKey(name: 'state_id')
   String? get stateId => throw _privateConstructorUsedError;
   @JsonKey(name: 'profile_photo')
-  String? get profileImage =>
-      throw _privateConstructorUsedError; // Changed JSON key to 'profile_photo'
+  String? get profileImage => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt =>
+      throw _privateConstructorUsedError; // Made nullable
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt =>
+      throw _privateConstructorUsedError; // Made nullable
+  @JsonKey(name: 'deleted_at')
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'uploads_left')
+  int? get uploadsLeft => throw _privateConstructorUsedError;
+  @JsonKey(name: 'active_status')
+  int? get activeStatus => throw _privateConstructorUsedError; // Made nullable
+  @JsonKey(name: 'avatar')
+  String? get avatar => throw _privateConstructorUsedError; // Made nullable
+  @JsonKey(name: 'dark_mode')
+  int? get darkMode => throw _privateConstructorUsedError; // Made nullable
+  @JsonKey(name: 'messenger_color')
+  String? get messengerColor => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: true, includeToJson: false)
   String? get id => throw _privateConstructorUsedError;
 
@@ -63,13 +76,19 @@ abstract class $UserModelCopyWith<$Res> {
       String email,
       String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
-      @JsonKey(name: 'paid_seller') int paidSeller,
+      @JsonKey(name: 'paid_seller') int? paidSeller,
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
       @JsonKey(name: 'country_id') String? countryId,
       @JsonKey(name: 'state_id') String? stateId,
       @JsonKey(name: 'profile_photo') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+      @JsonKey(name: 'uploads_left') int? uploadsLeft,
+      @JsonKey(name: 'active_status') int? activeStatus,
+      @JsonKey(name: 'avatar') String? avatar,
+      @JsonKey(name: 'dark_mode') int? darkMode,
+      @JsonKey(name: 'messenger_color') String? messengerColor,
       @JsonKey(includeFromJson: true, includeToJson: false) String? id});
 }
 
@@ -92,13 +111,19 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? email = null,
     Object? password = freezed,
     Object? phoneNumber = freezed,
-    Object? paidSeller = null,
+    Object? paidSeller = freezed,
     Object? emailVerifiedAt = freezed,
     Object? countryId = freezed,
     Object? stateId = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? deletedAt = freezed,
+    Object? uploadsLeft = freezed,
+    Object? activeStatus = freezed,
+    Object? avatar = freezed,
+    Object? darkMode = freezed,
+    Object? messengerColor = freezed,
     Object? id = freezed,
   }) {
     return _then(_value.copyWith(
@@ -118,10 +143,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      paidSeller: null == paidSeller
+      paidSeller: freezed == paidSeller
           ? _value.paidSeller
           : paidSeller // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       emailVerifiedAt: freezed == emailVerifiedAt
           ? _value.emailVerifiedAt
           : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
@@ -146,6 +171,30 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      uploadsLeft: freezed == uploadsLeft
+          ? _value.uploadsLeft
+          : uploadsLeft // ignore: cast_nullable_to_non_nullable
+              as int?,
+      activeStatus: freezed == activeStatus
+          ? _value.activeStatus
+          : activeStatus // ignore: cast_nullable_to_non_nullable
+              as int?,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      darkMode: freezed == darkMode
+          ? _value.darkMode
+          : darkMode // ignore: cast_nullable_to_non_nullable
+              as int?,
+      messengerColor: freezed == messengerColor
+          ? _value.messengerColor
+          : messengerColor // ignore: cast_nullable_to_non_nullable
+              as String?,
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -167,13 +216,19 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String email,
       String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
-      @JsonKey(name: 'paid_seller') int paidSeller,
+      @JsonKey(name: 'paid_seller') int? paidSeller,
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
       @JsonKey(name: 'country_id') String? countryId,
       @JsonKey(name: 'state_id') String? stateId,
       @JsonKey(name: 'profile_photo') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+      @JsonKey(name: 'uploads_left') int? uploadsLeft,
+      @JsonKey(name: 'active_status') int? activeStatus,
+      @JsonKey(name: 'avatar') String? avatar,
+      @JsonKey(name: 'dark_mode') int? darkMode,
+      @JsonKey(name: 'messenger_color') String? messengerColor,
       @JsonKey(includeFromJson: true, includeToJson: false) String? id});
 }
 
@@ -194,13 +249,19 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? email = null,
     Object? password = freezed,
     Object? phoneNumber = freezed,
-    Object? paidSeller = null,
+    Object? paidSeller = freezed,
     Object? emailVerifiedAt = freezed,
     Object? countryId = freezed,
     Object? stateId = freezed,
     Object? profileImage = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? deletedAt = freezed,
+    Object? uploadsLeft = freezed,
+    Object? activeStatus = freezed,
+    Object? avatar = freezed,
+    Object? darkMode = freezed,
+    Object? messengerColor = freezed,
     Object? id = freezed,
   }) {
     return _then(_$UserModelImpl(
@@ -220,10 +281,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      paidSeller: null == paidSeller
+      paidSeller: freezed == paidSeller
           ? _value.paidSeller
           : paidSeller // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       emailVerifiedAt: freezed == emailVerifiedAt
           ? _value.emailVerifiedAt
           : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
@@ -248,6 +309,30 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      uploadsLeft: freezed == uploadsLeft
+          ? _value.uploadsLeft
+          : uploadsLeft // ignore: cast_nullable_to_non_nullable
+              as int?,
+      activeStatus: freezed == activeStatus
+          ? _value.activeStatus
+          : activeStatus // ignore: cast_nullable_to_non_nullable
+              as int?,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      darkMode: freezed == darkMode
+          ? _value.darkMode
+          : darkMode // ignore: cast_nullable_to_non_nullable
+              as int?,
+      messengerColor: freezed == messengerColor
+          ? _value.messengerColor
+          : messengerColor // ignore: cast_nullable_to_non_nullable
+              as String?,
       id: freezed == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -265,13 +350,19 @@ class _$UserModelImpl extends _UserModel {
       required this.email,
       this.password,
       @JsonKey(name: 'phone') this.phoneNumber,
-      @JsonKey(name: 'paid_seller') required this.paidSeller,
+      @JsonKey(name: 'paid_seller') this.paidSeller,
       @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
       @JsonKey(name: 'country_id') this.countryId,
       @JsonKey(name: 'state_id') this.stateId,
       @JsonKey(name: 'profile_photo') this.profileImage,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'deleted_at') this.deletedAt,
+      @JsonKey(name: 'uploads_left') this.uploadsLeft,
+      @JsonKey(name: 'active_status') this.activeStatus,
+      @JsonKey(name: 'avatar') this.avatar,
+      @JsonKey(name: 'dark_mode') this.darkMode,
+      @JsonKey(name: 'messenger_color') this.messengerColor,
       @JsonKey(includeFromJson: true, includeToJson: false) this.id})
       : super._();
 
@@ -289,7 +380,8 @@ class _$UserModelImpl extends _UserModel {
   final String? phoneNumber;
   @override
   @JsonKey(name: 'paid_seller')
-  final int paidSeller;
+  final int? paidSeller;
+// Made nullable
   @override
   @JsonKey(name: 'email_verified_at')
   final DateTime? emailVerifiedAt;
@@ -302,20 +394,42 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey(name: 'profile_photo')
   final String? profileImage;
-// Changed JSON key to 'profile_photo'
   @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
+// Made nullable
   @override
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
+// Made nullable
+  @override
+  @JsonKey(name: 'deleted_at')
+  final DateTime? deletedAt;
+  @override
+  @JsonKey(name: 'uploads_left')
+  final int? uploadsLeft;
+  @override
+  @JsonKey(name: 'active_status')
+  final int? activeStatus;
+// Made nullable
+  @override
+  @JsonKey(name: 'avatar')
+  final String? avatar;
+// Made nullable
+  @override
+  @JsonKey(name: 'dark_mode')
+  final int? darkMode;
+// Made nullable
+  @override
+  @JsonKey(name: 'messenger_color')
+  final String? messengerColor;
   @override
   @JsonKey(includeFromJson: true, includeToJson: false)
   final String? id;
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, paidSeller: $paidSeller, emailVerifiedAt: $emailVerifiedAt, countryId: $countryId, stateId: $stateId, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt, id: $id)';
+    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, paidSeller: $paidSeller, emailVerifiedAt: $emailVerifiedAt, countryId: $countryId, stateId: $stateId, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, uploadsLeft: $uploadsLeft, activeStatus: $activeStatus, avatar: $avatar, darkMode: $darkMode, messengerColor: $messengerColor, id: $id)';
   }
 
   @override
@@ -342,6 +456,17 @@ class _$UserModelImpl extends _UserModel {
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.uploadsLeft, uploadsLeft) ||
+                other.uploadsLeft == uploadsLeft) &&
+            (identical(other.activeStatus, activeStatus) ||
+                other.activeStatus == activeStatus) &&
+            (identical(other.avatar, avatar) || other.avatar == avatar) &&
+            (identical(other.darkMode, darkMode) ||
+                other.darkMode == darkMode) &&
+            (identical(other.messengerColor, messengerColor) ||
+                other.messengerColor == messengerColor) &&
             (identical(other.id, id) || other.id == id));
   }
 
@@ -360,6 +485,12 @@ class _$UserModelImpl extends _UserModel {
       profileImage,
       createdAt,
       updatedAt,
+      deletedAt,
+      uploadsLeft,
+      activeStatus,
+      avatar,
+      darkMode,
+      messengerColor,
       id);
 
   /// Create a copy of UserModel
@@ -384,13 +515,19 @@ abstract class _UserModel extends UserModel {
       required final String email,
       final String? password,
       @JsonKey(name: 'phone') final String? phoneNumber,
-      @JsonKey(name: 'paid_seller') required final int paidSeller,
+      @JsonKey(name: 'paid_seller') final int? paidSeller,
       @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
       @JsonKey(name: 'country_id') final String? countryId,
       @JsonKey(name: 'state_id') final String? stateId,
       @JsonKey(name: 'profile_photo') final String? profileImage,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
+      @JsonKey(name: 'uploads_left') final int? uploadsLeft,
+      @JsonKey(name: 'active_status') final int? activeStatus,
+      @JsonKey(name: 'avatar') final String? avatar,
+      @JsonKey(name: 'dark_mode') final int? darkMode,
+      @JsonKey(name: 'messenger_color') final String? messengerColor,
       @JsonKey(includeFromJson: true, includeToJson: false)
       final String? id}) = _$UserModelImpl;
   const _UserModel._() : super._();
@@ -409,7 +546,7 @@ abstract class _UserModel extends UserModel {
   String? get phoneNumber;
   @override
   @JsonKey(name: 'paid_seller')
-  int get paidSeller;
+  int? get paidSeller; // Made nullable
   @override
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt;
@@ -421,13 +558,31 @@ abstract class _UserModel extends UserModel {
   String? get stateId;
   @override
   @JsonKey(name: 'profile_photo')
-  String? get profileImage; // Changed JSON key to 'profile_photo'
+  String? get profileImage;
   @override
   @JsonKey(name: 'created_at')
-  DateTime? get createdAt;
+  DateTime? get createdAt; // Made nullable
   @override
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt;
+  DateTime? get updatedAt; // Made nullable
+  @override
+  @JsonKey(name: 'deleted_at')
+  DateTime? get deletedAt;
+  @override
+  @JsonKey(name: 'uploads_left')
+  int? get uploadsLeft;
+  @override
+  @JsonKey(name: 'active_status')
+  int? get activeStatus; // Made nullable
+  @override
+  @JsonKey(name: 'avatar')
+  String? get avatar; // Made nullable
+  @override
+  @JsonKey(name: 'dark_mode')
+  int? get darkMode; // Made nullable
+  @override
+  @JsonKey(name: 'messenger_color')
+  String? get messengerColor;
   @override
   @JsonKey(includeFromJson: true, includeToJson: false)
   String? get id;

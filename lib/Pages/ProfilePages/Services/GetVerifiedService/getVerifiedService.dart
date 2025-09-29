@@ -7,18 +7,15 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Models/verifyDealerModel.da
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
+import 'package:logger/logger.dart';  
 
-class VerificationService {
+class GetVerifiedService {
   final logger = Logger();
   /// Uploads files to Cloudinary and submits verification request
   Future<VerificationResponse> submitVerification({
-    required String dealerName,
-    required String location,
     required File selfie,
     required File nationalIdFront,
     required File nationalIdBack,
-    File? companyRegistrationDoc,
   }) async {
     final uri = Uri.parse('$baseApiUrl${ApiEndpoint.verifications}');
 
@@ -29,22 +26,15 @@ class VerificationService {
       final selfieUrl = await CloudinaryService.uploadImage(selfie);
       final frontUrl = await CloudinaryService.uploadImage(nationalIdFront);
       final backUrl = await CloudinaryService.uploadImage(nationalIdBack);
-      String? companyDocUrl;
       logger.w("selfieUrl: $selfieUrl, DocumentFront: $frontUrl, DocumentBack: $backUrl");
-      if (companyRegistrationDoc != null) {
-        companyDocUrl = await CloudinaryService.uploadImage(companyRegistrationDoc);
-      }
 
       // 🔹 Build request model with uploaded URLs (temporarily commenting out optional fields)
       final request = VerificationRequest(
-        dealership_name: dealerName,  // Temporarily commented out
-        address: location,       // Temporarily commented out
         selfie: selfieUrl,
         document_front: frontUrl,
         document_back: backUrl,
+        verification_type: "individual",
         status: "pending",
-        verification_type: "dealer",
-        dealership_registration_document: companyDocUrl,  // Temporarily commented out
       );
 
       // 🔹 Send request to backend

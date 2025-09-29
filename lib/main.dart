@@ -24,6 +24,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/ma
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/WishlistService/wishlistService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/dealerDashboard.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
@@ -86,6 +87,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(),
       debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
+      // home: DealerDashboardPage(),
       home: SplashPage(),
       // home: ListingDetailPage(),
       // home: PostItemPage(),

@@ -21,13 +21,17 @@ VerificationRequest _$VerificationRequestFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$VerificationRequest {
   String? get document_type => throw _privateConstructorUsedError;
-  String? get document_number =>
-      throw _privateConstructorUsedError; // String? dealer_name,  // Temporarily commented out
-// String? location,     // Temporarily commented out
+  String? get document_number => throw _privateConstructorUsedError;
+  String? get dealership_name =>
+      throw _privateConstructorUsedError; // Temporarily commented out
+  String? get address =>
+      throw _privateConstructorUsedError; // Temporarily commented out
   String get document_front => throw _privateConstructorUsedError;
   String get document_back => throw _privateConstructorUsedError;
-  String get selfie =>
-      throw _privateConstructorUsedError; // String? company_registration_document,  // Temporarily commented out
+  String get selfie => throw _privateConstructorUsedError;
+  String? get verification_type => throw _privateConstructorUsedError;
+  String? get dealership_registration_document =>
+      throw _privateConstructorUsedError; // Temporarily commented out
   String? get status => throw _privateConstructorUsedError;
   String? get comment => throw _privateConstructorUsedError;
   String? get verified_by => throw _privateConstructorUsedError;
@@ -54,9 +58,13 @@ abstract class $VerificationRequestCopyWith<$Res> {
   $Res call(
       {String? document_type,
       String? document_number,
+      String? dealership_name,
+      String? address,
       String document_front,
       String document_back,
       String selfie,
+      String? verification_type,
+      String? dealership_registration_document,
       String? status,
       String? comment,
       String? verified_by,
@@ -82,9 +90,13 @@ class _$VerificationRequestCopyWithImpl<$Res, $Val extends VerificationRequest>
   $Res call({
     Object? document_type = freezed,
     Object? document_number = freezed,
+    Object? dealership_name = freezed,
+    Object? address = freezed,
     Object? document_front = null,
     Object? document_back = null,
     Object? selfie = null,
+    Object? verification_type = freezed,
+    Object? dealership_registration_document = freezed,
     Object? status = freezed,
     Object? comment = freezed,
     Object? verified_by = freezed,
@@ -101,6 +113,14 @@ class _$VerificationRequestCopyWithImpl<$Res, $Val extends VerificationRequest>
           ? _value.document_number
           : document_number // ignore: cast_nullable_to_non_nullable
               as String?,
+      dealership_name: freezed == dealership_name
+          ? _value.dealership_name
+          : dealership_name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
       document_front: null == document_front
           ? _value.document_front
           : document_front // ignore: cast_nullable_to_non_nullable
@@ -113,6 +133,15 @@ class _$VerificationRequestCopyWithImpl<$Res, $Val extends VerificationRequest>
           ? _value.selfie
           : selfie // ignore: cast_nullable_to_non_nullable
               as String,
+      verification_type: freezed == verification_type
+          ? _value.verification_type
+          : verification_type // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dealership_registration_document: freezed ==
+              dealership_registration_document
+          ? _value.dealership_registration_document
+          : dealership_registration_document // ignore: cast_nullable_to_non_nullable
+              as String?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -152,9 +181,13 @@ abstract class _$$VerificationRequestImplCopyWith<$Res>
   $Res call(
       {String? document_type,
       String? document_number,
+      String? dealership_name,
+      String? address,
       String document_front,
       String document_back,
       String selfie,
+      String? verification_type,
+      String? dealership_registration_document,
       String? status,
       String? comment,
       String? verified_by,
@@ -178,9 +211,13 @@ class __$$VerificationRequestImplCopyWithImpl<$Res>
   $Res call({
     Object? document_type = freezed,
     Object? document_number = freezed,
+    Object? dealership_name = freezed,
+    Object? address = freezed,
     Object? document_front = null,
     Object? document_back = null,
     Object? selfie = null,
+    Object? verification_type = freezed,
+    Object? dealership_registration_document = freezed,
     Object? status = freezed,
     Object? comment = freezed,
     Object? verified_by = freezed,
@@ -197,6 +234,14 @@ class __$$VerificationRequestImplCopyWithImpl<$Res>
           ? _value.document_number
           : document_number // ignore: cast_nullable_to_non_nullable
               as String?,
+      dealership_name: freezed == dealership_name
+          ? _value.dealership_name
+          : dealership_name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
       document_front: null == document_front
           ? _value.document_front
           : document_front // ignore: cast_nullable_to_non_nullable
@@ -209,6 +254,15 @@ class __$$VerificationRequestImplCopyWithImpl<$Res>
           ? _value.selfie
           : selfie // ignore: cast_nullable_to_non_nullable
               as String,
+      verification_type: freezed == verification_type
+          ? _value.verification_type
+          : verification_type // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dealership_registration_document: freezed ==
+              dealership_registration_document
+          ? _value.dealership_registration_document
+          : dealership_registration_document // ignore: cast_nullable_to_non_nullable
+              as String?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -243,9 +297,13 @@ class _$VerificationRequestImpl implements _VerificationRequest {
   const _$VerificationRequestImpl(
       {this.document_type,
       this.document_number,
+      this.dealership_name,
+      this.address,
       required this.document_front,
       required this.document_back,
       required this.selfie,
+      this.verification_type,
+      this.dealership_registration_document,
       this.status,
       this.comment,
       this.verified_by,
@@ -260,15 +318,23 @@ class _$VerificationRequestImpl implements _VerificationRequest {
   final String? document_type;
   @override
   final String? document_number;
-// String? dealer_name,  // Temporarily commented out
-// String? location,     // Temporarily commented out
+  @override
+  final String? dealership_name;
+// Temporarily commented out
+  @override
+  final String? address;
+// Temporarily commented out
   @override
   final String document_front;
   @override
   final String document_back;
   @override
   final String selfie;
-// String? company_registration_document,  // Temporarily commented out
+  @override
+  final String? verification_type;
+  @override
+  final String? dealership_registration_document;
+// Temporarily commented out
   @override
   final String? status;
   @override
@@ -284,7 +350,7 @@ class _$VerificationRequestImpl implements _VerificationRequest {
 
   @override
   String toString() {
-    return 'VerificationRequest(document_type: $document_type, document_number: $document_number, document_front: $document_front, document_back: $document_back, selfie: $selfie, status: $status, comment: $comment, verified_by: $verified_by, rejected_by: $rejected_by, approved_at: $approved_at, rejected_at: $rejected_at)';
+    return 'VerificationRequest(document_type: $document_type, document_number: $document_number, dealership_name: $dealership_name, address: $address, document_front: $document_front, document_back: $document_back, selfie: $selfie, verification_type: $verification_type, dealership_registration_document: $dealership_registration_document, status: $status, comment: $comment, verified_by: $verified_by, rejected_by: $rejected_by, approved_at: $approved_at, rejected_at: $rejected_at)';
   }
 
   @override
@@ -296,11 +362,20 @@ class _$VerificationRequestImpl implements _VerificationRequest {
                 other.document_type == document_type) &&
             (identical(other.document_number, document_number) ||
                 other.document_number == document_number) &&
+            (identical(other.dealership_name, dealership_name) ||
+                other.dealership_name == dealership_name) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.document_front, document_front) ||
                 other.document_front == document_front) &&
             (identical(other.document_back, document_back) ||
                 other.document_back == document_back) &&
             (identical(other.selfie, selfie) || other.selfie == selfie) &&
+            (identical(other.verification_type, verification_type) ||
+                other.verification_type == verification_type) &&
+            (identical(other.dealership_registration_document,
+                    dealership_registration_document) ||
+                other.dealership_registration_document ==
+                    dealership_registration_document) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.comment, comment) || other.comment == comment) &&
             (identical(other.verified_by, verified_by) ||
@@ -319,9 +394,13 @@ class _$VerificationRequestImpl implements _VerificationRequest {
       runtimeType,
       document_type,
       document_number,
+      dealership_name,
+      address,
       document_front,
       document_back,
       selfie,
+      verification_type,
+      dealership_registration_document,
       status,
       comment,
       verified_by,
@@ -350,9 +429,13 @@ abstract class _VerificationRequest implements VerificationRequest {
   const factory _VerificationRequest(
       {final String? document_type,
       final String? document_number,
+      final String? dealership_name,
+      final String? address,
       required final String document_front,
       required final String document_back,
       required final String selfie,
+      final String? verification_type,
+      final String? dealership_registration_document,
       final String? status,
       final String? comment,
       final String? verified_by,
@@ -366,16 +449,21 @@ abstract class _VerificationRequest implements VerificationRequest {
   @override
   String? get document_type;
   @override
-  String?
-      get document_number; // String? dealer_name,  // Temporarily commented out
-// String? location,     // Temporarily commented out
+  String? get document_number;
+  @override
+  String? get dealership_name; // Temporarily commented out
+  @override
+  String? get address; // Temporarily commented out
   @override
   String get document_front;
   @override
   String get document_back;
   @override
-  String
-      get selfie; // String? company_registration_document,  // Temporarily commented out
+  String get selfie;
+  @override
+  String? get verification_type;
+  @override
+  String? get dealership_registration_document; // Temporarily commented out
   @override
   String? get status;
   @override
@@ -631,16 +719,20 @@ VerificationData _$VerificationDataFromJson(Map<String, dynamic> json) {
 mixin _$VerificationData {
   int get id => throw _privateConstructorUsedError;
   String? get document_type => throw _privateConstructorUsedError;
-  String? get document_number =>
-      throw _privateConstructorUsedError; // String? dealer_name,  // Temporarily commented out
-// String? location,     // Temporarily commented out
+  String? get document_number => throw _privateConstructorUsedError;
+  String? get dealership_name =>
+      throw _privateConstructorUsedError; // Temporarily commented out
+  String? get address =>
+      throw _privateConstructorUsedError; // Temporarily commented out
   String get document_front => throw _privateConstructorUsedError;
   String get document_back => throw _privateConstructorUsedError;
   String get selfie => throw _privateConstructorUsedError;
-  String? get status =>
-      throw _privateConstructorUsedError; // String? company_registration_document,  // Temporarily commented out
+  String? get status => throw _privateConstructorUsedError;
+  String? get dealership_registration_document =>
+      throw _privateConstructorUsedError; // Temporarily commented out
   String? get comment => throw _privateConstructorUsedError;
   String? get verified_by => throw _privateConstructorUsedError;
+  String? get verification_type => throw _privateConstructorUsedError;
   String? get rejected_by => throw _privateConstructorUsedError;
   String? get approved_at => throw _privateConstructorUsedError;
   String? get rejected_at => throw _privateConstructorUsedError;
@@ -667,12 +759,16 @@ abstract class $VerificationDataCopyWith<$Res> {
       {int id,
       String? document_type,
       String? document_number,
+      String? dealership_name,
+      String? address,
       String document_front,
       String document_back,
       String selfie,
       String? status,
+      String? dealership_registration_document,
       String? comment,
       String? verified_by,
+      String? verification_type,
       String? rejected_by,
       String? approved_at,
       String? rejected_at,
@@ -698,12 +794,16 @@ class _$VerificationDataCopyWithImpl<$Res, $Val extends VerificationData>
     Object? id = null,
     Object? document_type = freezed,
     Object? document_number = freezed,
+    Object? dealership_name = freezed,
+    Object? address = freezed,
     Object? document_front = null,
     Object? document_back = null,
     Object? selfie = null,
     Object? status = freezed,
+    Object? dealership_registration_document = freezed,
     Object? comment = freezed,
     Object? verified_by = freezed,
+    Object? verification_type = freezed,
     Object? rejected_by = freezed,
     Object? approved_at = freezed,
     Object? rejected_at = freezed,
@@ -723,6 +823,14 @@ class _$VerificationDataCopyWithImpl<$Res, $Val extends VerificationData>
           ? _value.document_number
           : document_number // ignore: cast_nullable_to_non_nullable
               as String?,
+      dealership_name: freezed == dealership_name
+          ? _value.dealership_name
+          : dealership_name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
       document_front: null == document_front
           ? _value.document_front
           : document_front // ignore: cast_nullable_to_non_nullable
@@ -739,6 +847,11 @@ class _$VerificationDataCopyWithImpl<$Res, $Val extends VerificationData>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
+      dealership_registration_document: freezed ==
+              dealership_registration_document
+          ? _value.dealership_registration_document
+          : dealership_registration_document // ignore: cast_nullable_to_non_nullable
+              as String?,
       comment: freezed == comment
           ? _value.comment
           : comment // ignore: cast_nullable_to_non_nullable
@@ -746,6 +859,10 @@ class _$VerificationDataCopyWithImpl<$Res, $Val extends VerificationData>
       verified_by: freezed == verified_by
           ? _value.verified_by
           : verified_by // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verification_type: freezed == verification_type
+          ? _value.verification_type
+          : verification_type // ignore: cast_nullable_to_non_nullable
               as String?,
       rejected_by: freezed == rejected_by
           ? _value.rejected_by
@@ -783,12 +900,16 @@ abstract class _$$VerificationDataImplCopyWith<$Res>
       {int id,
       String? document_type,
       String? document_number,
+      String? dealership_name,
+      String? address,
       String document_front,
       String document_back,
       String selfie,
       String? status,
+      String? dealership_registration_document,
       String? comment,
       String? verified_by,
+      String? verification_type,
       String? rejected_by,
       String? approved_at,
       String? rejected_at,
@@ -812,12 +933,16 @@ class __$$VerificationDataImplCopyWithImpl<$Res>
     Object? id = null,
     Object? document_type = freezed,
     Object? document_number = freezed,
+    Object? dealership_name = freezed,
+    Object? address = freezed,
     Object? document_front = null,
     Object? document_back = null,
     Object? selfie = null,
     Object? status = freezed,
+    Object? dealership_registration_document = freezed,
     Object? comment = freezed,
     Object? verified_by = freezed,
+    Object? verification_type = freezed,
     Object? rejected_by = freezed,
     Object? approved_at = freezed,
     Object? rejected_at = freezed,
@@ -837,6 +962,14 @@ class __$$VerificationDataImplCopyWithImpl<$Res>
           ? _value.document_number
           : document_number // ignore: cast_nullable_to_non_nullable
               as String?,
+      dealership_name: freezed == dealership_name
+          ? _value.dealership_name
+          : dealership_name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
       document_front: null == document_front
           ? _value.document_front
           : document_front // ignore: cast_nullable_to_non_nullable
@@ -853,6 +986,11 @@ class __$$VerificationDataImplCopyWithImpl<$Res>
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
+      dealership_registration_document: freezed ==
+              dealership_registration_document
+          ? _value.dealership_registration_document
+          : dealership_registration_document // ignore: cast_nullable_to_non_nullable
+              as String?,
       comment: freezed == comment
           ? _value.comment
           : comment // ignore: cast_nullable_to_non_nullable
@@ -860,6 +998,10 @@ class __$$VerificationDataImplCopyWithImpl<$Res>
       verified_by: freezed == verified_by
           ? _value.verified_by
           : verified_by // ignore: cast_nullable_to_non_nullable
+              as String?,
+      verification_type: freezed == verification_type
+          ? _value.verification_type
+          : verification_type // ignore: cast_nullable_to_non_nullable
               as String?,
       rejected_by: freezed == rejected_by
           ? _value.rejected_by
@@ -892,12 +1034,16 @@ class _$VerificationDataImpl implements _VerificationData {
       {required this.id,
       this.document_type,
       this.document_number,
+      this.dealership_name,
+      this.address,
       required this.document_front,
       required this.document_back,
       required this.selfie,
       this.status,
+      this.dealership_registration_document,
       this.comment,
       this.verified_by,
+      this.verification_type,
       this.rejected_by,
       this.approved_at,
       this.rejected_at,
@@ -913,8 +1059,12 @@ class _$VerificationDataImpl implements _VerificationData {
   final String? document_type;
   @override
   final String? document_number;
-// String? dealer_name,  // Temporarily commented out
-// String? location,     // Temporarily commented out
+  @override
+  final String? dealership_name;
+// Temporarily commented out
+  @override
+  final String? address;
+// Temporarily commented out
   @override
   final String document_front;
   @override
@@ -923,11 +1073,15 @@ class _$VerificationDataImpl implements _VerificationData {
   final String selfie;
   @override
   final String? status;
-// String? company_registration_document,  // Temporarily commented out
+  @override
+  final String? dealership_registration_document;
+// Temporarily commented out
   @override
   final String? comment;
   @override
   final String? verified_by;
+  @override
+  final String? verification_type;
   @override
   final String? rejected_by;
   @override
@@ -941,7 +1095,7 @@ class _$VerificationDataImpl implements _VerificationData {
 
   @override
   String toString() {
-    return 'VerificationData(id: $id, document_type: $document_type, document_number: $document_number, document_front: $document_front, document_back: $document_back, selfie: $selfie, status: $status, comment: $comment, verified_by: $verified_by, rejected_by: $rejected_by, approved_at: $approved_at, rejected_at: $rejected_at, created_at: $created_at, updated_at: $updated_at)';
+    return 'VerificationData(id: $id, document_type: $document_type, document_number: $document_number, dealership_name: $dealership_name, address: $address, document_front: $document_front, document_back: $document_back, selfie: $selfie, status: $status, dealership_registration_document: $dealership_registration_document, comment: $comment, verified_by: $verified_by, verification_type: $verification_type, rejected_by: $rejected_by, approved_at: $approved_at, rejected_at: $rejected_at, created_at: $created_at, updated_at: $updated_at)';
   }
 
   @override
@@ -954,15 +1108,24 @@ class _$VerificationDataImpl implements _VerificationData {
                 other.document_type == document_type) &&
             (identical(other.document_number, document_number) ||
                 other.document_number == document_number) &&
+            (identical(other.dealership_name, dealership_name) ||
+                other.dealership_name == dealership_name) &&
+            (identical(other.address, address) || other.address == address) &&
             (identical(other.document_front, document_front) ||
                 other.document_front == document_front) &&
             (identical(other.document_back, document_back) ||
                 other.document_back == document_back) &&
             (identical(other.selfie, selfie) || other.selfie == selfie) &&
             (identical(other.status, status) || other.status == status) &&
+            (identical(other.dealership_registration_document,
+                    dealership_registration_document) ||
+                other.dealership_registration_document ==
+                    dealership_registration_document) &&
             (identical(other.comment, comment) || other.comment == comment) &&
             (identical(other.verified_by, verified_by) ||
                 other.verified_by == verified_by) &&
+            (identical(other.verification_type, verification_type) ||
+                other.verification_type == verification_type) &&
             (identical(other.rejected_by, rejected_by) ||
                 other.rejected_by == rejected_by) &&
             (identical(other.approved_at, approved_at) ||
@@ -982,12 +1145,16 @@ class _$VerificationDataImpl implements _VerificationData {
       id,
       document_type,
       document_number,
+      dealership_name,
+      address,
       document_front,
       document_back,
       selfie,
       status,
+      dealership_registration_document,
       comment,
       verified_by,
+      verification_type,
       rejected_by,
       approved_at,
       rejected_at,
@@ -1016,12 +1183,16 @@ abstract class _VerificationData implements VerificationData {
       {required final int id,
       final String? document_type,
       final String? document_number,
+      final String? dealership_name,
+      final String? address,
       required final String document_front,
       required final String document_back,
       required final String selfie,
       final String? status,
+      final String? dealership_registration_document,
       final String? comment,
       final String? verified_by,
+      final String? verification_type,
       final String? rejected_by,
       final String? approved_at,
       final String? rejected_at,
@@ -1036,9 +1207,11 @@ abstract class _VerificationData implements VerificationData {
   @override
   String? get document_type;
   @override
-  String?
-      get document_number; // String? dealer_name,  // Temporarily commented out
-// String? location,     // Temporarily commented out
+  String? get document_number;
+  @override
+  String? get dealership_name; // Temporarily commented out
+  @override
+  String? get address; // Temporarily commented out
   @override
   String get document_front;
   @override
@@ -1046,12 +1219,15 @@ abstract class _VerificationData implements VerificationData {
   @override
   String get selfie;
   @override
-  String?
-      get status; // String? company_registration_document,  // Temporarily commented out
+  String? get status;
+  @override
+  String? get dealership_registration_document; // Temporarily commented out
   @override
   String? get comment;
   @override
   String? get verified_by;
+  @override
+  String? get verification_type;
   @override
   String? get rejected_by;
   @override

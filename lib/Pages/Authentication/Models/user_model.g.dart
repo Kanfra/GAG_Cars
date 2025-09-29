@@ -12,7 +12,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       email: json['email'] as String,
       password: json['password'] as String?,
       phoneNumber: json['phone'] as String?,
-      paidSeller: (json['paid_seller'] as num).toInt(),
+      paidSeller: (json['paid_seller'] as num?)?.toInt(),
       emailVerifiedAt: json['email_verified_at'] == null
           ? null
           : DateTime.parse(json['email_verified_at'] as String),
@@ -25,6 +25,14 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      deletedAt: json['deleted_at'] == null
+          ? null
+          : DateTime.parse(json['deleted_at'] as String),
+      uploadsLeft: (json['uploads_left'] as num?)?.toInt(),
+      activeStatus: (json['active_status'] as num?)?.toInt(),
+      avatar: json['avatar'] as String?,
+      darkMode: (json['dark_mode'] as num?)?.toInt(),
+      messengerColor: json['messenger_color'] as String?,
       id: json['id'] as String?,
     );
 
@@ -41,4 +49,10 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'profile_photo': instance.profileImage,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
+      'deleted_at': instance.deletedAt?.toIso8601String(),
+      'uploads_left': instance.uploadsLeft,
+      'active_status': instance.activeStatus,
+      'avatar': instance.avatar,
+      'dark_mode': instance.darkMode,
+      'messenger_color': instance.messengerColor,
     };

@@ -98,6 +98,8 @@ class _SettingsState extends State<SettingsPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final userProvider = Provider.of<UserProvider>(context);
     final UserModel? user = userProvider.user;
+    bool isUserVerified = userProvider.isVerified;
+    bool isDealerVerified = userProvider.isVerifiedDealer;
     
     // Format the joined date
     String joinedDate = "Not available";
@@ -195,9 +197,13 @@ class _SettingsState extends State<SettingsPage> {
                           ),
                           const SizedBox(height: 16),
                           // Get Verified Button
-                          if (user != null && !userProvider.isPaidSeller)
+                          if (user != null && !userProvider.isPaidSeller && !isUserVerified)
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.toNamed(
+                                  RouteClass.getGetVerifiedPage(),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.primaryColor,
                                 padding: const EdgeInsets.symmetric(
@@ -258,8 +264,20 @@ class _SettingsState extends State<SettingsPage> {
                       _buildSettingsItem(
                         context,
                         icon: Icons.business_center_outlined,
-                        title: "Dealer Login",
-                        onTap: () => Get.toNamed(RouteClass.getDealerLoginPage()),
+                        title: isDealerVerified ? "Dealer Dashboard" : "Dealer Login",
+                        onTap: (){
+                          if(isDealerVerified){
+                            // dealer dashboard
+                            Get.toNamed(
+                              RouteClass.getDealerDashboardPage(),
+                            );
+                          } else {
+                            Get.toNamed(
+                          RouteClass.getDealerLoginPage(),
+                          arguments: user?.toJson(),
+                          );
+                          }
+                        }
                       ),
                       _buildSettingsItem(
                         context,

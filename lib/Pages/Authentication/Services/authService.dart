@@ -434,13 +434,44 @@ static Future<void> resetPassword({
   }
 }
  
-  // Get stored user
-  // static Future<UserModel?> getCurrentUser() async {
-  //   final userJson = await _storage.read(key: _userKey);
-  //   return userJson != null 
-  //       ? UserModel.fromJson(jsonDecode(userJson))
-  //       : null;
-  // }
+static Future<Map<String, dynamic>> getUserProfile() async {
+  final logger = Logger();
+  final uri = Uri.parse("$baseApiUrl${ApiEndpoint.authenticateUser}");
+  try{
+    final token = await AuthService.getToken();
+    if (token == null) {
+      throw Exception("User not authenticated");
+    }
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      }
+    );
+    final responseBody = jsonDecode(response.body);
+    if(response.statusCode == 200){
+      logger.i("User profile fetched successfully: ${response.body}");
+      return responseBody;
+    }
+    else {
+      logger.e("Failed to fetch user profile: ${response.body}");
+      throw Exception("Failed to fetch user profile: ${response.body}");
+    }
+      } catch(e){
+        logger.e("Error fetching user profile: $e");
+        throw Exception("Error fetching user profile: $e");
+      }
+  } 
+
+  // Add this method to get AuthResponseModel (which includes verified status)
+static Future<AuthResponseModel> getAuthUserProfile() async {
+  final response = await getUserProfile();
+  return AuthResponseModel.fromJson(response);
+}
+
+
 
   // Get stored token
   // static Future<String?> getToken() async {
