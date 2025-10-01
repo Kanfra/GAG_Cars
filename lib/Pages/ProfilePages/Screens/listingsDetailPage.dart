@@ -1,14 +1,20 @@
+import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MyListingsService/myListingsService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:provider/provider.dart';
 
 class ListingsDetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -32,23 +38,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   bool _isMarkingAsSold = false;
   bool _isSold = false;
   bool _isPromoted = false;
-
-  // Default car data as fallback with safe values
-  final Map<String, dynamic> defaultCar = {
-    "name": "Car Listing",
-    "price": "GH₵ 0",
-    "info": "No information available",
-    "highlights": [
-      {"title": "Model Year", "value": "N/A"},
-      {"title": "Mileage", "value": "N/A"},
-      {"title": "Fuel Type", "value": "N/A"},
-    ],
-    "specifications": [
-      {"title": "Make", "value": "N/A"},
-      {"title": "Model", "value": "N/A"},
-      {"title": "Color", "value": "N/A"},
-    ],
-  };
 
   @override
   void initState() {
@@ -84,6 +73,367 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  // Safe data access methods
+  String getListingName() {
+    try {
+      final name = listing['name'];
+      if (name is String && name.isNotEmpty) return name;
+    } catch (e) {
+      logger.e('Error getting listing name: $e');
+    }
+    return 'Vehicle Listing';
+  }
+
+  String getListingPrice() {
+    try {
+      final price = listing['price'];
+      if (price is String && price.isNotEmpty) {
+        return 'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(price))}';
+      } else if (price is num) {
+        return 'GH₵ ${formatNumber(shortenerRequired: false, number: price.toInt())}';
+      }
+    } catch (e) {
+      logger.e('Error getting listing price: $e');
+    }
+    return 'GH₵ 0';
+  }
+
+  String getListingDescription() {
+    try {
+      final description = listing['description'];
+      if (description is String && description.isNotEmpty) return description;
+    } catch (e) {
+      logger.e('Error getting listing description: $e');
+    }
+    return 'No description available for this vehicle.';
+  }
+
+  List<dynamic> getListingImages() {
+    try {
+      final images = listing['images'];
+      if (images is List && images.isNotEmpty) {
+        return images.whereType<String>().toList();
+      }
+    } catch (e) {
+      logger.e('Error getting listing images: $e');
+    }
+    return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
+  }
+
+  String getListingLocation() {
+    try {
+      final location = listing['location'];
+      if (location is String && location.isNotEmpty) return location;
+    } catch (e) {
+      logger.e('Error getting listing location: $e');
+    }
+    return 'Location not available';
+  }
+
+  String getListingCondition() {
+    try {
+      final condition = listing['condition'];
+      if (condition is String && condition.isNotEmpty) return condition;
+    } catch (e) {
+      logger.e('Error getting listing condition: $e');
+    }
+    return 'Used';
+  }
+
+  String getListingTransmission() {
+    try {
+      final transmission = listing['transmission'];
+      if (transmission is String && transmission.isNotEmpty) return transmission;
+    } catch (e) {
+      logger.e('Error getting listing transmission: $e');
+    }
+    return 'Manual';
+  }
+
+  String getListingMileage() {
+    try {
+      final mileage = listing['mileage'];
+      if (mileage is String && mileage.isNotEmpty) return '$mileage km';
+      if (mileage is num) return '${mileage.toString()} km';
+    } catch (e) {
+      logger.e('Error getting listing mileage: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingYear() {
+    try {
+      final year = listing['year'];
+      if (year is String && year.isNotEmpty) return year;
+      if (year is num) return year.toString();
+    } catch (e) {
+      logger.e('Error getting listing year: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingFuelType() {
+    try {
+      final fuelType = listing['fuel_type'];
+      if (fuelType is String && fuelType.isNotEmpty) return fuelType;
+    } catch (e) {
+      logger.e('Error getting listing fuel type: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingEngineCapacity() {
+    try {
+      final engine = listing['engine_capacity'];
+      if (engine is String && engine.isNotEmpty) return '$engine L';
+      if (engine is num) return '${engine.toString()} L';
+    } catch (e) {
+      logger.e('Error getting listing engine capacity: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingColor() {
+    try {
+      final color = listing['color'];
+      if (color is String && color.isNotEmpty) return color;
+    } catch (e) {
+      logger.e('Error getting listing color: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingBodyType() {
+    try {
+      final bodyType = listing['body_type'];
+      if (bodyType is String && bodyType.isNotEmpty) return bodyType;
+    } catch (e) {
+      logger.e('Error getting listing body type: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingDriveType() {
+    try {
+      final driveType = listing['drive_type'];
+      if (driveType is String && driveType.isNotEmpty) return driveType;
+    } catch (e) {
+      logger.e('Error getting listing drive type: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingSeats() {
+    try {
+      final seats = listing['number_of_passengers'];
+      if (seats is String && seats.isNotEmpty) return '$seats seats';
+      if (seats is num) return '${seats.toString()} seats';
+    } catch (e) {
+      logger.e('Error getting listing seats: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingBrand() {
+    try {
+      final brand = listing['brand'];
+      if (brand is Map<String, dynamic>) {
+        return brand['name']?.toString() ?? 'N/A';
+      } else if (brand is String && brand.isNotEmpty) {
+        return brand;
+      }
+    } catch (e) {
+      logger.e('Error getting listing brand: $e');
+    }
+    return 'N/A';
+  }
+
+  String getListingModel() {
+    try {
+      final model = listing['brand_model'];
+      if (model is Map<String, dynamic>) {
+        return model['name']?.toString() ?? 'N/A';
+      } else if (model is String && model.isNotEmpty) {
+        return model;
+      }
+    } catch (e) {
+      logger.e('Error getting listing model: $e');
+    }
+    return 'N/A';
+  }
+
+  // Check if listing has warranty - similar to DetailPage logic
+  bool get hasWarranty {
+    try {
+      final warranty = listing['warranty'];
+      // Handle different warranty formats
+      if (warranty is bool) return warranty;
+      if (warranty is String) return warranty.toLowerCase() == 'true' || warranty.isNotEmpty;
+      if (warranty is num) return warranty > 0;
+      if (warranty is Map) return warranty.isNotEmpty;
+      return false;
+    } catch (e) {
+      logger.e('Error checking warranty: $e');
+      return false;
+    }
+  }
+
+  // Get warranty details if available
+  String getWarrantyDetails() {
+    if (!hasWarranty) return '';
+    
+    try {
+      final warranty = listing['warranty'];
+      if (warranty is String && warranty.isNotEmpty) return warranty;
+      if (warranty is Map<String, dynamic>) {
+        return warranty['details']?.toString() ?? 
+               warranty['duration']?.toString() ?? 
+               warranty['type']?.toString() ?? 
+               'Warranty Included';
+      }
+      return 'Warranty Included';
+    } catch (e) {
+      logger.e('Error getting warranty details: $e');
+      return 'Warranty Included';
+    }
+  }
+
+  // Build Highlights from actual listing data
+  List<Map<String, String>> getHighlights() {
+    final List<Map<String, String>> highlights = [];
+    
+    // Add key highlights that are commonly important for vehicles
+    final year = getListingYear();
+    if (year != 'N/A') {
+      highlights.add({'title': 'Model Year', 'value': year});
+    }
+    
+    final mileage = getListingMileage();
+    if (mileage != 'N/A') {
+      highlights.add({'title': 'Mileage', 'value': mileage});
+    }
+    
+    final engine = getListingEngineCapacity();
+    if (engine != 'N/A') {
+      highlights.add({'title': 'Engine Capacity', 'value': engine});
+    }
+    
+    final condition = getListingCondition();
+    if (condition != 'N/A') {
+      highlights.add({'title': 'Condition', 'value': condition});
+    }
+    
+    final fuelType = getListingFuelType();
+    if (fuelType != 'N/A') {
+      highlights.add({'title': 'Fuel Type', 'value': fuelType});
+    }
+    
+    final transmission = getListingTransmission();
+    if (transmission != 'N/A') {
+      highlights.add({'title': 'Transmission', 'value': transmission});
+    }
+    
+    // Add warranty to highlights if available
+    if (hasWarranty) {
+      final warrantyDetails = getWarrantyDetails();
+      highlights.add({'title': 'Warranty', 'value': warrantyDetails});
+    }
+    
+    // If no highlights found, provide some defaults
+    if (highlights.isEmpty) {
+      highlights.addAll([
+        {'title': 'Model Year', 'value': getListingYear()},
+        {'title': 'Mileage', 'value': getListingMileage()},
+        {'title': 'Condition', 'value': getListingCondition()},
+      ]);
+    }
+    
+    return highlights;
+  }
+
+  // Build Specifications from actual listing data
+  List<Map<String, String>> getSpecifications() {
+    final List<Map<String, String>> specifications = [];
+    
+    // Add comprehensive specifications
+    final brand = getListingBrand();
+    if (brand != 'N/A') {
+      specifications.add({'title': 'Make', 'value': brand});
+    }
+    
+    final model = getListingModel();
+    if (model != 'N/A') {
+      specifications.add({'title': 'Model', 'value': model});
+    }
+    
+    final color = getListingColor();
+    if (color != 'N/A') {
+      specifications.add({'title': 'Color', 'value': color});
+    }
+    
+    final bodyType = getListingBodyType();
+    if (bodyType != 'N/A') {
+      specifications.add({'title': 'Body Type', 'value': bodyType});
+    }
+    
+    final driveType = getListingDriveType();
+    if (driveType != 'N/A') {
+      specifications.add({'title': 'Drive Type', 'value': driveType});
+    }
+    
+    final seats = getListingSeats();
+    if (seats != 'N/A') {
+      specifications.add({'title': 'Seating Capacity', 'value': seats});
+    }
+    
+    final fuelType = getListingFuelType();
+    if (fuelType != 'N/A' && !specifications.any((spec) => spec['title'] == 'Fuel Type')) {
+      specifications.add({'title': 'Fuel Type', 'value': fuelType});
+    }
+    
+    final transmission = getListingTransmission();
+    if (transmission != 'N/A' && !specifications.any((spec) => spec['title'] == 'Transmission')) {
+      specifications.add({'title': 'Transmission', 'value': transmission});
+    }
+    
+    // If no specifications found, provide some defaults
+    if (specifications.isEmpty) {
+      specifications.addAll([
+        {'title': 'Make', 'value': getListingBrand()},
+        {'title': 'Model', 'value': getListingModel()},
+        {'title': 'Color', 'value': getListingColor()},
+      ]);
+    }
+    
+    return specifications;
+  }
+
+  // Build tags list - Only show warranty tag if warranty exists and verified seller if user is paid seller
+  List<Widget> _buildTags(BuildContext context) {
+    final List<Widget> tags = [];
+    
+    // Get user provider to check if user is paid seller
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isPaidSeller = userProvider.isPaidSeller;
+    
+    // Only add warranty tag if the listing has warranty
+    if (hasWarranty) {
+      tags.add(_buildTag("Warranty", ColorGlobalVariables.greyColor));
+    }
+    
+    // Only show verified seller tag if user is a paid seller
+    if (isPaidSeller) {
+      tags.add(_buildVerifiedSellerTag());
+    }
+    
+    // Add promoted tag if applicable
+    if (_isPromoted && !_isSold) {
+      tags.add(_buildPromotedTag());
+    }
+    
+    return tags;
   }
 
   // Mark as Sold confirmation dialog
@@ -353,89 +703,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     }
   }
 
-  // Safe data access methods
-  String getListingName() {
-    try {
-      final name = listing['name'];
-      if (name is String && name.isNotEmpty) return name;
-    } catch (e) {
-      logger.e('Error getting listing name: $e');
-    }
-    return defaultCar['name'];
-  }
-
-  String getListingPrice() {
-    try {
-      final price = listing['price'];
-      if (price is String && price.isNotEmpty) {
-        return 'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(listing['price']))}';
-      } else if (price is num) {
-        return 'GH₵ ${price.toString()}';
-      }
-    } catch (e) {
-      logger.e('Error getting listing price: $e');
-    }
-    return defaultCar['price'];
-  }
-
-  String getListingInfo() {
-    try {
-      final info = listing['info'];
-      if (info is String && info.isNotEmpty) return info;
-      final description = listing['description'];
-      if (description is String && description.isNotEmpty) return description;
-    } catch (e) {
-      logger.e('Error getting listing info: $e');
-    }
-    return defaultCar['info'];
-  }
-
-  List<dynamic> getListingImages() {
-    try {
-      final images = listing['images'];
-      if (images is List && images.isNotEmpty) {
-        return images.whereType<String>().toList();
-      }
-    } catch (e) {
-      logger.e('Error getting listing images: $e');
-    }
-    return ['assets/images/default_car.png'];
-  }
-
-  List<Map<String, String>> getHighlights() {
-    try {
-      final highlights = listing['highlights'];
-      if (highlights is List) {
-        return highlights.whereType<Map<String, dynamic>>().map((item) {
-          return {
-            'title': (item['title']?.toString() ?? 'N/A').trim(),
-            'value': (item['value']?.toString() ?? 'N/A').trim(),
-          };
-        }).toList();
-      }
-    } catch (e) {
-      logger.e('Error parsing highlights: $e');
-    }
-    return List<Map<String, String>>.from(defaultCar['highlights']);
-  }
-
-  List<Map<String, String>> getSpecifications() {
-    try {
-      final specs = listing['specifications'];
-      if (specs is List) {
-        return specs.whereType<Map<String, dynamic>>().map((item) {
-          return {
-            'title': (item['title']?.toString() ?? 'N/A').trim(),
-            'value': (item['value']?.toString() ?? 'N/A').trim(),
-          };
-        }).toList();
-      }
-    } catch (e) {
-      logger.e('Error parsing specifications: $e');
-    }
-    return List<Map<String, String>>.from(defaultCar['specifications']);
-  }
-
   Widget _buildShimmerPlaceholder(double? width, double? height) {
     return Shimmer.fromColors(
       baseColor: Colors.grey[300]!,
@@ -515,7 +782,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     final images = getListingImages();
     final currentImage = images.isNotEmpty && selectedIndex < images.length 
         ? images[selectedIndex] 
-        : 'assets/images/default_car.png';
+        : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
 
     return Scaffold(
       body: CustomScrollView(
@@ -649,7 +916,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(Icons.star, color: Colors.white, size: 14),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Text(
                               'PROMOTED',
                               style: TextStyle(
@@ -766,7 +1033,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                       itemCount: images.length,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       itemBuilder: (context, index) {
-                        final image = index < images.length ? images[index] : 'assets/images/default_car.png';
+                        final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
                         return GestureDetector(
                           onTap: () {
                             if (mounted) {
@@ -834,7 +1101,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    getListingInfo(),
+                    getListingDescription(),
                     style: const TextStyle(
                       fontSize: 16.0,
                       height: 1.6,
@@ -844,19 +1111,18 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   const SizedBox(height: 24),
                   const Divider(height: 1),
                   const SizedBox(height: 20),
-                  _buildInfoRow(Icons.location_on_outlined, listing['location'] ?? 'Location not available'),
+                  _buildInfoRow(Icons.location_on_outlined, getListingLocation()),
                   const SizedBox(height: 12),
-                  _buildInfoRow(Icons.refresh_outlined, '${formatTimeAgo(listing['created_at'] ?? '')}'),
+                  _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(listing['created_at']?.toString() ?? '')),
                   const SizedBox(height: 20),
+                  
+                  // Dynamic tags - Only show warranty if it exists and verified seller if user is paid seller
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
-                    children: [
-                      _buildTag("Warranty", ColorGlobalVariables.greyColor),
-                      _buildVerifiedSellerTag(),
-                      if (_isPromoted && !_isSold) _buildPromotedTag(),
-                    ],
+                    children: _buildTags(context),
                   ),
+                  
                   const SizedBox(height: 28),
                   _buildSectionTitle("Highlights"),
                   const SizedBox(height: 16),

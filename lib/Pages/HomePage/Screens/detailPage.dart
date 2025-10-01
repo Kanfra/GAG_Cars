@@ -11,6 +11,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
@@ -187,6 +188,327 @@ class _DetailPageState extends State<DetailPage> {
       // Handle error
     }
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
+  }
+
+  // Get user phone number from item/listing data
+  String? _getUserPhoneNumber() {
+    try {
+      // First try to get phone number from user object in item
+      final user = item['user'];
+      if (user is Map<String, dynamic>) {
+        return user['phoneNumber']?.toString() ?? 
+               user['phone_number']?.toString() ??
+               user['contact']?.toString() ??
+               user['mobile']?.toString();
+      }
+      
+      // Then try direct fields in item
+      return item['phoneNumber']?.toString() ?? 
+             item['phone_number']?.toString() ??
+             item['contact']?.toString() ??
+             item['mobile']?.toString();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Get user name from item/listing data
+  String _getUserName() {
+    try {
+      final user = item['user'];
+      if (user is Map<String, dynamic>) {
+        return user['name']?.toString() ?? 
+               user['username']?.toString() ??
+               'Seller';
+      }
+      return 'Seller';
+    } catch (e) {
+      return 'Seller';
+    }
+  }
+
+  // Show contact dialog
+  void _showContactDialog() {
+    final phoneNumber = _getUserPhoneNumber();
+    final userName = _getUserName();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.contact_phone,
+                        color: Colors.blue[700],
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Text(
+                        "Contact Information",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Seller name
+                Text(
+                  "Seller: $userName",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // Phone number
+                if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
+                  const Text(
+                    "Phone Number:",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: Text(
+                      phoneNumber,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "You can call or message this number to contact the seller.",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ] else ...[
+                  Column(
+                    children: [
+                      const Icon(
+                        Icons.contact_phone_outlined,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "No contact information available",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "The seller hasn't provided contact details",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[500],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ],
+              
+              const SizedBox(height: 24),
+              
+              // Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(color: Colors.grey[300]!),
+                      ),
+                      child: const Text(
+                        "Close",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // TODO: Implement call functionality
+                          Navigator.of(context).pop();
+                          Get.snackbar(
+                            'Call',
+                            'Calling $phoneNumber',
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          "Call",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+  // Show "Coming soon" message for Notify price drops
+  void _showComingSoonMessage() {
+    Get.snackbar(
+      'Coming Soon',
+      'Price drop notifications feature will be available soon!',
+      backgroundColor: Colors.blue,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  // Build verification badges based on UserProvider
+  List<Widget> _buildVerificationBadges() {
+    final List<Widget> badges = [];
+    
+    // Get user provider to check verification status
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    
+    // Only show verified dealer badge if user is a verified dealer
+    if (userProvider.isVerifiedDealer) {
+      badges.add(
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          decoration: BoxDecoration(
+            color: Colors.lightBlue[100],
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Verified Dealer",
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(width: 4),
+              CircleAvatar(
+                radius: 8,
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.check, size: 12, color: Colors.white),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+    
+    // Only show verified badge if user is verified
+    if (userProvider.isFullyVerified) {
+      badges.add(
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          decoration: BoxDecoration(
+            color: Colors.green[100],
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Verified",
+                style: TextStyle(
+                  fontSize: 12.0,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(width: 4),
+              CircleAvatar(
+                radius: 8,
+                backgroundColor: Colors.green,
+                child: Icon(Icons.verified, size: 12, color: Colors.white),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+    
+    return badges;
   }
 
   // Get highlights data dynamically based on category configuration
@@ -908,69 +1230,28 @@ class _DetailPageState extends State<DetailPage> {
                         _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item['created_at'] ?? '')),
                         const SizedBox(height: 16),
                         
-                        // Rating, Verified Dealer, and Notify Price Drops row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            // verified dealer
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.lightBlue[100],
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Verified Dealer",
-                                    style: TextStyle(
-                                      fontSize: 12.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(width: 4),
-                                  CircleAvatar(
-                                    radius: 8,
-                                    backgroundColor: Colors.blue,
-                                    child: Icon(Icons.check, size: 12, color: Colors.white),
-                                  )
-                                ],
-                              ),
-                            ),
-                            // Stars rating
-                            SizedBox(
-                              height: 16,
-                              child: ListView.builder(
-                                itemCount: 5,
-                                scrollDirection: Axis.horizontal,
-                                primary: false,
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) => Padding(
-                                  padding: const EdgeInsets.only(right: 1),
-                                  child: CustomIcon(
-                                    iconData: Icons.star, 
-                                    isFaIcon: false, 
-                                    iconSize: 12,
-                                    iconColor: ColorGlobalVariables.goldColor
-                                  ),
-                                ),
-                              ),
-                            ),
-                            // Notify Price Drops button
-                            Links(
-                              linkTextType: 'Notify price drops', 
-                              linkTextColor: ColorGlobalVariables.blackColor, 
-                              isTextSmall: true, 
-                              textDecorationColor: ColorGlobalVariables.blackColor,
-                              isIconWidgetRequiredAtEnd: false, 
-                              isIconWidgetRequiredAtFront: true, 
-                              iconData: Icons.notifications_outlined,
-                              iconColor: ColorGlobalVariables.blackColor,
-                              onClickFunction: (){},
-                            ),
-                          ],
+                        // Verification badges - Only show if user is verified/verified dealer
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _buildVerificationBadges(),
                         ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Notify Price Drops button - Updated to show coming soon message
+                        Links(
+                          linkTextType: 'Notify price drops', 
+                          linkTextColor: ColorGlobalVariables.blackColor, 
+                          isTextSmall: true, 
+                          textDecorationColor: ColorGlobalVariables.blackColor,
+                          isIconWidgetRequiredAtEnd: false, 
+                          isIconWidgetRequiredAtFront: true, 
+                          iconData: Icons.notifications_outlined,
+                          iconColor: ColorGlobalVariables.blackColor,
+                          onClickFunction: _showComingSoonMessage,
+                        ),
+                        
                         const SizedBox(height: 20),
                         // Tags section
                         Wrap(
@@ -981,31 +1262,6 @@ class _DetailPageState extends State<DetailPage> {
                             _buildTag(
                               "Warranty", 
                               Colors.grey[300]!),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.lightBlue[100],
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    "Verified",
-                                    style: TextStyle(
-                                      fontSize: 12.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  SizedBox(width: 4),
-                                  CircleAvatar(
-                                    radius: 8,
-                                    backgroundColor: Colors.blue,
-                                    child: Icon(Icons.check, size: 12, color: Colors.white),
-                                  )
-                                ],
-                              ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -1038,20 +1294,7 @@ class _DetailPageState extends State<DetailPage> {
                           }).toList(),
                         ),
                         const SizedBox(height: 16),
-                        // Show more link button
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Links(
-                            linkTextType: 'Show more', 
-                            linkFontWeight: FontWeight.w500,
-                            linkTextColor: ColorGlobalVariables.redColor, 
-                            isTextSmall: true, 
-                            textDecorationColor: ColorGlobalVariables.redColor,
-                            isIconWidgetRequiredAtEnd: false, 
-                            isIconWidgetRequiredAtFront: false, 
-                            onClickFunction: (){}
-                          ),
-                        ),
+                        
                         const Divider(
                           color: ColorGlobalVariables.fadedBlackColor,
                           height: 12,
@@ -1091,14 +1334,16 @@ class _DetailPageState extends State<DetailPage> {
                                         ),
                                       ),
                                       const SizedBox(width: 6),
-                                      CustomImage(
-                                        imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
-                                        imageWidth: 16,
-                                        imageHeight: 16,
-                                        fit: BoxFit.cover, 
-                                        isAssetImage: true, 
-                                        isImageBorderRadiusRequired: false,
-                                      ),
+                                      // Show verification badge only if user is verified
+                                      if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
+                                        CustomImage(
+                                          imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
+                                          imageWidth: 16,
+                                          imageHeight: 16,
+                                          fit: BoxFit.cover, 
+                                          isAssetImage: true, 
+                                          isImageBorderRadiusRequired: false,
+                                        ),
                                     ],
                                   ),
                                     const SizedBox(height: 6),
@@ -1142,7 +1387,7 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // Show contact button
+                            // Show contact button - Updated to show contact dialog
                             Expanded(
                               child: CustomTextButton(
                                 buttonTextType: 'Show contact', 
@@ -1150,7 +1395,7 @@ class _DetailPageState extends State<DetailPage> {
                                 textTypeColor: ColorGlobalVariables.redColor, 
                                 isFullButtonWidthRequired: false, 
                                 buttonBackgroundColor: Colors.transparent, 
-                                onClickFunction: (){}
+                                onClickFunction: _showContactDialog
                               ),
                             )
                           ],

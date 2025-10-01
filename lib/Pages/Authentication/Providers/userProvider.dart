@@ -27,6 +27,7 @@ class UserProvider with ChangeNotifier {
     String? userName,
     String? phoneNumber,
     String? email,
+    int? countryId,
   }) async {
     if (_user == null) {
       throw Exception('No user logged in');
@@ -44,6 +45,7 @@ class UserProvider with ChangeNotifier {
         userName: userName,
         phoneNumber: phoneNumber,
         email: email,
+        countryId: countryId,
       );
 
       // Update local state with the new user data

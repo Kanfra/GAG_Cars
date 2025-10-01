@@ -24,6 +24,8 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/ma
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/WishlistService/wishlistService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/dealerDashboard.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -65,7 +67,13 @@ void main() async {
         ), 
         ChangeNotifierProvider( // ADD THIS NEW PROVIDER
           create: (context) => WishlistManager(),
-        ),           
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PackageProvider(),
+        ),     
+        ChangeNotifierProvider(
+          create: (context) => CountryProvider(),
+        ),      
       ],
       child: const MyApp(),
     ),

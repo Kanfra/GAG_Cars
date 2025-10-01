@@ -1,4 +1,5 @@
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePageSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/locationSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
@@ -74,6 +75,7 @@ class RouteClass {
 
   // Homepage
   // static String homePage = "/home-page";
+  static String homePageSearchPage = "/home-page-search-page";
   static String detailPage = "/detail-page";
   static String newsBlogPage = "/news-blog-page";
   static String mainNewsPage = "/main-news-page";
@@ -129,6 +131,7 @@ class RouteClass {
 
 
   // static String getHomePage() => homePage;
+  static String getHomePageSearchPage() => homePageSearchPage;
   static String getDetailPage() => detailPage;
   static String getNewsBlogPage() => newsBlogPage;
   static String getMainNewsPage() => mainNewsPage;
@@ -222,6 +225,7 @@ class RouteClass {
       name: detailPage, 
       transition: Transition.noTransition
       ),
+    GetPage(page: () => HomePageSearchPage(), name: homePageSearchPage, transition: Transition.noTransition),
     GetPage(page: () => const NewsBlogPage(), name: newsBlogPage, transition: Transition.noTransition),
     GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
     // GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),

@@ -15,6 +15,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+          selectedItemColor: ColorGlobalVariables.brownColor,
+          unselectedItemColor: ColorGlobalVariables.greyColor,
+        ),
+      ),
       home: MainBottomNavigationPage(),
     );
   }
@@ -25,21 +33,81 @@ class MainBottomNavigationPage extends StatefulWidget {
   _MainBottomNavigationPageState createState() => _MainBottomNavigationPageState();
 }
 
-class _MainBottomNavigationPageState extends State<MainBottomNavigationPage> {
+class _MainBottomNavigationPageState extends State<MainBottomNavigationPage> 
+    with TickerProviderStateMixin {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+  
+  // Animation controllers for smooth transitions
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
 
-  final List<Widget> _pages = [
-    const HomePage(),
-    const WishlistPage(),
-    const PostItemPage(),
-    const MessagesPage(),
-    const SettingsPage(),
+  final List<BottomNavigationItem> _navItems = [
+    BottomNavigationItem(
+      icon: Icons.home_outlined,
+      activeIcon: Icons.home_rounded,
+      label: "Home",
+      page: const HomePage(),
+    ),
+    BottomNavigationItem(
+      icon: Icons.favorite_outline,
+      activeIcon: Icons.favorite_rounded,
+      label: "Favorite",
+      page: const WishlistPage(),
+    ),
+    BottomNavigationItem(
+      icon: Icons.add_circle_outline,
+      activeIcon: Icons.add_circle_rounded,
+      label: "Post",
+      page: const PostItemPage(),
+    ),
+    BottomNavigationItem(
+      icon: Icons.chat_bubble_outline,
+      activeIcon: Icons.chat_bubble_rounded,
+      label: "Messages",
+      page: const MessagesPage(),
+    ),
+    BottomNavigationItem(
+      icon: Icons.person_outline,
+      activeIcon: Icons.person_rounded,
+      label: "Profile",
+      page: const SettingsPage(),
+    ),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _onItemTapped(int index) {
+    if (index == 2) {
+      // Special animation for the center button
+      _scaleController.forward().then((_) {
+        _scaleController.reverse();
+      });
+    }
+
     setState(() => _selectedIndex = index);
-    _pageController.jumpToPage(index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -47,73 +115,152 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        physics: NeverScrollableScrollPhysics(),
-        children: _pages,
+        physics: const NeverScrollableScrollPhysics(),
+        children: _navItems.map((item) => item.page).toList(),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 10,
-            ),
-          ],
-          color: Colors.white,
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
+          ),
+        ],
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
         child: BottomAppBar(
-          shape: CircularNotchedRectangle(),
-          notchMargin: 8.0,
+          elevation: 0,
+          height: 70,
+          padding: EdgeInsets.zero,
+          color: Colors.white,
+          surfaceTintColor: Colors.transparent,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              _buildNavItem(Icons.home, "Home", 0),
-              _buildNavItem(Icons.favorite, "Favorite", 1),
-              SizedBox(width: 40), // space for the center button
-              _buildNavItem(Icons.message, "Messages", 3),
-              _buildNavItem(Icons.person, "Profile", 4),
+            children: [
+              // Left side items
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(0),
+                    _buildNavItem(1),
+                  ],
+                ),
+              ),
+              
+              // Center floating button
+              SizedBox(
+                width: 60,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: FloatingActionButton(
+                    onPressed: () => _onItemTapped(2),
+                    elevation: 0,
+                    backgroundColor: ColorGlobalVariables.brownColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      _selectedIndex == 2 
+                          ? _navItems[2].activeIcon
+                          : _navItems[2].icon,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Right side items
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildNavItem(3),
+                    _buildNavItem(4),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _onItemTapped(2),
-        child: Icon(Icons.add),
-        backgroundColor: Colors.blueAccent,
-        elevation: 4.0,
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(int index) {
+    final item = _navItems[index];
     final isSelected = _selectedIndex == index;
+    
+    // Skip the center item in the side navigation
+    if (index == 2) return const SizedBox.shrink();
+
     return GestureDetector(
       onTap: () => _onItemTapped(index),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 2),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: isSelected 
+              ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+              : Colors.transparent,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // icon
-            Expanded(
-              child: CustomIcon(
-                iconData: icon,
-                isFaIcon: false,
-                iconSize: 25,
-                iconColor: isSelected ? ColorGlobalVariables.blueColor : ColorGlobalVariables.greyColor,
-                ),
+            CustomIcon(
+              iconData: isSelected ? item.activeIcon : item.icon,
+              isFaIcon: false,
+              iconSize: 24,
+              iconColor: isSelected 
+                  ? ColorGlobalVariables.brownColor 
+                  : ColorGlobalVariables.greyColor,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             if (isSelected)
-              TextSmall(
-                title: label, 
-                fontWeight: FontWeight.w500, 
-                textColor: ColorGlobalVariables.blueColor,
-                overflow: TextOverflow.ellipsis,
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: isSelected ? 1.0 : 0.0,
+                child: TextSmall(
+                  title: item.label,
+                  fontWeight: FontWeight.w600,
+                  textColor: ColorGlobalVariables.brownColor,
+                  textSize: 11,
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
           ],
         ),
       ),
     );
   }
-} 
+}
+
+class BottomNavigationItem {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final Widget page;
+
+  const BottomNavigationItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.page,
+  });
+}

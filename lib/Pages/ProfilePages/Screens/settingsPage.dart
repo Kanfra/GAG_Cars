@@ -4,7 +4,6 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtr
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
@@ -92,6 +91,36 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
+  // Helper method to get profile image widget
+  Widget _getProfileImage(UserModel? user) {
+    // Priority 1: User's existing profile image from server
+    if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
+      return CustomImage(
+        imagePath: getImageUrl(user.profileImage!, ""),
+        isAssetImage: false,
+        imageHeight: 100,
+        imageWidth: 100,
+        imageBorderRadius: 50,
+        isImageBorderRadiusRequired: true,
+      );
+    }
+    
+    // Priority 2: Default profile image using Flutter's built-in person icon
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+      ),
+      child: Icon(
+        Icons.person,
+        size: 50,
+        color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -107,27 +136,14 @@ class _SettingsState extends State<SettingsPage> {
       joinedDate = "Joined ${user!.createdAt!.toLocal().toString().split(' ')[0]}";
     }
 
-    // Prepare image path and type
-    final String profileImagePath;
-    final bool isAssetImage;
-    
-    if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
-      profileImagePath = getImageUrl(user.profileImage!, null);
-      isAssetImage = false;
-    } else {
-      profileImagePath = "${ImageStringGlobalVariables.imagePath}gordon_image_temporary.png";
-      isAssetImage = true;
-    }
-
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => Get.back(),
         isLeadingWidgetExist: false,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
-        // leadingIconDataColor: ColorGlobalVariables.brownColor,
         titleText: "Settings",
-        titleTextColor: ColorGlobalVariables.brownColor,
+        titleTextColor: ColorGlobalVariables.blackColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -136,7 +152,7 @@ class _SettingsState extends State<SettingsPage> {
               Icons.notifications_none_outlined,
               color: isDarkMode 
                   ? Colors.white 
-                  : ColorGlobalVariables.brownColor,
+                  : ColorGlobalVariables.blackColor,
             ),
           ),
         ],
@@ -163,17 +179,15 @@ class _SettingsState extends State<SettingsPage> {
                         children: [
                           // Profile Image with zoom on tap
                           GestureDetector(
-                            onTap: () => _showImageZoomDialog(profileImagePath, isAssetImage),
+                            onTap: () => _showImageZoomDialog(
+                              user?.profileImage != null && user!.profileImage!.isNotEmpty 
+                                ? getImageUrl(user.profileImage!, "") 
+                                : "",
+                              user?.profileImage == null || user!.profileImage!.isEmpty
+                            ),
                             child: Hero(
                               tag: 'profile-image',
-                              child: CustomImage(
-                                imagePath: profileImagePath, 
-                                isAssetImage: isAssetImage,
-                                imageHeight: 100,
-                                imageWidth: 100,
-                                imageBorderRadius: 50,
-                                isImageBorderRadiusRequired: true,
-                              ),
+                              child: _getProfileImage(user),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -205,7 +219,7 @@ class _SettingsState extends State<SettingsPage> {
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.primaryColor,
+                                backgroundColor: ColorGlobalVariables.brownColor,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 12),
                                 shape: RoundedRectangleBorder(
@@ -462,7 +476,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   Future<void> _shareImage() async {
     try {
       if (widget.isAssetImage) {
-        // For asset images, we can't share directly
+        // For default profile images, we can't share directly
         Get.snackbar(
           "Info",
           "Cannot share default profile image",
@@ -518,6 +532,52 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     Get.toNamed(RouteClass.getProfileUpdatePage());
   }
 
+  // Helper method to get the display image for viewer
+  Widget _getImageViewerImage() {
+    if (widget.isAssetImage) {
+      // Show default person icon for default profile image
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: Icon(
+            Icons.person,
+            size: 120,
+            color: Colors.white.withOpacity(0.7),
+          ),
+        ),
+      );
+    } else {
+      return Image.network(
+        widget.imageUrl,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to default icon if network image fails
+          return Container(
+            color: Colors.black,
+            child: Center(
+              child: Icon(
+                Icons.person,
+                size: 120,
+                color: Colors.white.withOpacity(0.7),
+              ),
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -525,7 +585,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.7),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 236, 135, 135)),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -543,11 +603,12 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             onPressed: _navigateToEditProfile,
             tooltip: "Edit Profile",
           ),
-          IconButton(
-            icon: const Icon(Icons.share, color: Colors.white),
-            onPressed: _shareImage,
-            tooltip: "Share Photo",
-          ),
+          if (!widget.isAssetImage) // Only show share button for actual profile images
+            IconButton(
+              icon: const Icon(Icons.share, color: Colors.white),
+              onPressed: _shareImage,
+              tooltip: "Share Photo",
+            ),
         ],
       ),
       body: Center(
@@ -559,32 +620,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             panEnabled: true,
             minScale: 0.1,
             maxScale: 5,
-            child: widget.isAssetImage
-                ? Image.asset(
-                    widget.imageUrl,
-                    fit: BoxFit.contain,
-                  )
-                : Image.network(
-                    widget.imageUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        "${ImageStringGlobalVariables.imagePath}gordon_image_temporary.png",
-                        fit: BoxFit.contain,
-                      );
-                    },
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
-                  ),
+            child: _getImageViewerImage(),
           ),
         ),
       ),

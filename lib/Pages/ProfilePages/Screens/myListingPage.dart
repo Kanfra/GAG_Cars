@@ -106,13 +106,13 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
           backgroundColor: Colors.white,
           elevation: 1,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: ColorGlobalVariables.brownColor, size: 20),
+            icon: Icon(Icons.arrow_back_ios, color: ColorGlobalVariables.blackColor, size: 20),
             onPressed: () => Get.back(),
           ),
           title: Text(
             "My Listings",
             style: TextStyle(
-              color: ColorGlobalVariables.brownColor,
+              color: ColorGlobalVariables.blackColor,
               fontWeight: FontWeight.w600,
               fontSize: 20,
             ),
@@ -124,7 +124,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
               child: Stack(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.notifications_none, color: ColorGlobalVariables.brownColor, size: 24),
+                    icon: Icon(Icons.notifications_none, color: ColorGlobalVariables.blackColor, size: 24),
                     onPressed: () {},
                   ),
                   Positioned(

@@ -16,8 +16,8 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       emailVerifiedAt: json['email_verified_at'] == null
           ? null
           : DateTime.parse(json['email_verified_at'] as String),
-      countryId: json['country_id'] as String?,
-      stateId: json['state_id'] as String?,
+      countryId: (json['country_id'] as num?)?.toInt(),
+      stateId: (json['state_id'] as num?)?.toInt(),
       profileImage: json['profile_photo'] as String?,
       createdAt: json['created_at'] == null
           ? null

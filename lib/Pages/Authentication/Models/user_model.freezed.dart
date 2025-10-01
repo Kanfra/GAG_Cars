@@ -26,31 +26,31 @@ mixin _$UserModel {
   @JsonKey(name: 'phone')
   String? get phoneNumber => throw _privateConstructorUsedError;
   @JsonKey(name: 'paid_seller')
-  int? get paidSeller => throw _privateConstructorUsedError; // Made nullable
+  int? get paidSeller => throw _privateConstructorUsedError;
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'country_id')
-  String? get countryId => throw _privateConstructorUsedError;
+  int? get countryId =>
+      throw _privateConstructorUsedError; // Changed from String? to int?
   @JsonKey(name: 'state_id')
-  String? get stateId => throw _privateConstructorUsedError;
+  int? get stateId =>
+      throw _privateConstructorUsedError; // Also changed this to int? since it's likely the same type
   @JsonKey(name: 'profile_photo')
   String? get profileImage => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  DateTime? get createdAt =>
-      throw _privateConstructorUsedError; // Made nullable
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt =>
-      throw _privateConstructorUsedError; // Made nullable
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
   DateTime? get deletedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'uploads_left')
   int? get uploadsLeft => throw _privateConstructorUsedError;
   @JsonKey(name: 'active_status')
-  int? get activeStatus => throw _privateConstructorUsedError; // Made nullable
+  int? get activeStatus => throw _privateConstructorUsedError;
   @JsonKey(name: 'avatar')
-  String? get avatar => throw _privateConstructorUsedError; // Made nullable
+  String? get avatar => throw _privateConstructorUsedError;
   @JsonKey(name: 'dark_mode')
-  int? get darkMode => throw _privateConstructorUsedError; // Made nullable
+  int? get darkMode => throw _privateConstructorUsedError;
   @JsonKey(name: 'messenger_color')
   String? get messengerColor => throw _privateConstructorUsedError;
   @JsonKey(includeFromJson: true, includeToJson: false)
@@ -78,8 +78,8 @@ abstract class $UserModelCopyWith<$Res> {
       @JsonKey(name: 'phone') String? phoneNumber,
       @JsonKey(name: 'paid_seller') int? paidSeller,
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
-      @JsonKey(name: 'country_id') String? countryId,
-      @JsonKey(name: 'state_id') String? stateId,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'state_id') int? stateId,
       @JsonKey(name: 'profile_photo') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
@@ -154,11 +154,11 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
       countryId: freezed == countryId
           ? _value.countryId
           : countryId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       stateId: freezed == stateId
           ? _value.stateId
           : stateId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       profileImage: freezed == profileImage
           ? _value.profileImage
           : profileImage // ignore: cast_nullable_to_non_nullable
@@ -218,8 +218,8 @@ abstract class _$$UserModelImplCopyWith<$Res>
       @JsonKey(name: 'phone') String? phoneNumber,
       @JsonKey(name: 'paid_seller') int? paidSeller,
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
-      @JsonKey(name: 'country_id') String? countryId,
-      @JsonKey(name: 'state_id') String? stateId,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'state_id') int? stateId,
       @JsonKey(name: 'profile_photo') String? profileImage,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
@@ -292,11 +292,11 @@ class __$$UserModelImplCopyWithImpl<$Res>
       countryId: freezed == countryId
           ? _value.countryId
           : countryId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       stateId: freezed == stateId
           ? _value.stateId
           : stateId // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       profileImage: freezed == profileImage
           ? _value.profileImage
           : profileImage // ignore: cast_nullable_to_non_nullable
@@ -381,27 +381,26 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey(name: 'paid_seller')
   final int? paidSeller;
-// Made nullable
   @override
   @JsonKey(name: 'email_verified_at')
   final DateTime? emailVerifiedAt;
   @override
   @JsonKey(name: 'country_id')
-  final String? countryId;
+  final int? countryId;
+// Changed from String? to int?
   @override
   @JsonKey(name: 'state_id')
-  final String? stateId;
+  final int? stateId;
+// Also changed this to int? since it's likely the same type
   @override
   @JsonKey(name: 'profile_photo')
   final String? profileImage;
   @override
   @JsonKey(name: 'created_at')
   final DateTime? createdAt;
-// Made nullable
   @override
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
-// Made nullable
   @override
   @JsonKey(name: 'deleted_at')
   final DateTime? deletedAt;
@@ -411,15 +410,12 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey(name: 'active_status')
   final int? activeStatus;
-// Made nullable
   @override
   @JsonKey(name: 'avatar')
   final String? avatar;
-// Made nullable
   @override
   @JsonKey(name: 'dark_mode')
   final int? darkMode;
-// Made nullable
   @override
   @JsonKey(name: 'messenger_color')
   final String? messengerColor;
@@ -517,8 +513,8 @@ abstract class _UserModel extends UserModel {
       @JsonKey(name: 'phone') final String? phoneNumber,
       @JsonKey(name: 'paid_seller') final int? paidSeller,
       @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
-      @JsonKey(name: 'country_id') final String? countryId,
-      @JsonKey(name: 'state_id') final String? stateId,
+      @JsonKey(name: 'country_id') final int? countryId,
+      @JsonKey(name: 'state_id') final int? stateId,
       @JsonKey(name: 'profile_photo') final String? profileImage,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
@@ -546,25 +542,25 @@ abstract class _UserModel extends UserModel {
   String? get phoneNumber;
   @override
   @JsonKey(name: 'paid_seller')
-  int? get paidSeller; // Made nullable
+  int? get paidSeller;
   @override
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt;
   @override
   @JsonKey(name: 'country_id')
-  String? get countryId;
+  int? get countryId; // Changed from String? to int?
   @override
   @JsonKey(name: 'state_id')
-  String? get stateId;
+  int? get stateId; // Also changed this to int? since it's likely the same type
   @override
   @JsonKey(name: 'profile_photo')
   String? get profileImage;
   @override
   @JsonKey(name: 'created_at')
-  DateTime? get createdAt; // Made nullable
+  DateTime? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  DateTime? get updatedAt; // Made nullable
+  DateTime? get updatedAt;
   @override
   @JsonKey(name: 'deleted_at')
   DateTime? get deletedAt;
@@ -573,13 +569,13 @@ abstract class _UserModel extends UserModel {
   int? get uploadsLeft;
   @override
   @JsonKey(name: 'active_status')
-  int? get activeStatus; // Made nullable
+  int? get activeStatus;
   @override
   @JsonKey(name: 'avatar')
-  String? get avatar; // Made nullable
+  String? get avatar;
   @override
   @JsonKey(name: 'dark_mode')
-  int? get darkMode; // Made nullable
+  int? get darkMode;
   @override
   @JsonKey(name: 'messenger_color')
   String? get messengerColor;

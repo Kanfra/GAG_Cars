@@ -19,6 +19,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
@@ -41,6 +42,8 @@ class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   Timer? _loadMoreDebouncer;
   SfRangeValues _priceRange = const SfRangeValues(700, 2000);
+  bool _showSearchBar = true;
+  double _lastScrollOffset = 0.0;
 
   @override
   void initState() {
@@ -54,6 +57,39 @@ class _HomePageState extends State<HomePage> {
   void _scrollListener() {
     final provider = Provider.of<HomeProvider>(context, listen: false);
     
+    // Handle search bar show/hide based on scroll direction
+    if (_scrollController.hasClients) {
+      final currentOffset = _scrollController.offset;
+      
+      // Show search bar when at the top
+      if (currentOffset <= 0) {
+        if (!_showSearchBar) {
+          setState(() {
+            _showSearchBar = true;
+          });
+        }
+      } 
+      // Hide when scrolling down, show when scrolling up
+      else if (currentOffset > _lastScrollOffset + 50) {
+        // Scrolling down - hide search bar
+        if (_showSearchBar) {
+          setState(() {
+            _showSearchBar = false;
+          });
+        }
+      } else if (currentOffset < _lastScrollOffset - 25) {
+        // Scrolling up - show search bar
+        if (!_showSearchBar) {
+          setState(() {
+            _showSearchBar = true;
+          });
+        }
+      }
+      
+      _lastScrollOffset = currentOffset;
+    }
+    
+    // Load more functionality (unchanged)
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 100 &&
         !provider.isLoadingMore &&
@@ -73,6 +109,10 @@ class _HomePageState extends State<HomePage> {
 
   void _onRefresh() async {
     await _loadData();
+  }
+
+  void _navigateToSearchPage() {
+    Get.toNamed(RouteClass.getHomePageSearchPage());
   }
 
   @override
@@ -141,7 +181,28 @@ class _HomePageState extends State<HomePage> {
                 ? _buildErrorState(homeProvider)
                 : RefreshIndicator(
                     onRefresh: _loadData,
-                    child: _buildContent(screenSize, homeProvider),
+                    child: Stack(
+                      children: [
+                        _buildContent(screenSize, homeProvider),
+                        
+                        // Floating Search Bar
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            transform: Matrix4.translationValues(
+                              0, 
+                              _showSearchBar ? 0 : -100, 
+                              0
+                            ),
+                            child: _buildSearchWidget(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
       ),
     );
@@ -202,49 +263,9 @@ class _HomePageState extends State<HomePage> {
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
-        // Search Section
+        // Add padding at the top for the floating search bar
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: CustomTextFormField(
-                obscureText: false,
-                textInputType: TextInputType.text,
-                hintText: 'Search for cars, brands, or models...',
-                cursorColor: ColorGlobalVariables.brownColor,
-                fillColor: Colors.white,
-                enabledBorderColor: Colors.transparent,
-                focusedBorderColor: ColorGlobalVariables.brownColor,
-                prefixIconData: Icons.search,
-                fieldWidth: double.infinity,
-                fieldHeight: 16,
-                suffixIconData: FontAwesomeIcons.sliders,
-                onSuffixIconClickFunction: () => showFilterBottomSheet(
-                  context: context,
-                  widget: FilterBottomSheetContent(
-                    priceRange: _priceRange,
-                    onPriceRangeChanged: (newRange) {
-                      setState(() => _priceRange = newRange);
-                    },
-                  ),
-                ),
-                isSuffixIconRequired: true,
-                isPrefixIconRequired: true,
-                editingController: searchEditingController,
-                isFieldHeightRequired: false,
-              ),
-            ),
-          ),
+          child: SizedBox(height: _showSearchBar ? 80 : 0),
         ),
 
         // Trending Makes Section
@@ -372,6 +393,94 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+
+  Widget _buildSearchWidget() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: GestureDetector(
+        onTap: _navigateToSearchPage,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 12,
+                offset: Offset(0, 4),
+              ),
+            ],
+            border: Border.all(
+              color: Colors.grey.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search_rounded,
+                  color: ColorGlobalVariables.blueColor,
+                  size: 24,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Search for cars, brands, or models...',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 16,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorGlobalVariables.blueColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.tune_rounded,
+                        color: ColorGlobalVariables.blueColor,
+                        size: 16,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Filter',
+                        style: TextStyle(
+                          color: ColorGlobalVariables.blueColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ... Rest of the methods remain exactly the same as your original code
+  // _buildTrendingMakes, _buildCategoriesSection, _buildSpecialOffers, 
+  // helper methods, and _RecommendedItemWidget class
 
   Widget _buildTrendingMakes(HomeProvider homeProvider) {
     return Column(
@@ -724,6 +833,7 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+// _RecommendedItemWidget class remains exactly the same as your original code
 class _RecommendedItemWidget extends StatefulWidget {
   final RecommendedItem recommended;
   final Size screenSize;
