@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
@@ -7,10 +8,13 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AllMakesPage extends StatefulWidget {
@@ -27,9 +31,9 @@ class AllMakesPage extends StatefulWidget {
 class _AllMakesPageState extends State<AllMakesPage> {
   final TextEditingController _searchEditingController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  late final String type;
-  late final List<Map<String, dynamic>> brands;
-  List<Map<String, dynamic>> filteredBrands = [];
+  late String _type;
+  late List<TrendingMake> _brands;
+  late List<TrendingMake> _filteredBrands;
   bool _isSearching = false;
   bool _showShimmer = true;
   String _currentLayout = 'grid';
@@ -38,15 +42,64 @@ class _AllMakesPageState extends State<AllMakesPage> {
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    _initializeFromArguments();
     _simulateLoading();
   }
 
-  void _initializeData() {
-    type = widget.allJson['type'] as String;
-    brands = widget.allJson['brands'] as List<Map<String, dynamic>>;
-    filteredBrands = List.from(brands);
-    logger.i('Loaded ${brands.length} brands');
+  void _initializeFromArguments() {
+    final Map<String, dynamic> args = widget.allJson;
+
+    // DEBUG: Print all arguments to see what's actually being passed
+    print('=== DEBUG: AllMakesPage Arguments ===');
+    print('All arguments keys: ${args.keys}');
+    print('Arguments: $args');
+    print('=====================================');
+
+    // Handle type
+    _type = args['type'] as String? ?? 'brands';
+
+    // Handle brands data - FIXED: Properly extract and convert brands
+    if (args.containsKey('brands')) {
+      final brandsData = args['brands'];
+      if (brandsData is List<dynamic>) {
+        _brands = brandsData.map((brandJson) {
+          if (brandJson is TrendingMake) {
+            return brandJson;
+          } else if (brandJson is Map<String, dynamic>) {
+            return TrendingMake.fromJson(brandJson);
+          } else {
+            throw Exception('Invalid brand type: ${brandJson.runtimeType}');
+          }
+        }).toList();
+        logger.i('✅ Loaded ${_brands.length} brands from arguments');
+      } else {
+        _brands = [];
+        logger.w('⚠️ brands is not a list, using empty list');
+      }
+    } else if (args.containsKey('selectedBrands')) {
+      // Alternative key name
+      final selectedBrands = args['selectedBrands'];
+      if (selectedBrands is List<dynamic>) {
+        _brands = selectedBrands.map((brandJson) {
+          if (brandJson is TrendingMake) {
+            return brandJson;
+          } else if (brandJson is Map<String, dynamic>) {
+            return TrendingMake.fromJson(brandJson);
+          } else {
+            throw Exception('Invalid brand type: ${brandJson.runtimeType}');
+          }
+        }).toList();
+        logger.i('✅ Loaded ${_brands.length} brands from selectedBrands');
+      } else {
+        _brands = [];
+        logger.w('⚠️ selectedBrands is not a list, using empty list');
+      }
+    } else {
+      _brands = [];
+      logger.w('⚠️ No brands data found in arguments, using empty list');
+    }
+
+    _filteredBrands = List.from(_brands);
   }
 
   void _simulateLoading() {
@@ -63,11 +116,11 @@ class _AllMakesPageState extends State<AllMakesPage> {
     setState(() {
       _isSearching = query.isNotEmpty;
       if (query.isEmpty) {
-        filteredBrands = List.from(brands);
+        _filteredBrands = List.from(_brands);
       } else {
-        filteredBrands = brands
+        _filteredBrands = _brands
             .where((brand) =>
-                brand['name']?.toString().toLowerCase().contains(query.toLowerCase()) ?? false)
+                brand.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
             .toList();
       }
     });
@@ -79,27 +132,25 @@ class _AllMakesPageState extends State<AllMakesPage> {
     });
   }
 
-  void _navigateToSelectedBrand(Map<String, dynamic> brand) {
-    // Navigate to SelectedBrandPage with the selected brand data
+  void _navigateToSelectedBrand(TrendingMake brand) {
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    
+    // Filter recommended items by this brand
+    final brandItems = homeProvider.recommendedItems.where((item) {
+      final itemBrandId = item.brand?.id ?? item.brandId;
+      return itemBrandId == brand.id;
+    }).toList();
+
+    logger.w('🚗 Found ${brandItems.length} items for brand: ${brand.name}');
+    
     Get.toNamed(
       RouteClass.getSelectedBrandPage(),
       arguments: {
-        'selectedBrand': brand,
+        'selectedBrand': brand.toJson(),
+        'brandItems': brandItems, // Pass the actual filtered items
         'type': 'selectedBrand'
       }
     );
-    // Get.toNamed(
-    //   '/selectedBrand', // Make sure this route is defined in your RouteClass
-    //   arguments: {
-    //     'brand': brand,
-    //     'brandName': brand['name'],
-    //     'brandImage': brand['image'],
-    //     'vehicleCount': brand['id']?.toString() ?? '0',
-    //     'sourcePage': 'AllMakesPage',
-    //   },
-    //   transition: Transition.rightToLeft, // Smooth GetX transition
-    //   duration: Duration(milliseconds: 300),
-    // );
   }
 
   @override
@@ -115,7 +166,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
             Expanded(
               child: _showShimmer
                   ? _buildShimmerLoader()
-                  : filteredBrands.isEmpty
+                  : _filteredBrands.isEmpty
                       ? _buildEmptyState()
                       : _currentLayout == 'grid'
                           ? _buildGridView()
@@ -146,10 +197,10 @@ class _AllMakesPageState extends State<AllMakesPage> {
       ),
       centerTitle: true,
       actions: [
-        IconButton(
-          icon: Icon(Icons.filter_list_rounded, color: Colors.black54),
-          onPressed: () {},
-        ),
+        // IconButton(
+        //   icon: Icon(Icons.filter_list_rounded, color: Colors.black54),
+        //   onPressed: () {},
+        // ),
       ],
     );
   }
@@ -218,7 +269,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${filteredBrands.length} ${filteredBrands.length == 1 ? 'Make' : 'All Makes'}',
+            '${_filteredBrands.length} ${_filteredBrands.length == 1 ? 'Make' : 'All Makes'}',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -257,9 +308,9 @@ class _AllMakesPageState extends State<AllMakesPage> {
         mainAxisSpacing: 20,
         childAspectRatio: 0.85,
       ),
-      itemCount: filteredBrands.length,
+      itemCount: _filteredBrands.length,
       itemBuilder: (context, index) {
-        final brand = filteredBrands[index];
+        final brand = _filteredBrands[index];
         return _buildBrandGridCard(brand);
       },
     );
@@ -268,16 +319,21 @@ class _AllMakesPageState extends State<AllMakesPage> {
   Widget _buildListView() {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      itemCount: filteredBrands.length,
+      itemCount: _filteredBrands.length,
       itemBuilder: (context, index) {
-        final brand = filteredBrands[index];
+        final brand = _filteredBrands[index];
         return _buildBrandListCard(brand);
       },
     );
   }
 
-  Widget _buildBrandGridCard(Map<String, dynamic> brand) {
-    final carCount = brand['id']?.toString() ?? '0';
+  Widget _buildBrandGridCard(TrendingMake brand) {
+    // Get vehicle count for this brand from HomeProvider
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    final vehicleCount = homeProvider.recommendedItems.where((item) {
+      final itemBrandId = item.brand?.id ?? item.brandId;
+      return itemBrandId == brand.id;
+    }).length;
     
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -315,12 +371,13 @@ class _AllMakesPageState extends State<AllMakesPage> {
                           border: Border.all(color: Colors.grey[100]!, width: 3),
                         ),
                         child: ClipOval(
-                          child: CustomImage(
-                            imagePath: getImageUrl(brand['image'], null),
-                            isAssetImage: false,
-                            isImageBorderRadiusRequired: false,
-                            imageWidth: 55,
-                            imageHeight: 55,
+                          child: CachedNetworkImage(
+                            imageUrl: getImageUrl(brand.image, null),
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Container(
+                              color: Colors.grey[200],
+                              child: Icon(Icons.business, color: Colors.grey[400]),
+                            ),
                           ),
                         ),
                       ),
@@ -331,7 +388,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                       ConstrainedBox(
                         constraints: BoxConstraints(maxWidth: 120),
                         child: Text(
-                          brand['name'] ?? 'Unknown Brand',
+                          brand.name ?? 'Unknown Brand',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -346,7 +403,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
 
                       SizedBox(height: 12),
 
-                      // Car Count Badge - Centered
+                      // Vehicle Count Badge - Centered
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
@@ -359,7 +416,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Text(
-                          '$carCount vehicles',
+                          '$vehicleCount ${vehicleCount == 1 ? 'vehicle' : 'vehicles'}',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -392,8 +449,13 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildBrandListCard(Map<String, dynamic> brand) {
-    final carCount = brand['id']?.toString() ?? '0';
+  Widget _buildBrandListCard(TrendingMake brand) {
+    // Get vehicle count for this brand from HomeProvider
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    final vehicleCount = homeProvider.recommendedItems.where((item) {
+      final itemBrandId = item.brand?.id ?? item.brandId;
+      return itemBrandId == brand.id;
+    }).length;
     
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -433,12 +495,13 @@ class _AllMakesPageState extends State<AllMakesPage> {
                         border: Border.all(color: Colors.grey[100]!, width: 2),
                       ),
                       child: ClipOval(
-                        child: CustomImage(
-                          imagePath: getImageUrl(brand['image'], null),
-                          isAssetImage: false,
-                          isImageBorderRadiusRequired: false,
-                          imageWidth: 50,
-                          imageHeight: 50,
+                        child: CachedNetworkImage(
+                          imageUrl: getImageUrl(brand.image, null),
+                          fit: BoxFit.cover,
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: Icon(Icons.business, color: Colors.grey[400]),
+                          ),
                         ),
                       ),
                     ),
@@ -451,7 +514,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            brand['name'] ?? 'Unknown Brand',
+                            brand.name ?? 'Unknown Brand',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -460,7 +523,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            '$carCount premium vehicles available',
+                            '$vehicleCount ${vehicleCount == 1 ? 'vehicle' : 'vehicles'} available',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.grey[600],

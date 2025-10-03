@@ -6,6 +6,7 @@ import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPag
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
@@ -73,7 +74,10 @@ void main() async {
         ),     
         ChangeNotifierProvider(
           create: (context) => CountryProvider(),
-        ),      
+        ),
+        ChangeNotifierProvider(
+          create: (context) => SimilarItemsProvider(),
+          ),      
       ],
       child: const MyApp(),
     ),

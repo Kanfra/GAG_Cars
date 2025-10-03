@@ -14,6 +14,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
@@ -22,6 +23,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetConten
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
@@ -115,6 +117,143 @@ class _HomePageState extends State<HomePage> {
     Get.toNamed(RouteClass.getHomePageSearchPage());
   }
 
+  void _showMenu(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return Container(
+        margin: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 20,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey[200]!,
+                    width: 1,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                    child: Icon(
+                      Icons.person,
+                      color: ColorGlobalVariables.brownColor,
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Menu',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'App settings and preferences',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Settings Option
+            ListTile(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.settings,
+                  color: ColorGlobalVariables.brownColor,
+                  size: 20,
+                ),
+              ),
+              title: Text(
+                'Profile',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              subtitle: Text(
+                'Have access to your profile details',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+              trailing: Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Colors.grey[400],
+              ),
+              onTap: () {
+                Navigator.pop(context); // Close the menu
+                Get.toNamed(RouteClass.getProfileUpdatePage()); // Navigate to SettingsPage
+              },
+            ),
+            
+            // Close Button
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey[100],
+                    foregroundColor: Colors.grey[700],
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text('Close'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
@@ -135,7 +274,9 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(FontAwesomeIcons.bars, size: 20, color: Colors.black87),
-          onPressed: () {},
+          onPressed: () {
+            _showMenu(context);
+          },
         ),
         title: Text(
           "GAGcars",
@@ -478,10 +619,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ... Rest of the methods remain exactly the same as your original code
-  // _buildTrendingMakes, _buildCategoriesSection, _buildSpecialOffers, 
-  // helper methods, and _RecommendedItemWidget class
-
   Widget _buildTrendingMakes(HomeProvider homeProvider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,9 +645,12 @@ class _HomePageState extends State<HomePage> {
                 isIconWidgetRequiredAtEnd: false,
                 isIconWidgetRequiredAtFront: false,
                 onClickFunction: () {
+                   final make = homeProvider.trendingMakes;
+              final brand = make;
                   Get.toNamed(
                     RouteClass.getAllMakesPage(),
                     arguments: {
+                       'selectedBrand':  homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
                       'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
                       'type': 'brands',
                     },
@@ -531,10 +671,16 @@ class _HomePageState extends State<HomePage> {
               final brand = make;
               return GestureDetector(
                 onTap: (){
+                  final brandItems = homeProvider.recommendedItems.where((item) {
+                  final itemBrandId = item.brand?.id ?? item.brandId;
+                  return itemBrandId == brand.id;
+                }).toList();
                   Get.toNamed(
                     RouteClass.getSelectedBrandPage(),
                     arguments: {
                       'selectedBrand': brand.toJson(),
+                      'brandItems': brandItems,
+                      'itemId': brand.id.toString(),
                       'type': 'selectedBrand'
                     }
                   );
@@ -595,8 +741,11 @@ class _HomePageState extends State<HomePage> {
               final category = homeProvider.categories[index];
               return GestureDetector(
                 onTap: () {
-                  // Navigate to category page or filter by category
-                  print('Category tapped: ${category.name}');
+                  final logger = Logger();
+                  logger.w('Category tapped: ${category.name}');
+                  
+                  // NEW: Filter recommended items by category and navigate
+                  _navigateToCategoryItems(category, homeProvider);
                 },
                 child: Container(
                   width: 90,
@@ -615,18 +764,17 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Category Icon
+                      // CATEGORY IMAGE - REPLACED ICON WITH ACTUAL IMAGE
                       Container(
-                        width: 40,
-                        height: 40,
+                        width: 50,
+                        height: 50,
                         decoration: BoxDecoration(
-                          color: _getCategoryColor(category.name),
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(25),
+                          color: Colors.grey[100],
                         ),
-                        child: Icon(
-                          _getIconForCategory(categoryName: category.name),
-                          size: 20,
-                          color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25),
+                          child: _buildCategoryImage(category),
                         ),
                       ),
                       SizedBox(height: 8),
@@ -655,6 +803,89 @@ class _HomePageState extends State<HomePage> {
         SizedBox(height: 24),
       ],
     );
+  }
+
+  // NEW METHOD: Filter recommended items by category and navigate
+void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
+  final logger = Logger();
+  
+  // Filter recommended items that belong to this category
+  final categoryItems = homeProvider.recommendedItems.where((item) {
+    final itemCategoryId = item.category?.id ?? item.categoryId;
+    return itemCategoryId == category.id;
+  }).toList();
+
+  logger.w('📊 Found ${categoryItems.length} items for category: ${category.name}');
+  
+  if (categoryItems.isNotEmpty) {
+    // Get the first item ID to use as reference
+    final firstItemId = categoryItems.first.id ?? '';
+    
+    Get.toNamed(
+      RouteClass.getSelectedCategoryItemPage(),
+      arguments: {
+        'selectedCategory': category,
+        'categoryItems': categoryItems, // PASS OBJECTS DIRECTLY, NOT JSON
+        'itemId': firstItemId,
+      }
+    );
+  } else {
+    logger.w('⚠️ No items found for category: ${category.name}');
+    
+    Get.toNamed(
+      RouteClass.getSelectedCategoryItemPage(),
+      arguments: {
+        'selectedCategory': category,
+        'categoryItems': [], // Empty list
+        'itemId': category.id.toString(),
+      }
+    );
+  }
+}
+
+  Widget _buildCategoryImage(Categories category) {
+    final imageUrl = category.image;
+    final hasValidImage = imageUrl != null && 
+                         imageUrl.isNotEmpty && 
+                         imageUrl != 'assets/images/category_placeholder.png';
+    
+    if (hasValidImage) {
+      return CachedNetworkImage(
+        imageUrl: '${ApiEndpoint.baseImageUrl}$imageUrl',
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[100],
+          child: Center(
+            child: Icon(
+              Icons.category_outlined,
+              color: Colors.grey[400],
+              size: 24,
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.grey[100],
+          child: Center(
+            child: Icon(
+              Icons.error_outline,
+              color: Colors.grey[400],
+              size: 24,
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        color: Colors.grey[100],
+        child: Center(
+          child: Icon(
+            Icons.category_outlined,
+            color: Colors.grey[400],
+            size: 24,
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize) {
@@ -688,7 +919,17 @@ class _HomePageState extends State<HomePage> {
               final brandImage = brand?.image;
               final discount = offer.discount;
 
-              return Container(
+              return GestureDetector(
+                onTap: () {
+                  Get.toNamed( 
+                    RouteClass.getSpecialOfferDetailPage(),
+                    arguments: {
+                      "specialOffer": offer,
+                      "type": "specialOffer",
+                    },
+                    );
+                },
+                child: Container(
                 width: screenSize.width * 0.75,
                 margin: EdgeInsets.symmetric(horizontal: 6),
                 decoration: BoxDecoration(
@@ -792,6 +1033,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+              ),
               );
             },
           ),
@@ -885,7 +1127,6 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
   }
 
   void _initializeLikeStatus() {
-    // FIX: Check global wishlist status instead of setting to false
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkWishlistStatus();
     });
@@ -899,7 +1140,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
       setState(() {
         _isLiked = isInWishlist;
         if (_isLiked) {
-          _animationController.value = 1.0; // Set to liked state
+          _animationController.value = 1.0;
         }
       });
     } catch (e) {
@@ -915,14 +1156,12 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
     });
 
     try {
-      // Toggle the animation
       if (_isLiked) {
         _animationController.reverse();
       } else {
         _animationController.forward();
       }
 
-      // Get the wishlist provider and call toggleWishlistItem
       final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
       final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
       
@@ -931,12 +1170,10 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
       );
 
       if (result) {
-        // Update local state - WishlistManager will handle the global sync
         setState(() {
           _isLiked = !_isLiked;
         });
         
-        // Show success feedback
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -952,7 +1189,6 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
           ),
         );
       } else {
-        // Failure - revert the animation
         if (_isLiked) {
           _animationController.forward();
         } else {
@@ -972,7 +1208,6 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
       }
     } catch (e) {
       print('Wishlist error: $e');
-      // Revert animation on error
       if (_isLiked) {
         _animationController.forward();
       } else {
@@ -1105,7 +1340,6 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                   right: 8,
                   child: GestureDetector(
                     onTap: () {
-                      // Prevent tap if already loading
                       if (_isLoading) return;
                       _toggleLike();
                     },

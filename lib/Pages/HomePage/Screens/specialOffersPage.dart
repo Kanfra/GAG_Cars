@@ -10,7 +10,11 @@ import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dar
 import 'package:get/get.dart';
 
 class SpecialOffersPage extends StatefulWidget {
-  const SpecialOffersPage({super.key});
+  final Map<String, dynamic>? allJson;
+  const SpecialOffersPage({
+    super.key,
+    this.allJson,
+    });
 
   @override
   State<SpecialOffersPage> createState() => _SpecialOffersPageState();

@@ -1,101 +1,105 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:get/get.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/similarItemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
-import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
-import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class SelectedBrandPage extends StatefulWidget {
+class SelectedCategoryItemPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  const SelectedBrandPage({
+  const SelectedCategoryItemPage({
     super.key,
     required this.allJson,
   });
 
   @override
-  State<SelectedBrandPage> createState() => _SelectedBrandPageState();
+  State<SelectedCategoryItemPage> createState() => _SelectedCategoryItemPageState();
 }
 
-class _SelectedBrandPageState extends State<SelectedBrandPage> {
-  late TrendingMake _selectedBrand;
-  late List<RecommendedItem> _brandItems;
-  late String _type;
+class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
+  final ScrollController _scrollController = ScrollController();
+  Timer? _loadMoreDebouncer;
+  late Categories _category;
+  late List<RecommendedItem> _categoryItems;
+  late String _itemId;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_scrollListener);
+    
+    // Initialize from arguments
     _initializeFromArguments();
   }
 
-  void _initializeFromArguments() {
-    final Map<String, dynamic> args = widget.allJson;
-
-    // DEBUG: Print all arguments to see what's actually being passed
-    print('=== DEBUG: SelectedBrandPage Arguments ===');
-    print('All arguments keys: ${args.keys}');
-    print('Arguments: $args');
-    print('=====================================');
-
-    // Handle selectedBrand
-    if (args.containsKey('selectedBrand')) {
-      final selectedBrand = args['selectedBrand'];
-      if (selectedBrand is TrendingMake) {
-        _selectedBrand = selectedBrand;
-      } else if (selectedBrand is Map<String, dynamic>) {
-        _selectedBrand = TrendingMake.fromJson(selectedBrand);
-      } else {
-        throw Exception('Invalid selectedBrand type: ${selectedBrand.runtimeType}');
-      }
+void _initializeFromArguments() {
+  final Map<String, dynamic> args = widget.allJson;
+  
+  if (args.containsKey('selectedCategory')) {
+    _category = args['selectedCategory'] as Categories;
+    
+    // Get the pre-filtered category items from homepage
+    if (args.containsKey('categoryItems')) {
+      final categoryItems = args['categoryItems'] as List<dynamic>;
+      // Simply cast to RecommendedItem since we passed objects directly
+      _categoryItems = categoryItems.cast<RecommendedItem>();
     } else {
-      throw Exception('selectedBrand is required in arguments');
+      _categoryItems = []; // Empty list if no items passed
     }
+    
+    // Get itemId for fallback (if needed)
+    _itemId = args['itemId'] as String? ?? _category.id.toString();
+    
+    // Debug log
+    print('Category: ${_category.name}, Items count: ${_categoryItems.length}');
+  }
+}
 
-    // Handle brandItems - THIS IS THE KEY PART YOU'RE MISSING
-    if (args.containsKey('brandItems')) {
-      final brandItems = args['brandItems'];
-      if (brandItems is List<dynamic>) {
-        _brandItems = brandItems.cast<RecommendedItem>();
-        print('✅ Loaded ${_brandItems.length} brand items from arguments');
-      } else {
-        _brandItems = [];
-        print('⚠️ brandItems is not a list, using empty list');
-      }
-    } else {
-      _brandItems = [];
-      print('⚠️ No brandItems found in arguments, using empty list');
-    }
+// REMOVE the _convertJsonToRecommendedItems method entirely - we don't need it!
 
-    // Handle type
-    _type = args['type'] as String? ?? 'selectedBrand';
+
+
+  void _scrollListener() {
+    // Since we're using pre-loaded data, we don't need lazy loading
+    // But keeping the structure for consistency
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    _loadMoreDebouncer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isSmallScreen = screenSize.width < 360;
-
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0,
+        elevation: 1,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
         title: Text(
-          _selectedBrand.name,
-          style: TextStyle(
+          _category.name,
+          style: const TextStyle(
             color: ColorGlobalVariables.brownColor,
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -114,82 +118,123 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with results count
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  "${_brandItems.length} vehicles found",
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-
-              // Grid view - NOW USING ACTUAL DATA FROM ARGUMENTS
-              Expanded(
-                child: _brandItems.isEmpty
-                    ? _buildEmptyState()
-                    : GridView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: _brandItems.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isSmallScreen ? 1 : 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: isSmallScreen ? 1.6 : 0.72,
-                        ),
-                        itemBuilder: (context, index) {
-                          final item = _brandItems[index];
-                          return _BrandItemWidget(
-                            item: item,
-                            screenSize: screenSize,
-                          );
-                        },
-                      ),
-              ),
-            ],
-          ),
-        ),
+        child: _buildContent(),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.directions_car_outlined,
-            size: 64,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No vehicles found for ${_selectedBrand.name}',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
+  Widget _buildContent() {
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          // Header Section
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _category.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${_categoryItems.length} items found',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later for new ${_selectedBrand.name} vehicles',
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 14,
+
+          // Grid Items
+          if (_categoryItems.isNotEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.72,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final item = _categoryItems[index];
+                    return _CategoryItemWidget(
+                      item: item,
+                      screenSize: MediaQuery.of(context).size,
+                    );
+                  },
+                  childCount: _categoryItems.length,
+                ),
+              ),
+            )
+          else
+            // Empty State
+            SliverFillRemaining(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.category_outlined,
+                    size: 64,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No items found in this category',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Try a different category or check back later',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: const Text('Back to Categories', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
         ],
       ),
     );
+  }
+
+  Future<void> _onRefresh() async {
+    // Since we're using pre-loaded data, refresh would go back to homepage
+    // or you could implement a different refresh logic
+    setState(() {
+      // Could trigger a re-filter or other logic here
+    });
   }
 
   void _showFilterOptions() {
@@ -214,9 +259,9 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Filter ${_selectedBrand.name} Vehicles',
-                      style: const TextStyle(
+                    const Text(
+                                'Filter Options',
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -232,7 +277,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
               Expanded(
                 child: Center(
                   child: Text(
-                    'Filter options for ${_selectedBrand.name}',
+                    'Filter options for ${_category.name}',
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 16,
@@ -248,37 +293,37 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   }
 }
 
-class _BrandItemWidget extends StatefulWidget {
+class _CategoryItemWidget extends StatefulWidget {
   final RecommendedItem item;
   final Size screenSize;
 
-  const _BrandItemWidget({
+  const _CategoryItemWidget({
     required this.item,
     required this.screenSize,
   });
 
   @override
-  __BrandItemWidgetState createState() => __BrandItemWidgetState();
+  __CategoryItemWidgetState createState() => __CategoryItemWidgetState();
 }
 
-class __BrandItemWidgetState extends State<_BrandItemWidget>
+class __CategoryItemWidgetState extends State<_CategoryItemWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<Color?> _colorAnimation;
-
+  
   bool _isLiked = false;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-
+    
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-
+    
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
@@ -286,7 +331,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-
+    
     _colorAnimation = ColorTween(
       begin: Colors.grey[400],
       end: Colors.red,
@@ -308,7 +353,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
     try {
       final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
       final isInWishlist = wishlistManager.isLiked(widget.item.id);
-
+      
       setState(() {
         _isLiked = isInWishlist;
         if (_isLiked) {
@@ -322,7 +367,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
 
   Future<void> _toggleLike() async {
     if (_isLoading) return;
-
+    
     setState(() {
       _isLoading = true;
     });
@@ -336,9 +381,9 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
 
       final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
       final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
-
+      
       final result = await wishlistProvider.toggleWishlistItem(
-        itemId: widget.item.id,
+        itemId: widget.item.id, 
         context: context,
       );
 
@@ -346,7 +391,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
         setState(() {
           _isLiked = !_isLiked;
         });
-
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -367,7 +412,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
         } else {
           _animationController.reverse();
         }
-
+        
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -386,7 +431,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
       } else {
         _animationController.reverse();
       }
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -425,7 +470,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
           arguments: {
             'product': widget.item.toJson(),
             'item': widget.item.toJson(),
-            'type': 'brand-item',
+            'type': 'category-item',
           },
         );
       },
@@ -456,7 +501,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                     child: _buildItemImage(firstImage),
                   ),
                 ),
-
+                
                 // Condition Badge
                 if (widget.item.condition != null)
                   Positioned(
@@ -478,7 +523,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                       ),
                     ),
                   ),
-
+                
                 // PROMOTED BADGE
                 if (isPromoted)
                   Positioned(
@@ -507,7 +552,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                       ),
                     ),
                   ),
-
+                
                 // Animated Wishlist Button
                 Positioned(
                   bottom: 8,
@@ -551,8 +596,8 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                                     return Icon(
                                       _isLiked ? Icons.favorite : Icons.favorite_border,
                                       size: 18,
-                                      color: _isLiked
-                                          ? _colorAnimation.value
+                                      color: _isLiked 
+                                          ? _colorAnimation.value 
                                           : Colors.grey[600],
                                     );
                                   },
@@ -650,7 +695,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                         )
                       else
                         const SizedBox(width: 24),
-
+                      
                       if (widget.item.transmission != null)
                         Row(
                           children: [
@@ -665,7 +710,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                             ),
                           ],
                         ),
-
+                      
                       if (widget.item.location != null)
                         Flexible(
                           child: Row(
@@ -699,7 +744,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
 
   Widget _buildItemImage(String imageUrl) {
     final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-
+    
     if (isAssetImage) {
       return Image.asset(
         imageUrl,
@@ -710,7 +755,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
       );
     } else {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-
+      
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,

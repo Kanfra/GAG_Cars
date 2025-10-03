@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePageSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/locationSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/selectedBrandPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/selectedCategoryItemPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOfferDetailPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/paymentFailedPage.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/paymentProcessingPage.dart';
@@ -77,6 +80,7 @@ class RouteClass {
   // static String homePage = "/home-page";
   static String homePageSearchPage = "/home-page-search-page";
   static String detailPage = "/detail-page";
+  static String selectedCategoryItemPage = "/selected-category-item-page";
   static String newsBlogPage = "/news-blog-page";
   static String mainNewsPage = "/main-news-page";
   static String myListingsPage = "/my-listings-page";
@@ -86,6 +90,7 @@ class RouteClass {
   static String sellCarTwoPage = "/sell-car-two-page";
   static String allMakesPage = "/all-makes-page";
   static String specialOfferPage = "/special-offer-page";
+  static String specialOfferDetailPage = "/special-offer-detail-page";
   static String notificationsPage = "/notifications-page";
   static String searchPage = "/search-page";
   static String mainBottomNavigationPage = "/main-bottom-navigation-page";
@@ -135,6 +140,7 @@ class RouteClass {
   static String getDetailPage() => detailPage;
   static String getNewsBlogPage() => newsBlogPage;
   static String getMainNewsPage() => mainNewsPage;
+  static String getSelectedCategoryItemPage() => selectedCategoryItemPage;
   // static String getWishlistPage() => wishlistPage;
   static String getMyListingsPage() => myListingsPage;
   static String getSelectedBrandPage() => selectedBrandPage;
@@ -142,6 +148,7 @@ class RouteClass {
   static String getSellCarTwoPage() => sellCarTwoPage;
   static String getAllMakesPage() => allMakesPage;
   static String getSpecialOfferPage() => specialOfferPage;
+  static String getSpecialOfferDetailPage() => specialOfferDetailPage;
   static String getNotificationsPage() => notificationsPage;
   static String getSearchPage() => searchPage;
   static String getMainBottomNavigationPage() => mainBottomNavigationPage;
@@ -225,6 +232,15 @@ class RouteClass {
       name: detailPage, 
       transition: Transition.noTransition
       ),
+    GetPage(page: (){
+      final args = Get.arguments as Map<String, dynamic>? ?? {};
+      return SelectedCategoryItemPage(
+        allJson: args,
+      );
+    },
+     name: selectedCategoryItemPage, 
+     transition: Transition.noTransition
+     ),
     GetPage(page: () => HomePageSearchPage(), name: homePageSearchPage, transition: Transition.noTransition),
     GetPage(page: () => const NewsBlogPage(), name: newsBlogPage, transition: Transition.noTransition),
     GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
@@ -257,7 +273,30 @@ class RouteClass {
       name: allMakesPage, 
       transition: Transition.noTransition
       ),
-    GetPage(page: () => const SpecialOffersPage(), name: specialOfferPage, transition: Transition.noTransition),
+    GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return SpecialOffersPage(
+          allJson: args,
+        );
+      }, 
+      name: specialOfferPage, 
+      transition: Transition.noTransition
+    ),
+    GetPage(
+      page: (){
+        final arguments = Get.arguments;
+        if(arguments != null && arguments["specialOffer"] != null){
+          return SpecialOfferDetailPage(
+          specialOffer: arguments["specialOffer"]
+        );
+        } else {
+          return Scaffold(body: Center(child: Text("Invalid data")));
+        }
+      }, 
+      name: specialOfferDetailPage, 
+      transition: Transition.noTransition
+    ),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
     GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:flutter_google_maps_webservices/places.dart';
@@ -48,7 +49,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
 
   Future<void> _searchLocations(String query) async {
     if (!mounted) return;
-    
+
     setState(() => _isLoading = true);
     try {
       final response = await _placesClient.autocomplete(
@@ -57,7 +58,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         region: 'gh', // Focus on Ghana
         language: 'en',
       );
-      
+
       if (!mounted) return;
       setState(() => _searchResults = response.predictions);
     } catch (e) {
@@ -87,7 +88,6 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     });
 
     try {
-      // Check if location services are enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         setState(() => _locationServiceEnabled = false);
@@ -95,7 +95,6 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         return;
       }
 
-      // Check and request permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -111,12 +110,10 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         return;
       }
 
-      // Get current position
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
       );
 
-      // Get address from coordinates
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
@@ -125,7 +122,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
         String locationName = _formatLocationName(place);
-        
+
         setState(() {
           _currentPosition = position;
           _selectedLocation = locationName;
@@ -133,11 +130,13 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         });
 
         if (widget.onLocationSelected != null) {
-          widget.onLocationSelected!({
-            'locationName': locationName,
-            'position': position,
-            'coordinates': '${position.latitude},${position.longitude}',
-          });
+          widget.onLocationSelected!(
+            {
+              'locationName': locationName,
+              'position': position,
+              'coordinates': '${position.latitude},${position.longitude}',
+            },
+          );
         }
       }
     } catch (e) {
@@ -162,7 +161,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     String locality = place.locality ?? '';
     String country = place.country ?? '';
     String administrativeArea = place.administrativeArea ?? '';
-    
+
     if (locality.isNotEmpty && country.isNotEmpty) {
       return '$locality, $country';
     } else if (locality.isNotEmpty) {
@@ -178,7 +177,9 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Location Services Disabled'),
-        content: const Text('Please enable location services to use this feature.'),
+        content: const Text(
+          'Please enable location services to use this feature.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -201,7 +202,9 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Location Permission Required'),
-        content: const Text('This app needs location permission to determine your current location.'),
+        content: const Text(
+          'This app needs location permission to determine your current location.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -226,8 +229,8 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     });
 
     try {
-      // Get details for the selected place to get coordinates
-      final details = await _placesClient.getDetailsByPlaceId(prediction.placeId!);
+      final details =
+          await _placesClient.getDetailsByPlaceId(prediction.placeId!);
       if (details.result.geometry?.location != null) {
         final location = details.result.geometry!.location;
         _currentPosition = Position(
@@ -238,8 +241,8 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
           altitude: 0,
           heading: 0,
           speed: 0,
-          speedAccuracy: 0, 
-          altitudeAccuracy: 0, 
+          speedAccuracy: 0,
+          altitudeAccuracy: 0,
           headingAccuracy: 0,
         );
       }
@@ -248,13 +251,15 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     }
 
     if (widget.onLocationSelected != null) {
-      widget.onLocationSelected!({
-        'locationName': prediction.description,
-        'position': _currentPosition,
-        'coordinates': _currentPosition != null 
-          ? '${_currentPosition!.latitude},${_currentPosition!.longitude}'
-          : null,
-      });
+      widget.onLocationSelected!(
+        {
+          'locationName': prediction.description,
+          'position': _currentPosition,
+          'coordinates': _currentPosition != null
+              ? '${_currentPosition!.latitude},${_currentPosition!.longitude}'
+              : null,
+        },
+      );
     }
   }
 
@@ -262,7 +267,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Location'),
+        title: const Text(
+          'Select Location',
+          style: TextStyle(
+            color: ColorGlobalVariables.brownColor,
+          ),
+          ),
         centerTitle: true,
         actions: [
           if (_selectedLocation != null)
@@ -272,9 +282,9 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 Navigator.pop(context, {
                   'locationName': _selectedLocation,
                   'position': _currentPosition,
-                  'coordinates': _currentPosition != null 
-                    ? '${_currentPosition!.latitude},${_currentPosition!.longitude}'
-                    : null,
+                  'coordinates': _currentPosition != null
+                      ? '${_currentPosition!.latitude},${_currentPosition!.longitude}'
+                      : null,
                 });
               },
               tooltip: 'Confirm selection',
@@ -336,7 +346,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.red[50],
+          color: Colors.red.shade50,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -346,7 +356,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             Expanded(
               child: Text(
                 'Location permission denied. Tap to enable.',
-                style: TextStyle(color: Colors.red[700]),
+                style: TextStyle(color: Colors.red.shade700),
               ),
             ),
           ],
@@ -361,7 +371,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.orange[50],
+          color: Colors.orange.shade50,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -371,7 +381,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             Expanded(
               child: Text(
                 'Location services disabled. Tap to enable.',
-                style: TextStyle(color: Colors.orange[700]),
+                style: TextStyle(color: Colors.orange.shade700),
               ),
             ),
           ],
@@ -393,14 +403,14 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             Icon(
               Icons.location_on,
               size: 48,
-              color: Colors.grey[400],
+              color: Colors.grey.shade400,
             ),
             const SizedBox(height: 16),
             Text(
               _searchController.text.isEmpty
                   ? 'Search for a location or use your current position'
                   : 'No locations found. Try a different search.',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: Colors.grey.shade600),
             ),
           ],
         ),

@@ -58,4 +58,6 @@ class HomeService {
       );
       return response.data;
   }
+    // get similar items by category
+
   }

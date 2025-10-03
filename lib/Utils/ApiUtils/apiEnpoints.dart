@@ -17,6 +17,7 @@ class ApiEndpoint{
   static const String categories = "/categories";
   static const String posts = "/posts";
   static const String canUpload = "/app/can-upload";
+  static const String similarItemsByCategory = "/app/similar-items-by-category";
   
   static const String resetPassword = '/reset-password';
   static const String sendResetPasswordOtp = '/send-reset-password-otp';

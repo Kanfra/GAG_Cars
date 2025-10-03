@@ -18,6 +18,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/itemCategoryModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/makeAndModelModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Services/CanUploadItemService/canUploadItemService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
@@ -116,6 +117,27 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
+  // Check if user can upload item
+  Future<bool> _checkCanUpload() async {
+    try {
+      final canUploadService = CanUploadItemService();
+      final result = await canUploadService.checkCanUpload(
+        categorySlug: selectedCategory?.slug ?? '',
+      );
+      
+      final bool canUpload = result['can_upload'] ?? false;
+      final String reason = result['reason'] ?? 'Unknown reason';
+      
+      logger.i("Can upload check: $canUpload, Reason: $reason");
+      
+      return canUpload;
+    } catch (e) {
+      logger.e("Error checking upload permission: $e");
+      // If there's an error checking, allow upload as fallback
+      return true;
+    }
+  }
+
   // form validation function
   Future<void> _formValidation() async {
     if (_formKey.currentState!.validate()) {
@@ -127,27 +149,51 @@ class _PostItemPageState extends State<PostItemPage> {
         );
         return;
       }
-      setState((){
+      
+      setState(() {
         _isSelling = true;
       });
-      try{
-        await sellCarFunction();
-        showCustomSnackBar(
-          backgroundColor: ColorGlobalVariables.greenColor,
-          title: 'Success',
-          message: 'Vehicle listed successfully'
-        );
+      
+      try {
+        // First check if user can upload
+        bool canUpload = await _checkCanUpload();
+        
+        if (canUpload) {
+          // User can upload - proceed with vehicle listing
+          await sellCarFunction();
+          showCustomSnackBar(
+            backgroundColor: ColorGlobalVariables.greenColor,
+            title: 'Success',
+            message: 'Vehicle listed successfully'
+          );
 
-        // optionally reset form or navigate away
-        // _formKey.currentState?.reset();
-        // Navigate.pop(context);
-      }catch(e){
+          // Navigate to homepage after successful upload
+          Navigator.pushNamedAndRemoveUntil(
+            context, 
+            RouteClass.getMainBottomNavigationPage(), 
+            (route) => false
+          );
+        } else {
+          // User cannot upload - navigate to PromotionPage
+          showCustomSnackBar(
+            backgroundColor: ColorGlobalVariables.blueColor,
+            title: 'Information',
+            message: 'Please complete promotion requirements to list your vehicle'
+          );
+          
+          // Navigate to PromotionPage
+          Navigator.pushNamed(
+            context, 
+            RouteClass.getPromotionsPage() // Make sure this route exists in your RouteClass
+          );
+        }
+      } catch (e) {
         showCustomSnackBar(
           backgroundColor: ColorGlobalVariables.redColor,
           title: 'Error',
           message: 'Failed to list vehicle: ${e.toString()}'
         );
-      } finally{
+      } finally {
         setState(() {
           _isSelling = false;
         });

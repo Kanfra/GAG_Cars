@@ -33,32 +33,42 @@ String formatNumber({
 
 // date time formatter
 String formatTimeAgo(String isoDate) {
-  final date = Jiffy.parse(isoDate);
-  final now = Jiffy.now();
-  final diffInDays = now.diff(date, unit: Unit.day);
+  // Add null/empty check at the beginning
+  if (isoDate.isEmpty) {
+    return 'Recently';
+  }
+  
+  try {
+    final date = Jiffy.parse(isoDate);
+    final now = Jiffy.now();
+    final diffInDays = now.diff(date, unit: Unit.day);
 
-  // Less than 1 day ago (show relative time)
-  if (diffInDays == 0) {
-    final diffInHours = now.diff(date, unit: Unit.hour);
-    if (diffInHours > 0) {
-      return '$diffInHours ${diffInHours == 1 ? 'hour' : 'hours'} ago';
-    } else {
-      final diffInMinutes = now.diff(date, unit: Unit.minute);
-      return diffInMinutes > 1 ? '$diffInMinutes minutes ago' : 'Just now';
+    // Less than 1 day ago (show relative time)
+    if (diffInDays == 0) {
+      final diffInHours = now.diff(date, unit: Unit.hour);
+      if (diffInHours > 0) {
+        return '$diffInHours ${diffInHours == 1 ? 'hour' : 'hours'} ago';
+      } else {
+        final diffInMinutes = now.diff(date, unit: Unit.minute);
+        return diffInMinutes > 1 ? '$diffInMinutes minutes ago' : 'Just now';
+      }
+    } 
+    // 1-30 days ago (show "X days ago" + time)
+    else if (diffInDays <= 30) {
+      return '${diffInDays} ${diffInDays == 1 ? 'day' : 'days'} ago at ${date.format(pattern: "h:mm a")}';
     }
-  } 
-  // 1-30 days ago (show "X days ago" + time)
-  else if (diffInDays <= 30) {
-    return '${diffInDays} ${diffInDays == 1 ? 'day' : 'days'} ago at ${date.format(pattern: "h:mm a")}';
-  }
-  // 1-12 months ago (show "X months ago" + time)
-  else if (diffInDays <= 365) {
-    final months = (diffInDays / 30).floor();
-    return '$months ${months == 1 ? 'month' : 'months'} ago at ${date.format(pattern: "h:mm a")}';
-  }
-  // Older than 1 year (show full date + time)
-  else {
-    return date.format(pattern: "MMM d, y 'at' h:mm a");
+    // 1-12 months ago (show "X months ago" + time)
+    else if (diffInDays <= 365) {
+      final months = (diffInDays / 30).floor();
+      return '$months ${months == 1 ? 'month' : 'months'} ago at ${date.format(pattern: "h:mm a")}';
+    }
+    // Older than 1 year (show full date + time)
+    else {
+      return date.format(pattern: "MMM d, y 'at' h:mm a");
+    }
+  } catch (e) {
+    // Handle any parsing errors
+    return 'Recently';
   }
 }
 

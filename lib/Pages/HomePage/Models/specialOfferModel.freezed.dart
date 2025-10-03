@@ -169,9 +169,7 @@ class _$SpecialOfferResponseImpl
     with DiagnosticableTreeMixin
     implements _SpecialOfferResponse {
   const _$SpecialOfferResponseImpl(
-      {required final List<SpecialOffer> data,
-      required this.links,
-      required this.meta})
+      {final List<SpecialOffer> data = const [], this.links, this.meta})
       : _data = data;
 
   factory _$SpecialOfferResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -179,6 +177,7 @@ class _$SpecialOfferResponseImpl
 
   final List<SpecialOffer> _data;
   @override
+  @JsonKey()
   List<SpecialOffer> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
@@ -240,9 +239,9 @@ class _$SpecialOfferResponseImpl
 
 abstract class _SpecialOfferResponse implements SpecialOfferResponse {
   const factory _SpecialOfferResponse(
-      {required final List<SpecialOffer> data,
-      required final PaginationLinks? links,
-      required final PaginationMeta? meta}) = _$SpecialOfferResponseImpl;
+      {final List<SpecialOffer> data,
+      final PaginationLinks? links,
+      final PaginationMeta? meta}) = _$SpecialOfferResponseImpl;
 
   factory _SpecialOfferResponse.fromJson(Map<String, dynamic> json) =
       _$SpecialOfferResponseImpl.fromJson;
@@ -268,24 +267,26 @@ SpecialOffer _$SpecialOfferFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SpecialOffer {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'item_id')
+  @JsonKey(name: 'item_id', fromJson: _parseString)
   String get itemId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'start_at')
+  @JsonKey(name: 'start_at', fromJson: _parseString)
   String get startAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'end_at')
+  @JsonKey(name: 'end_at', fromJson: _parseString)
   String get endAt => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get status => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
   int get discount => throw _privateConstructorUsedError;
-  @JsonKey(name: 'discount_type')
+  @JsonKey(name: 'discount_type', fromJson: _parseString)
   String get discountType => throw _privateConstructorUsedError;
-  String? get description =>
-      throw _privateConstructorUsedError; // Changed from required
-  @JsonKey(name: 'created_at')
+  String? get description => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   String get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   String get updatedAt => throw _privateConstructorUsedError;
   Item? get item => throw _privateConstructorUsedError;
 
@@ -306,17 +307,18 @@ abstract class $SpecialOfferCopyWith<$Res> {
       _$SpecialOfferCopyWithImpl<$Res, SpecialOffer>;
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'item_id') String itemId,
-      @JsonKey(name: 'start_at') String startAt,
-      @JsonKey(name: 'end_at') String endAt,
-      String status,
-      int discount,
-      @JsonKey(name: 'discount_type') String discountType,
+      @JsonKey(name: 'item_id', fromJson: _parseString) String itemId,
+      @JsonKey(name: 'start_at', fromJson: _parseString) String startAt,
+      @JsonKey(name: 'end_at', fromJson: _parseString) String endAt,
+      @JsonKey(fromJson: _parseString) String status,
+      @JsonKey(fromJson: _parseInt) int discount,
+      @JsonKey(name: 'discount_type', fromJson: _parseString)
+      String discountType,
       String? description,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString) String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString) String updatedAt,
       Item? item});
 
   $ItemCopyWith<$Res>? get item;
@@ -426,17 +428,18 @@ abstract class _$$SpecialOfferImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'item_id') String itemId,
-      @JsonKey(name: 'start_at') String startAt,
-      @JsonKey(name: 'end_at') String endAt,
-      String status,
-      int discount,
-      @JsonKey(name: 'discount_type') String discountType,
+      @JsonKey(name: 'item_id', fromJson: _parseString) String itemId,
+      @JsonKey(name: 'start_at', fromJson: _parseString) String startAt,
+      @JsonKey(name: 'end_at', fromJson: _parseString) String endAt,
+      @JsonKey(fromJson: _parseString) String status,
+      @JsonKey(fromJson: _parseInt) int discount,
+      @JsonKey(name: 'discount_type', fromJson: _parseString)
+      String discountType,
       String? description,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString) String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString) String updatedAt,
       Item? item});
 
   @override
@@ -526,51 +529,56 @@ class __$$SpecialOfferImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$SpecialOfferImpl with DiagnosticableTreeMixin implements _SpecialOffer {
   const _$SpecialOfferImpl(
-      {required this.id,
+      {@JsonKey(fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'item_id') required this.itemId,
-      @JsonKey(name: 'start_at') required this.startAt,
-      @JsonKey(name: 'end_at') required this.endAt,
-      required this.status,
-      required this.discount,
-      @JsonKey(name: 'discount_type') required this.discountType,
+      @JsonKey(name: 'item_id', fromJson: _parseString) required this.itemId,
+      @JsonKey(name: 'start_at', fromJson: _parseString) required this.startAt,
+      @JsonKey(name: 'end_at', fromJson: _parseString) required this.endAt,
+      @JsonKey(fromJson: _parseString) required this.status,
+      @JsonKey(fromJson: _parseInt) required this.discount,
+      @JsonKey(name: 'discount_type', fromJson: _parseString)
+      required this.discountType,
       this.description,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString)
+      required this.createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString)
+      required this.updatedAt,
       this.item});
 
   factory _$SpecialOfferImpl.fromJson(Map<String, dynamic> json) =>
       _$$SpecialOfferImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
   @override
-  @JsonKey(name: 'item_id')
+  @JsonKey(name: 'item_id', fromJson: _parseString)
   final String itemId;
   @override
-  @JsonKey(name: 'start_at')
+  @JsonKey(name: 'start_at', fromJson: _parseString)
   final String startAt;
   @override
-  @JsonKey(name: 'end_at')
+  @JsonKey(name: 'end_at', fromJson: _parseString)
   final String endAt;
   @override
+  @JsonKey(fromJson: _parseString)
   final String status;
   @override
+  @JsonKey(fromJson: _parseInt)
   final int discount;
   @override
-  @JsonKey(name: 'discount_type')
+  @JsonKey(name: 'discount_type', fromJson: _parseString)
   final String discountType;
   @override
   final String? description;
-// Changed from required
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   final String createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   final String updatedAt;
   @override
   final Item? item;
@@ -658,50 +666,59 @@ class _$SpecialOfferImpl with DiagnosticableTreeMixin implements _SpecialOffer {
 
 abstract class _SpecialOffer implements SpecialOffer {
   const factory _SpecialOffer(
-      {required final int id,
+      {@JsonKey(fromJson: _parseInt) required final int id,
       @JsonKey(name: 'user_id') final String? userId,
-      @JsonKey(name: 'item_id') required final String itemId,
-      @JsonKey(name: 'start_at') required final String startAt,
-      @JsonKey(name: 'end_at') required final String endAt,
-      required final String status,
-      required final int discount,
-      @JsonKey(name: 'discount_type') required final String discountType,
+      @JsonKey(name: 'item_id', fromJson: _parseString)
+      required final String itemId,
+      @JsonKey(name: 'start_at', fromJson: _parseString)
+      required final String startAt,
+      @JsonKey(name: 'end_at', fromJson: _parseString)
+      required final String endAt,
+      @JsonKey(fromJson: _parseString) required final String status,
+      @JsonKey(fromJson: _parseInt) required final int discount,
+      @JsonKey(name: 'discount_type', fromJson: _parseString)
+      required final String discountType,
       final String? description,
-      @JsonKey(name: 'created_at') required final String createdAt,
-      @JsonKey(name: 'updated_at') required final String updatedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString)
+      required final String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString)
+      required final String updatedAt,
       final Item? item}) = _$SpecialOfferImpl;
 
   factory _SpecialOffer.fromJson(Map<String, dynamic> json) =
       _$SpecialOfferImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
   @JsonKey(name: 'user_id')
   String? get userId;
   @override
-  @JsonKey(name: 'item_id')
+  @JsonKey(name: 'item_id', fromJson: _parseString)
   String get itemId;
   @override
-  @JsonKey(name: 'start_at')
+  @JsonKey(name: 'start_at', fromJson: _parseString)
   String get startAt;
   @override
-  @JsonKey(name: 'end_at')
+  @JsonKey(name: 'end_at', fromJson: _parseString)
   String get endAt;
   @override
+  @JsonKey(fromJson: _parseString)
   String get status;
   @override
+  @JsonKey(fromJson: _parseInt)
   int get discount;
   @override
-  @JsonKey(name: 'discount_type')
+  @JsonKey(name: 'discount_type', fromJson: _parseString)
   String get discountType;
   @override
-  String? get description; // Changed from required
+  String? get description;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   String get createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   String get updatedAt;
   @override
   Item? get item;
@@ -720,76 +737,56 @@ Item _$ItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Item {
+  @JsonKey(fromJson: _parseString)
   String get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'country_id')
-  int? get countryId =>
-      throw _privateConstructorUsedError; // Changed from required
-  @JsonKey(name: 'brand_model_id')
-  int? get brandModelId =>
-      throw _privateConstructorUsedError; // Changed from required
-  @JsonKey(name: 'brand_id')
-  int? get brandId =>
-      throw _privateConstructorUsedError; // Changed from required
-  @JsonKey(name: 'category_id')
-  int? get categoryId =>
-      throw _privateConstructorUsedError; // Changed from required
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  int? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+  int? get brandModelId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  int? get brandId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'category_id', fromJson: _parseInt)
+  int? get categoryId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
-  String? get year =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get slug =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get description =>
-      throw _privateConstructorUsedError; // Changed from required
-  List<String>? get images =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get location =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get year => throw _privateConstructorUsedError;
+  String? get slug => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  List<String>? get images => throw _privateConstructorUsedError;
+  String? get location => throw _privateConstructorUsedError;
   @JsonKey(name: 'serial_number')
   String? get serialNumber => throw _privateConstructorUsedError;
-  String? get condition =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get condition => throw _privateConstructorUsedError;
   @JsonKey(name: 'steer_position')
   String? get steerPosition => throw _privateConstructorUsedError;
   @JsonKey(name: 'engine_capacity')
-  String? get engineCapacity =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get engineCapacity => throw _privateConstructorUsedError;
   String? get transmission => throw _privateConstructorUsedError;
-  String? get color =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: 'build_type')
   String? get buildType => throw _privateConstructorUsedError;
-  @JsonKey(name: 'number_of_passengers')
-  int? get numberOfPassengers =>
-      throw _privateConstructorUsedError; // Changed from required
-  List<String>? get features =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get status =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get price =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get mileage =>
-      throw _privateConstructorUsedError; // Changed from required
-  int? get warranty =>
-      throw _privateConstructorUsedError; // Changed from required
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+  int? get numberOfPassengers => throw _privateConstructorUsedError;
+  List<String>? get features => throw _privateConstructorUsedError;
+  String? get status => throw _privateConstructorUsedError;
+  String? get price => throw _privateConstructorUsedError;
+  String? get mileage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
+  int? get warranty => throw _privateConstructorUsedError;
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
   String? get deletedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String? get createdAt =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  String? get updatedAt =>
-      throw _privateConstructorUsedError; // Changed from required
-  Brand? get brand =>
-      throw _privateConstructorUsedError; // Changed from required
-  Category? get category =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get updatedAt => throw _privateConstructorUsedError;
+  Brand? get brand => throw _privateConstructorUsedError;
+  Category? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'brand_model')
-  BrandModel? get brandModel =>
-      throw _privateConstructorUsedError; // Removed duplicate BrandModel field
+  BrandModel? get brandModel => throw _privateConstructorUsedError;
   Map<String, dynamic>? get user => throw _privateConstructorUsedError;
 
   /// Serializes this Item to a JSON map.
@@ -807,13 +804,13 @@ abstract class $ItemCopyWith<$Res> {
       _$ItemCopyWithImpl<$Res, Item>;
   @useResult
   $Res call(
-      {String id,
+      {@JsonKey(fromJson: _parseString) String id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id') int? countryId,
-      @JsonKey(name: 'brand_model_id') int? brandModelId,
-      @JsonKey(name: 'brand_id') int? brandId,
-      @JsonKey(name: 'category_id') int? categoryId,
-      String name,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt) int? categoryId,
+      @JsonKey(fromJson: _parseString) String name,
       String? year,
       String? slug,
       String? description,
@@ -826,12 +823,13 @@ abstract class $ItemCopyWith<$Res> {
       String? transmission,
       String? color,
       @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      int? numberOfPassengers,
       List<String>? features,
       String? status,
       String? price,
       String? mileage,
-      int? warranty,
+      @JsonKey(fromJson: _parseInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
       @JsonKey(name: 'created_at') String? createdAt,
@@ -1082,13 +1080,13 @@ abstract class _$$ItemImplCopyWith<$Res> implements $ItemCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {String id,
+      {@JsonKey(fromJson: _parseString) String id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id') int? countryId,
-      @JsonKey(name: 'brand_model_id') int? brandModelId,
-      @JsonKey(name: 'brand_id') int? brandId,
-      @JsonKey(name: 'category_id') int? categoryId,
-      String name,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt) int? categoryId,
+      @JsonKey(fromJson: _parseString) String name,
       String? year,
       String? slug,
       String? description,
@@ -1101,12 +1099,13 @@ abstract class _$$ItemImplCopyWith<$Res> implements $ItemCopyWith<$Res> {
       String? transmission,
       String? color,
       @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      int? numberOfPassengers,
       List<String>? features,
       String? status,
       String? price,
       String? mileage,
-      int? warranty,
+      @JsonKey(fromJson: _parseInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
       @JsonKey(name: 'created_at') String? createdAt,
@@ -1311,13 +1310,13 @@ class __$$ItemImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   const _$ItemImpl(
-      {required this.id,
+      {@JsonKey(fromJson: _parseString) required this.id,
       @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'country_id') this.countryId,
-      @JsonKey(name: 'brand_model_id') this.brandModelId,
-      @JsonKey(name: 'brand_id') this.brandId,
-      @JsonKey(name: 'category_id') this.categoryId,
-      required this.name,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) this.countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) this.brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) this.brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt) this.categoryId,
+      @JsonKey(fromJson: _parseString) required this.name,
       this.year,
       this.slug,
       this.description,
@@ -1330,12 +1329,13 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
       this.transmission,
       this.color,
       @JsonKey(name: 'build_type') this.buildType,
-      @JsonKey(name: 'number_of_passengers') this.numberOfPassengers,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      this.numberOfPassengers,
       final List<String>? features,
       this.status,
       this.price,
       this.mileage,
-      this.warranty,
+      @JsonKey(fromJson: _parseInt) this.warranty,
       @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
@@ -1352,39 +1352,33 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
       _$$ItemImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String id;
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
   @override
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
   final int? countryId;
-// Changed from required
   @override
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
   final int? brandModelId;
-// Changed from required
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   final int? brandId;
-// Changed from required
   @override
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseInt)
   final int? categoryId;
-// Changed from required
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
   final String? year;
-// Changed from required
   @override
   final String? slug;
-// Changed from required
   @override
   final String? description;
-// Changed from required
   final List<String>? _images;
-// Changed from required
   @override
   List<String>? get images {
     final value = _images;
@@ -1394,37 +1388,30 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
     return EqualUnmodifiableListView(value);
   }
 
-// Changed from required
   @override
   final String? location;
-// Changed from required
   @override
   @JsonKey(name: 'serial_number')
   final String? serialNumber;
   @override
   final String? condition;
-// Changed from required
   @override
   @JsonKey(name: 'steer_position')
   final String? steerPosition;
   @override
   @JsonKey(name: 'engine_capacity')
   final String? engineCapacity;
-// Changed from required
   @override
   final String? transmission;
   @override
   final String? color;
-// Changed from required
   @override
   @JsonKey(name: 'build_type')
   final String? buildType;
   @override
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
   final int? numberOfPassengers;
-// Changed from required
   final List<String>? _features;
-// Changed from required
   @override
   List<String>? get features {
     final value = _features;
@@ -1434,19 +1421,15 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
     return EqualUnmodifiableListView(value);
   }
 
-// Changed from required
   @override
   final String? status;
-// Changed from required
   @override
   final String? price;
-// Changed from required
   @override
   final String? mileage;
-// Changed from required
   @override
+  @JsonKey(fromJson: _parseInt)
   final int? warranty;
-// Changed from required
   @override
   @JsonKey(name: 'warranty_expiration')
   final String? warrantyExpiration;
@@ -1456,23 +1439,17 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
-// Changed from required
   @override
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
-// Changed from required
   @override
   final Brand? brand;
-// Changed from required
   @override
   final Category? category;
-// Changed from required
   @override
   @JsonKey(name: 'brand_model')
   final BrandModel? brandModel;
-// Removed duplicate BrandModel field
   final Map<String, dynamic>? _user;
-// Removed duplicate BrandModel field
   @override
   @JsonKey()
   Map<String, dynamic>? get user {
@@ -1644,13 +1621,14 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
 
 abstract class _Item implements Item {
   const factory _Item(
-      {required final String id,
+      {@JsonKey(fromJson: _parseString) required final String id,
       @JsonKey(name: 'user_id') final String? userId,
-      @JsonKey(name: 'country_id') final int? countryId,
-      @JsonKey(name: 'brand_model_id') final int? brandModelId,
-      @JsonKey(name: 'brand_id') final int? brandId,
-      @JsonKey(name: 'category_id') final int? categoryId,
-      required final String name,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) final int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+      final int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) final int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt) final int? categoryId,
+      @JsonKey(fromJson: _parseString) required final String name,
       final String? year,
       final String? slug,
       final String? description,
@@ -1663,12 +1641,13 @@ abstract class _Item implements Item {
       final String? transmission,
       final String? color,
       @JsonKey(name: 'build_type') final String? buildType,
-      @JsonKey(name: 'number_of_passengers') final int? numberOfPassengers,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      final int? numberOfPassengers,
       final List<String>? features,
       final String? status,
       final String? price,
       final String? mileage,
-      final int? warranty,
+      @JsonKey(fromJson: _parseInt) final int? warranty,
       @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') final String? deletedAt,
       @JsonKey(name: 'created_at') final String? createdAt,
@@ -1681,65 +1660,68 @@ abstract class _Item implements Item {
   factory _Item.fromJson(Map<String, dynamic> json) = _$ItemImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseString)
   String get id;
   @override
   @JsonKey(name: 'user_id')
   String? get userId;
   @override
-  @JsonKey(name: 'country_id')
-  int? get countryId; // Changed from required
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  int? get countryId;
   @override
-  @JsonKey(name: 'brand_model_id')
-  int? get brandModelId; // Changed from required
+  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+  int? get brandModelId;
   @override
-  @JsonKey(name: 'brand_id')
-  int? get brandId; // Changed from required
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  int? get brandId;
   @override
-  @JsonKey(name: 'category_id')
-  int? get categoryId; // Changed from required
+  @JsonKey(name: 'category_id', fromJson: _parseInt)
+  int? get categoryId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
-  String? get year; // Changed from required
+  String? get year;
   @override
-  String? get slug; // Changed from required
+  String? get slug;
   @override
-  String? get description; // Changed from required
+  String? get description;
   @override
-  List<String>? get images; // Changed from required
+  List<String>? get images;
   @override
-  String? get location; // Changed from required
+  String? get location;
   @override
   @JsonKey(name: 'serial_number')
   String? get serialNumber;
   @override
-  String? get condition; // Changed from required
+  String? get condition;
   @override
   @JsonKey(name: 'steer_position')
   String? get steerPosition;
   @override
   @JsonKey(name: 'engine_capacity')
-  String? get engineCapacity; // Changed from required
+  String? get engineCapacity;
   @override
   String? get transmission;
   @override
-  String? get color; // Changed from required
+  String? get color;
   @override
   @JsonKey(name: 'build_type')
   String? get buildType;
   @override
-  @JsonKey(name: 'number_of_passengers')
-  int? get numberOfPassengers; // Changed from required
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+  int? get numberOfPassengers;
   @override
-  List<String>? get features; // Changed from required
+  List<String>? get features;
   @override
-  String? get status; // Changed from required
+  String? get status;
   @override
-  String? get price; // Changed from required
+  String? get price;
   @override
-  String? get mileage; // Changed from required
+  String? get mileage;
   @override
-  int? get warranty; // Changed from required
+  @JsonKey(fromJson: _parseInt)
+  int? get warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration;
@@ -1748,17 +1730,17 @@ abstract class _Item implements Item {
   String? get deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  String? get createdAt; // Changed from required
+  String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  String? get updatedAt; // Changed from required
+  String? get updatedAt;
   @override
-  Brand? get brand; // Changed from required
+  Brand? get brand;
   @override
-  Category? get category; // Changed from required
+  Category? get category;
   @override
   @JsonKey(name: 'brand_model')
-  BrandModel? get brandModel; // Removed duplicate BrandModel field
+  BrandModel? get brandModel;
   @override
   Map<String, dynamic>? get user;
 
@@ -1776,17 +1758,16 @@ Brand _$BrandFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Brand {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
-  String? get slug =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get image =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get slug => throw _privateConstructorUsedError;
+  String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String? get createdAt =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
@@ -1805,9 +1786,9 @@ abstract class $BrandCopyWith<$Res> {
       _$BrandCopyWithImpl<$Res, Brand>;
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
-      String name,
+      @JsonKey(fromJson: _parseString) String name,
       String? slug,
       String? image,
       @JsonKey(name: 'created_at') String? createdAt,
@@ -1878,9 +1859,9 @@ abstract class _$$BrandImplCopyWith<$Res> implements $BrandCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
-      String name,
+      @JsonKey(fromJson: _parseString) String name,
       String? slug,
       String? image,
       @JsonKey(name: 'created_at') String? createdAt,
@@ -1945,9 +1926,9 @@ class __$$BrandImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
   const _$BrandImpl(
-      {required this.id,
+      {@JsonKey(fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id') this.userId,
-      required this.name,
+      @JsonKey(fromJson: _parseString) required this.name,
       this.slug,
       this.image,
       @JsonKey(name: 'created_at') this.createdAt,
@@ -1957,22 +1938,21 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
       _$$BrandImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
   @JsonKey(name: 'user_id')
   final String? userId;
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
   final String? slug;
-// Changed from required
   @override
   final String? image;
-// Changed from required
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
-// Changed from required
   @override
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
@@ -2035,9 +2015,9 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
 
 abstract class _Brand implements Brand {
   const factory _Brand(
-      {required final int id,
+      {@JsonKey(fromJson: _parseInt) required final int id,
       @JsonKey(name: 'user_id') final String? userId,
-      required final String name,
+      @JsonKey(fromJson: _parseString) required final String name,
       final String? slug,
       final String? image,
       @JsonKey(name: 'created_at') final String? createdAt,
@@ -2046,19 +2026,21 @@ abstract class _Brand implements Brand {
   factory _Brand.fromJson(Map<String, dynamic> json) = _$BrandImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
   @JsonKey(name: 'user_id')
   String? get userId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
-  String? get slug; // Changed from required
+  String? get slug;
   @override
-  String? get image; // Changed from required
+  String? get image;
   @override
   @JsonKey(name: 'created_at')
-  String? get createdAt; // Changed from required
+  String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
   String? get updatedAt;
@@ -2077,23 +2059,20 @@ Category _$CategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Category {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'parent_id')
   String? get parentId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
-  String? get slug =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get description =>
-      throw _privateConstructorUsedError; // Changed from required
-  List<String>? get features =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get image =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get slug => throw _privateConstructorUsedError;
+  String? get description => throw _privateConstructorUsedError;
+  List<String>? get features => throw _privateConstructorUsedError;
+  String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String? get createdAt =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
@@ -2113,10 +2092,10 @@ abstract class $CategoryCopyWith<$Res> {
       _$CategoryCopyWithImpl<$Res, Category>;
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
       @JsonKey(name: 'parent_id') String? parentId,
-      String name,
+      @JsonKey(fromJson: _parseString) String name,
       String? slug,
       String? description,
       List<String>? features,
@@ -2205,10 +2184,10 @@ abstract class _$$CategoryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
+      {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
       @JsonKey(name: 'parent_id') String? parentId,
-      String name,
+      @JsonKey(fromJson: _parseString) String name,
       String? slug,
       String? description,
       List<String>? features,
@@ -2290,10 +2269,10 @@ class __$$CategoryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   const _$CategoryImpl(
-      {required this.id,
+      {@JsonKey(fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id') this.userId,
       @JsonKey(name: 'parent_id') this.parentId,
-      required this.name,
+      @JsonKey(fromJson: _parseString) required this.name,
       this.slug,
       this.description,
       final List<String>? features,
@@ -2306,6 +2285,7 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
       _$$CategoryImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
   @JsonKey(name: 'user_id')
@@ -2314,15 +2294,13 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   @JsonKey(name: 'parent_id')
   final String? parentId;
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
   final String? slug;
-// Changed from required
   @override
   final String? description;
-// Changed from required
   final List<String>? _features;
-// Changed from required
   @override
   List<String>? get features {
     final value = _features;
@@ -2332,14 +2310,11 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
     return EqualUnmodifiableListView(value);
   }
 
-// Changed from required
   @override
   final String? image;
-// Changed from required
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
-// Changed from required
   @override
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
@@ -2420,10 +2395,10 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-      {required final int id,
+      {@JsonKey(fromJson: _parseInt) required final int id,
       @JsonKey(name: 'user_id') final String? userId,
       @JsonKey(name: 'parent_id') final String? parentId,
-      required final String name,
+      @JsonKey(fromJson: _parseString) required final String name,
       final String? slug,
       final String? description,
       final List<String>? features,
@@ -2435,6 +2410,7 @@ abstract class _Category implements Category {
       _$CategoryImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
   @JsonKey(name: 'user_id')
@@ -2443,18 +2419,19 @@ abstract class _Category implements Category {
   @JsonKey(name: 'parent_id')
   String? get parentId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
-  String? get slug; // Changed from required
+  String? get slug;
   @override
-  String? get description; // Changed from required
+  String? get description;
   @override
-  List<String>? get features; // Changed from required
+  List<String>? get features;
   @override
-  String? get image; // Changed from required
+  String? get image;
   @override
   @JsonKey(name: 'created_at')
-  String? get createdAt; // Changed from required
+  String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
   String? get updatedAt;
@@ -2473,16 +2450,15 @@ BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BrandModel {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id')
-  int? get brandId =>
-      throw _privateConstructorUsedError; // Changed from required
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  int? get brandId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
-  String? get slug =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get slug => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String? get createdAt =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
@@ -2503,9 +2479,9 @@ abstract class $BrandModelCopyWith<$Res> {
       _$BrandModelCopyWithImpl<$Res, BrandModel>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'brand_id') int? brandId,
-      String name,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
+      @JsonKey(fromJson: _parseString) String name,
       String? slug,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt});
@@ -2571,9 +2547,9 @@ abstract class _$$BrandModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'brand_id') int? brandId,
-      String name,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
+      @JsonKey(fromJson: _parseString) String name,
       String? slug,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt});
@@ -2632,9 +2608,9 @@ class __$$BrandModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
   const _$BrandModelImpl(
-      {required this.id,
-      @JsonKey(name: 'brand_id') this.brandId,
-      required this.name,
+      {@JsonKey(fromJson: _parseInt) required this.id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) this.brandId,
+      @JsonKey(fromJson: _parseString) required this.name,
       this.slug,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt});
@@ -2643,20 +2619,19 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
       _$$BrandModelImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   final int? brandId;
-// Changed from required
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
   final String? slug;
-// Changed from required
   @override
   @JsonKey(name: 'created_at')
   final String? createdAt;
-// Changed from required
   @override
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
@@ -2717,9 +2692,9 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
 
 abstract class _BrandModel implements BrandModel {
   const factory _BrandModel(
-      {required final int id,
-      @JsonKey(name: 'brand_id') final int? brandId,
-      required final String name,
+      {@JsonKey(fromJson: _parseInt) required final int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) final int? brandId,
+      @JsonKey(fromJson: _parseString) required final String name,
       final String? slug,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt}) = _$BrandModelImpl;
@@ -2728,17 +2703,19 @@ abstract class _BrandModel implements BrandModel {
       _$BrandModelImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
-  @JsonKey(name: 'brand_id')
-  int? get brandId; // Changed from required
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  int? get brandId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
-  String? get slug; // Changed from required
+  String? get slug;
   @override
   @JsonKey(name: 'created_at')
-  String? get createdAt; // Changed from required
+  String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
   String? get updatedAt;
@@ -2972,20 +2949,19 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationMeta {
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseInt)
   int get currentPage => throw _privateConstructorUsedError;
-  int? get from => throw _privateConstructorUsedError; // Changed from required
-  @JsonKey(name: 'last_page')
-  int? get lastPage =>
-      throw _privateConstructorUsedError; // Changed from required
-  List<PaginationMetaLink>? get links =>
-      throw _privateConstructorUsedError; // Changed from required
-  String? get path =>
-      throw _privateConstructorUsedError; // Changed from required
-  @JsonKey(name: 'per_page')
-  int? get perPage =>
-      throw _privateConstructorUsedError; // Changed from required
-  int? get to => throw _privateConstructorUsedError; // Changed from required
+  @JsonKey(fromJson: _parseInt)
+  int? get from => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_page', fromJson: _parseInt)
+  int? get lastPage => throw _privateConstructorUsedError;
+  List<PaginationMetaLink>? get links => throw _privateConstructorUsedError;
+  String? get path => throw _privateConstructorUsedError;
+  @JsonKey(name: 'per_page', fromJson: _parseInt)
+  int? get perPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
+  int? get to => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseInt)
   int? get total => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMeta to a JSON map.
@@ -3005,14 +2981,14 @@ abstract class $PaginationMetaCopyWith<$Res> {
       _$PaginationMetaCopyWithImpl<$Res, PaginationMeta>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int? from,
-      @JsonKey(name: 'last_page') int? lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
+      @JsonKey(fromJson: _parseInt) int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) int? lastPage,
       List<PaginationMetaLink>? links,
       String? path,
-      @JsonKey(name: 'per_page') int? perPage,
-      int? to,
-      int? total});
+      @JsonKey(name: 'per_page', fromJson: _parseInt) int? perPage,
+      @JsonKey(fromJson: _parseInt) int? to,
+      @JsonKey(fromJson: _parseInt) int? total});
 }
 
 /// @nodoc
@@ -3085,14 +3061,14 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int? from,
-      @JsonKey(name: 'last_page') int? lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
+      @JsonKey(fromJson: _parseInt) int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) int? lastPage,
       List<PaginationMetaLink>? links,
       String? path,
-      @JsonKey(name: 'per_page') int? perPage,
-      int? to,
-      int? total});
+      @JsonKey(name: 'per_page', fromJson: _parseInt) int? perPage,
+      @JsonKey(fromJson: _parseInt) int? to,
+      @JsonKey(fromJson: _parseInt) int? total});
 }
 
 /// @nodoc
@@ -3160,31 +3136,30 @@ class _$PaginationMetaImpl
     with DiagnosticableTreeMixin
     implements _PaginationMeta {
   const _$PaginationMetaImpl(
-      {@JsonKey(name: 'current_page') required this.currentPage,
-      this.from,
-      @JsonKey(name: 'last_page') this.lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt)
+      required this.currentPage,
+      @JsonKey(fromJson: _parseInt) this.from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) this.lastPage,
       final List<PaginationMetaLink>? links,
       this.path,
-      @JsonKey(name: 'per_page') this.perPage,
-      this.to,
-      this.total})
+      @JsonKey(name: 'per_page', fromJson: _parseInt) this.perPage,
+      @JsonKey(fromJson: _parseInt) this.to,
+      @JsonKey(fromJson: _parseInt) this.total})
       : _links = links;
 
   factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaImplFromJson(json);
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseInt)
   final int currentPage;
   @override
+  @JsonKey(fromJson: _parseInt)
   final int? from;
-// Changed from required
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseInt)
   final int? lastPage;
-// Changed from required
   final List<PaginationMetaLink>? _links;
-// Changed from required
   @override
   List<PaginationMetaLink>? get links {
     final value = _links;
@@ -3194,18 +3169,16 @@ class _$PaginationMetaImpl
     return EqualUnmodifiableListView(value);
   }
 
-// Changed from required
   @override
   final String? path;
-// Changed from required
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseInt)
   final int? perPage;
-// Changed from required
   @override
+  @JsonKey(fromJson: _parseInt)
   final int? to;
-// Changed from required
   @override
+  @JsonKey(fromJson: _parseInt)
   final int? total;
 
   @override
@@ -3269,36 +3242,40 @@ class _$PaginationMetaImpl
 
 abstract class _PaginationMeta implements PaginationMeta {
   const factory _PaginationMeta(
-      {@JsonKey(name: 'current_page') required final int currentPage,
-      final int? from,
-      @JsonKey(name: 'last_page') final int? lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseInt)
+      required final int currentPage,
+      @JsonKey(fromJson: _parseInt) final int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseInt) final int? lastPage,
       final List<PaginationMetaLink>? links,
       final String? path,
-      @JsonKey(name: 'per_page') final int? perPage,
-      final int? to,
-      final int? total}) = _$PaginationMetaImpl;
+      @JsonKey(name: 'per_page', fromJson: _parseInt) final int? perPage,
+      @JsonKey(fromJson: _parseInt) final int? to,
+      @JsonKey(fromJson: _parseInt) final int? total}) = _$PaginationMetaImpl;
 
   factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaImpl.fromJson;
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseInt)
   int get currentPage;
   @override
-  int? get from; // Changed from required
+  @JsonKey(fromJson: _parseInt)
+  int? get from;
   @override
-  @JsonKey(name: 'last_page')
-  int? get lastPage; // Changed from required
+  @JsonKey(name: 'last_page', fromJson: _parseInt)
+  int? get lastPage;
   @override
-  List<PaginationMetaLink>? get links; // Changed from required
+  List<PaginationMetaLink>? get links;
   @override
-  String? get path; // Changed from required
+  String? get path;
   @override
-  @JsonKey(name: 'per_page')
-  int? get perPage; // Changed from required
+  @JsonKey(name: 'per_page', fromJson: _parseInt)
+  int? get perPage;
   @override
-  int? get to; // Changed from required
+  @JsonKey(fromJson: _parseInt)
+  int? get to;
   @override
+  @JsonKey(fromJson: _parseInt)
   int? get total;
 
   /// Create a copy of PaginationMeta
@@ -3316,8 +3293,7 @@ PaginationMetaLink _$PaginationMetaLinkFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$PaginationMetaLink {
   String? get url => throw _privateConstructorUsedError;
-  String? get label =>
-      throw _privateConstructorUsedError; // Changed from required
+  String? get label => throw _privateConstructorUsedError;
   bool? get active => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMetaLink to a JSON map.
@@ -3434,7 +3410,6 @@ class _$PaginationMetaLinkImpl
   final String? url;
   @override
   final String? label;
-// Changed from required
   @override
   final bool? active;
 
@@ -3496,7 +3471,7 @@ abstract class _PaginationMetaLink implements PaginationMetaLink {
   @override
   String? get url;
   @override
-  String? get label; // Changed from required
+  String? get label;
   @override
   bool? get active;
 

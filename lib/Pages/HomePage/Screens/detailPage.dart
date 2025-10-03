@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
@@ -12,7 +13,12 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.d
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
@@ -39,6 +45,15 @@ class _DetailPageState extends State<DetailPage> {
   late final Map<String, dynamic> item;
   late final Map<String, dynamic>? product;
   late final String? type;
+  
+  // Lazy loading variables
+  late List<RecommendedItem> _filteredRecommendedItems = [];
+  int _currentRecommendedPage = 1;
+  bool _isLoadingMoreRecommended = false;
+  bool _hasMoreRecommended = true;
+  final int _recommendedItemsPerPage = 8;
+  final int _initialRecommendedItems = 4;
+  bool _isNearBottom = false;
 
   @override
   void initState() {
@@ -50,6 +65,7 @@ class _DetailPageState extends State<DetailPage> {
     // Use WidgetsBinding to ensure build is complete before loading category details
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadCategoryDetails();
+      _loadInitialRecommendedItems();
     });
     
     _scrollController.addListener(() {
@@ -65,6 +81,9 @@ class _DetailPageState extends State<DetailPage> {
           }
         });
       }
+
+      // Lazy loading detection
+      _checkLazyLoading();
     });
   }
 
@@ -78,6 +97,125 @@ class _DetailPageState extends State<DetailPage> {
       if (!categoryDetailProvider.categoryDetails.containsKey(categoryId)) {
         categoryDetailProvider.fetchCategoryDetail(categoryId);
       }
+    }
+  }
+
+  // Load initial recommended items
+  void _loadInitialRecommendedItems() {
+    if (!mounted) return;
+    
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    final currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    
+    List<RecommendedItem> allMatchingItems = [];
+    
+    if (currentItemCategoryId != null) {
+      // Filter recommended items that belong to the same category but exclude the current item
+      allMatchingItems = homeProvider.recommendedItems.where((recommendedItem) {
+        final recommendedCategoryId = recommendedItem.category?.id ?? recommendedItem.categoryId;
+        final isSameCategory = recommendedCategoryId == currentItemCategoryId;
+        final isNotCurrentItem = recommendedItem.id != item['id'];
+        return isSameCategory && isNotCurrentItem;
+      }).toList();
+    } else {
+      // Fallback: get recommended items excluding current item
+      allMatchingItems = homeProvider.recommendedItems
+          .where((recommendedItem) => recommendedItem.id != item['id'])
+          .toList();
+    }
+    
+    // Load initial batch
+    final endIndex = _initialRecommendedItems < allMatchingItems.length 
+        ? _initialRecommendedItems 
+        : allMatchingItems.length;
+    
+    _filteredRecommendedItems = allMatchingItems.sublist(0, endIndex);
+    
+    // Check if there are more items to load
+    _hasMoreRecommended = allMatchingItems.length > _initialRecommendedItems;
+    
+    print('🎯 Loaded ${_filteredRecommendedItems.length} initial recommended items');
+    print('🎯 Total matching items: ${allMatchingItems.length}, Has more: $_hasMoreRecommended');
+    
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  // Load more recommended items for lazy loading
+  Future<void> _loadMoreRecommendedItems() async {
+    if (_isLoadingMoreRecommended || !_hasMoreRecommended) return;
+    
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoadingMoreRecommended = true;
+    });
+    
+    // Simulate API call delay
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    if (!mounted) return;
+    
+    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+    final currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    
+    List<RecommendedItem> allMatchingItems = [];
+    
+    if (currentItemCategoryId != null) {
+      allMatchingItems = homeProvider.recommendedItems.where((recommendedItem) {
+        final recommendedCategoryId = recommendedItem.category?.id ?? recommendedItem.categoryId;
+        final isSameCategory = recommendedCategoryId == currentItemCategoryId;
+        final isNotCurrentItem = recommendedItem.id != item['id'];
+        return isSameCategory && isNotCurrentItem;
+      }).toList();
+    } else {
+      allMatchingItems = homeProvider.recommendedItems
+          .where((recommendedItem) => recommendedItem.id != item['id'])
+          .toList();
+    }
+    
+    final startIndex = _currentRecommendedPage * _initialRecommendedItems;
+    final endIndex = startIndex + _recommendedItemsPerPage;
+    
+    if (startIndex < allMatchingItems.length) {
+      final newItems = allMatchingItems.sublist(
+        startIndex,
+        endIndex < allMatchingItems.length ? endIndex : allMatchingItems.length
+      );
+      
+      _filteredRecommendedItems.addAll(newItems);
+      _currentRecommendedPage++;
+      
+      // Check if we have more items to load
+      _hasMoreRecommended = endIndex < allMatchingItems.length;
+      
+      print('🎯 Loaded ${newItems.length} more items. Total: ${_filteredRecommendedItems.length}');
+      print('🎯 Has more: $_hasMoreRecommended');
+    } else {
+      _hasMoreRecommended = false;
+    }
+    
+    if (mounted) {
+      setState(() {
+        _isLoadingMoreRecommended = false;
+      });
+    }
+  }
+
+  // Check if we need to load more items
+  void _checkLazyLoading() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 500 && // 500px from bottom
+        !_isLoadingMoreRecommended &&
+        _hasMoreRecommended &&
+        !_isNearBottom) {
+      
+      _isNearBottom = true;
+      _loadMoreRecommendedItems();
+    } else if (_scrollController.position.pixels <
+        _scrollController.position.maxScrollExtent - 600) {
+      _isNearBottom = false;
     }
   }
 
@@ -698,11 +836,24 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Build recommended item card matching homepage style
-  Widget _buildRecommendedItem(Map<String, dynamic> recommended, Size screenSize) {
+  // Build recommended item card matching homepage style - UPDATED TO USE RecommendedItem
+  Widget _buildRecommendedItem(RecommendedItem recommendedItem, Size screenSize) {
+    final firstImage = recommendedItem.images?.isNotEmpty == true
+        ? recommendedItem.images!.first
+        : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final brandImage = recommendedItem.brand?.image;
+    final isPromoted = recommendedItem.isPromoted == true;
+
     return GestureDetector(
       onTap: () {
-        // Navigate to detail page
+        Get.toNamed(
+          RouteClass.getDetailPage(),
+          arguments: {
+            'product': recommendedItem.toJson(),
+            'item': recommendedItem.toJson(),
+            'type': 'recommended',
+          },
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -729,7 +880,7 @@ class _DetailPageState extends State<DetailPage> {
                     width: double.infinity,
                     color: Colors.grey[100],
                     child: buildSafeImage(
-                      recommended["productImage"],
+                      firstImage,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -746,7 +897,7 @@ class _DetailPageState extends State<DetailPage> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      recommended["productType"] ?? 'Car',
+                      recommendedItem.category?.name ?? 'Car',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 9,
@@ -757,7 +908,7 @@ class _DetailPageState extends State<DetailPage> {
                 ),
                 
                 // Promoted Badge
-                if (recommended["productType"] == "PROMOTION")
+                if (isPromoted)
                   Positioned(
                     top: 6,
                     right: 6,
@@ -791,7 +942,7 @@ class _DetailPageState extends State<DetailPage> {
                   right: 6,
                   child: GestureDetector(
                     onTap: () {
-                      // Toggle wishlist
+                      // Toggle wishlist - you can implement this if needed
                     },
                     child: Container(
                       padding: const EdgeInsets.all(4),
@@ -807,9 +958,9 @@ class _DetailPageState extends State<DetailPage> {
                         ],
                       ),
                       child: Icon(
-                        recommended["isLiked"] ? Icons.favorite : Icons.favorite_border,
+                        Icons.favorite_border,
                         size: 16,
-                        color: recommended["isLiked"] ? ColorGlobalVariables.redColor : Colors.black54,
+                        color: Colors.black54,
                       ),
                     ),
                   ),
@@ -829,7 +980,7 @@ class _DetailPageState extends State<DetailPage> {
                     children: [
                       Expanded(
                         child: Text(
-                          recommended["productName"] ?? 'Unnamed Vehicle',
+                          recommendedItem.name ?? 'Unnamed Vehicle',
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -840,7 +991,7 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       Text(
-                        recommended["productNature"] ?? 'Used',
+                        recommendedItem.condition ?? 'Used',
                         style: TextStyle(
                           fontSize: 11,
                           color: Colors.grey[600],
@@ -856,20 +1007,20 @@ class _DetailPageState extends State<DetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵${recommended["cost"]}',
+                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommendedItem.price ?? '0'))}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: ColorGlobalVariables.redColor,
                         ),
                       ),
-                      if (recommended["mileage"] != null)
+                      if (recommendedItem.mileage != null)
                         Row(
                           children: [
                             Icon(Icons.speed, size: 12, color: Colors.grey[600]),
                             const SizedBox(width: 2),
                             Text(
-                              "${recommended["mileage"]} km",
+                              "${formatNumber(shortenerRequired: true, number: int.parse(recommendedItem.mileage!))} km",
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey[600],
@@ -887,54 +1038,60 @@ class _DetailPageState extends State<DetailPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Brand Logo
-                      recommended["productLogo"].toString().isNotEmpty 
-                          ? Container(
-                              width: 20,
-                              height: 20,
-                              child: CustomImage(
-                                imagePath: recommended["productLogo"],
-                                isAssetImage: true,
-                                isImageBorderRadiusRequired: false,
-                                fit: BoxFit.contain,
-                              ),
-                            )
-                          : const SizedBox(width: 20),
-                      
-                      // Transmission
-                      Row(
-                        children: [
-                          Icon(Icons.settings, size: 12, color: Colors.grey[600]),
-                          const SizedBox(width: 2),
-                          Text(
-                            recommended["driveType"] ?? 'Automatic',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey[600],
+                      if (brandImage != null)
+                        Container(
+                          width: 20,
+                          height: 20,
+                          child: CachedNetworkImage(
+                            imageUrl: getImageUrl(brandImage, null),
+                            fit: BoxFit.contain,
+                            errorWidget: (context, url, error) => Icon(
+                              Icons.business,
+                              size: 16,
+                              color: Colors.grey[400],
                             ),
                           ),
-                        ],
-                      ),
+                        )
+                      else
+                        const SizedBox(width: 20),
                       
-                      // Location
-                      Flexible(
-                        child: Row(
+                      // Transmission
+                      if (recommendedItem.transmission != null)
+                        Row(
                           children: [
-                            Icon(Icons.location_on, size: 12, color: Colors.grey[600]),
+                            Icon(Icons.settings, size: 12, color: Colors.grey[600]),
                             const SizedBox(width: 2),
-                            Flexible(
-                              child: Text(
-                                recommended["location"] ?? 'Location',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: Colors.grey[600],
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              recommendedItem.transmission!,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey[600],
                               ),
                             ),
                           ],
                         ),
-                      ),
+                      
+                      // Location
+                      if (recommendedItem.location != null)
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Icon(Icons.location_on, size: 12, color: Colors.grey[600]),
+                              const SizedBox(width: 2),
+                              Flexible(
+                                child: Text(
+                                  recommendedItem.location!,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                     ],
                   ),
                 ],
@@ -1405,36 +1562,76 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   const SizedBox(height: 24),
                   
-                  // Recommended Items Header
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(8, 0, 8, 12),
-                    child: Text(
-                      'Recommended for You',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                  // Recommended Items Header - ONLY SHOW IF WE HAVE ITEMS
+                  if (_filteredRecommendedItems.isNotEmpty || _isLoadingMoreRecommended) ...[
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(8, 0, 8, 12),
+                      child: Text(
+                        'Recommended for You',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
-                  ),
-                  
-                  // Recommended items grid view
-                  GridView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    itemCount: recommendeds.length,
-                    shrinkWrap: true,
-                    primary: false,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio: 0.72,
+                    
+                    // Recommended items grid view - NOW WITH LAZY LOADING
+                    GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      itemCount: _filteredRecommendedItems.length + (_isLoadingMoreRecommended ? 1 : 0),
+                      shrinkWrap: true,
+                      primary: false,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.72,
+                      ),
+                      itemBuilder: (context, index) {
+                        // Show loading indicator at the end
+                        if (index >= _filteredRecommendedItems.length) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                            ),
+                          );
+                        }
+                        
+                        final recommendedItem = _filteredRecommendedItems[index];
+                        return _buildRecommendedItem(recommendedItem, screenSize);
+                      },
                     ),
-                    itemBuilder: (context, index) {
-                      final recommended = recommendeds[index];
-                      return _buildRecommendedItem(recommended, screenSize);
-                    },
-                  ),
+                    
+                    // End of list message
+                    if (!_hasMoreRecommended && _filteredRecommendedItems.isNotEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Center(
+                          child: Text(
+                            'No more recommended items',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ] else if (!_isLoadingMoreRecommended) ...[
+                    // Show message when no recommended items available
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 20),
+                      child: Center(
+                        child: Text(
+                          'No similar items found',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1443,31 +1640,4 @@ class _DetailPageState extends State<DetailPage> {
       ),
     );
   }
-
-  List<Map<String, dynamic>> recommendeds = [
-    {
-      "productImage": "${ImageStringGlobalVariables.imagePath}honda_civic_temporary.png",
-      "productType": "FEATURED",
-      "productNature": "New",
-      "isLiked": false,
-      "cost": "400,000",
-      "productName": "BMW 8 Series",
-      "mileage": 3,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}bmw_logo_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"  
-    },
-    {
-      "productImage": "${ImageStringGlobalVariables.imagePath}black_car_temporary.png",
-      "productType": "PROMOTION",
-      "productNature": "New",
-      "isLiked": true,
-      "cost": "600,000",
-      "productName": "Mercedes Benz GCL 300",
-      "mileage": 2,
-      "productLogo": "${ImageStringGlobalVariables.imagePath}mercedes_logo_temporary.png",
-      "driveType": "Automatic",
-      "location": "Accra"
-    },
-  ];
 }
