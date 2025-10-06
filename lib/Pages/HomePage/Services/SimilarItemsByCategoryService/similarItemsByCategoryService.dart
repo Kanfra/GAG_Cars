@@ -27,14 +27,9 @@ class SimilarItemsByCategoryService {
       final token = await AuthService.getToken();
       logger.w('✅ Token obtained: ${token != null ? "Yes" : "No"}');
 
-      // Step 2: Construct URL - FIXED THE EXTRA SLASH ISSUE
+      // Step 2: Construct URL
       logger.w('🔗 Constructing URL...');
       
-      // Log the base URL and endpoint separately
-      logger.w('🏠 baseApiUrl: $baseApiUrl');
-      logger.w('📎 ApiEndpoint.similarItemsByCategory: ${ApiEndpoint.similarItemsByCategory}');
-      
-      // FIX: Remove the extra slash before $category
       final endpointPath = '${ApiEndpoint.similarItemsByCategory}/$category/$item';
       logger.w('🛣️ Full endpoint path: $endpointPath');
       
@@ -54,7 +49,7 @@ class SimilarItemsByCategoryService {
       logger.w('📋 Request headers:');
       logger.w('   - Authorization: Bearer ${token != null ? "***" : "null"}');
       logger.w('   - Content-Type: application/json');
-      logger.w('   - Accept: application/json');
+      // logger.w('   - Accept: 'application/json''');
 
       final stopwatch = Stopwatch()..start();
       final response = await http.get(
@@ -77,23 +72,49 @@ class SimilarItemsByCategoryService {
         
         try {
           logger.w('📝 Parsing response body...');
-          final jsonData = json.decode(response.body);
+          final dynamic jsonData = json.decode(response.body);
           logger.w('📊 Response data type: ${jsonData.runtimeType}');
           
+          // FIX: Handle both array and object responses
+          SimilarItemsResponse similarItemsResponse;
+          
           if (jsonData is List) {
-            logger.w('📋 Number of items: ${jsonData.length}');
-            if (jsonData.isNotEmpty) {
-              logger.w('📋 First item keys: ${(jsonData.first as Map).keys.join(", ")}');
-            }
+            logger.w('📋 API returned array with ${jsonData.length} items');
+            logger.w('🔄 Converting array to SimilarItemsResponse format...');
+            
+            // Convert array response to the expected paginated format
+            similarItemsResponse = SimilarItemsResponse(
+              data: jsonData.map<SimilarItem>((item) => SimilarItem.fromJson(item as Map<String, dynamic>)).toList(),
+              links: PaginationLinks(
+                first: null,
+                last: null,
+                prev: null,
+                next: null,
+              ),
+              meta: PaginationMeta(
+                currentPage: 1,
+                from: 1,
+                lastPage: 1,
+                links: [],
+                path: uri.toString(),
+                perPage: limit,
+                to: jsonData.length,
+                total: jsonData.length,
+              ),
+            );
           } else if (jsonData is Map) {
-            logger.w('📋 Response keys: ${jsonData.keys.join(", ")}');
+            logger.w('📋 API returned object with keys: ${jsonData.keys.join(", ")}');
+            logger.w('🔄 Converting to SimilarItemsResponse...');
+            // FIX: Cast Map<dynamic, dynamic> to Map<String, dynamic>
+            similarItemsResponse = SimilarItemsResponse.fromJson(jsonData.cast<String, dynamic>());
+          } else {
+            logger.e('❌ Unexpected response type: ${jsonData.runtimeType}');
+            throw DataParsingException('Unexpected response format from server');
           }
           
-          logger.w('🔄 Converting to SimilarItemsResponse...');
-          final similarItemsResponse = SimilarItemsResponse.fromJson(jsonData);
           logger.w('✅ Successfully parsed ${similarItemsResponse.data.length} items');
-          
           return similarItemsResponse;
+          
         } catch (e, stackTrace) {
           logger.e('❌ JSON parsing error: $e');
           logger.e('📋 First 500 chars of response body: ${response.body.length > 500 ? response.body.substring(0, 500) + "..." : response.body}');
@@ -151,7 +172,6 @@ class SimilarItemsByCategoryService {
       case 403:
         return 'Forbidden - Access denied';
       case 404:
-        // Enhanced 404 error message
         return 'Resource not found (404). Possible reasons:\n'
                '- Endpoint does not exist\n'
                '- Category or item ID is invalid\n'

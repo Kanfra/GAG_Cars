@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBrandItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
@@ -12,28 +12,17 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/sellCarTwoPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOffersPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/BlogPostService/blogPostService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/ItemCategoryService/itemCategoryService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/makeAndModelService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Services/WishlistService/wishlistService.dart';
-import 'package:gag_cars_frontend/Pages/Messages/Screens/mockUpScreenPage.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
-import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/dealerDashboard.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
 import 'GlobalVariables/colorGlobalVariables.dart';
-import 'Pages/Authentication/Screens/signUpWithEmailPage.dart';
-import 'Pages/HomePage/Screens/mainBottomNavigationPage.dart';
 import 'Routes/routeClass.dart';
 
 void main() async {
@@ -77,7 +66,10 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => SimilarItemsProvider(),
-          ),      
+          ), 
+        ChangeNotifierProvider(
+          create: (context) => BrandItemsProvider(),
+        ),
       ],
       child: const MyApp(),
     ),

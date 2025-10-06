@@ -668,6 +668,8 @@ class _HomePageState extends State<HomePage> {
             itemCount: homeProvider.trendingMakes.length,
             itemBuilder: (context, index) {
               final make = homeProvider.trendingMakes[index];
+              final logger = Logger();
+              logger.w("make: $make");
               final brand = make;
               return GestureDetector(
                 onTap: (){
@@ -679,8 +681,6 @@ class _HomePageState extends State<HomePage> {
                     RouteClass.getSelectedBrandPage(),
                     arguments: {
                       'selectedBrand': brand.toJson(),
-                      'brandItems': brandItems,
-                      'itemId': brand.id.toString(),
                       'type': 'selectedBrand'
                     }
                   );
@@ -1252,7 +1252,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
           arguments: {
             'product': widget.recommended.toJson(),
             'item': widget.recommended.toJson(),
-            'type': 'recommended',
+            'type': 'details',
           },
         );
       },

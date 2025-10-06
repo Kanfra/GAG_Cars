@@ -6,7 +6,6 @@ import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dar
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
@@ -32,7 +31,6 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
   final ScrollController _scrollController = ScrollController();
   Timer? _loadMoreDebouncer;
   late Categories _category;
-  late List<RecommendedItem> _categoryItems;
   late String _itemId;
 
   @override
@@ -42,38 +40,43 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
     
     // Initialize from arguments
     _initializeFromArguments();
+    
+    // Load initial items using provider
+    _loadInitialItems();
   }
 
-void _initializeFromArguments() {
-  final Map<String, dynamic> args = widget.allJson;
-  
-  if (args.containsKey('selectedCategory')) {
-    _category = args['selectedCategory'] as Categories;
+  void _initializeFromArguments() {
+    final Map<String, dynamic> args = widget.allJson;
     
-    // Get the pre-filtered category items from homepage
-    if (args.containsKey('categoryItems')) {
-      final categoryItems = args['categoryItems'] as List<dynamic>;
-      // Simply cast to RecommendedItem since we passed objects directly
-      _categoryItems = categoryItems.cast<RecommendedItem>();
-    } else {
-      _categoryItems = []; // Empty list if no items passed
+    if (args.containsKey('selectedCategory')) {
+      _category = args['selectedCategory'] as Categories;
+      
+      // Get itemId for the provider
+      _itemId = args['itemId'] as String? ?? _category.id.toString();
+      
+      // Debug log
+      print('Category: ${_category.name}, Category ID: ${_category.id}, Item ID: $_itemId');
     }
-    
-    // Get itemId for fallback (if needed)
-    _itemId = args['itemId'] as String? ?? _category.id.toString();
-    
-    // Debug log
-    print('Category: ${_category.name}, Items count: ${_categoryItems.length}');
   }
-}
 
-// REMOVE the _convertJsonToRecommendedItems method entirely - we don't need it!
-
-
+  void _loadInitialItems() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<SimilarItemsProvider>(context, listen: false);
+      provider.loadInitialItems(_category.id!, _itemId);
+    });
+  }
 
   void _scrollListener() {
-    // Since we're using pre-loaded data, we don't need lazy loading
-    // But keeping the structure for consistency
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMoreDebouncer?.cancel();
+      _loadMoreDebouncer = Timer(const Duration(milliseconds: 500), () {
+        final provider = Provider.of<SimilarItemsProvider>(context, listen: false);
+        if (provider.hasMore && !provider.isLoadingMore) {
+          provider.loadMoreItems();
+        }
+      });
+    }
   }
 
   @override
@@ -104,62 +107,45 @@ void _initializeFromArguments() {
           ),
         ),
         centerTitle: true,
-        actions: [
-          // CustomRoundIconButton(
-          //   iconData: Icons.filter_list_rounded,
-          //   isBorderSlightlyCurved: true,
-          //   onIconButtonClickFunction: () {
-          //     _showFilterOptions();
-          //   },
-          //   buttonSize: 36,
-          //   iconSize: 18,
-          // ),
-          const SizedBox(width: 8),
+        actions: const [
+          SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
-        child: _buildContent(),
+        child: Consumer<SimilarItemsProvider>(
+          builder: (context, provider, child) {
+            return _buildContent(provider);
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(SimilarItemsProvider provider) {
+    // Show empty state if no items and not loading (this is normal, not an error)
+    if (!provider.isLoading && provider.items.isEmpty) {
+      return _buildEmptyState();
+    }
+
     return RefreshIndicator(
-      onRefresh: _onRefresh,
+      onRefresh: () => provider.refresh(),
       child: CustomScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           // Header Section
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _category.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${_categoryItems.length} items found',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            child: _buildHeaderSection(provider),
           ),
 
-          // Grid Items
-          if (_categoryItems.isNotEmpty)
+          // Loading State (initial load)
+          if (provider.isLoading && provider.items.isEmpty)
+            const SliverFillRemaining(
+              child: _LoadingState(),
+            ),
+
+          // Grid Items - Show only if we have items
+          if (provider.items.isNotEmpty)
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               sliver: SliverGrid(
@@ -171,130 +157,251 @@ void _initializeFromArguments() {
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
-                    final item = _categoryItems[index];
+                    final item = provider.items[index];
                     return _CategoryItemWidget(
                       item: item,
                       screenSize: MediaQuery.of(context).size,
                     );
                   },
-                  childCount: _categoryItems.length,
+                  childCount: provider.items.length,
                 ),
               ),
-            )
-          else
-            // Empty State
-            SliverFillRemaining(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No items found in this category',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Try a different category or check back later',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () => Get.back(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorGlobalVariables.brownColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    ),
-                    child: const Text('Back to Categories', style: TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
+            ),
+
+          // Loading More Indicator
+          if (provider.isLoadingMore)
+            const SliverToBoxAdapter(
+              child: _LoadingMoreIndicator(),
+            ),
+
+          // End of List Indicator
+          if (!provider.hasMore && provider.items.isNotEmpty)
+            const SliverToBoxAdapter(
+              child: _EndOfListIndicator(),
             ),
         ],
       ),
     );
   }
 
-  Future<void> _onRefresh() async {
-    // Since we're using pre-loaded data, refresh would go back to homepage
-    // or you could implement a different refresh logic
-    setState(() {
-      // Could trigger a re-filter or other logic here
-    });
-  }
-
-  void _showFilterOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+  Widget _buildHeaderSection(SimilarItemsProvider provider) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _category.name,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
-          child: Column(
+          const SizedBox(height: 8),
+          Text(
+            provider.items.isNotEmpty 
+                ? '${provider.items.length} items found${provider.hasMore ? '+' : ''}'
+                : 'No items available',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 80),
+          // Empty State Icon
+          Container(
+            width: 140,
+            height: 140,
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.inventory_2_outlined,
+              size: 60,
+              color: Colors.blue[400],
+            ),
+          ),
+          const SizedBox(height: 32),
+          // Empty State Title
+          Text(
+            'No Items Available',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Empty State Description
+          Text(
+            'There are currently no items available in the "${_category.name}" category.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Please check back later or explore other categories.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 40),
+          // Action Buttons
+          Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                                'Filter Options',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Get.back(),
-                    ),
-                  ],
+              ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorGlobalVariables.brownColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
+                child: const Text(
+                  'Browse Other Categories',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
-              // Add your filter options here
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Filter options for ${_category.name}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
-                  ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Provider.of<SimilarItemsProvider>(context, listen: false).refresh(),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.blue[600],
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
+                child: const Text('Refresh'),
               ),
             ],
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+}
+
+// Loading State Widget
+class _LoadingState extends StatelessWidget {
+  const _LoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+          strokeWidth: 3,
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Loading Items...',
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Please wait while we fetch the latest items',
+          style: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Loading More Indicator Widget
+class _LoadingMoreIndicator extends StatelessWidget {
+  const _LoadingMoreIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            strokeWidth: 2,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Loading more items...',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// End of List Indicator Widget
+class _EndOfListIndicator extends StatelessWidget {
+  const _EndOfListIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        children: [
+          Icon(
+            Icons.check_circle_outline_rounded,
+            size: 40,
+            color: Colors.green[400],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'You\'ve reached the end',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'No more items to load',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _CategoryItemWidget extends StatefulWidget {
-  final RecommendedItem item;
+  final SimilarItem item;
   final Size screenSize;
 
   const _CategoryItemWidget({
@@ -420,7 +527,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -457,19 +564,17 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
 
   @override
   Widget build(BuildContext context) {
-    final firstImage = widget.item.images?.isNotEmpty == true
-        ? widget.item.images!.first
+    final firstImage = widget.item.images.isNotEmpty
+        ? widget.item.images.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-    final brandImage = widget.item.brand?.image;
-    final isPromoted = widget.item.isPromoted == true;
 
     return GestureDetector(
       onTap: () {
         Get.toNamed(
           RouteClass.getDetailPage(),
           arguments: {
-            'product': widget.item.toJson(),
-            'item': widget.item.toJson(),
+            'product': _convertToRecommendedItem(widget.item).toJson(),
+            'item': _convertToRecommendedItem(widget.item).toJson(),
             'type': 'category-item',
           },
         );
@@ -480,8 +585,8 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 6,
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
@@ -524,35 +629,6 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     ),
                   ),
                 
-                // PROMOTED BADGE
-                if (isPromoted)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[700],
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.star, color: Colors.white, size: 12),
-                          const SizedBox(width: 2),
-                          Text(
-                            'FEATURED',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                
                 // Animated Wishlist Button
                 Positioned(
                   bottom: 8,
@@ -573,7 +649,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black12,
+                                color: Colors.black.withOpacity(0.1),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
@@ -622,7 +698,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     children: [
                       Expanded(
                         child: Text(
-                          widget.item.name ?? 'Unnamed Vehicle',
+                          widget.item.name,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -633,7 +709,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                         ),
                       ),
                       Text(
-                        widget.item.year ?? '',
+                        widget.item.year,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -649,7 +725,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price ?? '0'))}',
+                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price))}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -679,22 +755,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (brandImage != null)
-                        Container(
-                          width: 24,
-                          height: 24,
-                          child: CachedNetworkImage(
-                            imageUrl: getImageUrl(brandImage, null),
-                            fit: BoxFit.contain,
-                            errorWidget: (context, url, error) => Icon(
-                              Icons.business,
-                              size: 16,
-                              color: Colors.grey[400],
-                            ),
-                          ),
-                        )
-                      else
-                        const SizedBox(width: 24),
+                      const SizedBox(width: 24),
                       
                       if (widget.item.transmission != null)
                         Row(
@@ -794,6 +855,50 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
           ],
         ),
       ),
+    );
+  }
+
+  // Helper method to convert SimilarItem to RecommendedItem for compatibility
+  RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
+    return RecommendedItem(
+      id: similarItem.id,
+      name: similarItem.name,
+      price: similarItem.price,
+      year: similarItem.year,
+      images: similarItem.images,
+      mileage: similarItem.mileage,
+      transmission: similarItem.transmission,
+      location: similarItem.location,
+      condition: similarItem.condition,
+      description: similarItem.description,
+      userId: similarItem.userId,
+      countryId: similarItem.countryId,
+      brandModelId: similarItem.brandModelId,
+      brandId: similarItem.brandId,
+      categoryId: similarItem.categoryId,
+      slug: similarItem.slug,
+      serialNumber: similarItem.serialNumber,
+      steerPosition: similarItem.steerPosition,
+      engineCapacity: similarItem.engineCapacity,
+      color: similarItem.color,
+      buildType: similarItem.buildType,
+      numberOfPassengers: similarItem.numberOfPassengers,
+      features: similarItem.features,
+      status: similarItem.status,
+      warranty: similarItem.warranty,
+      // Convert String dates to DateTime
+      warrantyExpiration: similarItem.warrantyExpiration != null 
+          ? DateTime.tryParse(similarItem.warrantyExpiration!) 
+          : null,
+      deletedAt: similarItem.deletedAt != null 
+          ? DateTime.tryParse(similarItem.deletedAt!) 
+          : null,
+      createdAt: DateTime.tryParse(similarItem.createdAt) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(similarItem.updatedAt) ?? DateTime.now(),
+      height: similarItem.height,
+      vin: similarItem.vin,
+      isPromoted: false,
+      brand: null,
     );
   }
 }

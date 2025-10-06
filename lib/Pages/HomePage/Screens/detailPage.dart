@@ -14,7 +14,9 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/similarItemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
@@ -22,6 +24,7 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -46,14 +49,8 @@ class _DetailPageState extends State<DetailPage> {
   late final Map<String, dynamic>? product;
   late final String? type;
   
-  // Lazy loading variables
-  late List<RecommendedItem> _filteredRecommendedItems = [];
-  int _currentRecommendedPage = 1;
-  bool _isLoadingMoreRecommended = false;
-  bool _hasMoreRecommended = true;
-  final int _recommendedItemsPerPage = 8;
-  final int _initialRecommendedItems = 4;
-  bool _isNearBottom = false;
+  late int _currentItemCategoryId;
+  late String _currentItemId;
 
   @override
   void initState() {
@@ -62,10 +59,12 @@ class _DetailPageState extends State<DetailPage> {
     product = widget.allJson['product'] as Map<String, dynamic>;
     type = widget.allJson['type'] as String?;
     
-    // Use WidgetsBinding to ensure build is complete before loading category details
+    _currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']) ?? 0;
+    _currentItemId = item['id']?.toString() ?? '';
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadCategoryDetails();
-      _loadInitialRecommendedItems();
+      _loadSimilarItems();
     });
     
     _scrollController.addListener(() {
@@ -82,7 +81,6 @@ class _DetailPageState extends State<DetailPage> {
         });
       }
 
-      // Lazy loading detection
       _checkLazyLoading();
     });
   }
@@ -93,133 +91,40 @@ class _DetailPageState extends State<DetailPage> {
     final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
     if (categoryId != null) {
       final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: false);
-      // Check if we already have the data to avoid unnecessary API calls
       if (!categoryDetailProvider.categoryDetails.containsKey(categoryId)) {
         categoryDetailProvider.fetchCategoryDetail(categoryId);
       }
     }
   }
 
-  // Load initial recommended items
-  void _loadInitialRecommendedItems() {
+  void _loadSimilarItems() {
+    if (!mounted || _currentItemCategoryId == 0 || _currentItemId.isEmpty) return;
+    
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+    similarItemsProvider.loadInitialItems(_currentItemCategoryId, _currentItemId);
+  }
+
+  Future<void> _loadMoreSimilarItems() async {
     if (!mounted) return;
     
-    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
-    final currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']);
-    
-    List<RecommendedItem> allMatchingItems = [];
-    
-    if (currentItemCategoryId != null) {
-      // Filter recommended items that belong to the same category but exclude the current item
-      allMatchingItems = homeProvider.recommendedItems.where((recommendedItem) {
-        final recommendedCategoryId = recommendedItem.category?.id ?? recommendedItem.categoryId;
-        final isSameCategory = recommendedCategoryId == currentItemCategoryId;
-        final isNotCurrentItem = recommendedItem.id != item['id'];
-        return isSameCategory && isNotCurrentItem;
-      }).toList();
-    } else {
-      // Fallback: get recommended items excluding current item
-      allMatchingItems = homeProvider.recommendedItems
-          .where((recommendedItem) => recommendedItem.id != item['id'])
-          .toList();
-    }
-    
-    // Load initial batch
-    final endIndex = _initialRecommendedItems < allMatchingItems.length 
-        ? _initialRecommendedItems 
-        : allMatchingItems.length;
-    
-    _filteredRecommendedItems = allMatchingItems.sublist(0, endIndex);
-    
-    // Check if there are more items to load
-    _hasMoreRecommended = allMatchingItems.length > _initialRecommendedItems;
-    
-    print('🎯 Loaded ${_filteredRecommendedItems.length} initial recommended items');
-    print('🎯 Total matching items: ${allMatchingItems.length}, Has more: $_hasMoreRecommended');
-    
-    if (mounted) {
-      setState(() {});
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+    if (similarItemsProvider.hasMore && !similarItemsProvider.isLoadingMore) {
+      await similarItemsProvider.loadMoreItems();
     }
   }
 
-  // Load more recommended items for lazy loading
-  Future<void> _loadMoreRecommendedItems() async {
-    if (_isLoadingMoreRecommended || !_hasMoreRecommended) return;
-    
-    if (!mounted) return;
-    
-    setState(() {
-      _isLoadingMoreRecommended = true;
-    });
-    
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    if (!mounted) return;
-    
-    final homeProvider = Provider.of<HomeProvider>(context, listen: false);
-    final currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']);
-    
-    List<RecommendedItem> allMatchingItems = [];
-    
-    if (currentItemCategoryId != null) {
-      allMatchingItems = homeProvider.recommendedItems.where((recommendedItem) {
-        final recommendedCategoryId = recommendedItem.category?.id ?? recommendedItem.categoryId;
-        final isSameCategory = recommendedCategoryId == currentItemCategoryId;
-        final isNotCurrentItem = recommendedItem.id != item['id'];
-        return isSameCategory && isNotCurrentItem;
-      }).toList();
-    } else {
-      allMatchingItems = homeProvider.recommendedItems
-          .where((recommendedItem) => recommendedItem.id != item['id'])
-          .toList();
-    }
-    
-    final startIndex = _currentRecommendedPage * _initialRecommendedItems;
-    final endIndex = startIndex + _recommendedItemsPerPage;
-    
-    if (startIndex < allMatchingItems.length) {
-      final newItems = allMatchingItems.sublist(
-        startIndex,
-        endIndex < allMatchingItems.length ? endIndex : allMatchingItems.length
-      );
-      
-      _filteredRecommendedItems.addAll(newItems);
-      _currentRecommendedPage++;
-      
-      // Check if we have more items to load
-      _hasMoreRecommended = endIndex < allMatchingItems.length;
-      
-      print('🎯 Loaded ${newItems.length} more items. Total: ${_filteredRecommendedItems.length}');
-      print('🎯 Has more: $_hasMoreRecommended');
-    } else {
-      _hasMoreRecommended = false;
-    }
-    
-    if (mounted) {
-      setState(() {
-        _isLoadingMoreRecommended = false;
-      });
-    }
-  }
-
-  // Check if we need to load more items
   void _checkLazyLoading() {
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+    
     if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 500 && // 500px from bottom
-        !_isLoadingMoreRecommended &&
-        _hasMoreRecommended &&
-        !_isNearBottom) {
+        _scrollController.position.maxScrollExtent - 500 &&
+        !similarItemsProvider.isLoadingMore &&
+        similarItemsProvider.hasMore) {
       
-      _isNearBottom = true;
-      _loadMoreRecommendedItems();
-    } else if (_scrollController.position.pixels <
-        _scrollController.position.maxScrollExtent - 600) {
-      _isNearBottom = false;
+      _loadMoreSimilarItems();
     }
   }
 
-  // Helper method to safely extract category ID from various formats
   int? _extractCategoryId(dynamic category) {
     if (category == null) return null;
     
@@ -323,15 +228,12 @@ class _DetailPageState extends State<DetailPage> {
         return images.whereType<String>().toList();
       }
     } catch (e) {
-      // Handle error
     }
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
   }
 
-  // Get user phone number from item/listing data
   String? _getUserPhoneNumber() {
     try {
-      // First try to get phone number from user object in item
       final user = item['user'];
       if (user is Map<String, dynamic>) {
         return user['phoneNumber']?.toString() ?? 
@@ -340,7 +242,6 @@ class _DetailPageState extends State<DetailPage> {
                user['mobile']?.toString();
       }
       
-      // Then try direct fields in item
       return item['phoneNumber']?.toString() ?? 
              item['phone_number']?.toString() ??
              item['contact']?.toString() ??
@@ -350,7 +251,6 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  // Get user name from item/listing data
   String _getUserName() {
     try {
       final user = item['user'];
@@ -365,7 +265,6 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  // Show contact dialog
   void _showContactDialog() {
     final phoneNumber = _getUserPhoneNumber();
     final userName = _getUserName();
@@ -385,7 +284,6 @@ class _DetailPageState extends State<DetailPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Row(
                   children: [
                     Container(
@@ -417,7 +315,6 @@ class _DetailPageState extends State<DetailPage> {
                 
                 const SizedBox(height: 20),
                 
-                // Seller name
                 Text(
                   "Seller: $userName",
                   style: const TextStyle(
@@ -429,7 +326,6 @@ class _DetailPageState extends State<DetailPage> {
                 
                 const SizedBox(height: 16),
                 
-                // Phone number
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
                   const Text(
                     "Phone Number:",
@@ -495,11 +391,9 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ],
                 ),
-              ],
               
               const SizedBox(height: 24),
               
-              // Buttons
               Row(
                 children: [
                   Expanded(
@@ -527,7 +421,6 @@ class _DetailPageState extends State<DetailPage> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          // TODO: Implement call functionality
                           Navigator.of(context).pop();
                           Get.snackbar(
                             'Call',
@@ -558,14 +451,13 @@ class _DetailPageState extends State<DetailPage> {
                 ],
               ),
             ],
-          ),
+          ]),
         ),
       );
     },
   );
 }
 
-  // Show "Coming soon" message for Notify price drops
   void _showComingSoonMessage() {
     Get.snackbar(
       'Coming Soon',
@@ -577,14 +469,11 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Build verification badges based on UserProvider
   List<Widget> _buildVerificationBadges() {
     final List<Widget> badges = [];
     
-    // Get user provider to check verification status
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     
-    // Only show verified dealer badge if user is a verified dealer
     if (userProvider.isVerifiedDealer) {
       badges.add(
         Container(
@@ -615,7 +504,6 @@ class _DetailPageState extends State<DetailPage> {
       );
     }
     
-    // Only show verified badge if user is verified
     if (userProvider.isFullyVerified) {
       badges.add(
         Container(
@@ -649,7 +537,6 @@ class _DetailPageState extends State<DetailPage> {
     return badges;
   }
 
-  // Get highlights data dynamically based on category configuration
   List<Map<String, String>> getHighlights() {
     final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
     if (categoryId == null) {
@@ -660,7 +547,6 @@ class _DetailPageState extends State<DetailPage> {
     return categoryDetailProvider.buildHighlights(categoryId, item);
   }
 
-  // Get specifications data dynamically based on category configuration
   List<Map<String, String>> getSpecifications() {
     final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
     if (categoryId == null) {
@@ -671,7 +557,6 @@ class _DetailPageState extends State<DetailPage> {
     return categoryDetailProvider.buildSpecifications(categoryId, item);
   }
 
-  // Safe method to extract string value from dynamic objects
   String? _safeGetString(dynamic obj, String key) {
     if (obj == null) return null;
     
@@ -680,7 +565,6 @@ class _DetailPageState extends State<DetailPage> {
       return value?.toString();
     }
     
-    // Try direct property access for custom objects
     try {
       switch (key) {
         case 'name':
@@ -697,12 +581,10 @@ class _DetailPageState extends State<DetailPage> {
           return obj.toString();
       }
     } catch (e) {
-      // Fallback if property doesn't exist
       return obj.toString();
     }
   }
 
-  // Default highlights fallback - SAFELY ACCESSING DATA
   List<Map<String, String>> _getDefaultHighlights() {
     final List<Map<String, String>> highlights = [];
     
@@ -726,7 +608,6 @@ class _DetailPageState extends State<DetailPage> {
     ];
   }
 
-  // Default specifications fallback - SAFELY ACCESSING DATA
   List<Map<String, String>> _getDefaultSpecifications() {
     final List<Map<String, String>> specifications = [];
     
@@ -760,7 +641,6 @@ class _DetailPageState extends State<DetailPage> {
     ];
   }
 
-  // Helper widget for building highlight/specification items
   Widget _buildInfoItem(String title, String value, {bool isSpecification = false}) {
     return IntrinsicWidth(
       child: Column(
@@ -788,7 +668,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Helper widget for building section titles
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -799,7 +678,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Helper widget for building info rows
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
       children: [
@@ -818,7 +696,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Helper widget for building tags
   Widget _buildTag(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
@@ -836,270 +713,105 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Build recommended item card matching homepage style - UPDATED TO USE RecommendedItem
-  Widget _buildRecommendedItem(RecommendedItem recommendedItem, Size screenSize) {
-    final firstImage = recommendedItem.images?.isNotEmpty == true
-        ? recommendedItem.images!.first
-        : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-    final brandImage = recommendedItem.brand?.image;
-    final isPromoted = recommendedItem.isPromoted == true;
-
-    return GestureDetector(
-      onTap: () {
-        Get.toNamed(
-          RouteClass.getDetailPage(),
-          arguments: {
-            'product': recommendedItem.toJson(),
-            'item': recommendedItem.toJson(),
-            'type': 'recommended',
-          },
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
+  Widget _buildDefaultProfileAvatar({double size = 60}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade400,
+            Colors.purple.shade400,
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Section
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                  child: Container(
-                    height: 110,
-                    width: double.infinity,
-                    color: Colors.grey[100],
-                    child: buildSafeImage(
-                      firstImage,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                
-                // Category Badge
-                Positioned(
-                  top: 6,
-                  left: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      recommendedItem.category?.name ?? 'Car',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-                
-                // Promoted Badge
-                if (isPromoted)
-                  Positioned(
-                    top: 6,
-                    right: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[700],
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.star, color: Colors.white, size: 10),
-                          SizedBox(width: 2),
-                          Text(
-                            'FEATURED',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 7,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                
-                // Wishlist Button
-                Positioned(
-                  bottom: 6,
-                  right: 6,
-                  child: GestureDetector(
-                    onTap: () {
-                      // Toggle wishlist - you can implement this if needed
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 3,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.favorite_border,
-                        size: 16,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            // Content Section
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title and Condition
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          recommendedItem.name ?? 'Unnamed Vehicle',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Text(
-                        recommendedItem.condition ?? 'Used',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  // Price and Mileage
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(recommendedItem.price ?? '0'))}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: ColorGlobalVariables.redColor,
-                        ),
-                      ),
-                      if (recommendedItem.mileage != null)
-                        Row(
-                          children: [
-                            Icon(Icons.speed, size: 12, color: Colors.grey[600]),
-                            const SizedBox(width: 2),
-                            Text(
-                              "${formatNumber(shortenerRequired: true, number: int.parse(recommendedItem.mileage!))} km",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Brand and Details
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Brand Logo
-                      if (brandImage != null)
-                        Container(
-                          width: 20,
-                          height: 20,
-                          child: CachedNetworkImage(
-                            imageUrl: getImageUrl(brandImage, null),
-                            fit: BoxFit.contain,
-                            errorWidget: (context, url, error) => Icon(
-                              Icons.business,
-                              size: 16,
-                              color: Colors.grey[400],
-                            ),
-                          ),
-                        )
-                      else
-                        const SizedBox(width: 20),
-                      
-                      // Transmission
-                      if (recommendedItem.transmission != null)
-                        Row(
-                          children: [
-                            Icon(Icons.settings, size: 12, color: Colors.grey[600]),
-                            const SizedBox(width: 2),
-                            Text(
-                              recommendedItem.transmission!,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      
-                      // Location
-                      if (recommendedItem.location != null)
-                        Flexible(
-                          child: Row(
-                            children: [
-                              Icon(Icons.location_on, size: 12, color: Colors.grey[600]),
-                              const SizedBox(width: 2),
-                              Flexible(
-                                child: Text(
-                                  recommendedItem.location!,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey[600],
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person,
+          size: size * 0.5,
+          color: Colors.white,
         ),
       ),
+    );
+  }
+
+  Widget _buildUserProfileImage() {
+    final user = item['user'];
+    final profilePhoto = _safeGetString(user, 'profilePhoto');
+    
+    if (profilePhoto != null && profilePhoto.isNotEmpty) {
+      return CustomImage(
+        imagePath: getImageUrl(profilePhoto, null), 
+        isAssetImage: false,
+        imageBackgroundColor: Colors.transparent,
+        useShimmerEffect: true,
+        imageWidth: 60,
+        imageHeight: 60,
+        imageBorderRadius: 30,
+        fit: BoxFit.cover, 
+        isImageBorderRadiusRequired: true
+      );
+    } else {
+      return _buildDefaultProfileAvatar(size: 60);
+    }
+  }
+
+  Widget _buildSimilarItem(SimilarItem similarItem, Size screenSize) {
+    return _SimilarItemWidget(
+      item: similarItem,
+      screenSize: screenSize,
+    );
+  }
+
+  RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
+    return RecommendedItem(
+      id: similarItem.id,
+      name: similarItem.name,
+      price: similarItem.price,
+      year: similarItem.year,
+      images: similarItem.images,
+      mileage: similarItem.mileage,
+      transmission: similarItem.transmission,
+      location: similarItem.location,
+      condition: similarItem.condition,
+      description: similarItem.description,
+      userId: similarItem.userId,
+      countryId: similarItem.countryId,
+      brandModelId: similarItem.brandModelId,
+      brandId: similarItem.brandId,
+      categoryId: similarItem.categoryId,
+      slug: similarItem.slug,
+      serialNumber: similarItem.serialNumber,
+      steerPosition: similarItem.steerPosition,
+      engineCapacity: similarItem.engineCapacity,
+      color: similarItem.color,
+      buildType: similarItem.buildType,
+      numberOfPassengers: similarItem.numberOfPassengers,
+      features: similarItem.features,
+      status: similarItem.status,
+      warranty: similarItem.warranty,
+      warrantyExpiration: similarItem.warrantyExpiration != null 
+          ? DateTime.tryParse(similarItem.warrantyExpiration!) 
+          : null,
+      deletedAt: similarItem.deletedAt != null 
+          ? DateTime.tryParse(similarItem.deletedAt!) 
+          : null,
+      createdAt: DateTime.tryParse(similarItem.createdAt) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(similarItem.updatedAt) ?? DateTime.now(),
+      height: similarItem.height,
+      vin: similarItem.vin,
+      isPromoted: false,
+      brand: null,
     );
   }
 
@@ -1115,459 +827,440 @@ class _DetailPageState extends State<DetailPage> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 350,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.black,
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                    color: Colors.white, size: 18),
-              ),
-              onPressed: () => Get.back(),
-            ),
-            title: AnimatedOpacity(
-              opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                item['name'] ?? 'Item Details',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16.0,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                children: [
-                  Opacity(
-                    opacity: _imageOpacity,
-                    child: buildSafeImage(
-                      getImageUrl(currentImage, null),
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  
-                  Container(
+      body: Consumer<SimilarItemsProvider>(
+        builder: (context, similarItemsProvider, child) {
+          return CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 350,
+                floating: false,
+                pinned: true,
+                backgroundColor: Colors.black,
+                leading: IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.8),
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.3),
-                        ],
-                      ),
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(20),
                     ),
+                    child: const Icon(Icons.arrow_back_ios_new_outlined, 
+                        color: Colors.white, size: 18),
                   ),
-                  
-                  Positioned(
-                    left: 20,
-                    bottom: 80,
-                    child: AnimatedOpacity(
-                      opacity: _imageOpacity,
-                      duration: const Duration(milliseconds: 200),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['name'] ?? 'Unnamed Item',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 26.0,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: AnimatedOpacity(
-                      opacity: _imageOpacity,
-                      duration: const Duration(milliseconds: 200),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${selectedIndex + 1}/${images.length}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            actions: [
-              IconButton(
-                onPressed: () {},
-                icon: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.share, color: Colors.white, size: 18),
+                  onPressed: () => Get.back(),
                 ),
-              ),
-            ],
-          ),
-          
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.grey[50],
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16, bottom: 8),
-                    child: Text(
-                      "Gallery",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                      ),
+                title: AnimatedOpacity(
+                  opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    item['name'] ?? 'Item Details',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.0,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(
-                    height: 80,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: images.length,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemBuilder: (context, index) {
-                        final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
-                        return GestureDetector(
-                          onTap: () {
-                            if (mounted) {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            }
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: index == selectedIndex 
-                                    ? ColorGlobalVariables.redColor 
-                                    : Colors.transparent,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 1),
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    children: [
+                      Opacity(
+                        opacity: _imageOpacity,
+                        child: buildSafeImage(
+                          getImageUrl(currentImage, null),
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.8),
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.3),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      Positioned(
+                        left: 20,
+                        bottom: 80,
+                        child: AnimatedOpacity(
+                          opacity: _imageOpacity,
+                          duration: const Duration(milliseconds: 200),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['name'] ?? 'Unnamed Item',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 26.0,
                                 ),
-                              ],
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: AnimatedOpacity(
+                          opacity: _imageOpacity,
+                          duration: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Stack(
-                                children: [
-                                  buildSafeImage(
-                                    image,
-                                    width: 100,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  if (index == selectedIndex)
-                                    Container(
-                                      color: Colors.black.withOpacity(0.3),
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.check_circle,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                            child: Text(
+                              '${selectedIndex + 1}/${images.length}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12.0,
+                                ),
                               ),
                             ),
                           ),
-                        );
-                      },
+                        ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.share, color: Colors.white, size: 18),
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-          
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Vehicle name
-                        Text(
-                          item['name'] ?? 'Unnamed Item',
-                          style: const TextStyle(
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+              
+              SliverToBoxAdapter(
+                child: Container(
+                  color: Colors.grey[50],
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 16, bottom: 8),
+                        child: Text(
+                          "Gallery",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        // Price
-                        Text(
-                          'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
-                          style: const TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Description
-                        if (item['description'] != null) ...[
-                          Text(
-                            item['description'],
-                            style: const TextStyle(
-                              fontSize: 15.0,
-                              height: 1.5,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                        // Location and date info
-                        if (item['location'] != null) ...[
-                          _buildInfoRow(Icons.location_on_outlined, item['location']),
-                          const SizedBox(height: 8),
-                        ],
-                        _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item['created_at'] ?? '')),
-                        const SizedBox(height: 16),
-                        
-                        // Verification badges - Only show if user is verified/verified dealer
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: _buildVerificationBadges(),
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        
-                        // Notify Price Drops button - Updated to show coming soon message
-                        Links(
-                          linkTextType: 'Notify price drops', 
-                          linkTextColor: ColorGlobalVariables.blackColor, 
-                          isTextSmall: true, 
-                          textDecorationColor: ColorGlobalVariables.blackColor,
-                          isIconWidgetRequiredAtEnd: false, 
-                          isIconWidgetRequiredAtFront: true, 
-                          iconData: Icons.notifications_outlined,
-                          iconColor: ColorGlobalVariables.blackColor,
-                          onClickFunction: _showComingSoonMessage,
-                        ),
-                        
-                        const SizedBox(height: 20),
-                        // Tags section
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            if(item["warranty"] != null)
-                            _buildTag(
-                              "Warranty", 
-                              Colors.grey[300]!),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        // Highlights section - NOW DYNAMIC
-                        _buildSectionTitle("Highlights"),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 20.0,
-                          runSpacing: 12.0,
-                          children: highlights.map((highlight) {
-                            return _buildInfoItem(
-                              highlight['title'] ?? 'N/A',
-                              highlight['value'] ?? 'N/A',
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        // Specifications section - NOW DYNAMIC
-                        _buildSectionTitle("Specifications"),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 20.0,
-                          runSpacing: 12.0,
-                          children: specifications.map((spec) {
-                            return _buildInfoItem(
-                              spec['title'] ?? 'N/A',
-                              spec['value'] ?? 'N/A',
-                              isSpecification: true,
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 16),
-                        
-                        const Divider(
-                          color: ColorGlobalVariables.fadedBlackColor,
-                          height: 12,
-                          thickness: 0.5,
-                        ),
-                        const SizedBox(height: 16),
-                        // Seller information section
-                        Row(
-                          children: [
-                            // User image
-                            CustomImage(
-                              imagePath: item['user'] == null ? '${ImageStringGlobalVariables.imagePath}user_profile_temporary.png' : getImageUrl(_safeGetString(item["user"], 'profilePhoto'), null), 
-                              isAssetImage: item['user'] == null ? true : false,
-                              imageBackgroundColor: Colors.transparent,
-                              useShimmerEffect: true,
-                              imageWidth: 60,
-                              imageHeight: 60,
-                              imageBorderRadius: 30,
-                              fit: BoxFit.contain, 
-                              isImageBorderRadiusRequired: true
-                            ),
-                            const SizedBox(width: 12),
-                            // User details
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Seller name with verification
-                                  Row(
+                      ),
+                      SizedBox(
+                        height: 80,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: images.length,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemBuilder: (context, index) {
+                            final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                            return GestureDetector(
+                              onTap: () {
+                                if (mounted) {
+                                  setState(() {
+                                    selectedIndex = index;
+                                  });
+                                }
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: index == selectedIndex 
+                                        ? ColorGlobalVariables.redColor 
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Stack(
                                     children: [
-                                      Text(
-                                        item["user"] == null ? "User name" : _safeGetString(item["user"], 'name') ?? "User name",
-                                        style: const TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
+                                      buildSafeImage(
+                                        image,
+                                        width: 100,
+                                        height: 80,
+                                        fit: BoxFit.cover,
                                       ),
-                                      const SizedBox(width: 6),
-                                      // Show verification badge only if user is verified
-                                      if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
-                                        CustomImage(
-                                          imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
-                                          imageWidth: 16,
-                                          imageHeight: 16,
-                                          fit: BoxFit.cover, 
-                                          isAssetImage: true, 
-                                          isImageBorderRadiusRequired: false,
+                                      if (index == selectedIndex)
+                                        Container(
+                                          color: Colors.black.withOpacity(0.3),
+                                          child: const Center(
+                                            child: Icon(
+                                              Icons.check_circle,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
                                         ),
                                     ],
                                   ),
-                                    const SizedBox(height: 6),
-                                  // Joined date
-                                  Text(
-                                    item["user"] == null ? "No date" : "Joined: ${formatTimeAgo(_safeGetString(item['user'], 'createdAt') ?? '')}",
-                                    style: TextStyle(
-                                      fontSize: 13.0,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  // Number of ads
-                                  Text(
-                                    '34 Ads',
-                                    style: const TextStyle(
-                                      fontSize: 13.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: ColorGlobalVariables.greenColor,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                        const SizedBox(height: 16),
-                        // Action buttons
-                        Row(
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Chat button
-                            Expanded(
-                              child: CustomTextButton(
-                                buttonTextType: 'Chat', 
-                                textTypeColor: ColorGlobalVariables.redColor, 
-                                borderColor: ColorGlobalVariables.fadedBlackColor,
-                                isFullButtonWidthRequired: false, 
-                                buttonBackgroundColor: Colors.transparent, 
-                                onClickFunction: (){}
+                            Text(
+                              item['name'] ?? 'Unnamed Item',
+                              style: const TextStyle(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            // Show contact button - Updated to show contact dialog
-                            Expanded(
-                              child: CustomTextButton(
-                                buttonTextType: 'Show contact', 
-                                borderColor: ColorGlobalVariables.fadedBlackColor,
-                                textTypeColor: ColorGlobalVariables.redColor, 
-                                isFullButtonWidthRequired: false, 
-                                buttonBackgroundColor: Colors.transparent, 
-                                onClickFunction: _showContactDialog
+                            const SizedBox(height: 6),
+                            Text(
+                              'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
+                              style: const TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
                               ),
-                            )
-                          ],
+                            ),
+                            const SizedBox(height: 16),
+                            if (item['description'] != null) ...[
+                              Text(
+                                item['description'],
+                                style: const TextStyle(
+                                  fontSize: 15.0,
+                                  height: 1.5,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (item['location'] != null) ...[
+                              _buildInfoRow(Icons.location_on_outlined, item['location']),
+                              const SizedBox(height: 8),
+                            ],
+                            _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item['created_at'] ?? '')),
+                            const SizedBox(height: 16),
+                            
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _buildVerificationBadges(),
+                            ),
+                            
+                            const SizedBox(height: 16),
+                            
+                            Links(
+                              linkTextType: 'Notify price drops', 
+                              linkTextColor: ColorGlobalVariables.blackColor, 
+                              isTextSmall: true, 
+                              textDecorationColor: ColorGlobalVariables.blackColor,
+                              isIconWidgetRequiredAtEnd: false, 
+                              isIconWidgetRequiredAtFront: true, 
+                              iconData: Icons.notifications_outlined,
+                              iconColor: ColorGlobalVariables.blackColor,
+                              onClickFunction: _showComingSoonMessage,
+                            ),
+                            
+                            const SizedBox(height: 20),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                if(item["warranty"] != null)
+                                _buildTag(
+                                  "Warranty", 
+                                  Colors.grey[300]!),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            _buildSectionTitle("Highlights"),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 20.0,
+                              runSpacing: 12.0,
+                              children: highlights.map((highlight) {
+                                return _buildInfoItem(
+                                  highlight['title'] ?? 'N/A',
+                                  highlight['value'] ?? 'N/A',
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildSectionTitle("Specifications"),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 20.0,
+                              runSpacing: 12.0,
+                              children: specifications.map((spec) {
+                                return _buildInfoItem(
+                                  spec['title'] ?? 'N/A',
+                                  spec['value'] ?? 'N/A',
+                                  isSpecification: true,
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            const Divider(
+                              color: ColorGlobalVariables.fadedBlackColor,
+                              height: 12,
+                              thickness: 0.5,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                _buildUserProfileImage(),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            item["user"] == null ? "User name" : _safeGetString(item["user"], 'name') ?? "User name",
+                                            style: const TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
+                                            CustomImage(
+                                              imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
+                                              imageWidth: 16,
+                                              imageHeight: 16,
+                                              fit: BoxFit.cover, 
+                                              isAssetImage: true, 
+                                              isImageBorderRadiusRequired: false,
+                                            ),
+                                        ],
+                                      ),
+                                        const SizedBox(height: 6),
+                                      Text(
+                                        item["user"] == null ? "No date" : "Joined: ${formatTimeAgo(_safeGetString(item['user'], 'createdAt') ?? '')}",
+                                        style: TextStyle(
+                                          fontSize: 13.0,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '34 Ads',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.w600,
+                                          color: ColorGlobalVariables.greenColor,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomTextButton(
+                                    buttonTextType: 'Chat', 
+                                    textTypeColor: ColorGlobalVariables.redColor, 
+                                    borderColor: ColorGlobalVariables.fadedBlackColor,
+                                    isFullButtonWidthRequired: false, 
+                                    buttonBackgroundColor: Colors.transparent, 
+                                    onClickFunction: (){}
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: CustomTextButton(
+                                    buttonTextType: 'Show contact', 
+                                    borderColor: ColorGlobalVariables.fadedBlackColor,
+                                    textTypeColor: ColorGlobalVariables.redColor, 
+                                    isFullButtonWidthRequired: false, 
+                                    buttonBackgroundColor: Colors.transparent, 
+                                    onClickFunction: _showContactDialog
+                                  ),
+                                )
+                              ],
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
                   
-                  // Recommended Items Header - ONLY SHOW IF WE HAVE ITEMS
-                  if (_filteredRecommendedItems.isNotEmpty || _isLoadingMoreRecommended) ...[
+                  if (similarItemsProvider.isLoading && similarItemsProvider.items.isEmpty) ...[
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                        ),
+                      ),
+                    ),
+                  ] else if (similarItemsProvider.items.isNotEmpty) ...[
                     const Padding(
                       padding: EdgeInsets.fromLTRB(8, 0, 8, 12),
                       child: Text(
-                        'Recommended for You',
+                        'Similar Items',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -1576,21 +1269,19 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                     
-                    // Recommended items grid view - NOW WITH LAZY LOADING
                     GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      itemCount: _filteredRecommendedItems.length + (_isLoadingMoreRecommended ? 1 : 0),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      itemCount: similarItemsProvider.items.length + (similarItemsProvider.isLoadingMore ? 1 : 0),
                       shrinkWrap: true,
                       primary: false,
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
                         childAspectRatio: 0.72,
                       ),
                       itemBuilder: (context, index) {
-                        // Show loading indicator at the end
-                        if (index >= _filteredRecommendedItems.length) {
+                        if (index >= similarItemsProvider.items.length) {
                           return const Center(
                             child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
@@ -1598,18 +1289,46 @@ class _DetailPageState extends State<DetailPage> {
                           );
                         }
                         
-                        final recommendedItem = _filteredRecommendedItems[index];
-                        return _buildRecommendedItem(recommendedItem, screenSize);
+                        final similarItem = similarItemsProvider.items[index];
+                        return GestureDetector(
+                          onTap: () {
+                            final logger = Logger();
+                            logger.w("Similar items detailpage data: $similarItem");
+                            print("Similar items detailpage data: $similarItem");
+                            Navigator.of(context).pushReplacement(  // Use Navigator instead of GetX
+                            MaterialPageRoute(
+                              builder: (context) => DetailPage(
+                                allJson: {
+                                  'product': similarItem.toJson(),
+                                  'item': similarItem.toJson(),
+                                  'type': 'details',
+                                },
+                              ),
+                            ),
+                          );
+                            // Get.offNamed(
+                            //   RouteClass.getDetailPage(),
+                            //   arguments: {
+                            //     'product': similarItem.toJson(),
+                            //     // _convertToRecommendedItem(widget.item).toJson(),
+                            //     'item': similarItem.toJson(),
+                            //     // _convertToRecommendedItem(widget.item).toJson(),
+                            //     'type': 'details',
+                            //     'uniqueKey': similarItem.id,
+                            //   },
+                            // );
+                          },
+                          child: _buildSimilarItem(similarItem, screenSize)
+                          );
                       },
                     ),
                     
-                    // End of list message
-                    if (!_hasMoreRecommended && _filteredRecommendedItems.isNotEmpty)
+                    if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
                       const Padding(
                         padding: EdgeInsets.all(16),
                         child: Center(
                           child: Text(
-                            'No more recommended items',
+                            'No more similar items',
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
@@ -1617,8 +1336,7 @@ class _DetailPageState extends State<DetailPage> {
                           ),
                         ),
                       ),
-                  ] else if (!_isLoadingMoreRecommended) ...[
-                    // Show message when no recommended items available
+                  ] else if (!similarItemsProvider.isLoading && similarItemsProvider.items.isEmpty) ...[
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
                       child: Center(
@@ -1637,7 +1355,491 @@ class _DetailPageState extends State<DetailPage> {
             ),
           ),
         ],
+      );
+    },
+  ),
+);
+  }
+}
+
+class _SimilarItemWidget extends StatefulWidget {
+  final SimilarItem item;
+  final Size screenSize;
+
+  const _SimilarItemWidget({
+    required this.item,
+    required this.screenSize,
+  });
+
+  @override
+  __SimilarItemWidgetState createState() => __SimilarItemWidgetState();
+}
+
+class __SimilarItemWidgetState extends State<_SimilarItemWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Color?> _colorAnimation;
+  
+  bool _isLiked = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _colorAnimation = ColorTween(
+      begin: Colors.grey[400],
+      end: Colors.red,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _initializeLikeStatus();
+  }
+
+  void _initializeLikeStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkWishlistStatus();
+    });
+  }
+
+  void _checkWishlistStatus() {
+    try {
+      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final isInWishlist = wishlistManager.isLiked(widget.item.id);
+      
+      setState(() {
+        _isLiked = isInWishlist;
+        if (_isLiked) {
+          _animationController.value = 1.0;
+        }
+      });
+    } catch (e) {
+      print('Error checking wishlist status: $e');
+    }
+  }
+
+  Future<void> _toggleLike() async {
+    if (_isLoading) return;
+    
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (_isLiked) {
+        _animationController.reverse();
+      } else {
+        _animationController.forward();
+      }
+
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      
+      final result = await wishlistProvider.toggleWishlistItem(
+        itemId: widget.item.id, 
+        context: context,
+      );
+
+      if (result) {
+        setState(() {
+          _isLiked = !_isLiked;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isLiked ? 'Added to wishlist!' : 'Removed from wishlist',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: _isLiked ? Colors.green : Colors.orange,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      } else {
+        if (_isLiked) {
+          _animationController.forward();
+        } else {
+          _animationController.reverse();
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Failed to update wishlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Wishlist error: $e');
+      if (_isLiked) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error: ${e.toString()}',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final firstImage = widget.item.images.isNotEmpty
+        ? widget.item.images.first
+        : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Container(
+                  height: 120,
+                  width: double.infinity,
+                  color: Colors.grey[100],
+                  child: _buildItemImage(firstImage),
+                ),
+              ),
+              
+              if (widget.item.condition != null)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.item.condition!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              
+              Positioned(
+                bottom: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () {
+                    if (_isLoading) return;
+                    _toggleLike();
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: _isLoading
+                            ? SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.grey,
+                                  ),
+                                ),
+                              )
+                            : AnimatedBuilder(
+                                animation: _colorAnimation,
+                                builder: (context, child) {
+                                  return Icon(
+                                    _isLiked ? Icons.favorite : Icons.favorite_border,
+                                    size: 18,
+                                    color: _isLiked 
+                                        ? _colorAnimation.value 
+                                        : Colors.grey[600],
+                                  );
+                                },
+                              ),
+                    ),
+                  ),
+                ),
+              ),
+          )],
+          ),
+    
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.item.name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      widget.item.year,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+    
+                const SizedBox(height: 8),
+    
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price))}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    if (widget.item.mileage != null)
+                      Row(
+                        children: [
+                          Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+    
+                const SizedBox(height: 12),
+    
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox(width: 24),
+                    
+                    if (widget.item.transmission != null)
+                      Row(
+                        children: [
+                          Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                          const SizedBox(width: 4),
+                          Text(
+                            widget.item.transmission!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    
+                    if (widget.item.location != null)
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                widget.item.location!,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemImage(String imageUrl) {
+    final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    
+    if (isAssetImage) {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorPlaceholder();
+        },
+      );
+    } else {
+      final String fullImageUrl = getImageUrl(imageUrl, null);
+      
+      return CachedNetworkImage(
+        imageUrl: fullImageUrl,
+        fit: BoxFit.cover,
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Center(
+            child: CircularProgressIndicator(
+              value: downloadProgress.progress,
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            ),
+          );
+        },
+        errorWidget: (context, url, error) {
+          return _buildImageErrorPlaceholder();
+        },
+      );
+    }
+  }
+
+  Widget _buildImageErrorPlaceholder() {
+    return Container(
+      color: Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            const SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
+    return RecommendedItem(
+      id: similarItem.id,
+      name: similarItem.name,
+      price: similarItem.price,
+      year: similarItem.year,
+      images: similarItem.images,
+      mileage: similarItem.mileage,
+      transmission: similarItem.transmission,
+      location: similarItem.location,
+      condition: similarItem.condition,
+      description: similarItem.description,
+      userId: similarItem.userId,
+      countryId: similarItem.countryId,
+      brandModelId: similarItem.brandModelId,
+      brandId: similarItem.brandId,
+      categoryId: similarItem.categoryId,
+      slug: similarItem.slug,
+      serialNumber: similarItem.serialNumber,
+      steerPosition: similarItem.steerPosition,
+      engineCapacity: similarItem.engineCapacity,
+      color: similarItem.color,
+      buildType: similarItem.buildType,
+      numberOfPassengers: similarItem.numberOfPassengers,
+      features: similarItem.features,
+      status: similarItem.status,
+      warranty: similarItem.warranty,
+      warrantyExpiration: similarItem.warrantyExpiration != null 
+          ? DateTime.tryParse(similarItem.warrantyExpiration!) 
+          : null,
+      deletedAt: similarItem.deletedAt != null 
+          ? DateTime.tryParse(similarItem.deletedAt!) 
+          : null,
+      createdAt: DateTime.tryParse(similarItem.createdAt) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(similarItem.updatedAt) ?? DateTime.now(),
+      height: similarItem.height,
+      vin: similarItem.vin,
+      isPromoted: false,
+      brand: null,
     );
   }
 }

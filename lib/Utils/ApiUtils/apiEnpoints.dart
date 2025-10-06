@@ -18,6 +18,8 @@ class ApiEndpoint{
   static const String posts = "/posts";
   static const String canUpload = "/app/can-upload";
   static const String similarItemsByCategory = "/app/similar-items-by-category";
+  static const String similarItemsByBrand = "/app/similar-items-by-brand";
+  static const String brandItems = "/app/brand-items";
   
   static const String resetPassword = '/reset-password';
   static const String sendResetPasswordOtp = '/send-reset-password-otp';
@@ -26,6 +28,7 @@ class ApiEndpoint{
   // profiles
   static const String verifications = "/verifications";
   static const String countries = "/countries";
+  static const String changePassword = "/change-password";
 
   // payment
   static const String packages = "/packages";

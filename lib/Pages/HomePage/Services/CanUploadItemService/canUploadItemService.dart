@@ -8,6 +8,7 @@ import 'package:logger/logger.dart';
 class CanUploadItemService {
   final logger = Logger();
   Future<Map<String, dynamic>> checkCanUpload({required String categorySlug}) async {
+    logger.w("Category slug: $categorySlug");
     final uri = Uri.parse("$baseApiUrl${ApiEndpoint.canUpload}");
     try {
       final token = await AuthService.getToken();

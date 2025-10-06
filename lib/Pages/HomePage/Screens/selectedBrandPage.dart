@@ -1,10 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/brandItemsModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBrandItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
@@ -25,56 +24,116 @@ class SelectedBrandPage extends StatefulWidget {
 }
 
 class _SelectedBrandPageState extends State<SelectedBrandPage> {
-  late TrendingMake _selectedBrand;
-  late List<RecommendedItem> _brandItems;
+  late Map<String, dynamic> _selectedBrand;
   late String _type;
+  final ScrollController _scrollController = ScrollController();
+  final double _scrollThreshold = 100.0;
+  bool _showSearchBar = true;
+  double _lastScrollOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
     _initializeFromArguments();
+    _setupScrollController();
+    _loadInitialItems();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void _initializeFromArguments() {
     final Map<String, dynamic> args = widget.allJson;
 
-    // DEBUG: Print all arguments to see what's actually being passed
     print('=== DEBUG: SelectedBrandPage Arguments ===');
     print('All arguments keys: ${args.keys}');
     print('Arguments: $args');
     print('=====================================');
 
-    // Handle selectedBrand
     if (args.containsKey('selectedBrand')) {
-      final selectedBrand = args['selectedBrand'];
-      if (selectedBrand is TrendingMake) {
-        _selectedBrand = selectedBrand;
-      } else if (selectedBrand is Map<String, dynamic>) {
-        _selectedBrand = TrendingMake.fromJson(selectedBrand);
-      } else {
-        throw Exception('Invalid selectedBrand type: ${selectedBrand.runtimeType}');
-      }
+      _selectedBrand = args['selectedBrand'] as Map<String, dynamic>;
+      print('Selected Brand Data: $_selectedBrand');
     } else {
       throw Exception('selectedBrand is required in arguments');
     }
 
-    // Handle brandItems - THIS IS THE KEY PART YOU'RE MISSING
-    if (args.containsKey('brandItems')) {
-      final brandItems = args['brandItems'];
-      if (brandItems is List<dynamic>) {
-        _brandItems = brandItems.cast<RecommendedItem>();
-        print('✅ Loaded ${_brandItems.length} brand items from arguments');
-      } else {
-        _brandItems = [];
-        print('⚠️ brandItems is not a list, using empty list');
-      }
-    } else {
-      _brandItems = [];
-      print('⚠️ No brandItems found in arguments, using empty list');
-    }
-
-    // Handle type
     _type = args['type'] as String? ?? 'selectedBrand';
+  }
+
+  void _setupScrollController() {
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.hasClients) {
+      final currentOffset = _scrollController.offset;
+      
+      // Show search bar when at the top
+      if (currentOffset <= 0) {
+        if (!_showSearchBar) {
+          setState(() {
+            _showSearchBar = true;
+          });
+        }
+      } 
+      // Hide when scrolling down, show when scrolling up
+      else if (currentOffset > _lastScrollOffset + 50) {
+        // Scrolling down - hide search bar
+        if (_showSearchBar) {
+          setState(() {
+            _showSearchBar = false;
+          });
+        }
+      } else if (currentOffset < _lastScrollOffset - 25) {
+        // Scrolling up - show search bar
+        if (!_showSearchBar) {
+          setState(() {
+            _showSearchBar = true;
+          });
+        }
+      }
+      
+      _lastScrollOffset = currentOffset;
+    }
+    
+    // Load more functionality
+    final provider = Provider.of<BrandItemsProvider>(context, listen: false);
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - _scrollThreshold &&
+        provider.canLoadMore) {
+      _loadMoreItems();
+    }
+  }
+
+  void _loadInitialItems() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<BrandItemsProvider>(context, listen: false);
+      
+      final brandId = _selectedBrand['id'];
+      if (brandId != null) {
+        print('🔄 Loading vehicles for brand: $brandId');
+        provider.loadInitialItems(brandId);
+      } else {
+        print('❌ No brand ID found in selectedBrand');
+      }
+    });
+  }
+
+  void _loadMoreItems() {
+    final provider = Provider.of<BrandItemsProvider>(context, listen: false);
+    if (provider.canLoadMore) {
+      print('🔄 Loading more items...');
+      provider.loadMoreItems();
+    }
+  }
+
+  void _onRefresh() async {
+    final provider = Provider.of<BrandItemsProvider>(context, listen: false);
+    await provider.refresh();
   }
 
   @override
@@ -88,11 +147,11 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 20, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black87),
           onPressed: () => Get.back(),
         ),
         title: Text(
-          _selectedBrand.name,
+          _selectedBrand['name'] ?? 'Brand',
           style: TextStyle(
             color: ColorGlobalVariables.brownColor,
             fontSize: 20,
@@ -100,79 +159,356 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          // CustomRoundIconButton(
-          //   iconData: Icons.filter_list_rounded,
-          //   isBorderSlightlyCurved: true,
-          //   onIconButtonClickFunction: () {
-          //     _showFilterOptions();
-          //   },
-          //   buttonSize: 36,
-          //   iconSize: 18,
-          // ),
-          const SizedBox(width: 8),
-        ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with results count
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
-                child: Text(
-                  "${_brandItems.length} vehicles found",
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-
-              // Grid view - NOW USING ACTUAL DATA FROM ARGUMENTS
-              Expanded(
-                child: _brandItems.isEmpty
-                    ? _buildEmptyState()
-                    : GridView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: _brandItems.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: isSmallScreen ? 1 : 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: isSmallScreen ? 1.6 : 0.72,
-                        ),
-                        itemBuilder: (context, index) {
-                          final item = _brandItems[index];
-                          return _BrandItemWidget(
-                            item: item,
-                            screenSize: screenSize,
-                          );
-                        },
+        child: Consumer<BrandItemsProvider>(
+          builder: (context, provider, child) {
+            return RefreshIndicator(
+              onRefresh: () async => _onRefresh(),
+              backgroundColor: Colors.white,
+              color: ColorGlobalVariables.brownColor,
+              child: Stack(
+                children: [
+                  _buildContent(provider, isSmallScreen),
+                  
+                  // Floating Search Bar
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      transform: Matrix4.translationValues(
+                        0, 
+                        _showSearchBar ? 0 : -100, 
+                        0
                       ),
+                      child: _buildSearchWidget(),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(BrandItemsProvider provider, bool isSmallScreen) {
+    return CustomScrollView(
+      controller: _scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        // Add padding at the top for the floating search bar
+        SliverToBoxAdapter(
+          child: SizedBox(height: _showSearchBar ? 80 : 0),
+        ),
+
+        // Header Section
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildHeaderSection(provider),
+          ),
+        ),
+
+        // Content based on state
+        if (provider.isLoading && provider.items.isEmpty)
+          const SliverToBoxAdapter(
+            child: _LoadingState(),
+          )
+        else if (provider.hasError && provider.items.isEmpty)
+          SliverToBoxAdapter(
+            child: _buildErrorState(provider.error!),
+          )
+        else if (provider.isEmpty)
+          SliverToBoxAdapter(
+            child: _buildEmptyState(),
+          )
+        else
+          _buildItemsGrid(provider, isSmallScreen),
+
+        // Load More Indicator
+        if (provider.hasMore)
+          SliverToBoxAdapter(
+            child: _buildLoadMoreIndicator(provider),
+          )
+        else if (provider.hasItems)
+          const SliverToBoxAdapter(
+            child: _NoMoreItemsIndicator(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSearchWidget() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to search page or implement search functionality
+          Get.toNamed(RouteClass.getHomePageSearchPage());
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 12,
+                offset: Offset(0, 4),
               ),
             ],
+            border: Border.all(
+              color: Colors.grey.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search_rounded,
+                  color: ColorGlobalVariables.blueColor,
+                  size: 24,
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Search ${_selectedBrand['name'] ?? 'brand'} vehicles...',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 16,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: ColorGlobalVariables.blueColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.tune_rounded,
+                        color: ColorGlobalVariables.blueColor,
+                        size: 16,
+                      ),
+                      SizedBox(width: 4),
+                      Text(
+                        'Filter',
+                        style: TextStyle(
+                          color: ColorGlobalVariables.blueColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  Widget _buildHeaderSection(BrandItemsProvider provider) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _selectedBrand['name'] ?? 'Brand',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          _buildResultsText(provider),
+          style: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+        if (provider.hasItems) ...[
+          const SizedBox(height: 8),
+          _buildStatsSection(provider),
+        ],
+      ],
+    );
+  }
+
+  String _buildResultsText(BrandItemsProvider provider) {
+    if (provider.isLoading && provider.items.isEmpty) {
+      return "Searching for vehicles...";
+    } else if (provider.isEmpty) {
+      return "No vehicles found";
+    } else {
+      return "${provider.totalItems} ${provider.totalItems == 1 ? 'vehicle' : 'vehicles'} available${provider.hasMore ? ' • More loading...' : ''}";
+    }
+  }
+
+  Widget _buildStatsSection(BrandItemsProvider provider) {
+    final priceRange = _calculatePriceRange(provider.items);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Price range: GH₵${formatNumber(shortenerRequired: true, number: priceRange['min']!.toInt())} - GH₵${formatNumber(shortenerRequired: true, number: priceRange['max']!.toInt())}',
+            style: TextStyle(
+              color: Colors.blue[700],
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (provider.hasMore)
+            Text(
+              '• More available',
+              style: TextStyle(
+                color: Colors.green[600],
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, double> _calculatePriceRange(List<BrandItem> items) {
+    if (items.isEmpty) return {'min': 0, 'max': 0};
+    
+    final prices = items.map((item) => double.tryParse(item.price) ?? 0).toList();
+    prices.sort();
+    
+    return {
+      'min': prices.first,
+      'max': prices.last,
+    };
+  }
+
+  Widget _buildItemsGrid(BrandItemsProvider provider, bool isSmallScreen) {
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: isSmallScreen ? 1 : 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: isSmallScreen ? 1.6 : 0.72,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final item = provider.items[index];
+            return _BrandItemWidget(
+              item: item,
+              screenSize: MediaQuery.of(context).size,
+            );
+          },
+          childCount: provider.items.length,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreIndicator(BrandItemsProvider provider) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: provider.isLoadingMore
+            ? Column(
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Loading more vehicles...',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              )
+            : GestureDetector(
+                onTap: _loadMoreItems,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.refresh, color: Colors.blue[700], size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Load More Vehicles',
+                        style: TextStyle(
+                          color: Colors.blue[700],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
-    return Center(
+    return Container(
+      height: 400,
+      padding: const EdgeInsets.all(32.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             Icons.directions_car_outlined,
-            size: 64,
+            size: 80,
             color: Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
-            'No vehicles found for ${_selectedBrand.name}',
+            'No Vehicles Found',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'We couldn\'t find any ${_selectedBrand['name'] ?? 'brand'} vehicles at the moment.',
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 16,
@@ -180,76 +516,147 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Check back later for new ${_selectedBrand.name} vehicles',
+            'Check back later or try another brand.',
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.grey[500],
               fontSize: 14,
             ),
-            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton(
+            onPressed: () => _loadInitialItems(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorGlobalVariables.brownColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text('Try Again'),
           ),
         ],
       ),
     );
   }
 
-  void _showFilterOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+  Widget _buildErrorState(String error) {
+    return Container(
+      height: 400,
+      padding: const EdgeInsets.all(32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 80,
+            color: Colors.red[400],
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Unable to Load Vehicles',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
-          child: Column(
+          const SizedBox(height: 12),
+          Text(
+            _extractErrorMessage(error),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Filter ${_selectedBrand.name} Vehicles',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Get.back(),
-                    ),
-                  ],
+              ElevatedButton(
+                onPressed: () => _loadInitialItems(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorGlobalVariables.brownColor,
+                  foregroundColor: Colors.white,
                 ),
+                child: const Text('Try Again'),
               ),
-              // Add your filter options here
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Filter options for ${_selectedBrand.name}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
+              const SizedBox(width: 12),
+              TextButton(
+                onPressed: () => Get.back(),
+                child: const Text('Go Back'),
               ),
             ],
           ),
-        );
-      },
+        ],
+      ),
+    );
+  }
+
+  String _extractErrorMessage(String fullError) {
+    try {
+      if (fullError.contains('"message":')) {
+        final start = fullError.indexOf('"message":') + 10;
+        final end = fullError.indexOf('",', start);
+        return fullError.substring(start, end).replaceAll('"', '');
+      }
+      return fullError.length > 150 ? '${fullError.substring(0, 150)}...' : fullError;
+    } catch (e) {
+      return fullError.length > 150 ? '${fullError.substring(0, 150)}...' : fullError;
+    }
+  }
+}
+
+// Loading State Widget
+class _LoadingState extends StatelessWidget {
+  const _LoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200,
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text(
+              'Loading vehicles...',
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// No More Items Indicator
+class _NoMoreItemsIndicator extends StatelessWidget {
+  const _NoMoreItemsIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Text(
+          'All vehicles loaded',
+          style: TextStyle(
+            color: Colors.grey[500],
+            fontSize: 14,
+          ),
+        ),
+      ),
     );
   }
 }
 
 class _BrandItemWidget extends StatefulWidget {
-  final RecommendedItem item;
+  final BrandItem item;
   final Size screenSize;
 
   const _BrandItemWidget({
@@ -258,27 +665,23 @@ class _BrandItemWidget extends StatefulWidget {
   });
 
   @override
-  __BrandItemWidgetState createState() => __BrandItemWidgetState();
+  _BrandItemWidgetState createState() => _BrandItemWidgetState();
 }
 
-class __BrandItemWidgetState extends State<_BrandItemWidget>
+class _BrandItemWidgetState extends State<_BrandItemWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  late Animation<Color?> _colorAnimation;
-
   bool _isLiked = false;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
@@ -286,15 +689,6 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-
-    _colorAnimation = ColorTween(
-      begin: Colors.grey[400],
-      end: Colors.red,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-
     _initializeLikeStatus();
   }
 
@@ -308,12 +702,9 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
     try {
       final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
       final isInWishlist = wishlistManager.isLiked(widget.item.id);
-
       setState(() {
         _isLiked = isInWishlist;
-        if (_isLiked) {
-          _animationController.value = 1.0;
-        }
+        if (_isLiked) _animationController.value = 1.0;
       });
     } catch (e) {
       print('Error checking wishlist status: $e');
@@ -322,10 +713,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
 
   Future<void> _toggleLike() async {
     if (_isLoading) return;
-
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     try {
       if (_isLiked) {
@@ -335,72 +723,25 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
       }
 
       final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
-
       final result = await wishlistProvider.toggleWishlistItem(
         itemId: widget.item.id,
         context: context,
       );
 
       if (result) {
-        setState(() {
-          _isLiked = !_isLiked;
-        });
-
+        setState(() => _isLiked = !_isLiked);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              _isLiked ? 'Added to wishlist!' : 'Removed from wishlist',
-              style: const TextStyle(color: Colors.white),
-            ),
+            content: Text(_isLiked ? 'Added to wishlist!' : 'Removed from wishlist'),
             backgroundColor: _isLiked ? Colors.green : Colors.orange,
             duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-      } else {
-        if (_isLiked) {
-          _animationController.forward();
-        } else {
-          _animationController.reverse();
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Failed to update wishlist',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
           ),
         );
       }
     } catch (e) {
       print('Wishlist error: $e');
-      if (_isLiked) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Error: ${e.toString()}',
-            style: const TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 2),
-        ),
-      );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -412,11 +753,9 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
 
   @override
   Widget build(BuildContext context) {
-    final firstImage = widget.item.images?.isNotEmpty == true
-        ? widget.item.images!.first
+    final firstImage = widget.item.images.isNotEmpty
+        ? widget.item.images.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-    final brandImage = widget.item.brand?.image;
-    final isPromoted = widget.item.isPromoted == true;
 
     return GestureDetector(
       onTap: () {
@@ -444,7 +783,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
+            // Image section
             Stack(
               children: [
                 ClipRRect(
@@ -456,8 +795,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                     child: _buildItemImage(firstImage),
                   ),
                 ),
-
-                // Condition Badge
+                // Condition badge
                 if (widget.item.condition != null)
                   Positioned(
                     top: 8,
@@ -478,45 +816,12 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                       ),
                     ),
                   ),
-
-                // PROMOTED BADGE
-                if (isPromoted)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[700],
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.star, color: Colors.white, size: 12),
-                          const SizedBox(width: 2),
-                          Text(
-                            'FEATURED',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                // Animated Wishlist Button
+                // Wishlist button
                 Positioned(
                   bottom: 8,
                   right: 8,
                   child: GestureDetector(
-                    onTap: () {
-                      if (_isLoading) return;
-                      _toggleLike();
-                    },
+                    onTap: _toggleLike,
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: ScaleTransition(
@@ -540,22 +845,13 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                                   height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.grey,
-                                    ),
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
                                   ),
                                 )
-                              : AnimatedBuilder(
-                                  animation: _colorAnimation,
-                                  builder: (context, child) {
-                                    return Icon(
-                                      _isLiked ? Icons.favorite : Icons.favorite_border,
-                                      size: 18,
-                                      color: _isLiked
-                                          ? _colorAnimation.value
-                                          : Colors.grey[600],
-                                    );
-                                  },
+                              : Icon(
+                                  _isLiked ? Icons.favorite : Icons.favorite_border,
+                                  size: 18,
+                                  color: _isLiked ? Colors.red : Colors.grey[600],
                                 ),
                         ),
                       ),
@@ -564,20 +860,18 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                 ),
               ],
             ),
-
-            // Content Section
+            // Details section
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title and Year
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
                         child: Text(
-                          widget.item.name ?? 'Unnamed Vehicle',
+                          widget.item.name,
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -588,7 +882,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                         ),
                       ),
                       Text(
-                        widget.item.year ?? '',
+                        widget.item.year,
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -596,15 +890,12 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 8),
-
-                  // Price and Mileage
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price ?? '0'))}',
+                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price))}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -627,30 +918,11 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                         ),
                     ],
                   ),
-
                   const SizedBox(height: 12),
-
-                  // Brand and Details
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (brandImage != null)
-                        Container(
-                          width: 24,
-                          height: 24,
-                          child: CachedNetworkImage(
-                            imageUrl: getImageUrl(brandImage, null),
-                            fit: BoxFit.contain,
-                            errorWidget: (context, url, error) => Icon(
-                              Icons.business,
-                              size: 16,
-                              color: Colors.grey[400],
-                            ),
-                          ),
-                        )
-                      else
-                        const SizedBox(width: 24),
-
+                      const SizedBox(width: 24),
                       if (widget.item.transmission != null)
                         Row(
                           children: [
@@ -665,7 +937,6 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                             ),
                           ],
                         ),
-
                       if (widget.item.location != null)
                         Flexible(
                           child: Row(
@@ -674,7 +945,7 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
-                                  widget.item.location!,
+                                  widget.item.location,
                                   style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.grey[600],
@@ -704,28 +975,20 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
       return Image.asset(
         imageUrl,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildImageErrorPlaceholder();
-        },
+        errorBuilder: (context, error, stackTrace) => _buildImageErrorPlaceholder(),
       );
     } else {
-      final String fullImageUrl = getImageUrl(imageUrl, null);
-
       return CachedNetworkImage(
-        imageUrl: fullImageUrl,
+        imageUrl: getImageUrl(imageUrl, null),
         fit: BoxFit.cover,
-        progressIndicatorBuilder: (context, url, downloadProgress) {
-          return Center(
-            child: CircularProgressIndicator(
-              value: downloadProgress.progress,
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-            ),
-          );
-        },
-        errorWidget: (context, url, error) {
-          return _buildImageErrorPlaceholder();
-        },
+        progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+          child: CircularProgressIndicator(
+            value: downloadProgress.progress,
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+          ),
+        ),
+        errorWidget: (context, url, error) => _buildImageErrorPlaceholder(),
       );
     }
   }
@@ -733,17 +996,17 @@ class __BrandItemWidgetState extends State<_BrandItemWidget>
   Widget _buildImageErrorPlaceholder() {
     return Container(
       color: Colors.grey[200],
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
-            const SizedBox(height: 4),
+            Icon(Icons.image_not_supported, size: 32, color: Colors.grey),
+            SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: Colors.grey,
               ),
             ),
           ],
