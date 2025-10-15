@@ -23,8 +23,8 @@ class Package with _$Package {
     @JsonKey(name: 'country_id') required int countryId,
     required String name,
     required String? description,
-    required String price,
-    @JsonKey(name: 'number_of_listings') required int numberOfListings,
+    @JsonKey(name: 'price') required String price, // This is now just 'price'
+    @JsonKey(name: 'number_of_listings') required int? numberOfListings,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
     @JsonKey(name: 'category_id') required int? categoryId,
@@ -38,6 +38,13 @@ class Package with _$Package {
       _$PackageFromJson(json);
 }
 
+// Create a separate helper class for price conversion
+class PackageHelper {
+  static double parsePrice(Package package) {
+    return double.tryParse(package.price) ?? 0.0; // Uses package.price
+  }
+}
+
 @freezed
 class Category with _$Category {
   const factory Category({
@@ -47,7 +54,7 @@ class Category with _$Category {
     required String name,
     required String slug,
     required String? description,
-    required List<String> features,
+    required List<dynamic> features,
     required String? image,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
@@ -103,7 +110,7 @@ class PaginationLinks with _$PaginationLinks {
 class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     @JsonKey(name: 'current_page') required int currentPage,
-    required int from,
+    required int? from,
     @JsonKey(name: 'last_page') required int lastPage,
     required List<PaginationLink> links,
     required String path,

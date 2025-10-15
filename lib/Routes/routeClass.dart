@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/enterOtpPage.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/postResponse.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Screens/chatPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/homePageSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/locationSearchPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/mainBottomNavigationPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/myListingsPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/selectedBrandPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/selectedCategoryItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/specialOfferDetailPage.dart';
@@ -32,7 +33,6 @@ import 'package:gag_cars_frontend/Pages/Authentication/Screens/forgotPasswordPag
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/resetPasswordPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/verifyCodePage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithEmailPage.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Screens/signUpWithPhonePage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signUpWithEmailPage.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Screens/signInWithPhonePage.dart';
 
@@ -85,6 +85,7 @@ class RouteClass {
   static String mainNewsPage = "/main-news-page";
   static String myListingsPage = "/my-listings-page";
   static String selectedBrandPage = "/selected-brand-page";
+  static String chatPage = "/chat-page";
   // static String wishlistPage = "/wishlist-page";
   static String sellCarPage = "/sell-car-page";
   static String sellCarTwoPage = "/sell-car-two-page";
@@ -141,6 +142,7 @@ class RouteClass {
   static String getNewsBlogPage() => newsBlogPage;
   static String getMainNewsPage() => mainNewsPage;
   static String getSelectedCategoryItemPage() => selectedCategoryItemPage;
+  static String getChatPage() => chatPage;
   // static String getWishlistPage() => wishlistPage;
   static String getMyListingsPage() => myListingsPage;
   static String getSelectedBrandPage() => selectedBrandPage;
@@ -173,8 +175,25 @@ class RouteClass {
     GetPage(page: () => const SplashPage(), name: splashPage, transition: Transition.noTransition),
     GetPage(page: () => VerifyCodePage(allJson: Get.arguments ?? {}), name: verifyCodePage, transition: Transition.noTransition),
     GetPage(page: () => const ForgotPasswordPage(), name: forgotPasswordPage, transition: Transition.noTransition),
-    GetPage(page: () => const ResetPasswordPage(), name: resetPasswordPage, transition: Transition.noTransition),
-    GetPage(page: () => EnterOtpPage(email: Get.arguments ?? ""), name: enterOtpPage, transition: Transition.noTransition),
+    GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return ResetPasswordPage(
+          allJson: args,
+        );
+      }, 
+      name: resetPasswordPage, 
+      transition: Transition.noTransition
+      ),
+    GetPage(
+      page: (){
+        final args = Get.arguments as Map<String, dynamic>? ?? {};
+        return EnterOtpPage(
+          allJson: args,
+        );  
+      } , 
+      name: enterOtpPage, 
+      transition: Transition.noTransition),
 
     // Profile
     // GetPage(page: () => const SettingsPage(), name: settingsPage, transition: Transition.noTransition),
@@ -241,12 +260,17 @@ class RouteClass {
      name: selectedCategoryItemPage, 
      transition: Transition.noTransition
      ),
+    GetPage(page: () => ChatPage(), name: chatPage, transition: Transition.noTransition),
     GetPage(page: () => HomePageSearchPage(), name: homePageSearchPage, transition: Transition.noTransition),
     GetPage(page: () => const NewsBlogPage(), name: newsBlogPage, transition: Transition.noTransition),
-    GetPage(page: () => MainNewsPage(allJson: Get.arguments ?? {}), name: mainNewsPage, transition: Transition.noTransition),
+    GetPage(
+      page: (){
+        final post = Get.arguments as Post; 
+        return MainNewsPage(post: post); },
+      name: mainNewsPage, 
+      transition: Transition.noTransition),
     // GetPage(page: () => const WishlistPage(), name: wishlistPage, transition: Transition.noTransition),
     GetPage(page: () => const SellCarPage(), name: sellCarPage, transition: Transition.noTransition),
-    GetPage(page: () => const MyListingsPage(), name: myListingsPage, transition: Transition.noTransition),
     GetPage(
       page: (){
         final args = Get.arguments as Map<String, dynamic>? ?? {};
@@ -297,9 +321,8 @@ class RouteClass {
       name: specialOfferDetailPage, 
       transition: Transition.noTransition
     ),
-    GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
+    GetPage(page: () => const NotificationPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => const SearchPage(), name: searchPage, transition: Transition.noTransition),
-    GetPage(page: () => const NotificationsPage(), name: notificationsPage, transition: Transition.noTransition),
     GetPage(page: () => MainBottomNavigationPage(), name: mainBottomNavigationPage, transition: Transition.noTransition),
     GetPage(page: () => LocationSearchPage(), name: locationSearchPage, transition: Transition.noTransition),
     // GetPage(page: () => PostItemPage(), name: postItemPage, transition: Transition.noTransition),

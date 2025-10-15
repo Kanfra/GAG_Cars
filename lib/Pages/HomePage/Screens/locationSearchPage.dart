@@ -175,24 +175,122 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   void _showLocationServiceDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Location Services Disabled'),
-        content: const Text(
-          'Please enable location services to use this feature.',
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor,
+                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.location_off_rounded,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Location Services Disabled',
+                style: TextStyle(
+                  color: ColorGlobalVariables.blackColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Please enable location services to use this feature and get accurate location results.',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Geolocator.openLocationSettings();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          child: Text(
+                            'Open Settings',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Geolocator.openLocationSettings();
-            },
-            child: const Text('Open Settings'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -200,24 +298,122 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   void _showLocationPermissionDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Location Permission Required'),
-        content: const Text(
-          'This app needs location permission to determine your current location.',
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor,
+                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.privacy_tip_rounded,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Location Permission Required',
+                style: TextStyle(
+                  color: ColorGlobalVariables.blackColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'This app needs location permission to determine your current location and provide accurate search results.',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Geolocator.openAppSettings();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          child: Text(
+                            'Open Settings',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Geolocator.openAppSettings();
-            },
-            child: const Text('Open Settings'),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -266,18 +462,92 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Select Location',
-          style: TextStyle(
+      backgroundColor: Colors.white,
+      appBar: _buildBeautifulAppBar(),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.white,
+              Colors.grey.shade50,
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              _buildBeautifulSearchBar(),
+              const SizedBox(height: 16),
+              if (_locationPermissionDenied) _buildBeautifulPermissionWarning(),
+              if (!_locationServiceEnabled) _buildBeautifulLocationServiceWarning(),
+              const SizedBox(height: 20),
+              Expanded(child: _buildBeautifulLocationList()),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  AppBar _buildBeautifulAppBar() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
             color: ColorGlobalVariables.brownColor,
+            size: 20,
           ),
-          ),
-        centerTitle: true,
-        actions: [
-          if (_selectedLocation != null)
-            IconButton(
-              icon: const Icon(Icons.check),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      title: Text(
+        'Select Location',
+        style: TextStyle(
+          color: ColorGlobalVariables.brownColor,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      centerTitle: true,
+      actions: [
+        if (_selectedLocation != null)
+          Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.check_rounded,
+                color: ColorGlobalVariables.brownColor,
+                size: 22,
+              ),
               onPressed: () {
                 Navigator.pop(context, {
                   'locationName': _selectedLocation,
@@ -289,74 +559,123 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               },
               tooltip: 'Confirm selection',
             ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildSearchBar(),
-            const SizedBox(height: 8),
-            if (_locationPermissionDenied) _buildPermissionWarning(),
-            if (!_locationServiceEnabled) _buildLocationServiceWarning(),
-            const SizedBox(height: 16),
-            Expanded(child: _buildLocationList()),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            controller: _searchController,
-            focusNode: _searchFocusNode,
-            decoration: InputDecoration(
-              hintText: 'Search for a location...',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        _searchFocusNode.requestFocus();
-                        setState(() => _searchResults = []);
-                      },
-                    )
-                  : null,
-            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(Icons.my_location),
-          onPressed: _getCurrentLocation,
-          tooltip: 'Use current location',
-        ),
       ],
     );
   }
 
-  Widget _buildPermissionWarning() {
-    return InkWell(
-      onTap: _showLocationPermissionDialog,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.red.shade50,
-          borderRadius: BorderRadius.circular(8),
-        ),
+  Widget _buildBeautifulSearchBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            const Icon(Icons.warning, color: Colors.red),
-            const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                'Location permission denied. Tap to enable.',
-                style: TextStyle(color: Colors.red.shade700),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.grey[300]!,
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Icon(
+                        Icons.search_rounded,
+                        color: Colors.grey[500],
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        style: TextStyle(
+                          color: ColorGlobalVariables.blackColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        decoration: const InputDecoration(
+                          hintText: 'Search for a city or location...',
+                          border: InputBorder.none,
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (_searchController.text.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.clear_rounded,
+                            color: Colors.grey[500],
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            _searchFocusNode.requestFocus();
+                            setState(() => _searchResults = []);
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor,
+                    ColorGlobalVariables.brownColor.withOpacity(0.8),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: _getCurrentLocation,
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    padding: const EdgeInsets.all(12),
+                    child: Icon(
+                      Icons.my_location_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -365,34 +684,214 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     );
   }
 
-  Widget _buildLocationServiceWarning() {
-    return InkWell(
-      onTap: _showLocationServiceDialog,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.orange.shade50,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.location_off, color: Colors.orange),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Location services disabled. Tap to enable.',
-                style: TextStyle(color: Colors.orange.shade700),
-              ),
+  Widget _buildBeautifulPermissionWarning() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _showLocationPermissionDialog,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.red.shade50,
+                Colors.red.shade100,
+              ],
             ),
-          ],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.red.shade200,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.red.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.warning_rounded,
+                  color: Colors.red.shade600,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Location Access Required',
+                      style: TextStyle(
+                        color: Colors.red.shade800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tap to enable location permissions for accurate results',
+                      style: TextStyle(
+                        color: Colors.red.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.red.shade600,
+                size: 24,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildLocationList() {
+  Widget _buildBeautifulLocationServiceWarning() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _showLocationServiceDialog,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.orange.shade50,
+                Colors.orange.shade100,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.orange.shade200,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withOpacity(0.1),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.location_off_rounded,
+                  color: Colors.orange.shade600,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Location Services Off',
+                      style: TextStyle(
+                        color: Colors.orange.shade800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Enable location services for better experience',
+                      style: TextStyle(
+                        color: Colors.orange.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.orange.shade600,
+                size: 24,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBeautifulLocationList() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                    blurRadius: 15,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.search_rounded,
+                color: ColorGlobalVariables.brownColor,
+                size: 36,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Searching Locations...',
+              style: TextStyle(
+                color: ColorGlobalVariables.brownColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Finding the best matches for you',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     if (_searchResults.isEmpty) {
@@ -400,36 +899,194 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.location_on,
-              size: 48,
-              color: Colors.grey.shade400,
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor.withOpacity(0.1),
+                    ColorGlobalVariables.brownColor.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(60),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.explore_rounded,
+                size: 50,
+                color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               _searchController.text.isEmpty
-                  ? 'Search for a location or use your current position'
-                  : 'No locations found. Try a different search.',
-              style: TextStyle(color: Colors.grey.shade600),
+                  ? 'Find Your Location'
+                  : 'No Locations Found',
+              style: TextStyle(
+                color: ColorGlobalVariables.blackColor,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            const SizedBox(height: 12),
+            Text(
+              _searchController.text.isEmpty
+                  ? 'Search for a city or use your current location to get started'
+                  : 'Try searching with different keywords or check your spelling',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            if (_searchController.text.isEmpty) ...[
+              const SizedBox(height: 24),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: _getCurrentLocation,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.my_location_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Use Current Location',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       );
     }
 
     return ListView.builder(
+      physics: const BouncingScrollPhysics(),
       itemCount: _searchResults.length,
       itemBuilder: (context, index) {
         final prediction = _searchResults[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: ListTile(
-            leading: const Icon(Icons.location_on),
-            title: Text(prediction.description ?? ''),
-            onTap: () => _handleLocationSelection(prediction),
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => _handleLocationSelection(prediction),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.grey[200]!,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Icons.location_on_rounded,
+                        color: ColorGlobalVariables.brownColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            prediction.structuredFormatting?.mainText ?? '',
+                            style: TextStyle(
+                              color: ColorGlobalVariables.blackColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (prediction.structuredFormatting?.secondaryText != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              prediction.structuredFormatting!.secondaryText!,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.grey[400],
+                      size: 24,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       },

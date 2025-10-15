@@ -83,7 +83,6 @@ dependencies:
   pdf: ^3.10.4             # For PDF generation
   printing: ^5.11.1        # For PDF printing and sharing
   open_file: ^3.3.1        # For opening downloaded files
-  mailer: ^6.5.0
 
 dev_dependencies:
   flutter_test:

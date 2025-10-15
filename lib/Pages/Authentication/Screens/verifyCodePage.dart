@@ -84,6 +84,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       );
       setState(() => _otpSent = true);
       showCustomSnackBar(
+        title: "OTP Sent",
         message: "OTP sent to $_phoneNumber",
         backgroundColor: ColorGlobalVariables.blueColor,
       );
@@ -153,7 +154,11 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
         _otpSent = true;
       });
       _startCountdown();
-      showCustomSnackBar(message: "OTP resent successfully");
+      showCustomSnackBar(
+        title: "OTP Sent",
+        message: "OTP resent successfully",
+        backgroundColor: ColorGlobalVariables.blueColor,
+        );
     }catch(e){
       setState(() => _errorMessage = e.toString());
       showCustomSnackBar(message: "Failed to resend OTP: $_errorMessage");
@@ -224,7 +229,9 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     // pinput field
                     SizedBox(height: 50),
                     (_isLoading || userProvider.isLoading) 
-                      ? CircularProgressIndicator() 
+                      ? CircularProgressIndicator(
+                        color: ColorGlobalVariables.brownColor,
+                      ) 
                       : Pinput(
                           controller: pinController,
                           focusNode: focusNode,

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/customListTile.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
@@ -16,7 +13,6 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -77,8 +73,38 @@ class _SettingsState extends State<SettingsPage> {
     }
   }
 
+  // Enhanced URL validation method
+  bool _isValidImageUrl(String url) {
+    if (url.isEmpty) return false;
+    
+    try {
+      final uri = Uri.parse(url);
+      // Check if it's a properly formatted HTTP/HTTPS URL
+      if (!uri.hasScheme || (uri.scheme != 'http' && uri.scheme != 'https')) {
+        return false;
+      }
+      
+      // Check if it has a valid host
+      if (uri.host.isEmpty) {
+        return false;
+      }
+      
+      return true;
+    } catch (e) {
+      print('Invalid image URL: $url, error: $e');
+      return false;
+    }
+  }
+
   // Function to show the image in a zoomable dialog with app bar
   void _showImageZoomDialog(String imageUrl, bool isAssetImage) {
+    // If it's not an asset image, validate the URL first
+    if (!isAssetImage && !_isValidImageUrl(imageUrl)) {
+      // Show default image instead of broken network image
+      _showDefaultImageZoomDialog();
+      return;
+    }
+    
     Navigator.of(context).push(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -91,21 +117,22 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
-  // Helper method to get profile image widget
-  Widget _getProfileImage(UserModel? user) {
-    // Priority 1: User's existing profile image from server
-    if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
-      return CustomImage(
-        imagePath: getImageUrl(user.profileImage!, ""),
-        isAssetImage: false,
-        imageHeight: 100,
-        imageWidth: 100,
-        imageBorderRadius: 50,
-        isImageBorderRadiusRequired: true,
-      );
-    }
-    
-    // Priority 2: Default profile image using Flutter's built-in person icon
+  // Show default image when URL is invalid
+  void _showDefaultImageZoomDialog() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => ImageViewerScreen(
+          imageUrl: "",
+          isAssetImage: true, // Treat as asset image to show default
+          userName: Provider.of<UserProvider>(context, listen: false).user?.name ?? "User",
+        ),
+      ),
+    );
+  }
+
+  // Build default profile image widget
+  Widget _buildDefaultProfileImage() {
     return Container(
       width: 100,
       height: 100,
@@ -119,6 +146,29 @@ class _SettingsState extends State<SettingsPage> {
         color: ColorGlobalVariables.brownColor.withOpacity(0.6),
       ),
     );
+  }
+
+  // Helper method to get profile image widget with robust error handling
+  Widget _getProfileImage(UserModel? user) {
+    // Priority 1: User's existing profile image from server (with validation)
+    if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
+      final String imageUrl = getImageUrl(user.profileImage!, "");
+      
+      // Validate if the URL is properly formatted
+      if (_isValidImageUrl(imageUrl)) {
+        return CustomImage(
+          imagePath: imageUrl,
+          isAssetImage: false,
+          imageHeight: 100,
+          imageWidth: 100,
+          imageBorderRadius: 50,
+          isImageBorderRadiusRequired: true,
+        );
+      }
+    }
+    
+    // Priority 2: Default profile image
+    return _buildDefaultProfileImage();
   }
 
   @override
@@ -141,9 +191,13 @@ class _SettingsState extends State<SettingsPage> {
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => Get.back(),
         isLeadingWidgetExist: false,
+        appbarBackgroundColor: ColorGlobalVariables.whiteColor,
+        titleTextSize: 22,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
         titleText: "Settings",
-        titleTextColor: ColorGlobalVariables.blackColor,
+        
+        titleFontWeight: FontWeight.bold,
+        titleTextColor: ColorGlobalVariables.brownColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -179,12 +233,17 @@ class _SettingsState extends State<SettingsPage> {
                         children: [
                           // Profile Image with zoom on tap
                           GestureDetector(
-                            onTap: () => _showImageZoomDialog(
-                              user?.profileImage != null && user!.profileImage!.isNotEmpty 
-                                ? getImageUrl(user.profileImage!, "") 
-                                : "",
-                              user?.profileImage == null || user!.profileImage!.isEmpty
-                            ),
+                            onTap: () {
+                              if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
+                                final String imageUrl = getImageUrl(user.profileImage!, "");
+                                _showImageZoomDialog(
+                                  imageUrl,
+                                  !_isValidImageUrl(imageUrl), // If URL is invalid, treat as asset
+                                );
+                              } else {
+                                _showDefaultImageZoomDialog();
+                              }
+                            },
                             child: Hero(
                               tag: 'profile-image',
                               child: _getProfileImage(user),
@@ -436,7 +495,7 @@ class _SettingsState extends State<SettingsPage> {
   }
 }
 
-// New screen for image viewing with app bar
+// Enhanced ImageViewerScreen with better error handling
 class ImageViewerScreen extends StatefulWidget {
   final String imageUrl;
   final bool isAssetImage;
@@ -475,7 +534,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
 
   Future<void> _shareImage() async {
     try {
-      if (widget.isAssetImage) {
+      if (widget.isAssetImage || widget.imageUrl.isEmpty) {
         // For default profile images, we can't share directly
         Get.snackbar(
           "Info",
@@ -532,9 +591,9 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     Get.toNamed(RouteClass.getProfileUpdatePage());
   }
 
-  // Helper method to get the display image for viewer
+  // Enhanced method to get the display image for viewer with better error handling
   Widget _getImageViewerImage() {
-    if (widget.isAssetImage) {
+    if (widget.isAssetImage || widget.imageUrl.isEmpty) {
       // Show default person icon for default profile image
       return Container(
         color: Colors.black,
@@ -585,7 +644,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black.withOpacity(0.7),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 236, 135, 135)),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -603,7 +662,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             onPressed: _navigateToEditProfile,
             tooltip: "Edit Profile",
           ),
-          if (!widget.isAssetImage) // Only show share button for actual profile images
+          if (!widget.isAssetImage && widget.imageUrl.isNotEmpty) // Only show share button for actual profile images
             IconButton(
               icon: const Icon(Icons.share, color: Colors.white),
               onPressed: _shareImage,

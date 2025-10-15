@@ -31,7 +31,7 @@ _$PackageImpl _$$PackageImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       description: json['description'] as String?,
       price: json['price'] as String,
-      numberOfListings: (json['number_of_listings'] as num).toInt(),
+      numberOfListings: (json['number_of_listings'] as num?)?.toInt(),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       categoryId: (json['category_id'] as num?)?.toInt(),
@@ -68,8 +68,7 @@ _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       slug: json['slug'] as String,
       description: json['description'] as String?,
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
+      features: json['features'] as List<dynamic>,
       image: json['image'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
@@ -158,7 +157,7 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
 _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
     _$PaginationMetaImpl(
       currentPage: (json['current_page'] as num).toInt(),
-      from: (json['from'] as num).toInt(),
+      from: (json['from'] as num?)?.toInt(),
       lastPage: (json['last_page'] as num).toInt(),
       links: (json['links'] as List<dynamic>)
           .map((e) => PaginationLink.fromJson(e as Map<String, dynamic>))

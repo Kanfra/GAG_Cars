@@ -6,10 +6,12 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBrandItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getNotificationsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/searchProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/BlogPostService/blogPostService.dart';
@@ -19,6 +21,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/ma
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/faqProvider.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +73,15 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => BrandItemsProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => NotificationProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => SearchProvider()
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FaqProvider()
+          ),
       ],
       child: const MyApp(),
     ),

@@ -147,7 +147,7 @@ class AuthService {
     required String phone
   }) async {
     final logger = Logger();
-    const endpoint = '/otp/send';
+    const endpoint = ApiEndpoint.sendOtp;
     final url = Uri.parse('$baseApiUrl$endpoint');
     try{
       // take the body
@@ -258,54 +258,180 @@ class AuthService {
   // sign in with email
   // auth_service.dart
 // Login with Email 
-  static Future<AuthResponseModel> logInWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    final logger = Logger();
-    final deviceName = await _getDeviceName();
-    const endpoint = '/sanctum/token'; 
-    final url = Uri.parse('$baseApiUrl$endpoint');
-    try {
-      final body = jsonEncode({
-        'email': email,
-        'password': password,
-        'device_name': deviceName,
-      });
-      logger.i("body: $body");
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: body,
-      );
+// sign in with email
+static Future<AuthResponseModel> logInWithEmail({
+  required String email,
+  required String password,
+}) async {
+  final logger = Logger();
+  final deviceName = await _getDeviceName();
+  const endpoint = '/sanctum/token'; 
+  final url = Uri.parse('$baseApiUrl$endpoint');
+  
+  logger.i('🚀 STARTING LOGIN PROCESS');
+  logger.i('📧 Email: $email');
+  logger.i('📱 Device name: $deviceName');
+  logger.i('🔗 API URL: $url');
+  
+  try {
+    final body = jsonEncode({
+      'email': email,
+      'password': password,
+      'device_name': deviceName,
+    });
+    
+    logger.i('📦 Request body: $body');
+    logger.i('📤 Sending login request...');
 
-      if (response.statusCode == 201) {
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: body,
+    );
+
+    logger.i('📥 Response received');
+    logger.i('📊 Status Code: ${response.statusCode}');
+    logger.i('📄 Response Headers: ${response.headers}');
+    logger.i('📝 Response Body: ${response.body}');
+
+    // Log detailed response information
+    if (response.statusCode == 201) {
+      logger.i('✅ Login successful (201)');
+      
+      try {
+        final responseData = jsonDecode(response.body);
+        logger.i('🔍 Parsed response data: $responseData');
+        
         final authResponse = AuthResponseModel.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>,
+          responseData as Map<String, dynamic>,
         );
         
-        // Secure storage of token and user data
-        await _storage.write(key: _tokenKey, value: authResponse.token);
-        await _storage.write(
-          key: _userKey, 
-          value: jsonEncode(authResponse.user.toJson()),
-        );
+        logger.i('🔑 Token received: ${authResponse.token != null ? "YES" : "NO"}');
+        logger.i('👤 User data received: ${authResponse.user != null ? "YES" : "NO"}');
         
-        return authResponse;
-      } else {
-        final error = jsonDecode(response.body);
-        logger.e("Login failed: ${error['message']}");
-        throw Exception(error['message'] ?? 'Login failed');
-      }
-    } catch (e) {
-      logger.e("Login failed: $e");
-      throw Exception('Login failed: ${e.toString()}');
-    }
-  }
+        if (authResponse.token == null) {
+          logger.e('❌ Token is null in response!');
+          throw Exception('Authentication token not received from server');
+        }
 
+        // Secure storage of token and user data
+        await _storage.write(key: _tokenKey, value: authResponse.token!);
+        logger.i('💾 Token stored securely');
+        
+        if (authResponse.user != null) {
+          await _storage.write(
+            key: _userKey, 
+            value: jsonEncode(authResponse.user!.toJson()),
+          );
+          logger.i('💾 User data stored for: ${authResponse.user!.email}');
+        }
+        
+        logger.i('🎉 Login completed successfully');
+        return authResponse;
+        
+      } catch (e) {
+        logger.e('❌ Error parsing successful response: $e');
+        throw Exception('Failed to process login response: $e');
+      }
+      
+    } else if (response.statusCode == 200) {
+      logger.i('✅ Login successful (200)');
+      
+      try {
+        final responseData = jsonDecode(response.body);
+        logger.i('🔍 Parsed response data: $responseData');
+        
+        final authResponse = AuthResponseModel.fromJson(
+          responseData as Map<String, dynamic>,
+        );
+        
+        logger.i('🔑 Token received: ${authResponse.token != null ? "YES" : "NO"}');
+        logger.i('👤 User data received: ${authResponse.user != null ? "YES" : "NO"}');
+        
+        if (authResponse.token == null) {
+          logger.e('❌ Token is null in response!');
+          throw Exception('Authentication token not received from server');
+        }
+
+        // Secure storage of token and user data
+        await _storage.write(key: _tokenKey, value: authResponse.token!);
+        logger.i('💾 Token stored securely');
+        
+        if (authResponse.user != null) {
+          await _storage.write(
+            key: _userKey, 
+            value: jsonEncode(authResponse.user!.toJson()),
+          );
+          logger.i('💾 User data stored for: ${authResponse.user!.email}');
+        }
+        
+        logger.i('🎉 Login completed successfully');
+        return authResponse;
+        
+      } catch (e) {
+        logger.e('❌ Error parsing successful response: $e');
+        throw Exception('Failed to process login response: $e');
+      }
+      
+    } else if (response.statusCode == 401) {
+      logger.e('❌ Unauthorized (401) - Invalid credentials');
+      final errorData = jsonDecode(response.body);
+      logger.e('🔍 Error details: $errorData');
+      throw Exception('The provided email or password is incorrect.');
+      
+    } else if (response.statusCode == 422) {
+      logger.e('❌ Unprocessable Entity (422) - Validation error');
+      final errorData = jsonDecode(response.body);
+      logger.e('🔍 Validation errors: $errorData');
+      final errorMessage = errorData['message'] ?? 'Validation failed';
+      throw Exception(errorMessage);
+      
+    } else if (response.statusCode == 400) {
+      logger.e('❌ Bad Request (400)');
+      final errorData = jsonDecode(response.body);
+      logger.e('🔍 Error details: $errorData');
+      throw Exception(errorData['message'] ?? 'Invalid request');
+      
+    } else if (response.statusCode == 404) {
+      logger.e('❌ Not Found (404)');
+      throw Exception('Login endpoint not found. Please check the API configuration.');
+      
+    } else if (response.statusCode == 500) {
+      logger.e('❌ Internal Server Error (500)');
+      throw Exception('Server error. Please try again later.');
+      
+    } else {
+      logger.e('❌ Unexpected status code: ${response.statusCode}');
+      final errorData = jsonDecode(response.body);
+      logger.e('🔍 Error response: $errorData');
+      throw Exception(errorData['message'] ?? 'Login failed with status: ${response.statusCode}');
+    }
+    
+  } on SocketException catch (e) {
+    logger.e('🌐 Network error: $e');
+    throw Exception('No internet connection. Please check your network and try again.');
+    
+  } on TimeoutException catch (e) {
+    logger.e('⏰ Request timeout: $e');
+    throw Exception('Request timeout. Please try again.');
+    
+  } on FormatException catch (e) {
+    logger.e('📄 JSON parsing error: $e');
+    throw Exception('Invalid server response format. Please try again.');
+    
+  } on http.ClientException catch (e) {
+    logger.e('🚫 HTTP client error: $e');
+    throw Exception('Network request failed. Please check your connection.');
+    
+  } catch (e) {
+    logger.e('💥 Unexpected login error: $e');
+    logger.e('📝 Stack trace: ${e.toString()}');
+    throw Exception('Login failed: ${e.toString()}');
+  }
+}
 // send otp - done
 static Future<bool> sendOtp(
   String phone, 
@@ -313,7 +439,7 @@ static Future<bool> sendOtp(
   // String token
   ) async {
   final logger = Logger();
-  const endpoint = '/otp/send'; 
+  const endpoint = ApiEndpoint.sendOtp; 
   final url = Uri.parse('$baseApiUrl$endpoint');
   try{
     final body = jsonEncode({
@@ -398,42 +524,61 @@ static Future<AuthResponseModel> verifyOtp({
 
 // send password reset email
 static Future<void> sendPasswordResetEmail({
+  required String phone,
   required String email,
 }) async {
+  final logger = Logger();
   try{
+
     await postApiData<void>(
       endpoint: ApiEndpoint.sendResetPasswordOtp,
       body: {
-        'email': email
+        "phone": phone,
+        "email": email,
       },
       fromJson: (_){}, // empty function since we don't need return data
     );
   } catch(e){
+    logger.e("Error sending password reset email: $e");
     rethrow; // let the calling function handle the error
   }
 }
 
 // reset password
 static Future<void> resetPassword({
-  required String token,
+  required String phone,
   required String email,
+  required String otp,
   required String newPassword,
 }) async {
+  final logger = Logger();
   try{
+    final token = await AuthService.getToken();
+    if(token == null){
+      throw Exception("User not authenticated");
+    }
+    logger.i("token: $token");
     await postApiData(
-      endpoint: ApiEndpoint.sendResetPasswordOtp, 
+      endpoint: ApiEndpoint.resetPassword, 
       body: {
-        'token': token,
+        'phone': phone,
         'email': email,
-        'newPassword': newPassword,
-      }, 
+        'otp': otp,
+        'password': newPassword,
+      },
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        }, 
       fromJson: (_){},  // no return data expected
       );
   }catch(e){
     rethrow; //let the UI handle the error
   }
 }
- 
+
+// get user profile
 static Future<Map<String, dynamic>> getUserProfile() async {
   final logger = Logger();
   final uri = Uri.parse("$baseApiUrl${ApiEndpoint.authenticateUser}");

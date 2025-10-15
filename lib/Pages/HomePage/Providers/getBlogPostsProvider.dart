@@ -77,7 +77,6 @@ class BlogPostProvider with ChangeNotifier {
         queryParams['category'] = category;
       }
       
-      // CORRECTED: Use queryParams parameter
       final response = await _blogPostService.getPosts(queryParams: queryParams);
       
       if (refresh || _postsResponse == null) {
@@ -147,7 +146,6 @@ class BlogPostProvider with ChangeNotifier {
         queryParams['category'] = category;
       }
       
-      // CORRECTED: Use queryParams parameter
       final response = await _blogPostService.getPosts(queryParams: queryParams);
       
       _postsResponse = _postsResponse!.copyWith(
@@ -179,42 +177,6 @@ class BlogPostProvider with ChangeNotifier {
   // Fetch posts by category name
   Future<void> fetchPostsByCategoryName(String categoryName, {bool refresh = false}) async {
     await fetchPosts(refresh: refresh, category: categoryName);
-  }
-
-  // Fetch posts by category ID
-  Future<void> fetchPostsByCategoryId(int categoryId, {bool refresh = false}) async {
-    if (refresh) {
-      _currentPage = 1;
-      _hasMore = true;
-      _postsResponse = null;
-    }
-    
-    _setLoading(true);
-    _error = null;
-    notifyListeners();
-
-    try {
-      final response = await _blogPostService.getPostsByCategoryId(categoryId, page: _currentPage);
-      
-      if (refresh || _postsResponse == null) {
-        _postsResponse = response;
-      } else {
-        _postsResponse = _postsResponse!.copyWith(
-          data: [..._postsResponse!.data, ...response.data],
-          links: response.links,
-          meta: response.meta,
-        );
-      }
-
-      _hasMore = response.links.next != null;
-      _currentPage++;
-      
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _setLoading(false);
-      notifyListeners();
-    }
   }
 
   // Get single post by ID
@@ -250,7 +212,7 @@ class BlogPostProvider with ChangeNotifier {
     fetchPosts(refresh: true, category: category);
   }
 
-  // Post filtering helpers
+  // Post filtering helpers - FIXED VERSION
   Post? getPostByIdFromCache(String id) {
     try {
       return posts.firstWhere((post) => post.id == id);
@@ -267,8 +229,13 @@ class BlogPostProvider with ChangeNotifier {
     return posts.where((post) => post.categoryId == categoryId).toList();
   }
 
+  // FIXED: This was the main issue - using exact match instead of tab name matching
   List<Post> getPostsByCategoryNameFromCache(String categoryName) {
-    return posts.where((post) => post.category.name.toLowerCase() == categoryName.toLowerCase()).toList();
+    if (categoryName == 'All News') return posts;
+    
+    return posts.where((post) => 
+        post.category.name.toLowerCase() == categoryName.toLowerCase()
+    ).toList();
   }
 
   List<Post> get publishedPosts {
@@ -287,5 +254,19 @@ class BlogPostProvider with ChangeNotifier {
     _categoryCurrentPages.clear();
     _categoryHasMore.clear();
     notifyListeners();
+  }
+
+  // Debug method to check categories
+  void debugCategories() {
+    final categories = posts.map((post) => post.category.name).toSet();
+    print('=== DEBUG CATEGORIES ===');
+    print('Available categories: $categories');
+    print('Total posts: ${posts.length}');
+    
+    for (final category in categories) {
+      final filtered = getPostsByCategoryNameFromCache(category);
+      print('Category "$category": ${filtered.length} posts');
+    }
+    print('=======================');
   }
 }

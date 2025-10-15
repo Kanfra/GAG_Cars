@@ -12,6 +12,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.d
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
@@ -667,6 +668,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     final isActive = _isOfferActive();
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
@@ -1349,7 +1351,11 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
                                 borderColor: ColorGlobalVariables.fadedBlackColor,
                                 isFullButtonWidthRequired: false, 
                                 buttonBackgroundColor: Colors.transparent, 
-                                onClickFunction: (){}
+                                onClickFunction: (){
+                                  Get.toNamed(
+                                    RouteClass.getChatPage(),
+                                  );
+                                }
                               ),
                             ),
                             const SizedBox(width: 12),

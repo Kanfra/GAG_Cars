@@ -7,6 +7,7 @@ class CountryCodeTextField extends StatefulWidget {
   final ValueChanged<Country>? onCountryChanged;
   final ValueChanged<String>? onPhoneNumberChanged;
   final FormFieldValidator<String>? validator;
+  final String? hintText; // Added hintText parameter
 
   const CountryCodeTextField({
     super.key,
@@ -14,6 +15,7 @@ class CountryCodeTextField extends StatefulWidget {
     this.onCountryChanged,
     this.onPhoneNumberChanged,
     this.validator,
+    this.hintText, // Added to constructor
   });
 
   @override
@@ -113,12 +115,42 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              hintText: 'Phone Number',
+              hintText: widget.hintText ?? 'Phone Number', // Use provided hintText or default
+              hintStyle: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+                color: Color.fromRGBO(168, 175, 185, 1),
+              ),
               errorMaxLines: 2,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: Theme.of(context).primaryColor,
+                  width: 1.5,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Colors.red,
+                  width: 1.2,
+                ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Colors.red,
+                  width: 1.4,
+                ),
               ),
               prefixIcon: InkWell(
                 onTap: () {

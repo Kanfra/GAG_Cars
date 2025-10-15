@@ -5,12 +5,11 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Models/packageModel.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
-import 'package:gag_cars_frontend/Pages/PaymentPage/Screens/webViewPaymentPage.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Services/PaystackService/paystackService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 
 class PromotionsPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -72,18 +71,23 @@ class _PromotionsPageState extends State<PromotionsPage> {
 
   Map<String, dynamic> _convertToUIPackage(Package package, int index) {
     final colorScheme = _getColorScheme(index);
-    final price = double.tryParse(package.price) ?? 0.0;
+    
+    // Use the helper to parse the price
+    final price = PackageHelper.parsePrice(package);
     
     bool isPopular = index == 1;
     String description = package.description ?? 'Boost your listing visibility';
     
+    // Handle nullable numberOfListings with proper null checking
+    final listingCount = package.numberOfListings ?? 1;
+    
     List<String> features = [
-      '${package.numberOfListings} listing${package.numberOfListings > 1 ? 's' : ''}',
+      '$listingCount listing${listingCount > 1 ? 's' : ''}',
       'Premium visibility',
       '24/7 customer support',
     ];
     
-    if (package.numberOfListings > 1) {
+    if (listingCount > 1) {
       features.add('Multiple listing support');
     }
     
@@ -100,7 +104,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
     return {
       "id": package.id,
       "startText": "${package.promotionDays ?? 7} Days",
-      "endText": "GH₵ ${package.price}",
+      "endText": "GH₵ ${price.toStringAsFixed(2)}",
       "price": price,
       "durationDays": package.promotionDays ?? 7,
       "name": package.name,
@@ -138,9 +142,12 @@ class _PromotionsPageState extends State<PromotionsPage> {
     try {
       final reference = LegacyPaystackService.generateReference();
       
+      // Convert price to int for Paystack (kobo/cent amount)
+      final amountInKobo = (promotion['price'] * 100).toInt();
+      
       final result = await LegacyPaystackService.initializeTransaction(
         context: context,
-        amount: promotion['price'],
+        amount: amountInKobo,
         reference: reference,
         packageId: promotion['id'],
         packageName: promotion['name'],
@@ -155,7 +162,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
         final paymentData = {
           'authorizationUrl': authorizationUrl,
           'reference': reference,
-          'amount': promotion['price'],
+          'amount': amountInKobo,
           'packageName': promotion['name'],
           'listingName': listing['name']?.toString() ?? 'Unknown Listing',
           'listingId': listing['id']?.toString() ?? 'unknown_id',
@@ -198,7 +205,6 @@ class _PromotionsPageState extends State<PromotionsPage> {
   }
 
   Widget _buildPromotionDetailsSheet(Map<String, dynamic> promotion, int index, List<Map<String, dynamic>> uiPackages) {
-    // FIXED: Safe way to get listing feature
     final listingFeature = promotion['features'].firstWhere(
       (f) => f.toString().toLowerCase().contains('listing'),
       orElse: () => '${promotion['features'].length} features',
@@ -288,7 +294,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                 children: [
                   _buildDetailItem(Icons.calendar_today, promotion['startText']),
                   _buildDetailItem(Icons.attach_money, promotion['endText']),
-                  _buildDetailItem(Icons.list_alt, listingFeature.toString()), // FIXED: Use safe value
+                  _buildDetailItem(Icons.list_alt, listingFeature.toString()),
                 ],
               ),
             ),

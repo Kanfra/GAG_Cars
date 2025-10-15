@@ -41,6 +41,9 @@ class _HelpCenterPageState extends State<HelpCenterPage>
         isLeadingWidgetExist: true,
         appbarBackgroundColor: ColorGlobalVariables.whiteColor,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
+        titleTextColor: ColorGlobalVariables.brownColor,
+        titleFontWeight: FontWeight.bold,
+        titleTextSize: 22,
         titleText: 'Help Center',
         centerTitle: true,
       ),
@@ -68,13 +71,13 @@ class _HelpCenterPageState extends State<HelpCenterPage>
                     indicator: UnderlineTabIndicator(
                       borderSide: BorderSide(
                         width: _tabIndicatorHeight,
-                        color: theme.primaryColor,
+                        color: ColorGlobalVariables.brownColor,
                       ),
                       insets: EdgeInsets.only(
                         bottom: _tabIndicatorHeight / 2,
                       ),
                     ),
-                    labelColor: theme.primaryColor,
+                    labelColor: ColorGlobalVariables.brownColor,
                     unselectedLabelColor: isDarkMode 
                         ? Colors.grey[400] 
                         : Colors.grey[600],

@@ -76,12 +76,14 @@ class _WishlistPageState extends State<WishlistPage> {
   PreferredSizeWidget _buildAppBar() {
     return CustomAppbar(
       onLeadingIconClickFunction: () => Get.back(),
-      isLeadingWidgetExist: true,
+      isLeadingWidgetExist: false,
       leadingIconData: Icons.arrow_back_ios_new,
       appbarBackgroundColor: Colors.white,
       leadingIconDataColor: ColorGlobalVariables.fadedBlackColor,
       titleText: "My Wishlist",
-      titleTextColor: ColorGlobalVariables.redColor,
+      titleTextColor: ColorGlobalVariables.brownColor,
+      titleFontWeight: FontWeight.bold,
+      titleTextSize: 22,
       centerTitle: true,
       actions: [
         const SizedBox(width: 8),
@@ -111,7 +113,7 @@ class _WishlistPageState extends State<WishlistPage> {
             width: 8,
             height: 8,
             decoration: const BoxDecoration(
-              color: Colors.redAccent,
+              color: ColorGlobalVariables.brownColor,
               shape: BoxShape.circle,
             ),
           ),
@@ -130,7 +132,7 @@ class _WishlistPageState extends State<WishlistPage> {
         builder: (context, provider, _) {
           return RefreshIndicator.adaptive(
             onRefresh: _onRefresh,
-            color: ColorGlobalVariables.redColor,
+            color: ColorGlobalVariables.brownColor,
             backgroundColor: Colors.white,
             displacement: 40,
             strokeWidth: 2.5,
@@ -214,7 +216,7 @@ class _WishlistPageState extends State<WishlistPage> {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isActive ? ColorGlobalVariables.redColor : Colors.transparent,
+        color: isActive ? ColorGlobalVariables.brownColor : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
@@ -384,7 +386,7 @@ class _WishlistPageState extends State<WishlistPage> {
     return ElevatedButton(
       onPressed: () => Get.offAllNamed(RouteClass.mainBottomNavigationPage),
       style: ElevatedButton.styleFrom(
-        backgroundColor: ColorGlobalVariables.redColor,
+        backgroundColor: ColorGlobalVariables.brownColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
         shape: RoundedRectangleBorder(
@@ -445,7 +447,7 @@ class _WishlistPageState extends State<WishlistPage> {
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
                 ),
               ),
               const SizedBox(height: 12),
@@ -935,7 +937,7 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
               : const Icon(
                   Icons.favorite,
                   size: 18,
-                  color: Colors.red,
+                  color: ColorGlobalVariables.redColor,
                 ),
         ),
       ),

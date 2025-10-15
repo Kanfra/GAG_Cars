@@ -9,14 +9,19 @@ import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 
 class ResetPasswordPage extends StatefulWidget {
-  final String? token; // token from email link
-  final String? email; // email from email link
+  // final String phone;
+  // final String email; // email from email link
+  // final String otp;
+  final Map<String, dynamic> allJson;
   const ResetPasswordPage({
     super.key,
-    this.token,
-    this.email,
+    required this.allJson,
+    // required this.phone,
+    // required this.email,
+    // required this.otp,
     });
 
   @override
@@ -66,9 +71,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     }
     setState(() => _isLoading = true);
     try{
-      await AuthService.resetPassword(
-        token: widget.token!, 
-        email: widget.email!, 
+      final logger = Logger();
+      logger.w("allData: ${widget.allJson}");
+      await AuthService.resetPassword( 
+        phone: widget.allJson["phone"],
+        email: widget.allJson["email"], 
+        otp: widget.allJson["otp"],
         newPassword: _newPassowordController.text,
         );
       showCustomSnackBar(

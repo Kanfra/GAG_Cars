@@ -13,33 +13,36 @@ import 'package:provider/provider.dart';
 class LegacyPaystackService {
   static final logger = Logger();
   
-  // CORRECT PAYSTACK API BASE URL
   static const String _paystackBaseUrl = 'https://api.paystack.co';
   
   static Map<String, dynamic> get getPaystackKeys {
-    final paystackPublicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'];
-    final paystackSecretKey = dotenv.env['PAYSTACK_SECRET_KEY'];
-    if (paystackPublicKey == null || paystackPublicKey.isEmpty) {
-      throw Exception('PAYSTACK_PUBLIC_KEY not found in .env file');
+    try {
+      final paystackPublicKey = dotenv.env['PAYSTACK_PUBLIC_KEY'];
+      final paystackSecretKey = dotenv.env['PAYSTACK_SECRET_KEY'];
+      
+      if (paystackPublicKey == null || paystackPublicKey.isEmpty) {
+        throw Exception('PAYSTACK_PUBLIC_KEY not found in .env file');
+      }
+      if (paystackSecretKey == null || paystackSecretKey.isEmpty) {
+        throw Exception('PAYSTACK_SECRET_KEY not found in .env file');
+      }
+      return {
+        'PAYSTACK_PUBLIC_KEY': paystackPublicKey,
+        'PAYSTACK_SECRET_KEY': paystackSecretKey,
+      };
+    } catch (e) {
+      logger.e('❌ Error getting Paystack keys: $e');
+      rethrow;
     }
-    if (paystackSecretKey == null || paystackSecretKey.isEmpty) {
-      throw Exception('PAYSTACK_SECRET_KEY not found in .env file');
-    }
-    return {
-      'PAYSTACK_PUBLIC_KEY': paystackPublicKey,
-      'PAYSTACK_SECRET_KEY': paystackSecretKey,
-    };
   }
 
-  // Generate unique reference
   static String generateReference() {
     return 'GAG_${DateTime.now().millisecondsSinceEpoch}_${UniqueKey().hashCode}';
   }
 
-  // Initialize transaction (server-side) - UPDATED WITH CORRECT URL
   static Future<Map<String, dynamic>> initializeTransaction({
     required BuildContext context,
-    required double amount,
+    required int amount,
     required String reference,
     required String packageId,
     required String packageName,
@@ -48,7 +51,6 @@ class LegacyPaystackService {
     required int durationDays,
     Map<String, dynamic>? additionalMetadata,
   }) async {
-    // CORRECT PAYSTACK API ENDPOINT
     final uri = Uri.parse('$_paystackBaseUrl/transaction/initialize');
     
     try {
@@ -59,10 +61,8 @@ class LegacyPaystackService {
         throw Exception('User must be logged in to make payments');
       }
 
-      // Get user metadata - AWAIT THIS FUTURE
       final userMetadata = await _getUserMetadata(context);
 
-      // Build complete metadata
       final metadata = {
         ...userMetadata,
         'transaction_type': 'listing_promotion',
@@ -75,72 +75,98 @@ class LegacyPaystackService {
         if (additionalMetadata != null) ...additionalMetadata,
       };
 
-      logger.i('Initializing transaction for ${user.email}, amount: $amount');
+      logger.i('🔄 Initializing transaction for ${user.email}');
+      logger.i('💰 Amount in kobo: $amount');
+      logger.i('🔢 Reference: $reference');
+
+      final paystackKeys = getPaystackKeys;
+      final secretKey = paystackKeys['PAYSTACK_SECRET_KEY'];
+
+      final requestBody = {
+        'email': user.email,
+        'amount': amount,
+        'reference': reference,
+        'metadata': metadata,
+        // REMOVED callback_url to avoid 404 errors
+        'channels': ['card', 'bank', 'mobile_money'],
+      };
 
       final response = await http.post(
         uri,
         headers: {
-          'Authorization': 'Bearer ${getPaystackKeys['PAYSTACK_SECRET_KEY']}',
+          'Authorization': 'Bearer $secretKey',
           'Content-Type': 'application/json',
         },
-        body: json.encode({
-          'email': user.email,
-          'amount': (amount * 100).toInt(), // Convert to kobo
-          'reference': reference,
-          'metadata': metadata,
-          'callback_url': 'https://gagcars.com/payment-callback', // Your website callback
-          'channels': ['card', 'bank', 'mobile_money'],
-        }),
+        body: json.encode(requestBody),
       );
+
+      logger.i('📡 Paystack response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final result = json.decode(response.body);
-        logger.i('Transaction initialized successfully');
+        logger.i('✅ Transaction initialized successfully');
         return result;
       } else {
-        logger.e('Failed to initialize transaction: ${response.statusCode}');
+        logger.e('❌ Failed to initialize transaction: ${response.statusCode}');
         throw Exception('Failed to initialize transaction: ${response.statusCode}');
       }
     } catch (e) {
-      logger.e('Error initializing transaction: $e');
+      logger.e('💥 Error initializing transaction: $e');
       rethrow;
     }
   }
 
-  // Verify transaction - UPDATED WITH CORRECT URL
-// Verify transaction - UPDATED WITH CORRECT URL
+// lib/Services/PaystackService/legacy_paystack_service.dart
+// ... (keep the same as previous version, but ensure this method exists):
+
 static Future<Map<String, dynamic>> verifyAndActivatePromotion({
   required String reference,
   required String listingId,
   required String packageId,
   required String packageName,
-  required double amount,
+  required int amount,
   required int durationDays,
 }) async {
   try {
-    logger.i('Verifying transaction: $reference');
+    logger.i('🔍 Verifying transaction: $reference');
 
-    // CORRECT PAYSTACK VERIFICATION ENDPOINT
     final verificationUri = Uri.parse('$_paystackBaseUrl/transaction/verify/$reference');
     
+    final paystackKeys = getPaystackKeys;
+    final secretKey = paystackKeys['PAYSTACK_SECRET_KEY'];
+
+    logger.i('🌐 Calling Paystack verification API: $verificationUri');
+
     final verificationResponse = await http.get(
       verificationUri,
       headers: {
-        'Authorization': 'Bearer ${getPaystackKeys['PAYSTACK_SECRET_KEY']}',
+        'Authorization': 'Bearer $secretKey',
       },
     );
+
+    logger.i('📡 Paystack response status: ${verificationResponse.statusCode}');
 
     if (verificationResponse.statusCode == 200) {
       final verificationResult = json.decode(verificationResponse.body);
       
+      logger.i('📊 Paystack response data: ${verificationResult['data']?['status']}');
+      
+      if (verificationResult['data'] == null) {
+        logger.e('❌ Paystack response missing data field');
+        return {
+          'success': false,
+          'message': 'Invalid response from Paystack',
+          'transaction_data': null,
+        };
+      }
+      
       if (verificationResult['data']['status'] == 'success') {
-        logger.i('Payment verified successfully');
+        logger.i('✅ Payment verified successfully by Paystack');
         
         try {
-          // Activate promotion on your backend
           final dates = PromotionService.calculatePromotionDates(durationDays);
           
-          logger.i('Attempting to activate promotion for item: $listingId');
+          logger.i('🚀 Activating promotion for item: $listingId');
           
           final promotionResult = await PromotionService.activatePromotion(
             itemId: listingId,
@@ -149,89 +175,101 @@ static Future<Map<String, dynamic>> verifyAndActivatePromotion({
             status: 'promoted',
           );
 
-          // DEBUG: Log the complete promotion result
-          logger.i('Promotion service raw result: ${promotionResult.toString()}');
-          
-          // Check if promotion activation was successful
-          // Based on your previous logs, successful response contains "Successfully Create Resource"
           final String? message = promotionResult['message']?.toString();
+          logger.i('📋 Promotion service message: $message');
+          
           final bool isPromotionSuccessful = message != null && 
               (message.toLowerCase().contains('success') || 
                message.contains('Successfully Create Resource'));
 
           if (isPromotionSuccessful) {
-            logger.i('Promotion activated successfully');
+            logger.i('🎉 Promotion activated successfully');
             return {
               'success': true,
               'message': 'Payment successful and promotion activated',
               'transaction_data': verificationResult['data'],
             };
           } else {
-            logger.w('Promotion activation may have failed. Message: $message');
-            // Still return success since payment was successful
+            logger.w('⚠️ Promotion activation failed. Message: $message');
             return {
-              'success': true,
-              'message': 'Payment successful. Promotion status: $message',
+              'success': false,
+              'message': 'Payment successful but promotion failed: $message',
               'transaction_data': verificationResult['data'],
             };
           }
         } catch (promotionError) {
-          logger.e('Error during promotion activation: $promotionError');
-          // Payment was successful, but promotion failed - still return success
+          logger.e('❌ Error during promotion activation: $promotionError');
           return {
-            'success': true,
-            'message': 'Payment successful but promotion activation encountered an issue',
+            'success': false,
+            'message': 'Payment verified but promotion activation failed',
             'transaction_data': verificationResult['data'],
           };
         }
       } else {
-        logger.w('Payment verification failed with status: ${verificationResult['data']['status']}');
+        logger.w('⚠️ Payment verification failed: ${verificationResult['data']['status']}');
         return {
           'success': false,
           'message': 'Payment verification failed: ${verificationResult['data']['status']}',
           'transaction_data': verificationResult['data'],
         };
       }
+    } else if (verificationResponse.statusCode == 404) {
+      logger.e('❌ Transaction not found (404): $reference');
+      return {
+        'success': false,
+        'message': 'Transaction not found. Payment may not have been completed.',
+        'transaction_data': null,
+      };
     } else {
-      logger.e('Paystack verification API error: ${verificationResponse.statusCode}');
-      throw Exception('Failed to verify transaction: ${verificationResponse.statusCode}');
+      logger.e('❌ Paystack API error: ${verificationResponse.statusCode}');
+      return {
+        'success': false,
+        'message': 'Paystack API error: ${verificationResponse.statusCode}',
+        'transaction_data': null,
+      };
     }
   } catch (e) {
-    logger.e('Error in verifyAndActivatePromotion: $e');
-    // Re-throw to let the caller handle it
-    rethrow;
+    logger.e('💥 Error in verifyAndActivatePromotion: $e');
+    return {
+      'success': false,
+      'message': 'Payment verification error: ${e.toString()}',
+      'transaction_data': null,
+    };
   }
 }
 
-  // Get user metadata from UserProvider - FIXED THE AWAIT ISSUE
   static Future<Map<String, dynamic>> _getUserMetadata(BuildContext context) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user;
-    
-    if (user == null) {
-      throw Exception('No user logged in');
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final user = userProvider.user;
+      
+      if (user == null) {
+        throw Exception('No user logged in');
+      }
+
+      final deviceInfo = await DeviceInfoUtils.getDeviceInfo();
+      final appInfo = await DeviceInfoUtils.getAppInfo();
+
+      return {
+        'user_id': user.email,
+        'user_name': user.name ?? 'Unknown',
+        'user_email': user.email ?? 'Unknown',
+        'user_phone': user.phoneNumber ?? 'Unknown',
+        'is_paid_seller': user.paidSeller ?? false,
+        'user_country_id': user.countryId ?? 0,
+        'user_state_id': user.stateId ?? 0,
+        'profile_image': user.profileImage ?? 'Unknown',
+        'email_verified': user.emailVerifiedAt != null,
+        'registration_date': user.createdAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        'device_info': deviceInfo,
+        'app_info': appInfo,
+        'platform': Platform.operatingSystem,
+        'platform_version': Platform.operatingSystemVersion,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+    } catch (e) {
+      logger.e('❌ Error getting user metadata: $e');
+      rethrow;
     }
-
-    // AWAIT BOTH FUTURES TO GET ACTUAL MAP VALUES, NOT FUTURES
-    final deviceInfo = await DeviceInfoUtils.getDeviceInfo();
-    final appInfo = await DeviceInfoUtils.getAppInfo();
-
-    return {
-      'user_id': user.email,
-      'user_name': user.name,
-      'user_email': user.email,
-      'user_phone': user.phoneNumber,
-      'is_paid_seller': user.paidSeller ?? false,
-      'user_country_id': user.countryId,
-      'user_state_id': user.stateId,
-      'profile_image': user.profileImage,
-      'email_verified': user.emailVerifiedAt != null,
-      'registration_date': user.createdAt?.toIso8601String(),
-      'device_info': deviceInfo, // Now this is a Map, not a Future
-      'app_info': appInfo, // Now this is a Map, not a Future
-      'platform': Platform.operatingSystem,
-      'platform_version': Platform.operatingSystemVersion,
-      'timestamp': DateTime.now().toIso8601String(),
-    };
   }
 }

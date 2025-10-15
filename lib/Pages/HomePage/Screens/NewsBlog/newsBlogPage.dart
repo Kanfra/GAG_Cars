@@ -1,14 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/DotSeparator/dotSeparator.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/postResponse.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
@@ -30,16 +21,17 @@ class NewsBlogPage extends StatefulWidget {
 class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMixin {
   late TabController _tabController;
   List<String> _tabTitles = ['All News'];
-  List<Widget> _tabPages = [];
   bool _isInitialLoad = true;
   bool _hasFetchedData = false;
   
-  // Use RefreshController for pull-to-refresh
+  // Search functionality
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  String _searchQuery = '';
+  
+  // Refresh controllers - REMOVED _scrollController since we're using NestedScrollView's internal one
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
   final Map<String, RefreshController> _tabRefreshControllers = {};
-  
-  // Keep your existing scroll controllers for backward compatibility
-  final ScrollController _scrollController = ScrollController();
   final Map<String, ScrollController> _tabScrollControllers = {};
 
   @override
@@ -47,14 +39,84 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     super.initState();
     
     _tabController = TabController(length: 1, vsync: this);
-    _tabPages = [_buildAllNewsPage()];
     
-    // Initialize scroll controller and refresh controller for initial tab
-    _tabScrollControllers['All News'] = ScrollController();
-    _tabRefreshControllers['All News'] = RefreshController();
+    // Initialize controllers for initial tab
+    _initializeTabControllers('All News');
     
-    // Add scroll listener for lazy loading
-    _tabScrollControllers['All News']!.addListener(_handleScroll);
+    // Add listener to search controller
+    _searchController.addListener(_onSearchChanged);
+    
+    // Add tab change listener
+    _tabController.addListener(_onTabChange);
+  }
+
+  void _initializeTabControllers(String tabName) {
+    if (!_tabScrollControllers.containsKey(tabName)) {
+      _tabScrollControllers[tabName] = ScrollController();
+      _tabScrollControllers[tabName]!.addListener(() => _handleScroll(tabName));
+    }
+    
+    if (!_tabRefreshControllers.containsKey(tabName)) {
+      _tabRefreshControllers[tabName] = RefreshController();
+    }
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text.trim();
+    });
+  }
+
+  void _onTabChange() {
+    if (mounted) {
+      setState(() {}); // Force rebuild when tab changes
+    }
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchController.clear();
+      _searchQuery = '';
+    });
+  }
+
+  // Filter posts based on search query
+  List<Post> _filterPostsBySearch(List<Post> posts, String query) {
+    if (query.isEmpty) return posts;
+
+    final lowercaseQuery = query.toLowerCase();
+    
+    return posts.where((post) {
+      // Search in multiple fields
+      final matchesTitle = post.title.toLowerCase().contains(lowercaseQuery);
+      final matchesDescription = post.description?.toLowerCase().contains(lowercaseQuery) ?? false;
+      final matchesContent = post.content.toLowerCase().contains(lowercaseQuery);
+      final matchesCategory = post.category.name.toLowerCase().contains(lowercaseQuery);
+      final matchesTags = post.tags.any((tag) => tag.toLowerCase().contains(lowercaseQuery));
+      
+      return matchesTitle || matchesDescription || matchesContent || matchesCategory || matchesTags;
+    }).toList();
+  }
+
+  // Get posts for current tab with search applied
+  List<Post> _getPostsForCurrentTab(BlogPostProvider provider) {
+    if (_tabTitles.isEmpty) return [];
+    
+    final currentTab = _tabTitles[_tabController.index];
+    List<Post> basePosts;
+
+    if (currentTab == 'All News') {
+      basePosts = provider.posts;
+    } else {
+      basePosts = provider.getPostsByCategoryNameFromCache(currentTab);
+    }
+
+    // Apply search filter if there's a search query
+    if (_searchQuery.isNotEmpty) {
+      return _filterPostsBySearch(basePosts, _searchQuery);
+    }
+
+    return basePosts;
   }
 
   void _fetchPostsAfterBuild() {
@@ -67,6 +129,9 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
         if (blogPostProvider.posts.isEmpty && !blogPostProvider.isLoading) {
           await blogPostProvider.fetchPosts(refresh: true);
         }
+        
+        // Debug: Check what we have
+        blogPostProvider.debugCategories();
         
         _updateTabsWithCategories(blogPostProvider.posts);
         _hasFetchedData = true;
@@ -92,48 +157,36 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
 
     final newTabTitles = ['All News', ...categories.toList()];
     
-    // Initialize scroll controllers and refresh controllers for new tabs
+    // Initialize controllers for new tabs
     for (final title in newTabTitles) {
-      if (!_tabScrollControllers.containsKey(title)) {
-        _tabScrollControllers[title] = ScrollController();
-        _tabRefreshControllers[title] = RefreshController();
-        _tabScrollControllers[title]!.addListener(_handleScroll);
-      }
+      _initializeTabControllers(title);
     }
-
-    final newTabPages = [
-      _buildAllNewsPage(),
-      for (final category in categories)
-        _buildCategoryPage(category),
-    ];
 
     if (newTabTitles.length != _tabTitles.length || !listEquals(newTabTitles, _tabTitles)) {
       setState(() {
         _tabTitles = newTabTitles;
-        _tabPages = newTabPages;
         
         _tabController.dispose();
         _tabController = TabController(length: _tabTitles.length, vsync: this);
+        _tabController.addListener(_onTabChange);
       });
     }
   }
 
-  // Handle scroll for lazy loading
-  void _handleScroll() {
-    final currentTab = _tabTitles[_tabController.index];
-    final scrollController = _tabScrollControllers[currentTab];
+  void _handleScroll(String tabName) {
+    final scrollController = _tabScrollControllers[tabName];
     final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
     
     if (scrollController == null) return;
     
     if (scrollController.offset >= scrollController.position.maxScrollExtent - 200 &&
         !blogPostProvider.isLoadingMore &&
-        blogPostProvider.hasMore) {
-      _loadMorePosts(currentTab);
+        blogPostProvider.hasMore &&
+        _searchQuery.isEmpty) {
+      _loadMorePosts(tabName);
     }
   }
 
-  // Load more posts for a specific tab
   Future<void> _loadMorePosts(String tabTitle) async {
     final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
     
@@ -141,13 +194,11 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     
     try {
       await blogPostProvider.loadMorePosts(category: tabTitle == 'All News' ? null : tabTitle);
-      
     } catch (e) {
       print('Error loading more posts for $tabTitle: $e');
     }
   }
 
-  // Handle pull-to-refresh
   Future<void> _onRefresh(String tabTitle) async {
     try {
       final blogPostProvider = Provider.of<BlogPostProvider>(context, listen: false);
@@ -159,125 +210,94 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
       }
       
       _tabRefreshControllers[tabTitle]?.refreshCompleted();
-      
     } catch (e) {
       print('Refresh error: $e');
       _tabRefreshControllers[tabTitle]?.refreshFailed();
     }
   }
 
-  bool get _shouldTabsBeScrollable {
-    return _tabTitles.length > 3;
-  }
-
-  double? get _tabWidth {
-    if (!_shouldTabsBeScrollable && _tabTitles.isNotEmpty) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      return screenWidth / _tabTitles.length;
-    }
-    return null;
-  }
-
-  Widget _buildAllNewsPage() {
+  Widget _buildContent() {
     return Consumer<BlogPostProvider>(
       builder: (context, blogPostProvider, child) {
-        return _buildSmartRefresher(
-          'All News',
-          _buildPostList(blogPostProvider.posts, 'All News', blogPostProvider),
-          blogPostProvider,
-        );
-      },
-    );
-  }
-
-  Widget _buildCategoryPage(String categoryName) {
-    return Consumer<BlogPostProvider>(
-      builder: (context, blogPostProvider, child) {
-        final categoryPosts = blogPostProvider.getPostsByCategoryNameFromCache(categoryName);
-        return _buildSmartRefresher(
-          categoryName,
-          _buildPostList(categoryPosts, categoryName, blogPostProvider),
-          blogPostProvider,
-        );
-      },
-    );
-  }
-
-  Widget _buildSmartRefresher(String tabTitle, Widget content, BlogPostProvider provider) {
-    return SmartRefresher(
-      controller: _tabRefreshControllers[tabTitle]!,
-      onRefresh: () => _onRefresh(tabTitle),
-      onLoading: () => _loadMorePosts(tabTitle),
-      enablePullDown: true,
-      enablePullUp: provider.hasMore,
-      header: ClassicHeader(
-        height: 60,
-        completeIcon: Icon(Icons.check, color: ColorGlobalVariables.brownColor),
-        completeText: 'Refresh Complete',
-        refreshingIcon: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(
-            strokeWidth: 2.0,
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-          ),
-        ),
-        refreshingText: 'Refreshing...',
-        releaseIcon: Icon(Icons.arrow_upward, color: ColorGlobalVariables.brownColor),
-        releaseText: 'Release to refresh',
-        idleIcon: Icon(Icons.arrow_downward, color: Colors.grey.shade400),
-        idleText: 'Pull down to refresh',
-        textStyle: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-      ),
-      footer: CustomFooter(
-        height: 60,
-        builder: (context, mode) {
-          Widget body;
-          if (mode == LoadStatus.idle) {
-            body = Text("Pull up to load more", 
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12));
-          } else if (mode == LoadStatus.loading) {
-            body = Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.0,
-                    valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-                  ),
-                ),
-                SizedBox(width: 8),
-                Text("Loading more...", 
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-              ],
-            );
-          } else if (mode == LoadStatus.failed) {
-            body = Text("Load failed! Click retry!", 
-              style: TextStyle(color: Colors.red.shade600, fontSize: 12));
-          } else if (mode == LoadStatus.canLoading) {
-            body = Text("Release to load more", 
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12));
-          } else {
-            body = Text("No more articles", 
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 12));
-          }
-          return Container(
+        final currentPosts = _getPostsForCurrentTab(blogPostProvider);
+        final currentTab = _tabTitles.isNotEmpty ? _tabTitles[_tabController.index] : 'All News';
+        
+        return SmartRefresher(
+          controller: _tabRefreshControllers[currentTab] ?? _refreshController,
+          onRefresh: () => _onRefresh(currentTab),
+          onLoading: _searchQuery.isEmpty ? () => _loadMorePosts(currentTab) : null,
+          enablePullDown: true,
+          enablePullUp: blogPostProvider.hasMore && _searchQuery.isEmpty,
+          header: ClassicHeader(
             height: 60,
-            child: Center(child: body),
-          );
-        },
-      ),
-      child: content,
+            completeIcon: Icon(Icons.check, color: ColorGlobalVariables.brownColor),
+            completeText: 'Refresh Complete',
+            refreshingIcon: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0,
+                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              ),
+            ),
+            refreshingText: 'Refreshing...',
+            releaseIcon: Icon(Icons.arrow_upward, color: ColorGlobalVariables.brownColor),
+            releaseText: 'Release to refresh',
+            idleIcon: Icon(Icons.arrow_downward, color: Colors.grey.shade400),
+            idleText: 'Pull down to refresh',
+            textStyle: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+          ),
+          footer: CustomFooter(
+            height: 60,
+            builder: (context, mode) {
+              Widget body;
+              if (mode == LoadStatus.idle) {
+                body = Text("Pull up to load more", 
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12));
+              } else if (mode == LoadStatus.loading) {
+                body = Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Text("Loading more...", 
+                      style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                  ],
+                );
+              } else if (mode == LoadStatus.failed) {
+                body = Text("Load failed! Click retry!", 
+                  style: TextStyle(color: Colors.red.shade600, fontSize: 12));
+              } else if (mode == LoadStatus.canLoading) {
+                body = Text("Release to load more", 
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12));
+              } else {
+                body = Text("No more articles", 
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 12));
+              }
+              return Container(
+                height: 60,
+                child: Center(child: body),
+              );
+            },
+          ),
+          child: _buildPostList(currentPosts, currentTab, blogPostProvider),
+        );
+      },
     );
   }
 
   Widget _buildPostList(List<Post> posts, String tabTitle, BlogPostProvider blogPostProvider) {
-    final isLoadingMore = blogPostProvider.isLoadingMore;
+    final isLoadingMore = blogPostProvider.isLoadingMore && _searchQuery.isEmpty;
 
-    if (posts.isEmpty && !blogPostProvider.isLoading) {
-      return _buildEmptyState();
+    if (posts.isEmpty) {
+      return _searchQuery.isNotEmpty ? _buildSearchEmptyState() : _buildEmptyState();
     }
 
     return ListView.builder(
@@ -296,53 +316,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildLoadMoreIndicator() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: Column(
-          children: [
-            SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.0,
-                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Loading more articles...',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImageShimmer() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Container(
-        height: 200,
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // KEEP ALL YOUR EXISTING UI METHODS EXACTLY AS THEY WERE
   Widget _buildPostCard(Post post, bool showCategoryBadge, int index) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 100)),
@@ -372,7 +345,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Image with gradient overlay
                   Stack(
                     children: [
                       ClipRRect(
@@ -410,7 +382,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                         ),
                       ),
                       
-                      // Gradient overlay
                       Container(
                         height: 200,
                         width: double.infinity,
@@ -430,7 +401,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                         ),
                       ),
                       
-                      // Category badge on image
                       if (showCategoryBadge)
                         Positioned(
                           top: 12,
@@ -460,7 +430,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           ),
                         ),
                       
-                      // Reading time indicator
                       Positioned(
                         top: 12,
                         right: 12,
@@ -489,7 +458,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                     ],
                   ),
                   
-                  // Content section
                   Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
@@ -582,7 +550,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                                 const SizedBox(width: 16),
                                 _buildEngagementStat(
                                   icon: Icons.share_outlined,
-                                  count: 0.toString(),
+                                  count: '0',
                                   color: Colors.green.shade400,
                                 ),
                               ],
@@ -658,6 +626,102 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     );
   }
 
+  Widget _buildSearchEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.search_off,
+              size: 50,
+              color: Colors.grey.shade400,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'No Results Found',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Try searching with different keywords',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade500,
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (_searchQuery.isNotEmpty)
+            Text(
+              'Searching for: "$_searchQuery"',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadMoreIndicator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Column(
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.0,
+                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Loading more articles...',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageShimmer() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        height: 200,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+      ),
+    );
+  }
+
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
@@ -679,13 +743,18 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     return (wordCount / 200).ceil();
   }
 
+  bool get _shouldTabsBeScrollable {
+    return _tabTitles.length > 3;
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
-    _scrollController.dispose();
     _refreshController.dispose();
+    _searchController.dispose();
+    _searchFocusNode.dispose();
     
-    // Dispose all scroll controllers and refresh controllers
+    // Dispose all tab scroll controllers
     for (final controller in _tabScrollControllers.values) {
       controller.dispose();
     }
@@ -705,7 +774,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: NestedScrollView(
-        controller: _scrollController,
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
@@ -738,9 +806,9 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           child: Text(
                             'GAG News',
                             style: TextStyle(
-                              fontSize: 28,
+                              fontSize: 22,
                               fontWeight: FontWeight.w800,
-                              color: ColorGlobalVariables.redColor,
+                              color: ColorGlobalVariables.brownColor,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -764,19 +832,66 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
               ),
               leading: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: CustomRoundIconButton(
-                  iconData: Icons.arrow_back_ios,
-                  buttonSize: 40,
-                  iconSize: 20,
-                  backgroundColor: Colors.grey.shade100,
-                  iconDataColor: ColorGlobalVariables.fadedBlackColor,
-                  isBorderSlightlyCurved: false,
-                  onIconButtonClickFunction: () {
-                    Get.back();
-                  },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      size: 18,
+                      color: ColorGlobalVariables.fadedBlackColor,
+                    ),
+                    onPressed: () => Get.back(),
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
               ),
-              actions: _buildAppBarActions(),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Stack(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.notifications_outlined,
+                            size: 18,
+                            color: Colors.grey.shade700,
+                          ),
+                          onPressed: () {
+                            Get.toNamed(RouteClass.getNotificationsPage());
+                          },
+                          padding: EdgeInsets.zero,
+                        ),
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
             ),
 
             SliverToBoxAdapter(
@@ -796,6 +911,8 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                     ],
                   ),
                   child: TextField(
+                    controller: _searchController,
+                    focusNode: _searchFocusNode,
                     decoration: InputDecoration(
                       hintText: 'Search articles, brands, topics...',
                       hintStyle: TextStyle(
@@ -804,8 +921,23 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                       ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 16, right: 8),
-                        child: Icon(Icons.search_rounded, color: Colors.grey.shade500, size: 20),
+                        child: Icon(
+                          Icons.search_rounded, 
+                          color: Colors.grey.shade500, 
+                          size: 20
+                        ),
                       ),
+                      suffixIcon: _searchQuery.isNotEmpty ? Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: Colors.grey.shade500,
+                            size: 20,
+                          ),
+                          onPressed: _clearSearch,
+                        ),
+                      ) : null,
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(vertical: 15),
                     ),
@@ -868,10 +1000,8 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           fontWeight: FontWeight.w500,
                           color: Colors.grey.shade600,
                         ),
-                        tabAlignment: _shouldTabsBeScrollable ? TabAlignment.start : TabAlignment.fill,
                         tabs: _tabTitles.map((title) => Tab(
                           child: Container(
-                            width: _tabWidth,
                             constraints: _shouldTabsBeScrollable 
                                 ? const BoxConstraints(minWidth: 80)
                                 : null,
@@ -896,16 +1026,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             ),
           ];
         },
-        body: Consumer<BlogPostProvider>(
-          builder: (context, blogPostProvider, child) {
-            return _isInitialLoad || blogPostProvider.isLoading
-                ? _buildLoadingState()
-                : TabBarView(
-                    controller: _tabController,
-                    children: _tabPages,
-                  );
-          },
-        ),
+        body: _isInitialLoad ? _buildLoadingState() : _buildContent(),
       ),
     );
   }
@@ -943,47 +1064,6 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
           ),
         ],
       ),
-    );
-  }
-
-  List<Widget> _buildAppBarActions() {
-    return [
-      _buildAppBarAction(
-        icon: Icons.notifications_outlined,
-        badge: true,
-        onTap: () {},
-      ),
-      const SizedBox(width: 16),
-    ];
-  }
-
-  Widget _buildAppBarAction({required IconData icon, required bool badge, required VoidCallback onTap}) {
-    return Stack(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, size: 18, color: Colors.grey.shade700),
-        ),
-        if (badge)
-          Positioned(
-            right: 2,
-            top: 2,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }

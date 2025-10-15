@@ -716,94 +716,91 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildCategoriesSection(HomeProvider homeProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Text(
-            'Browse Categories',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+Widget _buildCategoriesSection(HomeProvider homeProvider) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: Text(
+          'Browse Categories',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
           ),
         ),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            itemCount: homeProvider.categories.length,
-            itemBuilder: (context, index) {
-              final category = homeProvider.categories[index];
-              return GestureDetector(
-                onTap: () {
-                  final logger = Logger();
-                  logger.w('Category tapped: ${category.name}');
-                  
-                  // NEW: Filter recommended items by category and navigate
-                  _navigateToCategoryItems(category, homeProvider);
-                },
-                child: Container(
-                  width: 90,
-                  margin: EdgeInsets.symmetric(horizontal: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // CATEGORY IMAGE - REPLACED ICON WITH ACTUAL IMAGE
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          color: Colors.grey[100],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25),
-                          child: _buildCategoryImage(category),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      // Category Name
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Text(
-                          category.name,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black87,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
+      ),
+      SizedBox(
+        height: 100,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          itemCount: homeProvider.categories.length,
+          itemBuilder: (context, index) {
+            final category = homeProvider.categories[index];
+            return GestureDetector(
+              onTap: () {
+                _navigateToCategoryItems(category, homeProvider);
+              },
+              child: Container(
+                width: 90,
+                margin: EdgeInsets.symmetric(horizontal: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center, // FIX: Center content
+                  mainAxisSize: MainAxisSize.min, // FIX: Prevent overflow
+                  children: [
+                    // Category Image
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: Colors.grey[100],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(25),
+                        child: _buildCategoryImage(category),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    // Category Name - FIXED with proper constraints
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(
+                        category.name,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
-        SizedBox(height: 24),
-      ],
-    );
-  }
+      ),
+      SizedBox(height: 24),
+    ],
+  );
+}
 
   // NEW METHOD: Filter recommended items by category and navigate
 void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
@@ -847,7 +844,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
     final imageUrl = category.image;
     final hasValidImage = imageUrl != null && 
                          imageUrl.isNotEmpty && 
-                         imageUrl != 'assets/images/category_placeholder.png';
+                         !imageUrl.contains('assets/'); // Changed to exclude any asset paths
     
     if (hasValidImage) {
       return CachedNetworkImage(
@@ -915,7 +912,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
               final brand = item?.brand;
               final firstImage = item!.images?.isNotEmpty == true
                   ? item.images?.first
-                  : "car_placeholder.png";
+                  : null; // Changed to null to avoid asset issues
               final brandImage = brand?.image;
               final discount = offer.discount;
 
@@ -946,16 +943,16 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
                   borderRadius: BorderRadius.circular(16),
                   child: Stack(
                     children: [
-                      CachedNetworkImage(
-                        imageUrl: getImageUrl(firstImage, null),
-                        width: double.infinity,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey[200],
-                          child: Icon(Icons.error, color: Colors.grey[400]),
-                        ),
-                      ),
+                      // FIXED: Use network image only, no asset fallbacks
+                      firstImage != null && !firstImage.contains('assets/')
+                          ? CachedNetworkImage(
+                              imageUrl: getImageUrl(firstImage, null),
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => _buildImageErrorPlaceholder(),
+                            )
+                          : _buildImageErrorPlaceholder(),
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -994,7 +991,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (brandImage != null)
+                            if (brandImage != null && !brandImage.contains('assets/'))
                               Container(
                                 width: 32,
                                 height: 32,
@@ -1043,6 +1040,28 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
     );
   }
 
+  Widget _buildImageErrorPlaceholder() {
+    return Container(
+      color: Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Helper method to get colors for different categories
   Color _getCategoryColor(String categoryName) {
     switch (categoryName.toLowerCase()) {
@@ -1075,7 +1094,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
   }
 }
 
-// _RecommendedItemWidget class remains exactly the same as your original code
+// _RecommendedItemWidget class with fixed asset issues
 class _RecommendedItemWidget extends StatefulWidget {
   final RecommendedItem recommended;
   final Size screenSize;
@@ -1241,7 +1260,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
   Widget build(BuildContext context) {
     final firstImage = widget.recommended.images?.isNotEmpty == true
         ? widget.recommended.images!.first
-        : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+        : null; // Changed to null to avoid asset issues
     final brandImage = widget.recommended.brand?.image;
     final isPromoted = widget.recommended.isPromoted == true;
 
@@ -1460,7 +1479,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (brandImage != null)
+                      if (brandImage != null && !brandImage.contains('assets/'))
                         Container(
                           width: 24,
                           height: 24,
@@ -1523,18 +1542,9 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
     );
   }
 
-  Widget _buildRecommendedImage(String imageUrl) {
-    final bool isAssetImage = widget.recommended.images?.isNotEmpty != true;
-    
-    if (isAssetImage) {
-      return Image.asset(
-        "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildImageErrorPlaceholder();
-        },
-      );
-    } else {
+  Widget _buildRecommendedImage(String? imageUrl) {
+    // FIXED: Only use network images, no asset fallbacks
+    if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
       
       return CachedNetworkImage(
@@ -1553,6 +1563,8 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
           return _buildImageErrorPlaceholder();
         },
       );
+    } else {
+      return _buildImageErrorPlaceholder();
     }
   }
 

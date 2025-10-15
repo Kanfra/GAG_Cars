@@ -102,6 +102,7 @@ Future<T> postApiData<T>({
             logger.i("Status code: ${response.statusCode}");
             return true as T;
           }
+          logger.i("Success response from $uri, and status code: ${response.statusCode}");
           return fromJson(responseData as Map<String, dynamic>);
         } catch (e) {
           logger.e('Failed to parse success response from $uri: $e');

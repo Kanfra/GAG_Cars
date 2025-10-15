@@ -249,9 +249,11 @@ mixin _$Package {
   int get countryId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  String get price => throw _privateConstructorUsedError;
+  @JsonKey(name: 'price')
+  String get price =>
+      throw _privateConstructorUsedError; // This is now just 'price'
   @JsonKey(name: 'number_of_listings')
-  int get numberOfListings => throw _privateConstructorUsedError;
+  int? get numberOfListings => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
@@ -284,8 +286,8 @@ abstract class $PackageCopyWith<$Res> {
       @JsonKey(name: 'country_id') int countryId,
       String name,
       String? description,
-      String price,
-      @JsonKey(name: 'number_of_listings') int numberOfListings,
+      @JsonKey(name: 'price') String price,
+      @JsonKey(name: 'number_of_listings') int? numberOfListings,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
       @JsonKey(name: 'category_id') int? categoryId,
@@ -318,7 +320,7 @@ class _$PackageCopyWithImpl<$Res, $Val extends Package>
     Object? name = null,
     Object? description = freezed,
     Object? price = null,
-    Object? numberOfListings = null,
+    Object? numberOfListings = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? categoryId = freezed,
@@ -348,10 +350,10 @@ class _$PackageCopyWithImpl<$Res, $Val extends Package>
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as String,
-      numberOfListings: null == numberOfListings
+      numberOfListings: freezed == numberOfListings
           ? _value.numberOfListings
           : numberOfListings // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -420,8 +422,8 @@ abstract class _$$PackageImplCopyWith<$Res> implements $PackageCopyWith<$Res> {
       @JsonKey(name: 'country_id') int countryId,
       String name,
       String? description,
-      String price,
-      @JsonKey(name: 'number_of_listings') int numberOfListings,
+      @JsonKey(name: 'price') String price,
+      @JsonKey(name: 'number_of_listings') int? numberOfListings,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
       @JsonKey(name: 'category_id') int? categoryId,
@@ -454,7 +456,7 @@ class __$$PackageImplCopyWithImpl<$Res>
     Object? name = null,
     Object? description = freezed,
     Object? price = null,
-    Object? numberOfListings = null,
+    Object? numberOfListings = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? categoryId = freezed,
@@ -484,10 +486,10 @@ class __$$PackageImplCopyWithImpl<$Res>
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as String,
-      numberOfListings: null == numberOfListings
+      numberOfListings: freezed == numberOfListings
           ? _value.numberOfListings
           : numberOfListings // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -528,7 +530,7 @@ class _$PackageImpl implements _Package {
       @JsonKey(name: 'country_id') required this.countryId,
       required this.name,
       required this.description,
-      required this.price,
+      @JsonKey(name: 'price') required this.price,
       @JsonKey(name: 'number_of_listings') required this.numberOfListings,
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'updated_at') required this.updatedAt,
@@ -551,10 +553,12 @@ class _$PackageImpl implements _Package {
   @override
   final String? description;
   @override
+  @JsonKey(name: 'price')
   final String price;
+// This is now just 'price'
   @override
   @JsonKey(name: 'number_of_listings')
-  final int numberOfListings;
+  final int? numberOfListings;
   @override
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
@@ -649,8 +653,8 @@ abstract class _Package implements Package {
       @JsonKey(name: 'country_id') required final int countryId,
       required final String name,
       required final String? description,
-      required final String price,
-      @JsonKey(name: 'number_of_listings') required final int numberOfListings,
+      @JsonKey(name: 'price') required final String price,
+      @JsonKey(name: 'number_of_listings') required final int? numberOfListings,
       @JsonKey(name: 'created_at') required final DateTime createdAt,
       @JsonKey(name: 'updated_at') required final DateTime updatedAt,
       @JsonKey(name: 'category_id') required final int? categoryId,
@@ -671,10 +675,11 @@ abstract class _Package implements Package {
   @override
   String? get description;
   @override
-  String get price;
+  @JsonKey(name: 'price')
+  String get price; // This is now just 'price'
   @override
   @JsonKey(name: 'number_of_listings')
-  int get numberOfListings;
+  int? get numberOfListings;
   @override
   @JsonKey(name: 'created_at')
   DateTime get createdAt;
@@ -717,7 +722,7 @@ mixin _$Category {
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  List<String> get features => throw _privateConstructorUsedError;
+  List<dynamic> get features => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
@@ -746,7 +751,7 @@ abstract class $CategoryCopyWith<$Res> {
       String name,
       String slug,
       String? description,
-      List<String> features,
+      List<dynamic> features,
       String? image,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt});
@@ -806,7 +811,7 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
       features: null == features
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<dynamic>,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -838,7 +843,7 @@ abstract class _$$CategoryImplCopyWith<$Res>
       String name,
       String slug,
       String? description,
-      List<String> features,
+      List<dynamic> features,
       String? image,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt});
@@ -896,7 +901,7 @@ class __$$CategoryImplCopyWithImpl<$Res>
       features: null == features
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<dynamic>,
       image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
@@ -923,7 +928,7 @@ class _$CategoryImpl implements _Category {
       required this.name,
       required this.slug,
       required this.description,
-      required final List<String> features,
+      required final List<dynamic> features,
       required this.image,
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'updated_at') required this.updatedAt})
@@ -946,9 +951,9 @@ class _$CategoryImpl implements _Category {
   final String slug;
   @override
   final String? description;
-  final List<String> _features;
+  final List<dynamic> _features;
   @override
-  List<String> get features {
+  List<dynamic> get features {
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_features);
@@ -1028,7 +1033,7 @@ abstract class _Category implements Category {
           required final String name,
           required final String slug,
           required final String? description,
-          required final List<String> features,
+          required final List<dynamic> features,
           required final String? image,
           @JsonKey(name: 'created_at') required final DateTime createdAt,
           @JsonKey(name: 'updated_at') required final DateTime updatedAt}) =
@@ -1052,7 +1057,7 @@ abstract class _Category implements Category {
   @override
   String? get description;
   @override
-  List<String> get features;
+  List<dynamic> get features;
   @override
   String? get image;
   @override
@@ -1867,7 +1872,7 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 mixin _$PaginationMeta {
   @JsonKey(name: 'current_page')
   int get currentPage => throw _privateConstructorUsedError;
-  int get from => throw _privateConstructorUsedError;
+  int? get from => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_page')
   int get lastPage => throw _privateConstructorUsedError;
   List<PaginationLink> get links => throw _privateConstructorUsedError;
@@ -1895,7 +1900,7 @@ abstract class $PaginationMetaCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'current_page') int currentPage,
-      int from,
+      int? from,
       @JsonKey(name: 'last_page') int lastPage,
       List<PaginationLink> links,
       String path,
@@ -1920,7 +1925,7 @@ class _$PaginationMetaCopyWithImpl<$Res, $Val extends PaginationMeta>
   @override
   $Res call({
     Object? currentPage = null,
-    Object? from = null,
+    Object? from = freezed,
     Object? lastPage = null,
     Object? links = null,
     Object? path = null,
@@ -1933,10 +1938,10 @@ class _$PaginationMetaCopyWithImpl<$Res, $Val extends PaginationMeta>
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
               as int,
-      from: null == from
+      from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       lastPage: null == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
@@ -1975,7 +1980,7 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'current_page') int currentPage,
-      int from,
+      int? from,
       @JsonKey(name: 'last_page') int lastPage,
       List<PaginationLink> links,
       String path,
@@ -1998,7 +2003,7 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? currentPage = null,
-    Object? from = null,
+    Object? from = freezed,
     Object? lastPage = null,
     Object? links = null,
     Object? path = null,
@@ -2011,10 +2016,10 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
               as int,
-      from: null == from
+      from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       lastPage: null == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
@@ -2064,7 +2069,7 @@ class _$PaginationMetaImpl implements _PaginationMeta {
   @JsonKey(name: 'current_page')
   final int currentPage;
   @override
-  final int from;
+  final int? from;
   @override
   @JsonKey(name: 'last_page')
   final int lastPage;
@@ -2133,7 +2138,7 @@ class _$PaginationMetaImpl implements _PaginationMeta {
 abstract class _PaginationMeta implements PaginationMeta {
   const factory _PaginationMeta(
       {@JsonKey(name: 'current_page') required final int currentPage,
-      required final int from,
+      required final int? from,
       @JsonKey(name: 'last_page') required final int lastPage,
       required final List<PaginationLink> links,
       required final String path,
@@ -2148,7 +2153,7 @@ abstract class _PaginationMeta implements PaginationMeta {
   @JsonKey(name: 'current_page')
   int get currentPage;
   @override
-  int get from;
+  int? get from;
   @override
   @JsonKey(name: 'last_page')
   int get lastPage;

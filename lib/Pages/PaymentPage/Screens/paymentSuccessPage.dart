@@ -1,5 +1,6 @@
 // lib/Pages/Payment/payment_success_page.dart
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:pdf/pdf.dart';
@@ -29,12 +30,30 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   @override
   void initState() {
     super.initState();
-    logger.i('Payment success data: ${widget.allJson}');
+    logger.i('✅ Payment success initialized: ${widget.allJson}');
   }
 
-  /// Generate PDF Receipt
+  double _getAmountInGhs() {
+    final dynamic amountValue = widget.allJson['amount'];
+    
+    double amountDouble;
+    if (amountValue is int) {
+      amountDouble = amountValue.toDouble();
+    } else if (amountValue is double) {
+      amountDouble = amountValue;
+    } else if (amountValue is String) {
+      amountDouble = double.tryParse(amountValue) ?? 0.0;
+    } else {
+      amountDouble = 0.0;
+    }
+    
+    // Convert from kobo to GHS
+    return amountDouble / 100;
+  }
+
   Future<Uint8List> _generatePdfReceipt() async {
     final pdf = pw.Document();
+    final amountInGhs = _getAmountInGhs();
 
     pdf.addPage(
       pw.Page(
@@ -57,24 +76,15 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                 pw.Divider(),
                 pw.SizedBox(height: 20),
 
-                _buildPdfRow('Reference:',
-                    widget.allJson['transactionReference']?.toString() ?? 'N/A'),
+                _buildPdfRow('Reference:', widget.allJson['transactionReference']?.toString() ?? 'N/A'),
                 pw.SizedBox(height: 10),
-
-                _buildPdfRow('Date:',
-                    DateTime.now().toString().split('.').first),
+                _buildPdfRow('Date:', DateTime.now().toString().split('.').first),
                 pw.SizedBox(height: 10),
-
-                _buildPdfRow('Amount:',
-                    'GH₵ ${widget.allJson['amount']?.toString() ?? '0.00'}'),
+                _buildPdfRow('Amount:', 'GH₵ ${amountInGhs.toStringAsFixed(2)}'),
                 pw.SizedBox(height: 10),
-
-                _buildPdfRow('Package:',
-                    widget.allJson['packageName']?.toString() ?? 'Unknown'),
+                _buildPdfRow('Package:', widget.allJson['packageName']?.toString() ?? 'Unknown'),
                 pw.SizedBox(height: 10),
-
-                _buildPdfRow('Listing:',
-                    widget.allJson['listingName']?.toString() ?? 'Unknown'),
+                _buildPdfRow('Listing:', widget.allJson['listingName']?.toString() ?? 'Unknown'),
                 pw.SizedBox(height: 30),
 
                 pw.Center(
@@ -106,26 +116,22 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     );
   }
 
-  /// Share PDF
   Future<void> _shareReceipt() async {
     setState(() => _isSharing = true);
 
     try {
       final pdfBytes = await _generatePdfReceipt();
-
       await Printing.sharePdf(
         bytes: pdfBytes,
-        filename:
-            'receipt-${widget.allJson['transactionReference'] ?? 'payment'}.pdf',
+        filename: 'receipt-${widget.allJson['transactionReference'] ?? 'payment'}.pdf',
       );
     } catch (e) {
       logger.e('Share error: $e');
       Get.snackbar(
         'Error',
-        'Failed to share receipt: ${e.toString()}',
+        'Failed to share receipt',
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
       setState(() => _isSharing = false);
@@ -134,6 +140,8 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
   @override
   Widget build(BuildContext context) {
+    final amountInGhs = _getAmountInGhs();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -150,8 +158,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                   color: Colors.green.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle,
-                    color: Colors.green, size: 60),
+                child: const Icon(Icons.check_circle, color: Colors.green, size: 60),
               ),
               const SizedBox(height: 32),
 
@@ -166,7 +173,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               const SizedBox(height: 16),
 
               Text(
-                'GH₵ ${widget.allJson['amount']?.toString() ?? '0.00'}',
+                'GH₵ ${amountInGhs.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -174,16 +181,16 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               ),
               const SizedBox(height: 8),
 
-              Text(widget.allJson['packageName']?.toString() ?? 'Unknown Package',
-                  style: const TextStyle(fontSize: 18, color: Colors.grey)),
+              Text(
+                widget.allJson['packageName']?.toString() ?? 'Unknown Package',
+                style: const TextStyle(fontSize: 18, color: Colors.grey)
+              ),
               const SizedBox(height: 4),
 
               Text(
                 widget.allJson['listingName']?.toString() ?? 'Unknown Listing',
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
                 textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 24),
 
@@ -201,11 +208,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                     const SizedBox(width: 8),
                     Text(
                       'Ref: ${widget.allJson['transactionReference']?.toString() ?? 'N/A'}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontFamily: 'monospace',
-                      ),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -218,9 +221,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.offUntil(
-                          GetPageRoute(page: () => MyListingPage()),
-                          (route) => route.isFirst,
+                        Get.offNamedUntil(
+                         RouteClass.getMyListingPage(),
+                         (route) => route.isFirst,
                         );
                       },
                       style: ElevatedButton.styleFrom(

@@ -13,7 +13,10 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   final IconData leadingIconData;
   final Color? leadingIconDataColor;
   final bool? centerTitle;
+  final FontWeight? titleFontWeight;
   final String titleText;
+  final double? titleTextSize;
+  final FontWeight? titleTextWeight;
   final double? elevation;
   final Color? titleTextColor;
   final bool isLeadingWidgetExist;
@@ -24,7 +27,10 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
     required this.onLeadingIconClickFunction,
     this.actions,
     required this.isLeadingWidgetExist,
+    this.titleTextWeight,
     required this.leadingIconData,
+    this.titleFontWeight,
+    this.titleTextSize,
     this.leadingIconDataColor,
     this.centerTitle,
     this.elevation,
@@ -52,7 +58,8 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: appbarBackgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       title: TextLarge(
         title: titleText,
-        fontWeight: FontWeight.w600,
+        textSize: titleTextSize,
+        fontWeight: titleFontWeight ?? FontWeight.w600,
         textColor: titleTextColor ?? ColorGlobalVariables.blackColor,
       ),
       actions: actions ?? [],

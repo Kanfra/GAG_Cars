@@ -827,6 +827,7 @@ class _DetailPageState extends State<DetailPage> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: Consumer<SimilarItemsProvider>(
         builder: (context, similarItemsProvider, child) {
           return CustomScrollView(
@@ -1226,7 +1227,11 @@ class _DetailPageState extends State<DetailPage> {
                                     borderColor: ColorGlobalVariables.fadedBlackColor,
                                     isFullButtonWidthRequired: false, 
                                     buttonBackgroundColor: Colors.transparent, 
-                                    onClickFunction: (){}
+                                    onClickFunction: (){
+                                      Get.toNamed(
+                                        RouteClass.getChatPage()
+                                      );
+                                    }
                                   ),
                                 ),
                                 const SizedBox(width: 12),
