@@ -14,7 +14,7 @@ class SimilarItemsByCategoryService {
     required int category,
     required String item,
     int page = 1,
-    int limit = 10,
+    int limit = 8, // Reduced for better performance
   }) async {
     final logger = Logger();
     
@@ -49,7 +49,6 @@ class SimilarItemsByCategoryService {
       logger.w('📋 Request headers:');
       logger.w('   - Authorization: Bearer ${token != null ? "***" : "null"}');
       logger.w('   - Content-Type: application/json');
-      // logger.w('   - Accept: 'application/json''');
 
       final stopwatch = Stopwatch()..start();
       final response = await http.get(

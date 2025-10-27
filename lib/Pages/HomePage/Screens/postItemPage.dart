@@ -1,7 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemCategoryModel.dart';
@@ -10,7 +9,6 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProv
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/CanUploadItemService/canUploadItemService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
-import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/myListingPage.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,10 +16,14 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PostItemPage extends StatefulWidget {
-  const PostItemPage({super.key});
+  final bool hasPendingUpload;
+  const PostItemPage({
+    super.key,
+    this.hasPendingUpload = false,
+  });
 
   @override
   State<PostItemPage> createState() => _PostItemPageState();
@@ -39,7 +41,8 @@ class _PostItemPageState extends State<PostItemPage> {
   final Logger logger = Logger();
   
   // State variables
-  Color color = Colors.blue;
+  String selectedColorName = '';
+  Color selectedColor = Colors.blue;
   List<XFile> selectedImages = [];
   final ImagePicker picker = ImagePicker();
   String? selectedLocation;
@@ -52,11 +55,85 @@ class _PostItemPageState extends State<PostItemPage> {
   
   // Loading states
   bool _isLoading = false;
-  bool _isSelling = false;
+  bool _isUploading = false;
   bool _isCheckingUpload = false;
 
   // Form fields
   Map<String, dynamic> selectedFields = {};
+
+  // Image constants
+  static const int minImagesRequired = 4;
+  static const int maxImagesAllowed = 10;
+
+  // Predefined colors with names - SAME AS EDIT ITEM PAGE
+  final List<Map<String, dynamic>> colorOptions = [
+    {'name': 'Red', 'color': Colors.red, 'value': '#FF0000'},
+    {'name': 'Dark Red', 'color': Colors.red[700]!, 'value': '#B71C1C'},
+    {'name': 'Light Red', 'color': Colors.red[300]!, 'value': '#EF5350'},
+    {'name': 'Crimson', 'color': Color(0xFFDC143C), 'value': '#DC143C'},
+    {'name': 'Maroon', 'color': Color(0xFF800000), 'value': '#800000'},
+    
+    {'name': 'Blue', 'color': Colors.blue, 'value': '#2196F3'},
+    {'name': 'Dark Blue', 'color': Colors.blue[700]!, 'value': '#1976D2'},
+    {'name': 'Light Blue', 'color': Colors.blue[300]!, 'value': '#64B5F6'},
+    {'name': 'Navy Blue', 'color': Color(0xFF000080), 'value': '#000080'},
+    {'name': 'Sky Blue', 'color': Color(0xFF87CEEB), 'value': '#87CEEB'},
+    
+    {'name': 'Green', 'color': Colors.green, 'value': '#4CAF50'},
+    {'name': 'Dark Green', 'color': Colors.green[700]!, 'value': '#388E3C'},
+    {'name': 'Light Green', 'color': Colors.green[300]!, 'value': '#81C784'},
+    {'name': 'Forest Green', 'color': Color(0xFF228B22), 'value': '#228B22'},
+    {'name': 'Lime Green', 'color': Color(0xFF32CD32), 'value': '#32CD32'},
+    
+    {'name': 'Yellow', 'color': Colors.yellow, 'value': '#FFEB3B'},
+    {'name': 'Gold', 'color': Color(0xFFFFD700), 'value': '#FFD700'},
+    {'name': 'Light Yellow', 'color': Colors.yellow[300]!, 'value': '#FFF176'},
+    {'name': 'Amber', 'color': Colors.amber, 'value': '#FFC107'},
+    
+    {'name': 'Orange', 'color': Colors.orange, 'value': '#FF9800'},
+    {'name': 'Dark Orange', 'color': Colors.orange[700]!, 'value': '#F57C00'},
+    {'name': 'Light Orange', 'color': Colors.orange[300]!, 'value': '#FFB74D'},
+    
+    {'name': 'Purple', 'color': Colors.purple, 'value': '#9C27B0'},
+    {'name': 'Dark Purple', 'color': Colors.purple[700]!, 'value': '#7B1FA2'},
+    {'name': 'Light Purple', 'color': Colors.purple[300]!, 'value': '#BA68C8'},
+    {'name': 'Violet', 'color': Color(0xFFEE82EE), 'value': '#EE82EE'},
+    
+    {'name': 'Pink', 'color': Colors.pink, 'value': '#E91E63'},
+    {'name': 'Hot Pink', 'color': Color(0xFFFF69B4), 'value': '#FF69B4'},
+    {'name': 'Light Pink', 'color': Colors.pink[300]!, 'value': '#F06292'},
+    
+    {'name': 'Brown', 'color': Colors.brown, 'value': '#795548'},
+    {'name': 'Dark Brown', 'color': Colors.brown[700]!, 'value': '#5D4037'},
+    {'name': 'Light Brown', 'color': Colors.brown[300]!, 'value': '#A1887F'},
+    {'name': 'Tan', 'color': Color(0xFFD2B48C), 'value': '#D2B48C'},
+    
+    {'name': 'Gray', 'color': Colors.grey, 'value': '#9E9E9E'},
+    {'name': 'Dark Gray', 'color': Colors.grey[700]!, 'value': '#616161'},
+    {'name': 'Light Gray', 'color': Colors.grey[300]!, 'value': '#E0E0E0'},
+    {'name': 'Silver', 'color': Color(0xFFC0C0C0), 'value': '#C0C0C0'},
+    {'name': 'Charcoal', 'color': Color(0xFF36454F), 'value': '#36454F'},
+    
+    {'name': 'Black', 'color': Colors.black, 'value': '#000000'},
+    {'name': 'White', 'color': Colors.white, 'value': '#FFFFFF'},
+    {'name': 'Ivory', 'color': Color(0xFFFFFFF0), 'value': '#FFFFF0'},
+    {'name': 'Beige', 'color': Color(0xFFF5F5DC), 'value': '#F5F5DC'},
+    
+    {'name': 'Teal', 'color': Colors.teal, 'value': '#009688'},
+    {'name': 'Cyan', 'color': Colors.cyan, 'value': '#00BCD4'},
+    {'name': 'Turquoise', 'color': Color(0xFF40E0D0), 'value': '#40E0D0'},
+    
+    {'name': 'Indigo', 'color': Colors.indigo, 'value': '#3F51B5'},
+    {'name': 'Magenta', 'color': Color(0xFFFF00FF), 'value': '#FF00FF'},
+    {'name': 'Lavender', 'color': Color(0xFFE6E6FA), 'value': '#E6E6FA'},
+    {'name': 'Mint', 'color': Color(0xFF98FB98), 'value': '#98FB98'},
+    {'name': 'Olive', 'color': Color(0xFF808000), 'value': '#808000'},
+    {'name': 'Coral', 'color': Color(0xFFFF7F50), 'value': '#FF7F50'},
+    {'name': 'Salmon', 'color': Color(0xFFFA8072), 'value': '#FA8072'},
+    {'name': 'Peach', 'color': Color(0xFFFFDAB9), 'value': '#FFDAB9'},
+    {'name': 'Burgundy', 'color': Color(0xFF800020), 'value': '#800020'},
+    {'name': 'Mustard', 'color': Color(0xFFFFDB58), 'value': '#FFDB58'},
+  ];
 
   @override
   void initState() {
@@ -86,11 +163,7 @@ class _PostItemPageState extends State<PostItemPage> {
       ]);
       logger.i("Initial data loaded successfully");
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load data: ${e.toString()}'))
-        );
-      }
+      _showErrorSnackBar('Failed to load data: ${e.toString()}');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -99,14 +172,12 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   Future<Map<String, dynamic>> _checkCanUpload() async {
-    logger.i("Checking upload permissions...");
-    
     if (mounted) {
       setState(() => _isCheckingUpload = true);
     }
     
     try {
-      if (selectedCategory?.slug == null) {
+      if (selectedCategory?.id == null) {
         return {
           'can_upload': false,
           'reason': 'No category selected',
@@ -116,7 +187,7 @@ class _PostItemPageState extends State<PostItemPage> {
 
       final canUploadService = CanUploadItemService();
       final result = await canUploadService.checkCanUpload(
-        categorySlug: selectedCategory!.slug!,
+        categoryId: selectedCategory!.id!,
       );
       
       final bool canUpload = result['can_upload'] ?? false;
@@ -130,7 +201,6 @@ class _PostItemPageState extends State<PostItemPage> {
       
     } catch (e) {
       String errorMessage = 'Unable to verify upload permissions';
-      String reason = 'Service unavailable';
       
       if (e.toString().contains('Unauthorized')) {
         errorMessage = 'Please login again to continue';
@@ -140,7 +210,7 @@ class _PostItemPageState extends State<PostItemPage> {
       
       return {
         'can_upload': false,
-        'reason': reason,
+        'reason': 'Service unavailable',
         'error': errorMessage
       };
     } finally {
@@ -150,53 +220,66 @@ class _PostItemPageState extends State<PostItemPage> {
     }
   }
 
-  Future<void> sellCarFunction() async {
-    logger.i("Starting vehicle upload...");
+  Map<String, dynamic> _prepareVehicleData() {
+    Map<String, dynamic> normalizedFields = {};
+    
+    if (_colorController.text.trim().isNotEmpty) {
+      normalizedFields['color'] = _colorController.text.trim();
+    }
+    
+    if (year.toString().isNotEmpty) {
+      normalizedFields['year'] = year.toString().trim();
+    }
+
+    normalizedFields.addAll(selectedFields.map((key, value) => 
+      MapEntry(key!.toLowerCase().replaceAll(' ', '_'), value)));
+
+    return {
+      'category_id': selectedCategory?.id,
+      'brand_id': selectedMake?["id"],
+      'brand_model_id': selectedModel?.id, 
+      'name': _itemNameController.text.trim(),
+      'slug': _createSlug(_itemNameController.text.trim()),
+      ...normalizedFields,
+      'location': selectedLocation,
+      'price': _priceController.text.trim(),
+      'description': _itemDescriptionController.text.trim(),
+      'features': selectedFeatures,
+      'images': selectedImages.map((xFile) => xFile.path).toList(),
+    };
+  }
+
+  Future<void> _uploadVehicleWithData(Map<String, dynamic> vehicleData) async {
+    logger.i("Starting vehicle upload with prepared data...");
     
     try {
-      if (!_validateRequiredFields()) {
-        throw Exception('Please fill all required fields');
-      }
-
-      // Process form data
-      if (_colorController.text.trim().isNotEmpty) {
-        selectedFields['color'] = _colorController.text.trim();
-      }
-      
-      if (year.toString().isNotEmpty) {
-        selectedFields['year'] = year.toString().trim();
-      }
-
-      final normalizedFields = selectedFields.map((key, value) => 
-        MapEntry(key?.toLowerCase().replaceAll(' ', '_'), value));
-
-      // Process images
+      // Process and validate images
       List<File> imageFiles = [];
-      for (var xFile in selectedImages) {
-        final file = File(xFile.path);
+      for (var imagePath in vehicleData['images']) {
+        final file = File(imagePath.toString());
         if (await file.exists()) {
           imageFiles.add(file);
         } else {
-          throw Exception('One or more selected images are invalid');
+          throw Exception('One or more selected images are no longer available');
         }
       }
 
-      if (imageFiles.length < 2) {
-        throw Exception('At least 2 valid images are required');
+      if (imageFiles.length < minImagesRequired) { 
+        throw Exception('At least $minImagesRequired valid images are required');
       }
 
-      // Prepare request body
+      // Prepare final request body
       final requestBody = {
-        'category_id': selectedCategory!.id,
-        'brand_id': selectedMake!["id"],
-        'brand_model_id': selectedModel!.id, 
-        'name': _itemNameController.text.trim(),
-        'slug': _createSlug(_itemNameController.text.trim()),
-        ...normalizedFields,
-        'location': selectedLocation,
-        'price': _priceController.text.trim(),
-        'description': _itemDescriptionController.text.trim(),
-        'features': selectedFeatures,
+        'category_id': vehicleData['category_id'],
+        'brand_id': vehicleData['brand_id'],
+        'brand_model_id': vehicleData['brand_model_id'], 
+        'name': vehicleData['name'],
+        'slug': vehicleData['slug'],
+        ...vehicleData,
+        'location': vehicleData['location'],
+        'price': vehicleData['price'],
+        'description': vehicleData['description'],
+        'features': vehicleData['features'],
         'images': imageFiles
       };
       
@@ -205,9 +288,42 @@ class _PostItemPageState extends State<PostItemPage> {
       logger.i("Vehicle uploaded successfully");
       
     } catch (e) {
-      logger.e("Error in sellCarFunction: $e");
+      logger.e("Error in _uploadVehicleWithData: $e");
       rethrow;
     }
+  }
+
+  Future<void> _storeVehicleDataForLater() async {
+    final vehicleData = _prepareVehicleData();
+    final prefs = await SharedPreferences.getInstance();
+    
+    // Store both the data and a flag
+    await prefs.setString('pending_vehicle_data', json.encode(vehicleData));
+    await prefs.setBool('pending_upload', true);
+    
+    logger.i("Vehicle data stored for later upload");
+  }
+
+  Future<void> _navigateToPromotionsPage() async {
+    await _storeVehicleDataForLater();
+    
+    // Navigate to promotions page
+    final result = await Get.toNamed(
+      RouteClass.getPromotionsPage(),
+      arguments: {
+        'type': 'upload',
+      },
+    );
+    
+    // Handle payment result - if payment was successful, the upload will happen in WebViewPaymentPage
+    // No need to process anything here as the flow continues in WebViewPaymentPage
+    if (result == true && mounted) {
+      logger.i("Payment completed, upload should be in progress");
+    }
+  }
+
+  void _navigateToMyListings() {
+    Get.offAllNamed(RouteClass.getMyListingPage());
   }
 
   String _createSlug(String name) {
@@ -246,14 +362,49 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
+  void _showSuccessSnackBar(String message) {
+    showCustomSnackBar(
+      backgroundColor: ColorGlobalVariables.greenColor,
+      title: "Success",
+      message: message
+    );
+  }
+
+  void _clearAllFormFields() {
+    logger.i("Clearing all form fields after successful upload...");
+    
+    _priceController.clear();
+    _itemNameController.clear();
+    _itemDescriptionController.clear();
+    _colorController.clear();
+    
+    setState(() {
+      selectedColorName = '';
+      selectedColor = Colors.blue;
+      selectedImages = [];
+      selectedLocation = null;
+      _currentPosition = null;
+      selectedMake = null;
+      selectedModel = null;
+      selectedCategory = null;
+      selectedFeatures = [];
+      year = DateTime.now().year;
+      selectedFields = {};
+    });
+    
+    _formKey.currentState?.reset();
+    
+    logger.i("All form fields cleared successfully after upload");
+  }
+
   Future<void> _formValidation() async {
     if (!_formKey.currentState!.validate()) {
       _showErrorSnackBar('Please correct the errors in the form');
       return;
     }
 
-    if (selectedImages.isEmpty || selectedImages.length < 2) {
-      _showErrorSnackBar('Please upload at least 2 images and at most 4 images');
+    if (selectedImages.length < minImagesRequired || selectedImages.length > maxImagesAllowed) {
+      _showErrorSnackBar('Please upload between $minImagesRequired and $maxImagesAllowed images');
       return;
     }
     
@@ -261,7 +412,7 @@ class _PostItemPageState extends State<PostItemPage> {
       return;
     }
     
-    setState(() => _isSelling = true);
+    setState(() => _isUploading = true);
     
     try {
       final uploadCheckResult = await _checkCanUpload();
@@ -274,32 +425,20 @@ class _PostItemPageState extends State<PostItemPage> {
       }
       
       if (canUpload) {
-        await sellCarFunction();
+        // Free category - direct upload
+        logger.i("Free category - uploading directly");
+        final vehicleData = _prepareVehicleData();
+        await _uploadVehicleWithData(vehicleData);
         
-        showCustomSnackBar(
-          backgroundColor: ColorGlobalVariables.greenColor,
-          title: 'Success',
-          message: 'Vehicle listed successfully'
-        );
-
-        if (mounted) {
-         Get.offNamedUntil(
-          RouteClass.getMyListingPage(),
-        (route) => route.isFirst, // This keeps the very first route (usually home)
-      );
-          // Navigator.pushNamedAndRemoveUntil(
-          //   context, 
-          //   RouteClass.getMyListingPage(), 
-          //   (route) => false
-          // );
-        }
+        _showSuccessSnackBar('Vehicle listed successfully');
+        _clearAllFormFields();
+        _navigateToMyListings();
+        
       } else {
-        final String reason = uploadCheckResult['reason'] ?? 'Unknown reason';
-        showCustomSnackBar(
-          backgroundColor: ColorGlobalVariables.blueColor,
-          title: 'Upload Restricted',
-          message: reason
-        );
+        // Premium category - payment required
+        logger.i("Premium category - navigating to payment");
+        _showSuccessSnackBar("Purchase an upload package to list in this category");
+        await _navigateToPromotionsPage();
       }
     } catch (e) {
       String errorMessage = 'Failed to process your request';
@@ -313,32 +452,803 @@ class _PostItemPageState extends State<PostItemPage> {
       _showErrorSnackBar('$errorMessage: ${e.toString()}');
     } finally {
       if (mounted) {
-        setState(() => _isSelling = false);
+        setState(() => _isUploading = false);
       }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final categoriesProvider = Provider.of<ItemCategoriesProvider>(context);
-    final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
+  // =============================================
+  // FIXED COLOR PICKER - SAME AS EDIT ITEM PAGE
+  // =============================================
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildBeautifulAppBar(),
-      body: _isLoading
-          ? _buildBeautifulLoadingIndicator()
-          : (categoriesProvider.error != null || makeModelProvider.error != null) 
-            ? _buildBeautifulErrorView(categoriesProvider, makeModelProvider) 
-            : _buildBeautifulMainContent(),
+  void _showSimpleColorPicker() {
+    final searchController = TextEditingController();
+    final filteredColors = ValueNotifier<List<Map<String, dynamic>>>(colorOptions);
+    final dialogSelectedColorName = ValueNotifier<String>(selectedColorName);
+    final dialogSelectedColor = ValueNotifier<Color>(selectedColor);
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        elevation: 25,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header Section
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withOpacity(0.15),
+                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.palette_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Select Color',
+                      style: TextStyle(
+                        color: ColorGlobalVariables.blackColor,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Choose from common color names',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Selected Color Preview
+              ValueListenableBuilder<String>(
+                valueListenable: dialogSelectedColorName,
+                builder: (context, colorName, child) {
+                  return ValueListenableBuilder<Color>(
+                    valueListenable: dialogSelectedColor,
+                    builder: (context, color, child) {
+                      if (colorName.isEmpty) return const SizedBox();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[50],
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.grey[300]!,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: Colors.grey[400]!,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Selected Color',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      colorName,
+                                      style: TextStyle(
+                                        color: ColorGlobalVariables.blackColor,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+
+              // Search Section
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search colors... (e.g., red, blue, dark)',
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(12),
+                        child: Icon(
+                          Icons.search_rounded, 
+                          color: ColorGlobalVariables.brownColor,
+                          size: 20,
+                        ),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 14,
+                      ),
+                    ),
+                    style: TextStyle(
+                      color: ColorGlobalVariables.blackColor,
+                      fontSize: 14,
+                    ),
+                    onChanged: (value) {
+                      filteredColors.value = colorOptions.where((color) {
+                        final colorName = color['name'].toString().toLowerCase();
+                        return colorName.contains(value.toLowerCase());
+                      }).toList();
+                    },
+                  ),
+                ),
+              ),
+
+              // Colors Grid
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: ValueListenableBuilder<List<Map<String, dynamic>>>(
+                    valueListenable: filteredColors,
+                    builder: (context, filteredColors, child) {
+                      if (filteredColors.isEmpty) {
+                        return _buildColorEmptyState();
+                      }
+                      
+                      return ValueListenableBuilder<String>(
+                        valueListenable: dialogSelectedColorName,
+                        builder: (context, selectedName, child) {
+                          return GridView.builder(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing: 8,
+                              childAspectRatio: 0.85,
+                            ),
+                            itemCount: filteredColors.length,
+                            itemBuilder: (context, index) {
+                              final colorOption = filteredColors[index];
+                              final isSelected = selectedName == colorOption['name'];
+                              
+                              return _buildColorOptionItem(
+                                colorOption, 
+                                isSelected,
+                                onTap: () {
+                                  dialogSelectedColorName.value = colorOption['name'];
+                                  dialogSelectedColor.value = colorOption['color'];
+                                }
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // Footer Section
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(28),
+                    bottomRight: Radius.circular(28),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.grey[400]!,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    ValueListenableBuilder<String>(
+                      valueListenable: dialogSelectedColorName,
+                      builder: (context, colorName, child) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                ColorGlobalVariables.brownColor,
+                                ColorGlobalVariables.brownColor.withOpacity(0.8),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: () {
+                                if (colorName.isNotEmpty) {
+                                  setState(() {
+                                    selectedColorName = colorName;
+                                    selectedColor = dialogSelectedColor.value;
+                                    _colorController.text = colorName;
+                                    
+                                    // Also update the selectedFields for the form field
+                                    for (final field in selectedCategory?.itemFields ?? []) {
+                                      if (field.label.toLowerCase().contains("color")) {
+                                        selectedFields[field.name] = colorName;
+                                      }
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                                child: Text(
+                                  'Confirm',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  AppBar _buildBeautifulAppBar() {
+  Widget _buildColorOptionItem(
+    Map<String, dynamic> colorOption, 
+    bool isSelected, {
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
+              width: isSelected ? 2.5 : 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: colorOption['color'],
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.grey[400]!,
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: isSelected
+                    ? Icon(
+                        Icons.check_rounded,
+                        color: _getContrastColor(colorOption['color']),
+                        size: 18,
+                      )
+                    : null,
+              ),
+              const SizedBox(height: 6),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  colorOption['name'],
+                  style: TextStyle(
+                    color: ColorGlobalVariables.blackColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 70,
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.color_lens_rounded,
+                size: 35,
+                color: Colors.grey[400],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No colors found',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Try searching with different keywords',
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 13,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =============================================
+  // FIXED YEAR PICKER - SAME AS EDIT ITEM PAGE
+  // =============================================
+
+  void _showBeautifulYearPicker() {
+    final currentYear = DateTime.now().year;
+    final years = List.generate(50, (index) => currentYear - index);
+    final dialogSelectedYear = ValueNotifier<int>(year);
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        elevation: 25,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withOpacity(0.15),
+                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.calendar_today_rounded,
+                        color: Colors.white,
+                        size: 36,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Select Year',
+                      style: TextStyle(
+                        color: ColorGlobalVariables.blackColor,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Choose the manufacturing year of your vehicle',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 15,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.grey[300]!,
+                        width: 2,
+                      ),
+                    ),
+                    child: ValueListenableBuilder<int>(
+                      valueListenable: dialogSelectedYear,
+                      builder: (context, selectedYear, child) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: years.length,
+                          itemBuilder: (context, index) {
+                            final yearValue = years[index];
+                            final isSelected = selectedYear == yearValue;
+                            
+                            return Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  dialogSelectedYear.value = yearValue;
+                                },
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                                  decoration: BoxDecoration(
+                                    color: isSelected 
+                                        ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: isSelected
+                                        ? Border.all(
+                                            color: ColorGlobalVariables.brownColor,
+                                            width: 2,
+                                          )
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? ColorGlobalVariables.brownColor
+                                              : Colors.grey[200],
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
+                                          color: isSelected ? Colors.white : Colors.grey[600],
+                                          size: 20,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Text(
+                                          yearValue.toString(),
+                                          style: TextStyle(
+                                            color: isSelected 
+                                                ? ColorGlobalVariables.brownColor
+                                                : ColorGlobalVariables.blackColor,
+                                            fontSize: 18,
+                                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      if (isSelected)
+                                        Icon(
+                                          Icons.check_circle_rounded,
+                                          color: ColorGlobalVariables.brownColor,
+                                          size: 24,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(28),
+                    bottomRight: Radius.circular(28),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.grey[400]!,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    ValueListenableBuilder<int>(
+                      valueListenable: dialogSelectedYear,
+                      builder: (context, selectedYear, child) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                ColorGlobalVariables.brownColor,
+                                ColorGlobalVariables.brownColor.withOpacity(0.8),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () {
+                                setState(() {
+                                  year = selectedYear;
+                                  
+                                  // Also update the selectedFields for the form field
+                                  for (final field in selectedCategory?.itemFields ?? []) {
+                                    if (field.label.toLowerCase().contains("year")) {
+                                      selectedFields[field.name] = selectedYear.toString();
+                                    }
+                                  }
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                                child: Text(
+                                  'Confirm',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getContrastColor(Color backgroundColor) {
+    final luminance = (0.299 * backgroundColor.red + 0.587 * backgroundColor.green + 0.114 * backgroundColor.blue) / 255;
+    return luminance > 0.5 ? Colors.black : Colors.white;
+  }
+
+  // ========== UI BUILDING METHODS ==========
+
+  AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      // leading: 
       title: Text(
         'Post New Item',
         style: TextStyle(
@@ -348,39 +1258,10 @@ class _PostItemPageState extends State<PostItemPage> {
         ),
       ),
       centerTitle: true,
-      actions: [
-        Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.help_outline_rounded,
-              color: Colors.grey[600],
-              size: 20,
-            ),
-            onPressed: () {
-              // Help action
-              Get.toNamed(
-                RouteClass.getHelpCenterPage(),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 
-  Widget _buildBeautifulLoadingIndicator() {
+  Widget _buildLoadingIndicator() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -391,13 +1272,6 @@ class _PostItemPageState extends State<PostItemPage> {
             decoration: BoxDecoration(
               color: ColorGlobalVariables.brownColor.withOpacity(0.1),
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.2),
-                  blurRadius: 15,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
             child: const SpinKitDoubleBounce(
               color: ColorGlobalVariables.brownColor,
@@ -413,20 +1287,12 @@ class _PostItemPageState extends State<PostItemPage> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Getting everything ready for you',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 14,
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildBeautifulMainContent() {
+  Widget _buildMainContent() {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -448,21 +1314,21 @@ class _PostItemPageState extends State<PostItemPage> {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    _buildBeautifulCategoryField(),
+                    _buildCategoryField(),
                     const SizedBox(height: 20),
-                    if (selectedCategory != null) ..._buildBeautifulFormFields(),
+                    if (selectedCategory != null) ..._buildFormFields(),
                   ],
                 ),
               ),
             ),
-            if (selectedCategory != null) _buildBeautifulSellButton(),
+            if (selectedCategory != null) _buildUploadButton(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBeautifulCategoryField() {
+  Widget _buildCategoryField() {
     final provider = Provider.of<ItemCategoriesProvider>(context);
     
     return Container(
@@ -481,7 +1347,7 @@ class _PostItemPageState extends State<PostItemPage> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => _showBeautifulCategorySelectionDialog(provider.categories?.data ?? []),
+          onTap: () => _showCategorySelectionDialog(provider.categories?.data ?? []),
           child: Container(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -533,18 +1399,10 @@ class _PostItemPageState extends State<PostItemPage> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
-                    size: 24,
-                  ),
+                Icon(
+                  Icons.arrow_drop_down_rounded,
+                  color: Colors.grey[500],
+                  size: 24,
                 ),
               ],
             ),
@@ -554,26 +1412,26 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  List<Widget> _buildBeautifulFormFields() {
+  List<Widget> _buildFormFields() {
     final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
     
     return [
-      _buildBeautifulTextField(
+      _buildTextField(
         title: "Vehicle Name",
         hintText: "Enter vehicle name",
         controller: _itemNameController,
         icon: Icons.directions_car_rounded,
       ),
       const SizedBox(height: 20),
-      _buildBeautifulMakeModelRow(makeModelProvider),
+      _buildMakeModelRow(makeModelProvider),
       const SizedBox(height: 20),
-      _buildBeautifulFormFieldsGrid(),
+      _buildFormFieldsGrid(),
       const SizedBox(height: 20),
-      _buildBeautifulLocationAndPrice(),
+      _buildLocationAndPrice(),
       const SizedBox(height: 20),
-      _buildBeautifulFeatures(),
+      _buildFeatures(),
       const SizedBox(height: 20),
-      _buildBeautifulTextField(
+      _buildTextField(
         title: "Description",
         hintText: "Enter description",
         isFieldHeightRequired: true,
@@ -581,12 +1439,12 @@ class _PostItemPageState extends State<PostItemPage> {
         icon: Icons.description_rounded,
       ),
       const SizedBox(height: 20),
-      _buildBeautifulImagePickerSection(),
+      _buildImagePickerSection(),
       const SizedBox(height: 20),
     ];
   }
 
-  Widget _buildBeautifulTextField({
+  Widget _buildTextField({
     required String title,
     required String hintText,
     required TextEditingController controller,
@@ -682,7 +1540,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulMakeModelRow(MakeAndModelProvider provider) {
+  Widget _buildMakeModelRow(MakeAndModelProvider provider) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -735,11 +1593,11 @@ class _PostItemPageState extends State<PostItemPage> {
           Row(
             children: [
               Expanded(
-                child: _buildBeautifulMakeField(provider),
+                child: _buildMakeField(provider),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildBeautifulModelField(provider),
+                child: _buildModelField(provider),
               ),
             ],
           ),
@@ -748,7 +1606,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulMakeField(MakeAndModelProvider provider) {
+  Widget _buildMakeField(MakeAndModelProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -765,7 +1623,7 @@ class _PostItemPageState extends State<PostItemPage> {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(15),
-            onTap: () => _showBeautifulMakeSelectionDialog(provider.makes ?? []),
+            onTap: () => _showMakeSelectionDialog(provider.makes ?? []),
             child: Container(
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -805,7 +1663,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulModelField(MakeAndModelProvider provider) {
+  Widget _buildModelField(MakeAndModelProvider provider) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -827,7 +1685,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 _showErrorSnackBar("Select a Make first");
                 return;
               }
-              _showBeautifulModelSelectionDialog(provider.getModelsForMake(selectedMake!['id']));
+              _showModelSelectionDialog(provider.getModelsForMake(selectedMake!['id']));
             },
             child: Container(
               height: 56,
@@ -868,7 +1726,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulFormFieldsGrid() {
+  Widget _buildFormFieldsGrid() {
     final itemFields = selectedCategory?.itemFields ?? [];
     if (itemFields.isEmpty) return const SizedBox();
 
@@ -937,7 +1795,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 (field.label.toLowerCase().contains("color") ? _colorController.text : 
                  field.label.toLowerCase().contains("year") ? year.toString() : "");
 
-              return _buildBeautifulFormFieldItem(field, currentValue);
+              return _buildFormFieldItem(field, currentValue);
             },
           ),
         ],
@@ -945,7 +1803,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulFormFieldItem(ItemField field, String currentValue) {
+  Widget _buildFormFieldItem(ItemField field, String currentValue) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -964,13 +1822,13 @@ class _PostItemPageState extends State<PostItemPage> {
             borderRadius: BorderRadius.circular(12),
             onTap: () {
               if (field.type == "string" || field.type == "number") {
-                _showBeautifulFieldInputDialog(field.label, field.name, field.type);
+                _showFieldInputDialog(field.label, field.name, field.type);
               } else if (field.type == "enum") {
-                _showBeautifulSelectionDialog(field.options ?? [], field.name);
+                _showSelectionDialog(field.options ?? [], field.name);
               } else if (field.type == "year") {
                 _showBeautifulYearPicker();
               } else if (field.type == "json") {
-                _showFixedColorPicker();
+                _showSimpleColorPicker(); // Use the fixed color picker
               }
             },
             child: Container(
@@ -1012,7 +1870,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulLocationAndPrice() {
+  Widget _buildLocationAndPrice() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1065,11 +1923,11 @@ class _PostItemPageState extends State<PostItemPage> {
           Row(
             children: [
               Expanded(
-                child: _buildBeautifulLocationField(),
+                child: _buildLocationField(),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildBeautifulPriceField(),
+                child: _buildPriceField(),
               ),
             ],
           ),
@@ -1078,7 +1936,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulLocationField() {
+  Widget _buildLocationField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1145,7 +2003,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulPriceField() {
+  Widget _buildPriceField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1221,7 +2079,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulFeatures() {
+  Widget _buildFeatures() {
     final hasFeatures = selectedCategory?.features?.isNotEmpty ?? false;
     if (!hasFeatures) return const SizedBox();
     
@@ -1278,14 +2136,14 @@ class _PostItemPageState extends State<PostItemPage> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: selectedCategory!.features!.map((feature) => _buildBeautifulFeatureChip(feature)).toList(),
+            children: selectedCategory!.features!.map((feature) => _buildFeatureChip(feature)).toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBeautifulFeatureChip(String feature) {
+  Widget _buildFeatureChip(String feature) {
     final isSelected = selectedFeatures.contains(feature);
     
     return Material(
@@ -1313,20 +2171,6 @@ class _PostItemPageState extends State<PostItemPage> {
               color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
               width: 2,
             ),
-            boxShadow: [
-              if (isSelected)
-                BoxShadow(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                )
-              else
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-            ],
           ),
           child: Text(
             feature,
@@ -1341,7 +2185,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulImagePickerSection() {
+  Widget _buildImagePickerSection() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1393,7 +2237,7 @@ class _PostItemPageState extends State<PostItemPage> {
           ),
           const SizedBox(height: 12),
           Text(
-            "Tap to add images (2-4 required)",
+            "Tap to add images ($minImagesRequired-$maxImagesAllowed required)",
             style: TextStyle(
               color: Colors.grey[600],
               fontSize: 14,
@@ -1406,7 +2250,7 @@ class _PostItemPageState extends State<PostItemPage> {
               borderRadius: BorderRadius.circular(20),
               onTap: _pickImages,
               child: Container(
-                height: 200,
+                height: 240,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
@@ -1414,20 +2258,29 @@ class _PostItemPageState extends State<PostItemPage> {
                   border: Border.all(
                     color: Colors.grey[300]!,
                     width: 2,
-                    style: BorderStyle.solid,
                   ),
                 ),
                 child: selectedImages.isEmpty 
-                  ? _buildBeautifulEmptyImageState()
-                  : _buildBeautifulImageGrid(),
+                  ? _buildEmptyImageState()
+                  : _buildImageGrid(),
               ),
             ),
           ),
           if (selectedImages.isNotEmpty) ...[
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text(
+                  '${selectedImages.length}/$maxImagesAllowed images selected',
+                  style: TextStyle(
+                    color: selectedImages.length >= minImagesRequired 
+                      ? ColorGlobalVariables.greenColor 
+                      : ColorGlobalVariables.redColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
                 Material(
                   color: Colors.transparent,
                   child: InkWell(
@@ -1473,7 +2326,7 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulEmptyImageState() {
+  Widget _buildEmptyImageState() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1493,7 +2346,7 @@ class _PostItemPageState extends State<PostItemPage> {
         ),
         const SizedBox(height: 4),
         Text(
-          "2-4 images required",
+          "$minImagesRequired-$maxImagesAllowed images required",
           style: TextStyle(
             color: Colors.grey[400],
             fontSize: 14,
@@ -1503,44 +2356,39 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulImageGrid() {
+  Widget _buildImageGrid() {
     return GridView.builder(
       padding: const EdgeInsets.all(16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 1.0,
       ),
-      itemCount: 4,
+      itemCount: maxImagesAllowed,
       itemBuilder: (context, index) {
-        return _buildBeautifulImageContainer(index);
+        return _buildImageContainer(index);
       },
     );
   }
 
-  Widget _buildBeautifulImageContainer(int index) {
+  Widget _buildImageContainer(int index) {
     final hasImage = index < selectedImages.length;
+    final canAddMore = selectedImages.length < maxImagesAllowed;
     
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Colors.grey[300]!,
           width: 2,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Stack(
         children: [
           if (hasImage)
             ClipRRect(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               child: Image.file(
                 File(selectedImages[index].path),
                 fit: BoxFit.cover,
@@ -1548,7 +2396,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 height: double.infinity,
               ),
             )
-          else
+          else if (index == selectedImages.length && canAddMore)
             Container(
               color: Colors.grey[100],
               child: Center(
@@ -1558,31 +2406,28 @@ class _PostItemPageState extends State<PostItemPage> {
                   size: 32,
                 ),
               ),
+            )
+          else
+            Container(
+              color: Colors.grey[50],
             ),
           
           if (hasImage)
             Positioned(
-              top: 6,
-              right: 6,
+              top: 4,
+              right: 4,
               child: GestureDetector(
                 onTap: () => setState(() => selectedImages.removeAt(index)),
                 child: Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.7),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Icon(
                     Icons.close_rounded,
                     color: Colors.white,
-                    size: 18,
+                    size: 16,
                   ),
                 ),
               ),
@@ -1592,8 +2437,9 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulSellButton() {
-    final isProcessing = _isSelling || _isCheckingUpload;
+  Widget _buildUploadButton() {
+    final isProcessing = _isUploading || _isCheckingUpload;
+    final hasEnoughImages = selectedImages.length >= minImagesRequired;
     
     return SafeArea(
       top: false,
@@ -1604,7 +2450,9 @@ class _PostItemPageState extends State<PostItemPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                color: (isProcessing || !hasEnoughImages) 
+                  ? Colors.grey.withOpacity(0.4)
+                  : ColorGlobalVariables.brownColor.withOpacity(0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -1614,11 +2462,11 @@ class _PostItemPageState extends State<PostItemPage> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: isProcessing ? null : _formValidation,
+              onTap: (isProcessing || !hasEnoughImages) ? null : _formValidation,
               child: Container(
                 height: 60,
                 decoration: BoxDecoration(
-                  gradient: isProcessing 
+                  gradient: (isProcessing || !hasEnoughImages) 
                     ? LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -1652,7 +2500,7 @@ class _PostItemPageState extends State<PostItemPage> {
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              _isCheckingUpload ? 'Checking Permissions...' : 'Uploading Vehicle...',
+                              _isCheckingUpload ? 'Checking...' : 'Uploading...',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -1671,7 +2519,7 @@ class _PostItemPageState extends State<PostItemPage> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Sell Vehicle',
+                              'Upload Vehicle',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 17,
@@ -1689,7 +2537,23 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildBeautifulErrorView(
+  @override
+  Widget build(BuildContext context) {
+    final categoriesProvider = Provider.of<ItemCategoriesProvider>(context);
+    final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(),
+      body: _isLoading
+          ? _buildLoadingIndicator()
+          : (categoriesProvider.error != null || makeModelProvider.error != null) 
+            ? _buildErrorView(categoriesProvider, makeModelProvider) 
+            : _buildMainContent(),
+    );
+  }
+
+  Widget _buildErrorView(
     ItemCategoriesProvider categoriesProvider,
     MakeAndModelProvider makeModelProvider,
   ) {
@@ -1705,13 +2569,6 @@ class _PostItemPageState extends State<PostItemPage> {
               decoration: BoxDecoration(
                 color: ColorGlobalVariables.redColor.withOpacity(0.1),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
               ),
               child: Icon(
                 Icons.error_outline_rounded,
@@ -1785,298 +2642,59 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  // =============================================
-  // FIXED COLOR PICKER DIALOG - NO OVERFLOW
-  // =============================================
+  // ========== HELPER METHODS ==========
 
-  void _showFixedColorPicker() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        elevation: 25,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header Section
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
-                          ],
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.palette_rounded,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Pick a Color',
-                      style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Choose your preferred color',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Color Preview
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.grey[300]!,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.grey[400]!,
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Selected Color',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _colorController.text.isNotEmpty ? _colorController.text : 'No color selected',
-                              style: TextStyle(
-                                color: ColorGlobalVariables.blackColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Color Picker with Scrollable Container
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.grey[300]!,
-                          width: 2,
-                        ),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: ColorPicker(
-                          pickerColor: color,
-                          onColorChanged: (newColor) {
-                            setState(() {
-                              color = newColor;
-                              _colorController.text = _colorToHex(newColor);
-                            });
-                          },
-                          showLabel: true,
-                          pickerAreaHeightPercent: 0.7,
-                          enableAlpha: true,
-                          displayThumbColor: true,
-                          portraitOnly: true,
-                          pickerAreaBorderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(14),
-                            topRight: Radius.circular(14),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Footer Section
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(28),
-                    bottomRight: Radius.circular(28),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.grey[400]!,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.8),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                            child: Text(
-                              'Confirm',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+  void _toggleFeature(String feature) {
+    setState(() {
+      if (selectedFeatures.contains(feature)) {
+        selectedFeatures.remove(feature);
+      } else {
+        selectedFeatures.add(feature);
+      }
+    });
   }
 
-  // Other dialog methods remain the same...
-  Future<void> _showBeautifulCategorySelectionDialog(List<ItemCategory> categories) async {
+  Future<void> _pickImages() async {
+    try {
+      final List<XFile> pickedFiles = await picker.pickMultiImage(
+        maxWidth: 1000,
+        maxHeight: 1000,
+        imageQuality: 85,
+      );
+
+      if (pickedFiles.isNotEmpty) {
+        setState(() {
+          final availableSlots = maxImagesAllowed - selectedImages.length;
+          if (availableSlots > 0) {
+            final filesToAdd = pickedFiles.length > availableSlots 
+                ? pickedFiles.sublist(0, availableSlots)
+                : pickedFiles;
+            selectedImages.addAll(filesToAdd);
+            
+            if (pickedFiles.length > availableSlots) {
+              _showErrorSnackBar('Maximum of $maxImagesAllowed images allowed. Added $availableSlots images.');
+            }
+          } else {
+            _showErrorSnackBar('Maximum of $maxImagesAllowed images reached');
+          }
+        });
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error picking images: $e');
+    }
+  }
+
+  // ========== DIALOG METHODS ==========
+
+  Future<void> _showCategorySelectionDialog(List<ItemCategory> categories) async {
     final selected = await showDialog<ItemCategory>(
       context: context,
-      builder: (context) => _buildPremiumSearchableDialog(
+      builder: (context) => _buildSearchableDialog(
         title: 'Select Category',
         subtitle: 'Choose a category for your vehicle listing',
         icon: Icons.category_rounded,
         items: categories,
         itemBuilder: (category) => category.name ?? 'Unnamed Category',
-        onItemSelected: (category) => Navigator.pop(context, category),
       ),
     );
 
@@ -2091,16 +2709,15 @@ class _PostItemPageState extends State<PostItemPage> {
     }
   }
 
-  Future<void> _showBeautifulMakeSelectionDialog(List<VehicleMake> makes) async {
+  Future<void> _showMakeSelectionDialog(List<VehicleMake> makes) async {
     final selected = await showDialog<VehicleMake>(
       context: context,
-      builder: (context) => _buildPremiumSearchableDialog(
+      builder: (context) => _buildSearchableDialog(
         title: 'Select Make',
         subtitle: 'Choose your vehicle manufacturer',
         icon: Icons.business_center_rounded,
         items: makes,
         itemBuilder: (make) => make.name,
-        onItemSelected: (make) => Navigator.pop(context, make),
       ),
     );
 
@@ -2112,18 +2729,17 @@ class _PostItemPageState extends State<PostItemPage> {
     }
   }
 
-  Future<void> _showBeautifulModelSelectionDialog(List<VehicleModel>? models) async {
+  Future<void> _showModelSelectionDialog(List<VehicleModel>? models) async {
     if (models == null || models.isEmpty) return;
 
     final selected = await showDialog<VehicleModel>(
       context: context,
-      builder: (context) => _buildPremiumSearchableDialog(
+      builder: (context) => _buildSearchableDialog(
         title: 'Select Model',
         subtitle: 'Choose your vehicle model',
         icon: Icons.directions_car_rounded,
         items: models,
         itemBuilder: (model) => model.name,
-        onItemSelected: (model) => Navigator.pop(context, model),
       ),
     );
 
@@ -2132,23 +2748,19 @@ class _PostItemPageState extends State<PostItemPage> {
     }
   }
 
-  Widget _buildPremiumSearchableDialog<T>({
+  Widget _buildSearchableDialog<T>({
     required String title,
     required String subtitle,
     required IconData icon,
     required List<T> items,
     required String Function(T) itemBuilder,
-    required Function(T) onItemSelected,
   }) {
     final searchController = TextEditingController();
     final filteredItems = ValueNotifier<List<T>>(items);
 
     return Dialog(
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-      ),
-      elevation: 25,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
@@ -2157,9 +2769,7 @@ class _PostItemPageState extends State<PostItemPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
             Container(
-              width: double.infinity,
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -2190,13 +2800,6 @@ class _PostItemPageState extends State<PostItemPage> {
                         ],
                       ),
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                          blurRadius: 15,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
                     ),
                     child: Icon(
                       icon,
@@ -2226,140 +2829,93 @@ class _PostItemPageState extends State<PostItemPage> {
               ),
             ),
 
-            // Search Section
             Padding(
               padding: const EdgeInsets.all(24),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
                 ),
                 child: TextField(
                   controller: searchController,
                   decoration: InputDecoration(
                     hintText: 'Search...',
-                    prefixIcon: Container(
-                      margin: const EdgeInsets.all(14),
-                      child: Icon(
-                        Icons.search_rounded, 
-                        color: ColorGlobalVariables.brownColor,
-                        size: 22,
-                      ),
-                    ),
+                    prefixIcon: Icon(Icons.search_rounded, color: ColorGlobalVariables.brownColor),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                    hintStyle: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 16,
-                    ),
-                  ),
-                  style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
-                    fontSize: 16,
                   ),
                   onChanged: (value) {
                     filteredItems.value = items.where((item) {
-                      final itemName = itemBuilder(item).toLowerCase();
-                      return itemName.contains(value.toLowerCase());
+                      return itemBuilder(item).toLowerCase().contains(value.toLowerCase());
                     }).toList();
                   },
                 ),
               ),
             ),
 
-            // Results Section
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(28),
-                    bottomRight: Radius.circular(28),
-                  ),
-                ),
-                child: ValueListenableBuilder<List<T>>(
-                  valueListenable: filteredItems,
-                  builder: (context, filteredItems, child) {
-                    if (filteredItems.isEmpty) {
-                      return _buildPremiumEmptyState();
-                    }
-                    
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: filteredItems.length,
-                      separatorBuilder: (context, index) => Divider(
-                        height: 1,
-                        color: Colors.grey[200],
-                        indent: 20,
-                        endIndent: 20,
-                      ),
-                      itemBuilder: (context, index) {
-                        final item = filteredItems[index];
-                        return Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => onItemSelected(item),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          ColorGlobalVariables.brownColor.withOpacity(0.15),
-                                          ColorGlobalVariables.brownColor.withOpacity(0.08),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
+              child: ValueListenableBuilder<List<T>>(
+                valueListenable: filteredItems,
+                builder: (context, filteredItems, child) {
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: filteredItems.length,
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      color: Colors.grey[200],
+                    ),
+                    itemBuilder: (context, index) {
+                      final item = filteredItems[index];
+                      return Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => Navigator.pop(context, item),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        ColorGlobalVariables.brownColor.withOpacity(0.15),
+                                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                                      ],
                                     ),
-                                    child: Icon(
-                                      Icons.check_circle_outline_rounded,
-                                      color: ColorGlobalVariables.brownColor,
-                                      size: 24,
-                                    ),
+                                    borderRadius: BorderRadius.circular(14),
                                   ),
-                                  const SizedBox(width: 18),
-                                  Expanded(
-                                    child: Text(
-                                      itemBuilder(item),
-                                      style: TextStyle(
-                                        color: ColorGlobalVariables.blackColor,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.chevron_right_rounded,
-                                    color: Colors.grey[400],
+                                  child: Icon(
+                                    Icons.check_circle_outline_rounded,
+                                    color: ColorGlobalVariables.brownColor,
                                     size: 24,
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(width: 18),
+                                Expanded(
+                                  child: Text(
+                                    itemBuilder(item),
+                                    style: TextStyle(
+                                      color: ColorGlobalVariables.blackColor,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
             ),
 
-            // Footer
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -2372,30 +2928,13 @@ class _PostItemPageState extends State<PostItemPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey[400]!,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -2408,90 +2947,37 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildPremiumEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(50),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.search_off_rounded,
-                size: 50,
-                color: Colors.grey[400],
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No results found',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Try searching with different keywords',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showBeautifulSelectionDialog(List<dynamic> options, String fieldName) async {
+  Future<void> _showSelectionDialog(List<dynamic> options, String fieldName) async {
     final selected = await showDialog<String>(
       context: context,
-      builder: (context) => _buildPremiumSearchableDialog(
+      builder: (context) => _buildSearchableDialog(
         title: 'Select Option',
         subtitle: 'Choose from available options',
         icon: Icons.list_alt_rounded,
         items: options.map((e) => e.toString()).toList(),
         itemBuilder: (item) => item,
-        onItemSelected: (item) => Navigator.pop(context, item),
       ),
     );
 
     if (selected != null) {
-      setState(() {
-        selectedFields[fieldName] = selected;
-      });
+      setState(() => selectedFields[fieldName] = selected);
     }
   }
 
-  Future<void> _showBeautifulFieldInputDialog(String fieldLabel, String fieldName, String fieldType) async {
+  Future<void> _showFieldInputDialog(String fieldLabel, String fieldName, String fieldType) async {
     final controller = TextEditingController(text: selectedFields[fieldName]?.toString() ?? '');
 
     await showDialog(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        elevation: 25,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.85,
-          ),
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               Container(
                 width: 80,
                 height: 80,
@@ -2505,13 +2991,6 @@ class _PostItemPageState extends State<PostItemPage> {
                     ],
                   ),
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorGlobalVariables.brownColor.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
                 ),
                 child: Icon(
                   Icons.edit_rounded,
@@ -2528,130 +3007,57 @@ class _PostItemPageState extends State<PostItemPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Please provide the $fieldLabel details',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 15,
-                ),
-                textAlign: TextAlign.center,
-              ),
               const SizedBox(height: 28),
               
-              // Input Field
               Container(
                 decoration: BoxDecoration(
                   color: Colors.grey[50],
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.grey[300]!,
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: TextField(
                   controller: controller,
                   keyboardType: fieldType == "number" ? TextInputType.number : TextInputType.text,
-                  style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
                   decoration: InputDecoration(
                     hintText: "Enter $fieldLabel",
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    hintStyle: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 16,
-                    ),
                   ),
                   autofocus: true,
                 ),
               ),
               const SizedBox(height: 32),
               
-              // Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey[400]!,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
+                  ElevatedButton(
+                    onPressed: () {
+                      if (controller.text.trim().isNotEmpty) {
+                        setState(() => selectedFields[fieldName] = controller.text.trim());
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          if (controller.text.trim().isNotEmpty) {
-                            setState(() {
-                              selectedFields[fieldName] = controller.text.trim();
-                            });
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                          child: Text(
-                            'Confirm',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
+                    child: Text(
+                      'Confirm',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -2662,214 +3068,5 @@ class _PostItemPageState extends State<PostItemPage> {
         ),
       ),
     );
-  }
-
-  void _showBeautifulYearPicker() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        elevation: 25,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
-                          ],
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.calendar_today_rounded,
-                        color: Colors.white,
-                        size: 36,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Select Year',
-                      style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Choose the manufacturing year of your vehicle',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 15,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Year Picker
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.grey[300]!,
-                        width: 2,
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(18),
-                      child: SfDateRangePicker(
-                        view: DateRangePickerView.decade,
-                        initialSelectedDate: DateTime(year),
-                        selectionColor: ColorGlobalVariables.brownColor,
-                        selectionTextStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        selectionShape: DateRangePickerSelectionShape.rectangle,
-                        selectionRadius: 12,
-                        onSelectionChanged: (args) {
-                          if (args.value is DateTime) {
-                            setState(() {
-                              year = (args.value as DateTime).year;
-                            });
-                            Navigator.pop(context);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Footer
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(28),
-                    bottomRight: Radius.circular(28),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.grey[400]!,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _colorToHex(Color color) {
-    return "#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase()}";
-  }
-
-  Future<void> _pickImages() async {
-    try {
-      final List<XFile> pickedFiles = await picker.pickMultiImage(
-        maxWidth: 1000,
-        maxHeight: 1000,
-        imageQuality: 85,
-      );
-
-      if (pickedFiles.isNotEmpty) {
-        setState(() {
-          selectedImages.addAll(pickedFiles);
-          if (selectedImages.length > 4) {
-            selectedImages = selectedImages.sublist(0, 4);
-            _showErrorSnackBar('Maximum of 4 images allowed');
-          }
-        });
-      }
-    } catch (e) {
-      _showErrorSnackBar('Error picking images: $e');
-    }
-  }
-
-  void _toggleFeature(String feature) {
-    setState(() {
-      if (selectedFeatures.contains(feature)) {
-        selectedFeatures.remove(feature);
-      } else {
-        selectedFeatures.add(feature);
-      }
-    });
   }
 }

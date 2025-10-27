@@ -118,6 +118,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showMenu(BuildContext context) {
+  final theme = Theme.of(context);
   showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -125,7 +126,7 @@ class _HomePageState extends State<HomePage> {
       return Container(
         margin: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -144,7 +145,7 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.grey[200]!,
+                    color: theme.dividerColor,
                     width: 1,
                   ),
                 ),
@@ -168,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: theme.textTheme.titleLarge?.color,
                           ),
                         ),
                         SizedBox(height: 2),
@@ -176,7 +177,7 @@ class _HomePageState extends State<HomePage> {
                           'App settings and preferences',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: theme.textTheme.bodySmall?.color,
                           ),
                         ),
                       ],
@@ -206,20 +207,20 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: theme.textTheme.titleLarge?.color,
                 ),
               ),
               subtitle: Text(
                 'Have access to your profile details',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: theme.textTheme.bodySmall?.color,
                 ),
               ),
               trailing: Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 16,
-                color: Colors.grey[400],
+                color: theme.iconTheme.color,
               ),
               onTap: () {
                 Navigator.pop(context); // Close the menu
@@ -235,8 +236,12 @@ class _HomePageState extends State<HomePage> {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[100],
-                    foregroundColor: Colors.grey[700],
+                    backgroundColor: theme.brightness == Brightness.dark 
+                        ? Colors.grey[800] 
+                        : Colors.grey[100],
+                    foregroundColor: theme.brightness == Brightness.dark 
+                        ? Colors.grey[300] 
+                        : Colors.grey[700],
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -266,14 +271,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final homeProvider = Provider.of<HomeProvider>(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(FontAwesomeIcons.bars, size: 20, color: Colors.black87),
+          icon: Icon(FontAwesomeIcons.bars, size: 20, color: theme.iconTheme.color),
           onPressed: () {
             _showMenu(context);
           },
@@ -281,7 +287,7 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           "GAGcars",
           style: TextStyle(
-            color: ColorGlobalVariables.brownColor,
+            color: theme.appBarTheme.foregroundColor,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -289,13 +295,13 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(FontAwesomeIcons.globe, size: 20, color: Colors.black54),
+            icon: Icon(FontAwesomeIcons.globe, size: 20, color: theme.iconTheme.color),
             onPressed: () => Get.toNamed(RouteClass.newsBlogPage),
           ),
           Stack(
             children: [
               IconButton(
-                icon: Icon(Icons.notifications, size: 22, color: Colors.black54),
+                icon: Icon(Icons.notifications, size: 22, color: theme.iconTheme.color),
                 onPressed: () => Get.toNamed(RouteClass.notificationsPage),
               ),
               Positioned(
@@ -317,14 +323,14 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: homeProvider.isLoading 
-            ? _buildLoadingState()
+            ? _buildLoadingState(theme)
             : homeProvider.errorMessage.isNotEmpty 
-                ? _buildErrorState(homeProvider)
+                ? _buildErrorState(homeProvider, theme)
                 : RefreshIndicator(
                     onRefresh: _loadData,
                     child: Stack(
                       children: [
-                        _buildContent(screenSize, homeProvider),
+                        _buildContent(screenSize, homeProvider, theme),
                         
                         // Floating Search Bar
                         Positioned(
@@ -339,7 +345,7 @@ class _HomePageState extends State<HomePage> {
                               _showSearchBar ? 0 : -100, 
                               0
                             ),
-                            child: _buildSearchWidget(),
+                            child: _buildSearchWidget(theme),
                           ),
                         ),
                       ],
@@ -349,7 +355,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -361,7 +367,7 @@ class _HomePageState extends State<HomePage> {
           Text(
             'Loading amazing cars...',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: theme.textTheme.bodyMedium?.color,
               fontSize: 16,
             ),
           ),
@@ -370,16 +376,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildErrorState(HomeProvider homeProvider) {
+  Widget _buildErrorState(HomeProvider homeProvider, ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          Icon(Icons.error_outline, size: 64, color: theme.iconTheme.color),
           SizedBox(height: 16),
           Text(
             homeProvider.errorMessage,
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 16),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
@@ -399,7 +405,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildContent(Size screenSize, HomeProvider homeProvider) {
+  Widget _buildContent(Size screenSize, HomeProvider homeProvider, ThemeData theme) {
     return CustomScrollView(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
@@ -411,17 +417,17 @@ class _HomePageState extends State<HomePage> {
 
         // Trending Makes Section
         SliverToBoxAdapter(
-          child: _buildTrendingMakes(homeProvider),
+          child: _buildTrendingMakes(homeProvider, theme),
         ),
 
         // Categories Section
         SliverToBoxAdapter(
-          child: _buildCategoriesSection(homeProvider),
+          child: _buildCategoriesSection(homeProvider, theme),
         ),
 
         // Special Offers Section
         SliverToBoxAdapter(
-          child: _buildSpecialOffers(homeProvider, screenSize),
+          child: _buildSpecialOffers(homeProvider, screenSize, theme),
         ),
 
         // Recommended Header
@@ -436,7 +442,7 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: theme.textTheme.titleLarge?.color,
                   ),
                 ),
                 Row(
@@ -501,7 +507,7 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           'Loading more...',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: theme.textTheme.bodyMedium?.color,
                             fontSize: 14,
                           ),
                         ),
@@ -522,7 +528,7 @@ class _HomePageState extends State<HomePage> {
                     child: Text(
                       'You\'ve reached the end!',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: theme.textTheme.bodyMedium?.color,
                         fontSize: 14,
                         fontStyle: FontStyle.italic,
                       ),
@@ -535,11 +541,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSearchWidget() {
+  Widget _buildSearchWidget(ThemeData theme) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.appBarTheme.backgroundColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -552,7 +558,7 @@ class _HomePageState extends State<HomePage> {
         onTap: _navigateToSearchPage,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -562,7 +568,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             border: Border.all(
-              color: Colors.grey.withOpacity(0.2),
+              color: theme.dividerColor,
               width: 1,
             ),
           ),
@@ -580,7 +586,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     'Search for cars, brands, or models...',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                       fontSize: 16,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -619,7 +625,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTrendingMakes(HomeProvider homeProvider) {
+  Widget _buildTrendingMakes(HomeProvider homeProvider, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -633,7 +639,7 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: theme.textTheme.titleLarge?.color,
                 ),
               ),
               Links(
@@ -689,7 +695,7 @@ class _HomePageState extends State<HomePage> {
                   margin: EdgeInsets.symmetric(horizontal: 6),
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.cardColor,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -716,7 +722,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Widget _buildCategoriesSection(HomeProvider homeProvider) {
+Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -727,7 +733,7 @@ Widget _buildCategoriesSection(HomeProvider homeProvider) {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: theme.textTheme.titleLarge?.color,
           ),
         ),
       ),
@@ -747,7 +753,7 @@ Widget _buildCategoriesSection(HomeProvider homeProvider) {
                 width: 90,
                 margin: EdgeInsets.symmetric(horizontal: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -767,11 +773,13 @@ Widget _buildCategoriesSection(HomeProvider homeProvider) {
                       height: 50,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
-                        color: Colors.grey[100],
+                        color: theme.brightness == Brightness.dark 
+                            ? Colors.grey[700] 
+                            : Colors.grey[100],
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(25),
-                        child: _buildCategoryImage(category),
+                        child: _buildCategoryImage(category, theme),
                       ),
                     ),
                     SizedBox(height: 8),
@@ -783,7 +791,7 @@ Widget _buildCategoriesSection(HomeProvider homeProvider) {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black87,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                         textAlign: TextAlign.center,
                         maxLines: 2,
@@ -840,7 +848,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
   }
 }
 
-  Widget _buildCategoryImage(Categories category) {
+  Widget _buildCategoryImage(Categories category, ThemeData theme) {
     final imageUrl = category.image;
     final hasValidImage = imageUrl != null && 
                          imageUrl.isNotEmpty && 
@@ -851,21 +859,25 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
         imageUrl: '${ApiEndpoint.baseImageUrl}$imageUrl',
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
-          color: Colors.grey[100],
+          color: theme.brightness == Brightness.dark 
+              ? Colors.grey[700] 
+              : Colors.grey[100],
           child: Center(
             child: Icon(
               Icons.category_outlined,
-              color: Colors.grey[400],
+              color: theme.iconTheme.color,
               size: 24,
             ),
           ),
         ),
         errorWidget: (context, url, error) => Container(
-          color: Colors.grey[100],
+          color: theme.brightness == Brightness.dark 
+              ? Colors.grey[700] 
+              : Colors.grey[100],
           child: Center(
             child: Icon(
               Icons.error_outline,
-              color: Colors.grey[400],
+              color: theme.iconTheme.color,
               size: 24,
             ),
           ),
@@ -873,11 +885,13 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
       );
     } else {
       return Container(
-        color: Colors.grey[100],
+        color: theme.brightness == Brightness.dark 
+            ? Colors.grey[700] 
+            : Colors.grey[100],
         child: Center(
           child: Icon(
             Icons.category_outlined,
-            color: Colors.grey[400],
+            color: theme.iconTheme.color,
             size: 24,
           ),
         ),
@@ -885,7 +899,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
     }
   }
 
-  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize) {
+  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -896,7 +910,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: theme.textTheme.titleLarge?.color,
             ),
           ),
         ),
@@ -950,9 +964,9 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
                               width: double.infinity,
                               height: double.infinity,
                               fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => _buildImageErrorPlaceholder(),
+                              errorWidget: (context, url, error) => _buildImageErrorPlaceholder(theme),
                             )
-                          : _buildImageErrorPlaceholder(),
+                          : _buildImageErrorPlaceholder(theme),
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -1040,20 +1054,22 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
     );
   }
 
-  Widget _buildImageErrorPlaceholder() {
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: Colors.grey[200],
+      color: theme.brightness == Brightness.dark 
+          ? Colors.grey[800] 
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
             SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: theme.textTheme.bodySmall?.color,
               ),
             ),
           ],
@@ -1258,6 +1274,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final firstImage = widget.recommended.images?.isNotEmpty == true
         ? widget.recommended.images!.first
         : null; // Changed to null to avoid asset issues
@@ -1277,7 +1294,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -1298,8 +1315,10 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: Colors.grey[100],
-                    child: _buildRecommendedImage(firstImage),
+                    color: theme.brightness == Brightness.dark 
+                        ? Colors.grey[800] 
+                        : Colors.grey[100],
+                    child: _buildRecommendedImage(firstImage, theme),
                   ),
                 ),
                 
@@ -1369,7 +1388,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                         child: Container(
                           padding: EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -1398,7 +1417,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                                       size: 18,
                                       color: _isLiked 
                                           ? _colorAnimation.value 
-                                          : Colors.grey[600],
+                                          : theme.iconTheme.color,
                                     );
                                   },
                                 ),
@@ -1426,7 +1445,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: theme.textTheme.titleLarge?.color,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -1436,7 +1455,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                         widget.recommended.condition ?? 'Used',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                       ),
                     ],
@@ -1459,13 +1478,13 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                       if (widget.recommended.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                            Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
                             SizedBox(width: 4),
                             Text(
                               "${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.mileage!))} km",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -1489,7 +1508,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                             errorWidget: (context, url, error) => Icon(
                               Icons.business,
                               size: 16,
-                              color: Colors.grey[400],
+                              color: theme.iconTheme.color,
                             ),
                           ),
                         )
@@ -1499,13 +1518,13 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                       if (widget.recommended.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                            Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
                             SizedBox(width: 4),
                             Text(
                               widget.recommended.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -1515,14 +1534,14 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
                         Flexible(
                           child: Row(
                             children: [
-                              Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                              Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
                               SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   widget.recommended.location!,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[600],
+                                    color: theme.textTheme.bodyMedium?.color,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -1542,7 +1561,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
     );
   }
 
-  Widget _buildRecommendedImage(String? imageUrl) {
+  Widget _buildRecommendedImage(String? imageUrl, ThemeData theme) {
     // FIXED: Only use network images, no asset fallbacks
     if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
@@ -1560,28 +1579,30 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
           );
         },
         errorWidget: (context, url, error) {
-          return _buildImageErrorPlaceholder();
+          return _buildImageErrorPlaceholder(theme);
         },
       );
     } else {
-      return _buildImageErrorPlaceholder();
+      return _buildImageErrorPlaceholder(theme);
     }
   }
 
-  Widget _buildImageErrorPlaceholder() {
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: Colors.grey[200],
+      color: theme.brightness == Brightness.dark 
+          ? Colors.grey[800] 
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
             SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: theme.textTheme.bodySmall?.color,
               ),
             ),
           ],

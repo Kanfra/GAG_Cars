@@ -106,8 +106,8 @@ class RecommendedItem with _$RecommendedItem {
     @JsonKey(name: 'deleted_at') DateTime? deletedAt,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-    String? height,
-    String? vin,
+    @JsonKey(name: 'Height') String? height,
+    @JsonKey(name: 'VIN') String? vin,
     Brand? brand,
     Category? category,
     @JsonKey(name: 'brand_model') BrandModel? brandModel,
@@ -148,12 +148,12 @@ class RecommendedLinks with _$RecommendedLinks {
 class RecommendedMeta with _$RecommendedMeta {
   const factory RecommendedMeta({
     @JsonKey(name: 'current_page') required int currentPage,
-    required int from,
+    required int? from,        // FIXED: Made nullable
     @JsonKey(name: 'last_page') required int lastPage,
     required List<RecommendedMetaLink> links,
     required String path,
     @JsonKey(name: 'per_page') required int perPage,
-    required int to,
+    required int? to,          // FIXED: Made nullable
     required int total,
   }) = _RecommendedMeta;
 
@@ -166,6 +166,7 @@ class RecommendedMetaLink with _$RecommendedMetaLink {
   const factory RecommendedMetaLink({
     String? url,
     required String label,
+    int? page,
     required bool active,
   }) = _RecommendedMetaLink;
 

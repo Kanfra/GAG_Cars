@@ -1,4 +1,4 @@
-import 'dart:async';
+ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
@@ -58,22 +58,38 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     _isFirstLoad = false;
   }
 
-  void _scrollListener() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 100 &&
-        !_provider.isLoading &&
-        _provider.hasMore &&
-        _currentTabIndex == 0) { // Only load more for Live tab
-      
-      _loadMoreDebouncer?.cancel();
-      _loadMoreDebouncer = Timer(const Duration(milliseconds: 500), () {
-        _provider.loadMoreListings();
-      });
-    }
+void _scrollListener() {
+  final pixels = _scrollController.position.pixels;
+  final maxScroll = _scrollController.position.maxScrollExtent;
+  final shouldLoad = (pixels >= maxScroll - 200) && 
+                    !_provider.isLoading && 
+                    _provider.hasMore && 
+                    _currentTabIndex == 0;
+
+  print('📜 Scroll Debug:');
+  print('   Position: $pixels / $maxScroll');
+  print('   Should load: $shouldLoad');
+  print('   isLoading: ${_provider.isLoading}');
+  print('   hasMore: ${_provider.hasMore}');
+  print('   Current tab: $_currentTabIndex');
+  
+  if (shouldLoad) {
+    // print('🚀 LAZY LOADING TRIGGERED - Loading page ${_provider._currentPage}');
+    _loadMoreDebouncer?.cancel();
+    _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), () {
+      _provider.loadMoreListings();
+    });
   }
+}
 
   Future<void> _loadInitialData() async {
     await _provider.loadInitialListings();
+  }
+
+  Future<void> _loadMoreData() async {
+    if (!_provider.isLoading && _provider.hasMore && _currentTabIndex == 0) {
+      await _provider.loadMoreListings();
+    }
   }
 
   Future<void> _refreshListings() async {
@@ -107,14 +123,21 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
           elevation: 1,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios, color: ColorGlobalVariables.blackColor, size: 20),
-            onPressed: () => Get.back(),
+            onPressed: (){
+              Get.offAllNamed(
+                RouteClass.getMainBottomNavigationPage(),
+                arguments: {
+                  'selected_tab_index': 4,
+                }
+              );
+            },
           ),
           title: Text(
             "My Listings",
             style: TextStyle(
-              color: ColorGlobalVariables.blackColor,
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
+              color: ColorGlobalVariables.brownColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
             ),
           ),
           centerTitle: true,
@@ -125,7 +148,11 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                 children: [
                   IconButton(
                     icon: Icon(Icons.notifications_none, color: ColorGlobalVariables.blackColor, size: 24),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.toNamed(
+                        RouteClass.getNotificationsPage(),
+                      );
+                    },
                   ),
                   Positioned(
                     right: 12,
@@ -363,8 +390,8 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
             ),
           ),
 
-        // Loading More Indicator (only for Live tab)
-        if (isLiveTab && provider.isLoading)
+        // Loading More Indicator (only for Live tab) - LAZY LOADING IMPLEMENTATION
+        if (isLiveTab && provider.isLoading && provider.hasMore)
           SliverToBoxAdapter(
             child: _buildLoadMoreIndicator(),
           ),
@@ -445,7 +472,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
             ),
             const SizedBox(height: 8),
             Text(
-              'Loading more...',
+              'Loading more listings...',
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
@@ -505,7 +532,12 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
             if (isLiveTab)
               ElevatedButton(
                 onPressed: () {
-                  // Navigate to create listing page
+                 Get.offAllNamed(
+                RouteClass.getMainBottomNavigationPage(),
+                arguments: {
+                  'selected_tab_index': 2,
+                }
+              );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorGlobalVariables.redColor,
@@ -532,7 +564,6 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
 
     return GestureDetector(
       onTap: () {
-        // Navigate to listing detail
         logger.w('item is clicked on');
         Get.toNamed(
           RouteClass.listingsDetailPage,
@@ -638,23 +669,6 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-
-                // Promoted Gradient Overlay (subtle visual indicator)
-                if (isPromoted && isLiveTab)
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.amber.withOpacity(0.1),
-                          Colors.transparent,
-                        ],
-                        stops: const [0.0, 0.5],
                       ),
                     ),
                   ),
@@ -766,33 +780,6 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                       ),
                     ],
                   ),
-
-                  // Promoted indicator ribbon (below content)
-                  // if (isPromoted && isLiveTab)
-                  //   Container(
-                  //     margin: const EdgeInsets.only(top: 8),
-                  //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.amber[50],
-                  //       borderRadius: BorderRadius.circular(4),
-                  //       border: Border.all(color: Colors.amber[200]!, width: 1),
-                  //     ),
-                  //     child: Row(
-                  //       mainAxisSize: MainAxisSize.min,
-                  //       children: [
-                  //         Icon(Icons.star, color: Colors.amber[700], size: 12),
-                  //         const SizedBox(width: 4),
-                  //         Text(
-                  //           'Promoted Listing',
-                  //           style: TextStyle(
-                  //             color: Colors.amber[800],
-                  //             fontSize: 10,
-                  //             fontWeight: FontWeight.w600,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
                 ],
               ),
             ),

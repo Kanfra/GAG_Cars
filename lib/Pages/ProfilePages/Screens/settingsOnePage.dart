@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/GlobalVariables/sizeGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
@@ -17,14 +18,14 @@ class SettingsOnePage extends StatefulWidget {
 
 class _SettingsOnePageState extends State<SettingsOnePage> {
   bool isNotificationActive = true;
-  bool isDarkModeActive = false;
   String selectedLanguage = 'English';
+  bool _isLoggingOut = false;
+  bool _isDeletingAccount = false;
 
   // Helper method to get profile image widget with robust error handling
   Widget _getProfileImage(UserModel? user) {
     // Priority 1: User's existing profile image from server (with validation)
     if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
-      // Use NetworkImage directly with error handling to avoid 404 errors
       return ClipRRect(
         borderRadius: BorderRadius.circular(40),
         child: Image.network(
@@ -33,7 +34,6 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
           height: 80,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            // If network image fails, show default
             return _buildDefaultProfileImage();
           },
           loadingBuilder: (context, child, loadingProgress) {
@@ -93,27 +93,510 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final UserModel? user = userProvider.user;
+  Future<void> _handleLogout(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: _buildBeautifulAppBar(),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+    // Show confirmation dialog
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(24),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildProfileSection(user),
-              const SizedBox(height: 32),
-              _buildSettingsSection(),
-              const SizedBox(height: 32),
-              _buildSupportSection(),
-              const SizedBox(height: 32),
-              _buildLogoutButton(),
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  color: Colors.red,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Log Out',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Are you sure you want to log out?',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Theme.of(context).cardColor,
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.red,
+                            Colors.red.withOpacity(0.8),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => Navigator.of(context).pop(true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: Text(
+                                'Log Out',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (shouldLogout == true) {
+      setState(() => _isLoggingOut = true);
+
+      try {
+        // Simulate API call delay
+        await Future.delayed(const Duration(seconds: 1));
+        
+        // Perform logout
+        userProvider.clearUser();
+        Get.offAllNamed(RouteClass.getSignInWithPhonePage());
+      } finally {
+        if (mounted) {
+          setState(() => _isLoggingOut = false);
+        }
+      }
+    }
+  }
+
+  Future<void> _handleDeleteAccount(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Show confirmation dialog for account deletion
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.warning_rounded,
+                  color: Colors.red,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Delete Account',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'This action cannot be undone! All your data will be permanently deleted.',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_rounded,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'This will remove all your listings, favorites, and personal information.',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Theme.of(context).cardColor,
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.red,
+                            Colors.redAccent,
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () => Navigator.of(context).pop(true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: const Center(
+                              child: Text(
+                                'Delete Account',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (shouldDelete == true) {
+      await _performAccountDeletion(context, userProvider);
+    }
+  }
+
+  Future<void> _performAccountDeletion(BuildContext context, UserProvider userProvider) async {
+    setState(() => _isDeletingAccount = true);
+
+    try {
+      // Call the actual delete service
+      final success = await AuthService.deleteUser();
+      
+      if (success) {
+        // Account deleted successfully
+        userProvider.clearUser();
+        
+        // Show success message
+        Get.snackbar(
+          'Account Deleted',
+          'Your account has been successfully deleted.',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 3),
+        );
+        
+        // Navigate to sign in page after a brief delay
+        await Future.delayed(const Duration(milliseconds: 1500));
+        
+        Get.offAllNamed(RouteClass.getSignInWithPhonePage());
+      } else {
+        // Handle unauthorized case (token invalid)
+        Get.snackbar(
+          'Session Expired',
+          'Please log in again to continue.',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        
+        // Clear user data and navigate to login
+        userProvider.clearUser();
+        Get.offAllNamed(RouteClass.getSignInWithPhonePage());
+      }
+    } catch (error) {
+      // Handle other errors
+      _handleDeleteError(error);
+    } finally {
+      if (mounted) {
+        setState(() => _isDeletingAccount = false);
+      }
+    }
+  }
+
+  void _handleDeleteError(dynamic error) {
+    String errorMessage = 'Failed to delete account. Please try again.';
+    
+    if (error.toString().contains('Network error')) {
+      errorMessage = 'Network error. Please check your internet connection and try again.';
+    } else if (error.toString().contains('Timeout')) {
+      errorMessage = 'Request timeout. Please try again.';
+    } else if (error.toString().contains('401')) {
+      errorMessage = 'Session expired. Please log in again.';
+    } else if (error.toString().contains('500')) {
+      errorMessage = 'Server error. Please try again later.';
+    }
+    
+    Get.snackbar(
+      'Error',
+      errorMessage,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 4),
+    );
+  }
+
+  void _showAboutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor,
+                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                    ],
+                  ),
+                  shape: BoxShape.circle, 
+                  boxShadow: [
+                    BoxShadow(
+                      color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.directions_car_filled_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'About GAGcars',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Version 1.0.0',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'GAGcars is your premier marketplace for buying and selling automobiles, vehicle accessories, and automotive tools. '
+                'We connect car enthusiasts, dealers, and individual sellers in a seamless, secure, and user-friendly platform.',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.verified_user_rounded,
+                      color: ColorGlobalVariables.brownColor,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Secure transactions and verified sellers for your peace of mind',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          child: const Text(
+                            'Got It',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -121,9 +604,235 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     );
   }
 
-  AppBar _buildBeautifulAppBar() {
+  void _showRateAppDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        elevation: 20,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.star_rounded,
+                  color: Colors.amber,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Rate Our App',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.titleLarge?.color,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'How would you rate your experience with GAGcars?',
+                style: TextStyle(
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  fontSize: 15,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              // Star Rating
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return Icon(
+                    Icons.star_rounded,
+                    color: index < 4 ? Colors.amber : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.3),
+                    size: 40,
+                  );
+                }),
+              ),
+              const SizedBox(height: 20),
+              // Feedback Field
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).dividerColor ?? Colors.grey[300]!),
+                ),
+                child: TextField(
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: 'Tell us about your experience (optional)...',
+                    hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5)),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.all(16),
+                  ),
+                  style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Theme.of(context).cardColor,
+                      ),
+                      child: Text(
+                        'Maybe Later',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.amber,
+                            Colors.orange,
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.amber.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            // Handle submit rating
+                            Navigator.pop(context);
+                            Get.snackbar(
+                              'Thank You!',
+                              'Your rating has been submitted successfully.',
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: const Center(
+                              child: Text(
+                                'Submit Rating',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final UserModel? user = userProvider.user;
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: _buildBeautifulAppBar(context),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                children: [
+                  _buildProfileSection(user, context),
+                  const SizedBox(height: 32),
+                  _buildSettingsSection(context),
+                  const SizedBox(height: 32),
+                  _buildSupportSection(context),
+                  const SizedBox(height: 32),
+                  _buildAccountActionsSection(context),
+                ],
+              ),
+            ),
+          ),
+          if (_isLoggingOut || _isDeletingAccount)
+            Container(
+              color: Colors.black54,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _isDeletingAccount ? Colors.red : Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _isDeletingAccount ? 'Deleting Account...' : 'Logging Out...',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (_isDeletingAccount) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'This may take a few moments',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  AppBar _buildBeautifulAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       elevation: 0,
       leading: Container(
         margin: const EdgeInsets.all(8),
@@ -141,7 +850,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         child: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: ColorGlobalVariables.brownColor,
+            color: Theme.of(context).appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
             size: 20,
           ),
           onPressed: () => Get.back(),
@@ -150,45 +859,19 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       title: Text(
         'Settings',
         style: TextStyle(
-          color: ColorGlobalVariables.brownColor,
+          color: Theme.of(context).appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
       ),
       centerTitle: true,
-      actions: [
-        Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: Icon(
-              Icons.settings_outlined,
-              color: Colors.grey[600],
-              size: 20,
-            ),
-            onPressed: () {
-              // Additional settings action
-            },
-          ),
-        ),
-      ],
     );
   }
 
-  Widget _buildProfileSection(UserModel? user) {
+  Widget _buildProfileSection(UserModel? user, BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -212,7 +895,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   Text(
                     user?.name ?? 'Guest User',
                     style: TextStyle(
-                      color: ColorGlobalVariables.blackColor,
+                      color: Theme.of(context).textTheme.titleLarge?.color,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -221,7 +904,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   Text(
                     user?.email ?? 'No email provided',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -236,7 +919,6 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
-                          // Navigate to Edit Profile page
                           Get.toNamed(RouteClass.getProfileUpdatePage());
                         },
                         child: Padding(
@@ -273,10 +955,12 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     );
   }
 
-  Widget _buildSettingsSection() {
+  Widget _buildSettingsSection(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -294,64 +978,37 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
             child: Text(
               'Preferences',
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: Theme.of(context).textTheme.titleLarge?.color,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           _buildSettingsItem(
-            icon: Icons.notifications_active_rounded,
-            title: 'Push Notifications',
-            subtitle: 'Receive updates and alerts',
-            isToggle: true,
-            toggleValue: isNotificationActive,
-            onToggle: (value) {
-              setState(() {
-                isNotificationActive = value;
-              });
-            },
-          ),
-          _buildDivider(),
-          _buildSettingsItem(
             icon: FontAwesomeIcons.circleHalfStroke,
             title: 'Dark Mode',
             subtitle: 'Switch between themes',
             isToggle: true,
-            toggleValue: isDarkModeActive,
+            toggleValue: themeProvider.isDarkMode,
             onToggle: (value) {
-              setState(() {
-                isDarkModeActive = value;
-              });
+              themeProvider.toggleTheme(value);
             },
           ),
-          _buildDivider(),
-          _buildSettingsItem(
-            icon: FontAwesomeIcons.language,
-            title: 'Language',
-            subtitle: 'App language settings',
-            valueText: selectedLanguage,
-            onTap: () {
-              _showLanguageSelectionDialog();
-            },
-          ),
-          _buildDivider(),
+          _buildDivider(context),
           _buildSettingsItem(
             icon: Icons.security_rounded,
             title: 'Privacy & Security',
             subtitle: 'Manage your privacy settings',
             onTap: () {
-              // Navigate to security settings
               Get.toNamed(RouteClass.getSecurityPage());
             },
           ),
-          _buildDivider(),
+          _buildDivider(context),
           _buildSettingsItem(
             icon: Icons.help_rounded,
             title: 'Help & Support',
             subtitle: 'Get help and contact support',
             onTap: () {
-              // Navigate to help center
               Get.toNamed(RouteClass.getHelpCenterPage());
             },
           ),
@@ -407,7 +1064,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       title,
                       style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -416,7 +1073,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -429,7 +1086,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 Text(
                   valueText,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -437,13 +1094,13 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 const SizedBox(width: 8),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Colors.grey[400],
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
                   size: 24,
                 ),
               ] else ...[
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Colors.grey[400],
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
                   size: 24,
                 ),
               ],
@@ -455,62 +1112,58 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
   }
 
   Widget _buildBeautifulToggle(bool value, Function(bool) onChanged) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: 60,
-      height: 32,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: value
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  ColorGlobalVariables.brownColor,
-                  ColorGlobalVariables.brownColor.withOpacity(0.8),
-                ],
-              )
-            : LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.grey[400]!,
-                  Colors.grey[500]!,
-                ],
-              ),
-        boxShadow: [
-          BoxShadow(
-            color: value
-                ? ColorGlobalVariables.brownColor.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return GestureDetector(
+      onTap: () => onChanged(!value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 60,
+        height: 32,
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => onChanged(!value),
-          child: AnimatedAlign(
-            duration: const Duration(milliseconds: 300),
-            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-            child: Container(
-              margin: const EdgeInsets.all(4),
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+          gradient: value
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor,
+                    ColorGlobalVariables.brownColor.withOpacity(0.8),
+                  ],
+                )
+              : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.grey[400]!,
+                    Colors.grey[500]!,
+                  ],
+                ),
+          boxShadow: [
+            BoxShadow(
+              color: value
+                  ? ColorGlobalVariables.brownColor.withOpacity(0.3)
+                  : Colors.grey.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: AnimatedAlign(
+          duration: const Duration(milliseconds: 200),
+          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.all(4),
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
           ),
         ),
@@ -518,20 +1171,20 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Divider(
         height: 1,
-        color: Colors.grey[200],
+        color: Theme.of(context).dividerColor ?? Colors.grey[200],
       ),
     );
   }
 
-  Widget _buildSupportSection() {
+  Widget _buildSupportSection(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -549,7 +1202,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
             child: Text(
               'Support',
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: Theme.of(context).textTheme.titleLarge?.color,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -559,18 +1212,14 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
             icon: Icons.star_rounded,
             title: 'Rate Our App',
             subtitle: 'Share your experience with us',
+            onTap: _showRateAppDialog,
           ),
-          _buildDivider(),
-          _buildSupportItem(
-            icon: Icons.share_rounded,
-            title: 'Share App',
-            subtitle: 'Share with friends and family',
-          ),
-          _buildDivider(),
+          _buildDivider(context),
           _buildSupportItem(
             icon: Icons.info_rounded,
             title: 'About',
             subtitle: 'App version and information',
+            onTap: _showAboutDialog,
           ),
         ],
       ),
@@ -581,14 +1230,13 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     required IconData icon,
     required String title,
     required String subtitle,
+    Function()? onTap,
   }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(0),
-        onTap: () {
-          // Handle support item tap
-        },
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           child: Row(
@@ -614,7 +1262,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       title,
                       style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
+                        color: Theme.of(context).textTheme.titleLarge?.color,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -623,7 +1271,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -632,7 +1280,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.grey[400],
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
                 size: 24,
               ),
             ],
@@ -642,10 +1290,48 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     );
   }
 
-  Widget _buildLogoutButton() {
+  Widget _buildAccountActionsSection(BuildContext context) {
+    return Column(
+      children: [
+        // Logout Button
+        _buildActionButton(
+          context: context,
+          icon: Icons.logout_rounded,
+          title: 'Log Out',
+          subtitle: 'Sign out of your account',
+          color: Colors.red,
+          isLoading: _isLoggingOut,
+          onTap: () => _handleLogout(context),
+        ),
+        const SizedBox(height: 16),
+        // Delete Account Button
+        _buildActionButton(
+          context: context,
+          icon: Icons.delete_forever_rounded,
+          title: 'Delete Account',
+          subtitle: 'Permanently delete your account and data',
+          color: Colors.red,
+          isLoading: _isDeletingAccount,
+          onTap: () => _handleDeleteAccount(context),
+          isDestructive: true,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required bool isLoading,
+    required Function() onTap,
+    bool isDestructive = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -659,301 +1345,67 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
-          onTap: () {
-            _showLogoutConfirmationDialog();
-          },
+          onTap: isLoading ? null : onTap,
           child: Container(
             padding: const EdgeInsets.all(24),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.logout_rounded,
-                  color: Colors.red,
-                  size: 24,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  'Log Out',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showLanguageSelectionDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        elevation: 20,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  FontAwesomeIcons.language,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Select Language',
-                style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Choose your preferred language',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _buildLanguageOption('English', 'en'),
-              const SizedBox(height: 12),
-              _buildLanguageOption('Spanish', 'es'),
-              const SizedBox(height: 12),
-              _buildLanguageOption('French', 'fr'),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLanguageOption(String language, String code) {
-    final isSelected = selectedLanguage == language;
-    
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          setState(() {
-            selectedLanguage = language;
-          });
-          Navigator.pop(context);
-        },
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSelected ? ColorGlobalVariables.brownColor.withOpacity(0.1) : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : Colors.transparent,
-              width: 2,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                language,
-                style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
-              if (isSelected)
-                Icon(
-                  Icons.check_circle_rounded,
-                  color: ColorGlobalVariables.brownColor,
-                  size: 24,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        elevation: 20,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.logout_rounded,
-                  color: Colors.red,
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Log Out',
-                style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Are you sure you want to log out?',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  child: isLoading
+                      ? Center(
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(color),
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          icon,
+                          color: color,
+                          size: 24,
                         ),
-                        backgroundColor: Colors.grey[100],
-                      ),
-                      child: Text(
-                        'Cancel',
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: color,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.red,
-                            Colors.red.withOpacity(0.8),
-                          ],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.red.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            // Perform logout
-                            final userProvider = Provider.of<UserProvider>(context, listen: false);
-                            userProvider.clearUser();
-                            Navigator.pop(context);
-                            Get.offAllNamed(RouteClass.getSignInWithPhonePage());
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            child: Center(
-                              child: Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          fontSize: 14,
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+                if (!isLoading)
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: color.withOpacity(0.6),
+                    size: 24,
+                  ),
+              ],
+            ),
           ),
         ),
       ),

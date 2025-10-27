@@ -9,9 +9,9 @@ import 'package:logger/logger.dart';
 class CanUploadItemService {
   final logger = Logger();
   
-  Future<Map<String, dynamic>> checkCanUpload({required String categorySlug}) async {
+  Future<Map<String, dynamic>> checkCanUpload({required int categoryId}) async {
     logger.i("🟡 [CAN_UPLOAD_SERVICE] ===== STARTING UPLOAD CHECK =====");
-    logger.i("🟡 [CAN_UPLOAD_SERVICE] Category: $categorySlug");
+    logger.i("🟡 [CAN_UPLOAD_SERVICE] Category: $categoryId");
     
     final uri = Uri.parse("$baseApiUrl${ApiEndpoint.canUpload}");
     logger.i("🟡 [CAN_UPLOAD_SERVICE] API Endpoint: $uri");
@@ -33,7 +33,7 @@ class CanUploadItemService {
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
-          'category_slug': categorySlug,
+          'category_id': categoryId,
         }),
       );
 

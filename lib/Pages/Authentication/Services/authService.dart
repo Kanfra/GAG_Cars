@@ -618,10 +618,6 @@ static Future<AuthResponseModel> getAuthUserProfile() async {
 
 
 
-  // Get stored token
-  // static Future<String?> getToken() async {
-  //   return await _storage.read(key: _tokenKey);
-  // }
 
   // Logout- done
   static Future<Map<String, dynamic>> logoutUser() async {
@@ -678,7 +674,7 @@ static Future<AuthResponseModel> getAuthUserProfile() async {
   }
 
 
-  // upload image to cloudinary
+
   
   // update user profile
 static Future<UserModel> updateUserProfile({
@@ -756,5 +752,54 @@ static Future<UserModel> updateUserProfile({
   }
 }
 
+static Future<bool> deleteUser() async {
+  final logger = Logger();
+  try{
+    final token = await AuthService.getToken();
+    final uri = Uri.parse("$baseApiUrl${ApiEndpoint.deleteUser}");
+    final response = await http.delete(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      }
+    );
+    // success case - user deleted
+    if(response.statusCode == 200){
+      logger.i("User deleted successfully");
+      return true;
+      }
+    // unauthorized case - invalid token
+    else if(response.statusCode == 401){
+      return false;
+      }
+    // handle specific http errors
+    else{
+      throw HttpException(
+        'Failed to delete user. Status code: ${response.statusCode}',
+      );
+    }
+  } catch(e){
+    // Handle specific HTTP errors
+      if (e is http.ClientException) {
+        logger.e('Network error: ${e.message}');
+        throw HttpException(
+          'Network error: ${e.message}',
+        );
+      }
+      // Re-throw if it's already our custom exception
+      else if (e is HttpException) {
+        rethrow;
+      }
+      // Handle other unexpected errors
+      else {
+        logger.e('Unexpected error: ${e.toString()}');
+        throw HttpException(
+          'Unexpected error: ${e.toString()}',
+        );
+    }
+  }
+}
 
 }

@@ -20,6 +20,7 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
     final TextEditingController _emailController = TextEditingController();
     final TextEditingController _passwordController = TextEditingController();
     bool _isLoading = false;
+    bool isObscurred = true;
     // form validation
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     
@@ -81,6 +82,13 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
                                 ),
                                          CustomTextField(
                                           controller: _passwordController,
+                                          obscureText: isObscurred,
+                                          suffixIcon: isObscurred ? Icons.visibility : Icons.visibility_off,
+                                          onSuffixIconPressed: (){
+                                            setState(() {
+                                              isObscurred = !isObscurred;
+                                            });
+                                          },
                                           hintText: "Password", 
                                           prefixImage: AppIcons.lock_icon,
                                           onChanged: (value)=>{},
@@ -168,7 +176,7 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> {
                                               Get.offNamed(RouteClass.getSignInWithPhonePage());
                                             },
                                             child: Image.asset(AppIcons.phone_call_logo ,width: 24,)),
-                                              Image.asset(AppIcons.email_logo ,width: 24,),
+                                              // Image.asset(AppIcons.email_logo ,width: 24,),
                                 ],
                                ),
                              ),

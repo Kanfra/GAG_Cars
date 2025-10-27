@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
@@ -32,12 +31,14 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   late Timer _timer;
   int _remainingSeconds = 60;
   bool _isLoading = false;
-  String? _errorMessage;
   bool _otpSent = false;
   late String _phoneNumber;
   late bool _isSignIn;
   late String _email;
   final logger = Logger();
+
+  // Clipboard auto-fill variables
+  bool _isAutoFilling = false;
 
   @override
   void initState() {
@@ -57,6 +58,61 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     // automatically send otp when page loads
     _sendInitialOtp();
     _startCountdown();
+    
+    // Start clipboard monitoring
+    _startClipboardMonitoring();
+  }
+  
+  void _startClipboardMonitoring() {
+    // Check clipboard periodically for OTP
+    Future.delayed(const Duration(seconds: 2), () {
+      _checkClipboardForOtp();
+    });
+  }
+
+  void _checkClipboardForOtp() async {
+    if (_isAutoFilling || _isLoading) return;
+    
+    try {
+      final clipboardData = await Clipboard.getData('text/plain');
+      if (clipboardData?.text != null) {
+        final text = clipboardData!.text!.trim();
+        // Look for 6-digit OTP pattern
+        final otpMatch = RegExp(r'\b\d{6}\b').firstMatch(text);
+        if (otpMatch != null) {
+          final otp = otpMatch.group(0)!;
+          _handleAutoFillCode(otp);
+        }
+      }
+    } catch (e) {
+      print("Clipboard monitoring failed: $e");
+    }
+  }
+
+  void _handleAutoFillCode(String code) {
+    setState(() {
+      _isAutoFilling = true;
+    });
+
+    // Fill the OTP field automatically
+    pinController.text = code;
+
+    // Auto-verify after a short delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _verifyCode();
+    });
+
+    // Show auto-fill success message
+    _showAutoFillSuccess();
+  }
+
+  void _showAutoFillSuccess() {
+    showCustomSnackBar(
+      title: "Auto-filled",
+      message: 'OTP automatically detected and filled',
+      backgroundColor: ColorGlobalVariables.greenColor,
+      textColor: Colors.white,
+    );
   }
   
   void _startCountdown() {
@@ -74,7 +130,6 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   Future<void> _sendInitialOtp() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
     });
 
     try{
@@ -85,14 +140,12 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       setState(() => _otpSent = true);
       showCustomSnackBar(
         title: "OTP Sent",
-        message: "OTP sent to $_phoneNumber",
+        message: "Verification code sent to your phone",
         backgroundColor: ColorGlobalVariables.blueColor,
       );
     }catch(e){
-      setState(() => _errorMessage = e.toString());
-      showCustomSnackBar(
-        message: "Failed to send OTP: $_errorMessage"
-      );
+      // Show user-friendly error message
+      _showUserFriendlyError(e, "send OTP");
     } finally{
       if(mounted){
         setState(() => _isLoading = false);
@@ -107,7 +160,6 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
     });
 
     userProvider.clearError();
@@ -125,14 +177,14 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       );
 
     }catch(e){
-      setState(() => _errorMessage = e.toString());
-      logger.e("Verification failed: $e");
-      showCustomSnackBar(
-        message: "Verification failed: $e"
-      );
+      // Show user-friendly error message
+      _showUserFriendlyError(e, "verify code");
     } finally{
       if(mounted){
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _isAutoFilling = false;
+        });
       }
     }
   }
@@ -141,7 +193,6 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
   Future<void> _resendOtp() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
     });
 
     try{
@@ -155,17 +206,92 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
       });
       _startCountdown();
       showCustomSnackBar(
-        title: "OTP Sent",
-        message: "OTP resent successfully",
-        backgroundColor: ColorGlobalVariables.blueColor,
-        );
+        title: "OTP Resent",
+        message: "New verification code sent to your phone",
+        backgroundColor: ColorGlobalVariables.greenColor,
+      );
     }catch(e){
-      setState(() => _errorMessage = e.toString());
-      showCustomSnackBar(message: "Failed to resend OTP: $_errorMessage");
+      // Show user-friendly error message
+      _showUserFriendlyError(e, "resend OTP");
     } finally{
       if(mounted){
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  void _pasteFromClipboard() async {
+    try {
+      final clipboardData = await Clipboard.getData('text/plain');
+      if (clipboardData?.text != null) {
+        final text = clipboardData!.text!.trim();
+        if (text.length == 6 && text.contains(RegExp(r'^\d+$'))) {
+          _handleAutoFillCode(text);
+        } else {
+          showCustomSnackBar(
+            title: "Invalid OTP",
+            message: 'Clipboard does not contain a valid 6-digit code',
+            backgroundColor: ColorGlobalVariables.redColor,
+          );
+        }
+      } else {
+        showCustomSnackBar(
+          title: "No OTP Found",
+          message: 'No verification code found in clipboard',
+          backgroundColor: ColorGlobalVariables.redColor,
+        );
+      }
+    } catch (e) {
+      showCustomSnackBar(
+        title: "Paste Failed",
+        message: 'Unable to paste from clipboard. Please try again.',
+        backgroundColor: ColorGlobalVariables.redColor,
+      );
+    }
+  }
+
+  // Helper method to show user-friendly error messages
+  void _showUserFriendlyError(dynamic error, String operation) {
+    String errorMessage = "An error occurred";
+    String errorTitle = "Error";
+
+    if (error is String) {
+      // If error is already a string, try to make it user-friendly
+      errorMessage = _makeErrorMessageUserFriendly(error);
+    } else if (error is FormatException) {
+      errorMessage = "Invalid data format. Please try again.";
+    } else if (error is TimeoutException) {
+      errorMessage = "Request timed out. Please check your connection and try again.";
+    } else {
+      errorMessage = "Failed to $operation. Please try again.";
+    }
+
+    showCustomSnackBar(
+      title: errorTitle,
+      message: errorMessage,
+      backgroundColor: ColorGlobalVariables.redColor,
+      textColor: Colors.white,
+    );
+  }
+
+  // Method to convert technical error messages to user-friendly ones
+  String _makeErrorMessageUserFriendly(String error) {
+    // Convert common technical errors to user-friendly messages
+    if (error.toLowerCase().contains('timeout') || error.toLowerCase().contains('timed out')) {
+      return "Request timed out. Please check your internet connection.";
+    } else if (error.toLowerCase().contains('network') || error.toLowerCase().contains('connection')) {
+      return "Network error. Please check your internet connection.";
+    } else if (error.toLowerCase().contains('invalid') && error.toLowerCase().contains('otp')) {
+      return "Invalid verification code. Please check the code and try again.";
+    } else if (error.toLowerCase().contains('expired')) {
+      return "Verification code has expired. Please request a new one.";
+    } else if (error.toLowerCase().contains('too many attempts')) {
+      return "Too many failed attempts. Please wait before trying again.";
+    } else if (error.toLowerCase().contains('user not found')) {
+      return "Account not found. Please check your phone number.";
+    } else {
+      // Generic fallback - remove technical details
+      return "Something went wrong. Please try again.";
     }
   }
 
@@ -226,8 +352,43 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                       'Verify Code',
                       style: TextStyle(fontSize:32, fontWeight: FontWeight.w500),
                     ),
+                    
+                    // Auto-fill info
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.shade100),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.auto_awesome_motion, size: 16, color: Colors.blue.shade600),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Paste OTP from clipboard for auto-fill',
+                              style: TextStyle(fontSize: 12, color: Colors.blue.shade800),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _pasteFromClipboard,
+                            child: Text(
+                              'Paste',
+                              style: TextStyle(
+                                color: ColorGlobalVariables.brownColor,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
                     // pinput field
-                    SizedBox(height: 50),
+                    SizedBox(height: 20),
                     (_isLoading || userProvider.isLoading) 
                       ? CircularProgressIndicator(
                         color: ColorGlobalVariables.brownColor,
@@ -261,21 +422,13 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                           hapticFeedbackType: HapticFeedbackType.lightImpact,
                           onCompleted: (pin) {
                             debugPrint('Completed: $pin');
+                            _verifyCode();
                           },
                           onChanged: (value) {
                             debugPrint('Changed: $value');
                           },
                         ),
                     const SizedBox(height: 20),
-                    
-                    if(_errorMessage != null || userProvider.error != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: TextExtraSmall(
-                        title: _errorMessage ?? userProvider.error ?? "An error occurred", 
-                        textColor: ColorGlobalVariables.redColor,
-                      ),
-                    ),
                     
                     RichText(
                       text: TextSpan(
@@ -309,7 +462,7 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: CustomButton(
-                        buttonName: 'Verify Code',
+                        buttonName: _isAutoFilling ? 'Verifying...' : 'Verify Code',
                         backgroundColor: _remainingSeconds == 0 ? Colors.grey : Color.fromRGBO(159, 16, 16, 1), 
                         onPressed: _verifyCode, 
                         isLoading: (_isLoading || userProvider.isLoading),

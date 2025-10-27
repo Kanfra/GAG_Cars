@@ -8,13 +8,13 @@ part of 'trendingMakeModel.dart';
 
 _$TrendingMakeImpl _$$TrendingMakeImplFromJson(Map<String, dynamic> json) =>
     _$TrendingMakeImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      image: json['image'] as String,
-      createdAt: json['created_at'] as String,
-      updatedAt: json['updated_at'] as String,
+      id: _safeParseInt(json['id']),
+      userId: _safeParseString(json['user_id']),
+      name: _safeParseStringWithDefault(json['name']),
+      slug: _safeParseStringWithDefault(json['slug']),
+      image: _safeParseStringWithDefault(json['image']),
+      createdAt: _safeParseStringWithDefault(json['created_at']),
+      updatedAt: _safeParseStringWithDefault(json['updated_at']),
     );
 
 Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
@@ -31,11 +31,9 @@ Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
 _$TrendingMakeResponseImpl _$$TrendingMakeResponseImplFromJson(
         Map<String, dynamic> json) =>
     _$TrendingMakeResponseImpl(
-      data: (json['data'] as List<dynamic>)
-          .map((e) => TrendingMake.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
+      data: _safeParseTrendingMakeList(json['data']),
+      links: _safeParsePaginationLinks(json['links']),
+      meta: _safeParsePaginationMeta(json['meta']),
     );
 
 Map<String, dynamic> _$$TrendingMakeResponseImplToJson(
@@ -49,10 +47,10 @@ Map<String, dynamic> _$$TrendingMakeResponseImplToJson(
 _$PaginationLinksImpl _$$PaginationLinksImplFromJson(
         Map<String, dynamic> json) =>
     _$PaginationLinksImpl(
-      first: json['first'] as String,
-      last: json['last'] as String,
-      prev: json['prev'] as String?,
-      next: json['next'] as String?,
+      first: _safeParseStringWithDefault(json['first']),
+      last: _safeParseStringWithDefault(json['last']),
+      prev: _safeParseString(json['prev']),
+      next: _safeParseString(json['next']),
     );
 
 Map<String, dynamic> _$$PaginationLinksImplToJson(
@@ -66,16 +64,14 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
 
 _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
     _$PaginationMetaImpl(
-      currentPage: (json['current_page'] as num).toInt(),
-      from: (json['from'] as num).toInt(),
-      lastPage: (json['last_page'] as num).toInt(),
-      links: (json['links'] as List<dynamic>)
-          .map((e) => PaginationMetaLink.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      path: json['path'] as String,
-      perPage: (json['per_page'] as num).toInt(),
-      to: (json['to'] as num).toInt(),
-      total: (json['total'] as num).toInt(),
+      currentPage: _safeParseIntWithDefault(json['current_page']),
+      from: _safeParseIntWithDefault(json['from']),
+      lastPage: _safeParseIntWithDefault(json['last_page']),
+      links: _safeParsePaginationMetaLinkList(json['links']),
+      path: _safeParseStringWithDefault(json['path']),
+      perPage: _safeParseIntWithDefault(json['per_page']),
+      to: _safeParseIntWithDefault(json['to']),
+      total: _safeParseIntWithDefault(json['total']),
     );
 
 Map<String, dynamic> _$$PaginationMetaImplToJson(
@@ -94,9 +90,9 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
 _$PaginationMetaLinkImpl _$$PaginationMetaLinkImplFromJson(
         Map<String, dynamic> json) =>
     _$PaginationMetaLinkImpl(
-      url: json['url'] as String?,
-      label: json['label'] as String,
-      active: json['active'] as bool,
+      url: _safeParseString(json['url']),
+      label: _safeParseStringWithDefault(json['label']),
+      active: _safeParseBoolWithDefault(json['active']),
     );
 
 Map<String, dynamic> _$$PaginationMetaLinkImplToJson(

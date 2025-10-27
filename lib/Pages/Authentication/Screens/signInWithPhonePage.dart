@@ -118,6 +118,7 @@ textColor: ColorGlobalVariables.redColor,
                                CountryCodeTextField(
                                 controller: _phoneController,
                                 onCountryChanged: _onCountryChanged,
+                                hintText: "552058723",
                                 onPhoneNumberChanged: (value){
                                   // clear error when user types
                                   if(_errorMessage != null && value.isNotEmpty){

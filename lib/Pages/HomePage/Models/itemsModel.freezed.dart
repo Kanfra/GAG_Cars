@@ -1453,7 +1453,9 @@ mixin _$RecommendedItem {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'Height')
   String? get height => throw _privateConstructorUsedError;
+  @JsonKey(name: 'VIN')
   String? get vin => throw _privateConstructorUsedError;
   Brand? get brand => throw _privateConstructorUsedError;
   Category? get category => throw _privateConstructorUsedError;
@@ -1509,8 +1511,8 @@ abstract class $RecommendedItemCopyWith<$Res> {
       @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
-      String? height,
-      String? vin,
+      @JsonKey(name: 'Height') String? height,
+      @JsonKey(name: 'VIN') String? vin,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
@@ -1818,8 +1820,8 @@ abstract class _$$RecommendedItemImplCopyWith<$Res>
       @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
-      String? height,
-      String? vin,
+      @JsonKey(name: 'Height') String? height,
+      @JsonKey(name: 'VIN') String? vin,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
@@ -2070,8 +2072,8 @@ class _$RecommendedItemImpl
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
-      this.height,
-      this.vin,
+      @JsonKey(name: 'Height') this.height,
+      @JsonKey(name: 'VIN') this.vin,
       this.brand,
       this.category,
       @JsonKey(name: 'brand_model') this.brandModel,
@@ -2172,8 +2174,10 @@ class _$RecommendedItemImpl
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
   @override
+  @JsonKey(name: 'Height')
   final String? height;
   @override
+  @JsonKey(name: 'VIN')
   final String? vin;
   @override
   final Brand? brand;
@@ -2389,8 +2393,8 @@ abstract class _RecommendedItem implements RecommendedItem {
       @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
-      final String? height,
-      final String? vin,
+      @JsonKey(name: 'Height') final String? height,
+      @JsonKey(name: 'VIN') final String? vin,
       final Brand? brand,
       final Category? category,
       @JsonKey(name: 'brand_model') final BrandModel? brandModel,
@@ -2474,8 +2478,10 @@ abstract class _RecommendedItem implements RecommendedItem {
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
   @override
+  @JsonKey(name: 'Height')
   String? get height;
   @override
+  @JsonKey(name: 'VIN')
   String? get vin;
   @override
   Brand? get brand;
@@ -2964,14 +2970,14 @@ RecommendedMeta _$RecommendedMetaFromJson(Map<String, dynamic> json) {
 mixin _$RecommendedMeta {
   @JsonKey(name: 'current_page')
   int get currentPage => throw _privateConstructorUsedError;
-  int get from => throw _privateConstructorUsedError;
+  int? get from => throw _privateConstructorUsedError; // FIXED: Made nullable
   @JsonKey(name: 'last_page')
   int get lastPage => throw _privateConstructorUsedError;
   List<RecommendedMetaLink> get links => throw _privateConstructorUsedError;
   String get path => throw _privateConstructorUsedError;
   @JsonKey(name: 'per_page')
   int get perPage => throw _privateConstructorUsedError;
-  int get to => throw _privateConstructorUsedError;
+  int? get to => throw _privateConstructorUsedError; // FIXED: Made nullable
   int get total => throw _privateConstructorUsedError;
 
   /// Serializes this RecommendedMeta to a JSON map.
@@ -2992,12 +2998,12 @@ abstract class $RecommendedMetaCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'current_page') int currentPage,
-      int from,
+      int? from,
       @JsonKey(name: 'last_page') int lastPage,
       List<RecommendedMetaLink> links,
       String path,
       @JsonKey(name: 'per_page') int perPage,
-      int to,
+      int? to,
       int total});
 }
 
@@ -3017,12 +3023,12 @@ class _$RecommendedMetaCopyWithImpl<$Res, $Val extends RecommendedMeta>
   @override
   $Res call({
     Object? currentPage = null,
-    Object? from = null,
+    Object? from = freezed,
     Object? lastPage = null,
     Object? links = null,
     Object? path = null,
     Object? perPage = null,
-    Object? to = null,
+    Object? to = freezed,
     Object? total = null,
   }) {
     return _then(_value.copyWith(
@@ -3030,10 +3036,10 @@ class _$RecommendedMetaCopyWithImpl<$Res, $Val extends RecommendedMeta>
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
               as int,
-      from: null == from
+      from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       lastPage: null == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
@@ -3050,10 +3056,10 @@ class _$RecommendedMetaCopyWithImpl<$Res, $Val extends RecommendedMeta>
           ? _value.perPage
           : perPage // ignore: cast_nullable_to_non_nullable
               as int,
-      to: null == to
+      to: freezed == to
           ? _value.to
           : to // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       total: null == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
@@ -3072,12 +3078,12 @@ abstract class _$$RecommendedMetaImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'current_page') int currentPage,
-      int from,
+      int? from,
       @JsonKey(name: 'last_page') int lastPage,
       List<RecommendedMetaLink> links,
       String path,
       @JsonKey(name: 'per_page') int perPage,
-      int to,
+      int? to,
       int total});
 }
 
@@ -3095,12 +3101,12 @@ class __$$RecommendedMetaImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? currentPage = null,
-    Object? from = null,
+    Object? from = freezed,
     Object? lastPage = null,
     Object? links = null,
     Object? path = null,
     Object? perPage = null,
-    Object? to = null,
+    Object? to = freezed,
     Object? total = null,
   }) {
     return _then(_$RecommendedMetaImpl(
@@ -3108,10 +3114,10 @@ class __$$RecommendedMetaImplCopyWithImpl<$Res>
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
               as int,
-      from: null == from
+      from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       lastPage: null == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
@@ -3128,10 +3134,10 @@ class __$$RecommendedMetaImplCopyWithImpl<$Res>
           ? _value.perPage
           : perPage // ignore: cast_nullable_to_non_nullable
               as int,
-      to: null == to
+      to: freezed == to
           ? _value.to
           : to // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       total: null == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
@@ -3163,7 +3169,8 @@ class _$RecommendedMetaImpl
   @JsonKey(name: 'current_page')
   final int currentPage;
   @override
-  final int from;
+  final int? from;
+// FIXED: Made nullable
   @override
   @JsonKey(name: 'last_page')
   final int lastPage;
@@ -3181,7 +3188,8 @@ class _$RecommendedMetaImpl
   @JsonKey(name: 'per_page')
   final int perPage;
   @override
-  final int to;
+  final int? to;
+// FIXED: Made nullable
   @override
   final int total;
 
@@ -3247,12 +3255,12 @@ class _$RecommendedMetaImpl
 abstract class _RecommendedMeta implements RecommendedMeta {
   const factory _RecommendedMeta(
       {@JsonKey(name: 'current_page') required final int currentPage,
-      required final int from,
+      required final int? from,
       @JsonKey(name: 'last_page') required final int lastPage,
       required final List<RecommendedMetaLink> links,
       required final String path,
       @JsonKey(name: 'per_page') required final int perPage,
-      required final int to,
+      required final int? to,
       required final int total}) = _$RecommendedMetaImpl;
 
   factory _RecommendedMeta.fromJson(Map<String, dynamic> json) =
@@ -3262,7 +3270,7 @@ abstract class _RecommendedMeta implements RecommendedMeta {
   @JsonKey(name: 'current_page')
   int get currentPage;
   @override
-  int get from;
+  int? get from; // FIXED: Made nullable
   @override
   @JsonKey(name: 'last_page')
   int get lastPage;
@@ -3274,7 +3282,7 @@ abstract class _RecommendedMeta implements RecommendedMeta {
   @JsonKey(name: 'per_page')
   int get perPage;
   @override
-  int get to;
+  int? get to; // FIXED: Made nullable
   @override
   int get total;
 
@@ -3294,6 +3302,7 @@ RecommendedMetaLink _$RecommendedMetaLinkFromJson(Map<String, dynamic> json) {
 mixin _$RecommendedMetaLink {
   String? get url => throw _privateConstructorUsedError;
   String get label => throw _privateConstructorUsedError;
+  int? get page => throw _privateConstructorUsedError;
   bool get active => throw _privateConstructorUsedError;
 
   /// Serializes this RecommendedMetaLink to a JSON map.
@@ -3312,7 +3321,7 @@ abstract class $RecommendedMetaLinkCopyWith<$Res> {
           RecommendedMetaLink value, $Res Function(RecommendedMetaLink) then) =
       _$RecommendedMetaLinkCopyWithImpl<$Res, RecommendedMetaLink>;
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call({String? url, String label, int? page, bool active});
 }
 
 /// @nodoc
@@ -3332,6 +3341,7 @@ class _$RecommendedMetaLinkCopyWithImpl<$Res, $Val extends RecommendedMetaLink>
   $Res call({
     Object? url = freezed,
     Object? label = null,
+    Object? page = freezed,
     Object? active = null,
   }) {
     return _then(_value.copyWith(
@@ -3343,6 +3353,10 @@ class _$RecommendedMetaLinkCopyWithImpl<$Res, $Val extends RecommendedMetaLink>
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
               as String,
+      page: freezed == page
+          ? _value.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int?,
       active: null == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
@@ -3359,7 +3373,7 @@ abstract class _$$RecommendedMetaLinkImplCopyWith<$Res>
       __$$RecommendedMetaLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call({String? url, String label, int? page, bool active});
 }
 
 /// @nodoc
@@ -3377,6 +3391,7 @@ class __$$RecommendedMetaLinkImplCopyWithImpl<$Res>
   $Res call({
     Object? url = freezed,
     Object? label = null,
+    Object? page = freezed,
     Object? active = null,
   }) {
     return _then(_$RecommendedMetaLinkImpl(
@@ -3388,6 +3403,10 @@ class __$$RecommendedMetaLinkImplCopyWithImpl<$Res>
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
               as String,
+      page: freezed == page
+          ? _value.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int?,
       active: null == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
@@ -3402,7 +3421,7 @@ class _$RecommendedMetaLinkImpl
     with DiagnosticableTreeMixin
     implements _RecommendedMetaLink {
   const _$RecommendedMetaLinkImpl(
-      {this.url, required this.label, required this.active});
+      {this.url, required this.label, this.page, required this.active});
 
   factory _$RecommendedMetaLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$RecommendedMetaLinkImplFromJson(json);
@@ -3412,11 +3431,13 @@ class _$RecommendedMetaLinkImpl
   @override
   final String label;
   @override
+  final int? page;
+  @override
   final bool active;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'RecommendedMetaLink(url: $url, label: $label, active: $active)';
+    return 'RecommendedMetaLink(url: $url, label: $label, page: $page, active: $active)';
   }
 
   @override
@@ -3426,6 +3447,7 @@ class _$RecommendedMetaLinkImpl
       ..add(DiagnosticsProperty('type', 'RecommendedMetaLink'))
       ..add(DiagnosticsProperty('url', url))
       ..add(DiagnosticsProperty('label', label))
+      ..add(DiagnosticsProperty('page', page))
       ..add(DiagnosticsProperty('active', active));
   }
 
@@ -3436,12 +3458,13 @@ class _$RecommendedMetaLinkImpl
             other is _$RecommendedMetaLinkImpl &&
             (identical(other.url, url) || other.url == url) &&
             (identical(other.label, label) || other.label == label) &&
+            (identical(other.page, page) || other.page == page) &&
             (identical(other.active, active) || other.active == active));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, url, label, active);
+  int get hashCode => Object.hash(runtimeType, url, label, page, active);
 
   /// Create a copy of RecommendedMetaLink
   /// with the given fields replaced by the non-null parameter values.
@@ -3464,6 +3487,7 @@ abstract class _RecommendedMetaLink implements RecommendedMetaLink {
   const factory _RecommendedMetaLink(
       {final String? url,
       required final String label,
+      final int? page,
       required final bool active}) = _$RecommendedMetaLinkImpl;
 
   factory _RecommendedMetaLink.fromJson(Map<String, dynamic> json) =
@@ -3473,6 +3497,8 @@ abstract class _RecommendedMetaLink implements RecommendedMetaLink {
   String? get url;
   @override
   String get label;
+  @override
+  int? get page;
   @override
   bool get active;
 

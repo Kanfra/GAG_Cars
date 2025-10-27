@@ -145,19 +145,21 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: _buildAppBar(theme),
       body: Column(
         children: [
           // Search Bar
-          _buildSearchBar(),
+          _buildSearchBar(theme),
           
           // Categories
-          _buildCategoryTabs(),
+          _buildCategoryTabs(theme),
           
           // Messages List
-          _buildMessagesList(),
+          _buildMessagesList(theme),
         ],
       ),
       
@@ -166,15 +168,14 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(ThemeData theme) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.appBarTheme.backgroundColor ?? Colors.white,
       elevation: 1,
-      // leading: 
       title: Text(
         "Messages",
         style: TextStyle(
-          color: ColorGlobalVariables.brownColor,
+          color: theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -182,14 +183,16 @@ class _MessagesPageState extends State<MessagesPage> {
       centerTitle: true,
       actions: [
         IconButton(
-          icon: Icon(Icons.more_vert, color: Colors.black54),
-          onPressed: _showOptionsMenu,
+          icon: Icon(Icons.more_vert, color: theme.iconTheme.color ?? Colors.black54),
+          onPressed: () => _showOptionsMenu(theme),
         ),
       ],
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Container(
@@ -207,18 +210,29 @@ class _MessagesPageState extends State<MessagesPage> {
           controller: _searchController,
           decoration: InputDecoration(
             hintText: "Search conversations...",
-            hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
-            prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500], size: 24),
+            hintStyle: TextStyle(
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
+              fontSize: 16
+            ),
+            prefixIcon: Icon(
+              Icons.search_rounded, 
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
+              size: 24
+            ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(Icons.clear_rounded, color: Colors.grey[500], size: 20),
+                    icon: Icon(
+                      Icons.clear_rounded, 
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
+                      size: 20
+                    ),
                     onPressed: () {
                       _searchController.clear();
                       _filterMessages();
                     },
                   )
                 : null,
-            fillColor: Colors.white,
+            fillColor: theme.cardColor,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -226,14 +240,18 @@ class _MessagesPageState extends State<MessagesPage> {
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
           ),
-          style: TextStyle(color: Colors.black87, fontSize: 16),
+          style: TextStyle(
+            color: theme.textTheme.titleLarge?.color, 
+            fontSize: 16
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCategoryTabs() {
+  Widget _buildCategoryTabs(ThemeData theme) {
     final categories = ['All', 'Unread', 'Important', 'Groups'];
+    final isDarkMode = theme.brightness == Brightness.dark;
     
     return SizedBox(
       height: 50,
@@ -241,13 +259,13 @@ class _MessagesPageState extends State<MessagesPage> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: categories.map((category) {
-          return _buildCategoryItem(category);
+          return _buildCategoryItem(category, theme, isDarkMode);
         }).toList(),
       ),
     );
   }
 
-  Widget _buildCategoryItem(String category) {
+  Widget _buildCategoryItem(String category, ThemeData theme, bool isDarkMode) {
     final isActive = _selectedCategory == category;
     
     return Container(
@@ -260,10 +278,10 @@ class _MessagesPageState extends State<MessagesPage> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: isActive ? ColorGlobalVariables.brownColor : Colors.white,
+              color: isActive ? ColorGlobalVariables.brownColor : theme.cardColor,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isActive ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
+                color: isActive ? ColorGlobalVariables.brownColor : isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
                 width: 1.5,
               ),
               boxShadow: [
@@ -279,7 +297,7 @@ class _MessagesPageState extends State<MessagesPage> {
               child: Text(
                 category,
                 style: TextStyle(
-                  color: isActive ? Colors.white : Colors.grey[700],
+                  color: isActive ? Colors.white : theme.textTheme.bodyMedium?.color,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -291,12 +309,14 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  Widget _buildMessagesList() {
+  Widget _buildMessagesList(ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
@@ -309,7 +329,7 @@ class _MessagesPageState extends State<MessagesPage> {
         child: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           child: _filteredMessages.isEmpty
-              ? _buildEmptyState()
+              ? _buildEmptyState(theme)
               : ListView.separated(
                   padding: const EdgeInsets.only(top: 8, bottom: 16),
                   itemCount: _filteredMessages.length,
@@ -318,12 +338,12 @@ class _MessagesPageState extends State<MessagesPage> {
                     child: Divider(
                       height: 1,
                       thickness: 1,
-                      color: Colors.grey[200],
+                      color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
                     ),
                   ),
                   itemBuilder: (context, index) {
                     final message = _filteredMessages[index];
-                    return _buildMessageTile(message);
+                    return _buildMessageTile(message, theme);
                   },
                 ),
         ),
@@ -331,7 +351,7 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -339,13 +359,13 @@ class _MessagesPageState extends State<MessagesPage> {
           Icon(
             Icons.chat_bubble_outline_rounded,
             size: 80,
-            color: Colors.grey[300],
+            color: theme.iconTheme.color,
           ),
           const SizedBox(height: 16),
           Text(
             _selectedCategory == 'Groups' ? 'No group chats' : 'No messages found',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: theme.textTheme.bodyMedium?.color,
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -356,7 +376,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 ? 'Start a group conversation with multiple people'
                 : 'Start a conversation by messaging a seller or buyer',
             style: TextStyle(
-              color: Colors.grey[400],
+              color: theme.textTheme.bodySmall?.color,
               fontSize: 14,
             ),
             textAlign: TextAlign.center,
@@ -366,7 +386,9 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  Widget _buildMessageTile(Message message) {
+  Widget _buildMessageTile(Message message, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -385,13 +407,13 @@ class _MessagesPageState extends State<MessagesPage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: message.isOnline ? Colors.green : Colors.grey[300]!,
+                        color: message.isOnline ? Colors.green : isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
                         width: 2,
                       ),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(28),
-                      child: _buildUserImage(message.image),
+                      child: _buildUserImage(message.image, theme),
                     ),
                   ),
                   if (message.isOnline)
@@ -405,7 +427,7 @@ class _MessagesPageState extends State<MessagesPage> {
                           color: Colors.green,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             width: 2,
                           ),
                         ),
@@ -427,7 +449,7 @@ class _MessagesPageState extends State<MessagesPage> {
                         Text(
                           message.sender,
                           style: TextStyle(
-                            color: Colors.black87,
+                            color: theme.textTheme.titleLarge?.color,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -435,7 +457,7 @@ class _MessagesPageState extends State<MessagesPage> {
                         Text(
                           _formatTime(message.sentAt),
                           style: TextStyle(
-                            color: Colors.grey[500],
+                            color: theme.textTheme.bodySmall?.color,
                             fontSize: 12,
                           ),
                         ),
@@ -447,7 +469,7 @@ class _MessagesPageState extends State<MessagesPage> {
                     Text(
                       message.content,
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: theme.textTheme.bodyMedium?.color,
                         fontSize: 14,
                         height: 1.4,
                       ),
@@ -466,11 +488,11 @@ class _MessagesPageState extends State<MessagesPage> {
                             height: 20,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: Colors.grey[100],
+                              color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(4),
-                              child: _buildProductImage(message.productImage!),
+                              child: _buildProductImage(message.productImage!, theme),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -517,46 +539,50 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  Widget _buildUserImage(String imageUrl) {
+  Widget _buildUserImage(String imageUrl, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     if (imageUrl.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
-          color: Colors.grey[200],
-          child: Icon(Icons.person, color: Colors.grey[400]),
+          color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+          child: Icon(Icons.person, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
         ),
         errorWidget: (context, url, error) => Container(
-          color: Colors.grey[200],
-          child: Icon(Icons.person, color: Colors.grey[400]),
+          color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+          child: Icon(Icons.person, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
         ),
       );
     } else {
       return Container(
-        color: Colors.grey[200],
-        child: Icon(Icons.person, color: Colors.grey[400]),
+        color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+        child: Icon(Icons.person, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
       );
     }
   }
 
-  Widget _buildProductImage(String imageUrl) {
+  Widget _buildProductImage(String imageUrl, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     if (imageUrl.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
-          color: Colors.grey[200],
-          child: Icon(Icons.car_rental, color: Colors.grey[400], size: 12),
+          color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
+          child: Icon(Icons.car_rental, color: isDarkMode ? Colors.grey[500] : Colors.grey[400], size: 12),
         ),
         errorWidget: (context, url, error) => Container(
-          color: Colors.grey[200],
-          child: Icon(Icons.car_rental, color: Colors.grey[400], size: 12),
+          color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
+          child: Icon(Icons.car_rental, color: isDarkMode ? Colors.grey[500] : Colors.grey[400], size: 12),
         ),
       );
     } else {
       return Container(
-        color: Colors.grey[200],
-        child: Icon(Icons.car_rental, color: Colors.grey[400], size: 12),
+        color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
+        child: Icon(Icons.car_rental, color: isDarkMode ? Colors.grey[500] : Colors.grey[400], size: 12),
       );
     }
   }
@@ -573,7 +599,9 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  void _showOptionsMenu() {
+  void _showOptionsMenu(ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -581,7 +609,7 @@ class _MessagesPageState extends State<MessagesPage> {
         return Container(
           margin: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -600,7 +628,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: Colors.grey[200]!,
+                      color: theme.dividerColor,
                       width: 1,
                     ),
                   ),
@@ -624,7 +652,7 @@ class _MessagesPageState extends State<MessagesPage> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              color: theme.textTheme.titleLarge?.color,
                             ),
                           ),
                           SizedBox(height: 2),
@@ -632,7 +660,7 @@ class _MessagesPageState extends State<MessagesPage> {
                             'Manage your conversations',
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -662,13 +690,13 @@ class _MessagesPageState extends State<MessagesPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: theme.textTheme.titleLarge?.color,
                   ),
                 ),
                 trailing: Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16,
-                  color: Colors.grey[400],
+                  color: theme.iconTheme.color,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -695,13 +723,13 @@ class _MessagesPageState extends State<MessagesPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: theme.textTheme.titleLarge?.color,
                   ),
                 ),
                 trailing: Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 16,
-                  color: Colors.grey[400],
+                  color: theme.iconTheme.color,
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -717,8 +745,8 @@ class _MessagesPageState extends State<MessagesPage> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[100],
-                      foregroundColor: Colors.grey[700],
+                      backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                      foregroundColor: isDarkMode ? Colors.grey[300] : Colors.grey[700],
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

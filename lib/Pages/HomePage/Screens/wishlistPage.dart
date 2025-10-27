@@ -66,34 +66,36 @@ class _WishlistPageState extends State<WishlistPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: _buildAppBar(),
-      body: _buildBody(),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: _buildAppBar(theme),
+      body: _buildBody(theme),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(ThemeData theme) {
     return CustomAppbar(
       onLeadingIconClickFunction: () => Get.back(),
       isLeadingWidgetExist: false,
       leadingIconData: Icons.arrow_back_ios_new,
-      appbarBackgroundColor: Colors.white,
-      leadingIconDataColor: ColorGlobalVariables.fadedBlackColor,
+      appbarBackgroundColor: theme.appBarTheme.backgroundColor ?? Colors.white,
+      leadingIconDataColor: theme.iconTheme.color ?? ColorGlobalVariables.fadedBlackColor,
       titleText: "My Wishlist",
-      titleTextColor: ColorGlobalVariables.brownColor,
+      titleTextColor: theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
       titleFontWeight: FontWeight.bold,
       titleTextSize: 22,
       centerTitle: true,
       actions: [
         const SizedBox(width: 8),
-        _buildNotificationButton(),
+        _buildNotificationButton(theme),
         const SizedBox(width: 12),
       ],
     );
   }
 
-  Widget _buildNotificationButton() {
+  Widget _buildNotificationButton(ThemeData theme) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -103,8 +105,8 @@ class _WishlistPageState extends State<WishlistPage> {
           buttonSize: 40,
           isBorderSlightlyCurved: true,
           onIconButtonClickFunction: () => _handleNotificationTap(),
-          backgroundColor: Colors.grey[50],
-          iconDataColor: Colors.grey[700],
+          backgroundColor: theme.brightness == Brightness.dark ? Colors.grey[800]! : Colors.grey[50]!,
+          iconDataColor: theme.iconTheme.color ?? Colors.grey[700],
         ),
         Positioned(
           right: 2,
@@ -112,7 +114,7 @@ class _WishlistPageState extends State<WishlistPage> {
           child: Container(
             width: 8,
             height: 8,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: ColorGlobalVariables.brownColor,
               shape: BoxShape.circle,
             ),
@@ -126,32 +128,32 @@ class _WishlistPageState extends State<WishlistPage> {
     Get.toNamed(RouteClass.notificationsPage);
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(ThemeData theme) {
     return SafeArea(
       child: Consumer<WishlistFetchProvider>(
         builder: (context, provider, _) {
           return RefreshIndicator.adaptive(
             onRefresh: _onRefresh,
             color: ColorGlobalVariables.brownColor,
-            backgroundColor: Colors.white,
+            backgroundColor: theme.cardColor,
             displacement: 40,
             strokeWidth: 2.5,
             child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                _buildHeaderSliver(provider),
+                _buildHeaderSliver(provider, theme),
                 if (provider.isLoading && provider.wishlistItems.isEmpty)
-                  _buildLoadingSliver()
+                  _buildLoadingSliver(theme)
                 else if (provider.errorMessage.isNotEmpty && provider.wishlistItems.isEmpty)
-                  _buildErrorSliver(provider)
+                  _buildErrorSliver(provider, theme)
                 else if (provider.wishlistItems.isEmpty)
-                  _buildEmptySliver()
+                  _buildEmptySliver(theme)
                 else
-                  _buildContentSliver(provider),
-                if (provider.isLoadingMore) _buildLoadingMoreSliver(),
+                  _buildContentSliver(provider, theme),
+                if (provider.isLoadingMore) _buildLoadingMoreSliver(theme),
                 if (!provider.hasMore && provider.wishlistItems.isNotEmpty)
-                  _buildEndSliver(),
+                  _buildEndSliver(theme),
               ],
             ),
           );
@@ -160,7 +162,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverToBoxAdapter _buildHeaderSliver(WishlistFetchProvider provider) {
+  SliverToBoxAdapter _buildHeaderSliver(WishlistFetchProvider provider, ThemeData theme) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -175,7 +177,7 @@ class _WishlistPageState extends State<WishlistPage> {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[900],
+                    color: theme.textTheme.titleLarge?.color,
                     height: 1.2,
                   ),
                 ),
@@ -184,35 +186,37 @@ class _WishlistPageState extends State<WishlistPage> {
                   '${provider.totalItems} saved items',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: theme.textTheme.bodyMedium?.color,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-            _buildViewToggleButtons(),
+            _buildViewToggleButtons(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildViewToggleButtons() {
+  Widget _buildViewToggleButtons(ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          _buildViewButton(Icons.grid_view, true),
-          _buildViewButton(Icons.list, false),
+          _buildViewButton(Icons.grid_view, true, theme),
+          _buildViewButton(Icons.list, false, theme),
         ],
       ),
     );
   }
 
-  Widget _buildViewButton(IconData icon, bool isActive) {
+  Widget _buildViewButton(IconData icon, bool isActive, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -222,12 +226,12 @@ class _WishlistPageState extends State<WishlistPage> {
       child: Icon(
         icon,
         size: 18,
-        color: isActive ? Colors.white : Colors.grey[600],
+        color: isActive ? Colors.white : theme.iconTheme.color,
       ),
     );
   }
 
-  SliverFillRemaining _buildLoadingSliver() {
+  SliverFillRemaining _buildLoadingSliver(ThemeData theme) {
     return SliverFillRemaining(
       child: Center(
         child: Column(
@@ -239,7 +243,7 @@ class _WishlistPageState extends State<WishlistPage> {
               'Loading your wishlist...',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: theme.textTheme.bodyMedium?.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -273,7 +277,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverFillRemaining _buildErrorSliver(WishlistFetchProvider provider) {
+  SliverFillRemaining _buildErrorSliver(WishlistFetchProvider provider, ThemeData theme) {
     return SliverFillRemaining(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -283,7 +287,7 @@ class _WishlistPageState extends State<WishlistPage> {
             Icon(
               Icons.error_outline_rounded,
               size: 80,
-              color: Colors.grey[400],
+              color: theme.iconTheme.color,
             ),
             const SizedBox(height: 20),
             Text(
@@ -291,7 +295,7 @@ class _WishlistPageState extends State<WishlistPage> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[700],
+                color: theme.textTheme.titleLarge?.color,
               ),
             ),
             const SizedBox(height: 12),
@@ -300,19 +304,19 @@ class _WishlistPageState extends State<WishlistPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: theme.textTheme.bodyMedium?.color,
                 height: 1.4,
               ),
             ),
             const SizedBox(height: 24),
-            _buildRetryButton(provider),
+            _buildRetryButton(provider, theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRetryButton(WishlistFetchProvider provider) {
+  Widget _buildRetryButton(WishlistFetchProvider provider, ThemeData theme) {
     return ElevatedButton(
       onPressed: provider.fetchWishlist,
       style: ElevatedButton.styleFrom(
@@ -335,7 +339,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverFillRemaining _buildEmptySliver() {
+  SliverFillRemaining _buildEmptySliver(ThemeData theme) {
     return SliverFillRemaining(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -346,13 +350,13 @@ class _WishlistPageState extends State<WishlistPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.favorite_border_rounded,
                 size: 50,
-                color: Colors.grey[400],
+                color: theme.iconTheme.color,
               ),
             ),
             const SizedBox(height: 24),
@@ -361,7 +365,7 @@ class _WishlistPageState extends State<WishlistPage> {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[800],
+                color: theme.textTheme.titleLarge?.color,
               ),
             ),
             const SizedBox(height: 12),
@@ -370,19 +374,19 @@ class _WishlistPageState extends State<WishlistPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[600],
+                color: theme.textTheme.bodyMedium?.color,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 28),
-            _buildBrowseButton(),
+            _buildBrowseButton(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBrowseButton() {
+  Widget _buildBrowseButton(ThemeData theme) {
     return ElevatedButton(
       onPressed: () => Get.offAllNamed(RouteClass.mainBottomNavigationPage),
       style: ElevatedButton.styleFrom(
@@ -411,7 +415,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverPadding _buildContentSliver(WishlistFetchProvider provider) {
+  SliverPadding _buildContentSliver(WishlistFetchProvider provider, ThemeData theme) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       sliver: SliverGrid(
@@ -435,7 +439,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverToBoxAdapter _buildLoadingMoreSliver() {
+  SliverToBoxAdapter _buildLoadingMoreSliver(ThemeData theme) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -454,7 +458,7 @@ class _WishlistPageState extends State<WishlistPage> {
               Text(
                 'Loading more items...',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: theme.textTheme.bodyMedium?.color,
                   fontSize: 14,
                 ),
               ),
@@ -465,7 +469,7 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverToBoxAdapter _buildEndSliver() {
+  SliverToBoxAdapter _buildEndSliver(ThemeData theme) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 32),
@@ -481,7 +485,7 @@ class _WishlistPageState extends State<WishlistPage> {
               Text(
                 'All items loaded',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: theme.textTheme.bodyMedium?.color,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -635,6 +639,8 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -646,16 +652,17 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
           ),
         );
       },
-      child: _buildCardContent(),
+      child: _buildCardContent(theme),
     );
   }
 
-  Widget _buildCardContent() {
+  Widget _buildCardContent(ThemeData theme) {
     final imageUrl = _getImageUrl();
     final brandImage = _getBrandImage();
 
     return Card(
       elevation: 2,
+      color: theme.cardColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: _isRemoving ? null : _navigateToDetail,
@@ -666,10 +673,10 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Image Section
-                _buildImageSection(imageUrl),
+                _buildImageSection(imageUrl, theme),
                 
                 // Content Section
-                _buildContentSection(brandImage),
+                _buildContentSection(brandImage, theme),
               ],
             ),
             
@@ -677,7 +684,7 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
             Positioned(
               top: 8,
               right: 8,
-              child: _buildRemoveButton(),
+              child: _buildRemoveButton(theme),
             ),
 
             // Category Badge
@@ -692,16 +699,16 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  Widget _buildImageSection(String imageUrl) {
+  Widget _buildImageSection(String imageUrl, ThemeData theme) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
       child: Container(
         height: 120,
         width: double.infinity,
-        color: Colors.grey[100],
+        color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
         child: Stack(
           children: [
-            _buildImage(imageUrl),
+            _buildImage(imageUrl, theme),
             _buildImageOverlay(),
           ],
         ),
@@ -709,7 +716,7 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  Widget _buildImage(String imageUrl) {
+  Widget _buildImage(String imageUrl, ThemeData theme) {
     return CachedNetworkImage(
       imageUrl: imageUrl,
       fit: BoxFit.cover,
@@ -717,20 +724,20 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
       height: double.infinity,
       progressIndicatorBuilder: (context, url, progress) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(color: Colors.white),
+          baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+          highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+          child: Container(color: theme.cardColor),
         );
       },
       errorWidget: (context, url, error) {
         return Container(
-          color: Colors.grey[200],
+          color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.image_not_supported, color: Colors.grey[400], size: 32),
+              Icon(Icons.image_not_supported, color: theme.iconTheme.color, size: 32),
               const SizedBox(height: 4),
-              Text('No Image', style: TextStyle(color: Colors.grey[500], fontSize: 10)),
+              Text('No Image', style: TextStyle(color: theme.textTheme.bodySmall?.color, fontSize: 10)),
             ],
           ),
         );
@@ -773,7 +780,7 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  Widget _buildContentSection(dynamic brandImage) {
+  Widget _buildContentSection(dynamic brandImage, ThemeData theme) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -781,25 +788,25 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTitleSection(),
+            _buildTitleSection(theme),
             _buildPriceSection(),
-            _buildDetailsSection(brandImage),
+            _buildDetailsSection(brandImage, theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTitleSection() {
+  Widget _buildTitleSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           _getItemName(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: theme.textTheme.titleLarge?.color,
             height: 1.2,
           ),
           maxLines: 2,
@@ -810,7 +817,7 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
           _getCondition(),
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: theme.textTheme.bodyMedium?.color,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -850,25 +857,25 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  Widget _buildDetailsSection(dynamic brandImage) {
+  Widget _buildDetailsSection(dynamic brandImage, ThemeData theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        if (brandImage != null) _buildBrandImage(brandImage),
+        if (brandImage != null) _buildBrandImage(brandImage, theme),
         const Spacer(),
-        if (_getTransmission() != null) _buildTransmission(),
-        if (_getLocation() != null) _buildLocation(),
+        if (_getTransmission() != null) _buildTransmission(theme),
+        if (_getLocation() != null) _buildLocation(theme),
       ],
     );
   }
 
-  Widget _buildBrandImage(String brandImage) {
+  Widget _buildBrandImage(String brandImage, ThemeData theme) {
     return Container(
       width: 20,
       height: 20,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
-        color: Colors.grey[100],
+        color: theme.brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[100],
       ),
       child: CachedNetworkImage(
         imageUrl: getImageUrl(brandImage, null),
@@ -877,29 +884,29 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  Widget _buildTransmission() {
+  Widget _buildTransmission(ThemeData theme) {
     return Row(
       children: [
-        Icon(Icons.settings, size: 12, color: Colors.grey[600]),
+        Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
         const SizedBox(width: 2),
         Text(
           _getTransmission()!,
-          style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 10, color: theme.textTheme.bodyMedium?.color),
         ),
       ],
     );
   }
 
-  Widget _buildLocation() {
+  Widget _buildLocation(ThemeData theme) {
     return Flexible(
       child: Row(
         children: [
-          Icon(Icons.location_on, size: 12, color: Colors.grey[600]),
+          Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
           const SizedBox(width: 2),
           Flexible(
             child: Text(
               _getLocation()!,
-              style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+              style: TextStyle(fontSize: 10, color: theme.textTheme.bodyMedium?.color),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -909,9 +916,9 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  Widget _buildRemoveButton() {
+  Widget _buildRemoveButton(ThemeData theme) {
     return Material(
-      color: Colors.white,
+      color: theme.cardColor,
       shape: const CircleBorder(),
       clipBehavior: Clip.hardEdge,
       child: InkWell(
@@ -930,11 +937,14 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
             ],
           ),
           child: _isRemoving
-              ? const Padding(
-                  padding: EdgeInsets.all(6),
-                  child: CircularProgressIndicator(strokeWidth: 2),
+              ? Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+                  ),
                 )
-              : const Icon(
+              : Icon(
                   Icons.favorite,
                   size: 18,
                   color: ColorGlobalVariables.redColor,

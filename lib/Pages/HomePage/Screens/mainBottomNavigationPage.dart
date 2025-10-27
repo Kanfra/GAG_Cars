@@ -7,26 +7,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Screens/postItemPage.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/wishlistPage.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Screens/messagesPage.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/settingsPage.dart';
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: ColorGlobalVariables.brownColor,
-          unselectedItemColor: ColorGlobalVariables.greyColor,
-        ),
-      ),
-      home: MainBottomNavigationPage(),
-    );
-  }
-}
+import 'package:get/get.dart';
 
 class MainBottomNavigationPage extends StatefulWidget {
   @override
@@ -36,7 +17,7 @@ class MainBottomNavigationPage extends StatefulWidget {
 class _MainBottomNavigationPageState extends State<MainBottomNavigationPage> 
     with TickerProviderStateMixin {
   int _selectedIndex = 0;
-  final PageController _pageController = PageController();
+  late PageController _pageController;
   
   // Animation controllers for smooth transitions
   late AnimationController _scaleController;
@@ -78,6 +59,14 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
   @override
   void initState() {
     super.initState();
+    
+    // Initialize with arguments if provided
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    final initialIndex = arguments?['selected_tab_index'] as int? ?? 0;
+    
+    _pageController = PageController(initialPage: initialIndex);
+    _selectedIndex = initialIndex;
+    
     _scaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -85,6 +74,26 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
     );
+    
+    // Check for any additional navigation arguments after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkNavigationArguments();
+    });
+  }
+
+  // Method to check for navigation arguments
+  void _checkNavigationArguments() {
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    
+    if (arguments != null) {
+      final selectedTabIndex = arguments['selected_tab_index'];
+      
+      if (selectedTabIndex != null && selectedTabIndex is int && selectedTabIndex != _selectedIndex) {
+        // Navigate to the specified tab without animation
+        _pageController.jumpToPage(selectedTabIndex);
+        setState(() => _selectedIndex = selectedTabIndex);
+      }
+    }
   }
 
   @override
@@ -95,6 +104,8 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
   }
 
   void _onItemTapped(int index) {
+    if (index == _selectedIndex) return; // Don't do anything if same tab
+    
     if (index == 2) {
       // Special animation for the center button
       _scaleController.forward().then((_) {
@@ -103,26 +114,28 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
     }
 
     setState(() => _selectedIndex = index);
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
-    );
+    
+    // Instant navigation without animation
+    _pageController.jumpToPage(index);
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(), // Disable swipe
         children: _navItems.map((item) => item.page).toList(),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+      bottomNavigationBar: _buildBottomNavigationBar(theme),
     );
   }
 
-  Widget _buildBottomNavigationBar() {
+  Widget _buildBottomNavigationBar(ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -146,7 +159,7 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
           elevation: 0,
           height: 70,
           padding: EdgeInsets.zero,
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           surfaceTintColor: Colors.transparent,
           child: Row(
             children: [
@@ -155,8 +168,8 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildNavItem(0),
-                    _buildNavItem(1),
+                    _buildNavItem(0, theme),
+                    _buildNavItem(1, theme),
                   ],
                 ),
               ),
@@ -189,8 +202,8 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildNavItem(3),
-                    _buildNavItem(4),
+                    _buildNavItem(3, theme),
+                    _buildNavItem(4, theme),
                   ],
                 ),
               ),
@@ -201,9 +214,10 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
     );
   }
 
-  Widget _buildNavItem(int index) {
+  Widget _buildNavItem(int index, ThemeData theme) {
     final item = _navItems[index];
     final isSelected = _selectedIndex == index;
+    final isDarkMode = theme.brightness == Brightness.dark;
     
     // Skip the center item in the side navigation
     if (index == 2) return const SizedBox.shrink();
@@ -216,7 +230,7 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: isSelected 
-              ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+              ? ColorGlobalVariables.brownColor.withOpacity(isDarkMode ? 0.2 : 0.1)
               : Colors.transparent,
         ),
         child: Column(
@@ -229,7 +243,9 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
               iconSize: 24,
               iconColor: isSelected 
                   ? ColorGlobalVariables.brownColor 
-                  : ColorGlobalVariables.greyColor,
+                  : isDarkMode 
+                      ? Colors.grey[400]!
+                      : ColorGlobalVariables.greyColor,
             ),
             const SizedBox(height: 4),
             if (isSelected)

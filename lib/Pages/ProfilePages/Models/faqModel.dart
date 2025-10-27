@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'faqModels.freezed.dart';
-part 'faqModels.g.dart';
+part 'faqModel.freezed.dart';
+part 'faqModel.g.dart';
 
 @freezed
 class FaqResponse with _$FaqResponse {

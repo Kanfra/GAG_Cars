@@ -83,7 +83,6 @@ class RouteClass {
   static String selectedCategoryItemPage = "/selected-category-item-page";
   static String newsBlogPage = "/news-blog-page";
   static String mainNewsPage = "/main-news-page";
-  static String myListingsPage = "/my-listings-page";
   static String selectedBrandPage = "/selected-brand-page";
   static String chatPage = "/chat-page";
   // static String wishlistPage = "/wishlist-page";
@@ -144,7 +143,6 @@ class RouteClass {
   static String getSelectedCategoryItemPage() => selectedCategoryItemPage;
   static String getChatPage() => chatPage;
   // static String getWishlistPage() => wishlistPage;
-  static String getMyListingsPage() => myListingsPage;
   static String getSelectedBrandPage() => selectedBrandPage;
   static String getSellCarPage() => sellCarPage;
   static String getSellCarTwoPage() => sellCarTwoPage;
@@ -378,7 +376,7 @@ class RouteClass {
           allJson: args,
         );
       }, 
-      name: paymentSuccessPage, 
+      name: paymentProcessingPage, 
       transition: Transition.noTransition),
 
   ];

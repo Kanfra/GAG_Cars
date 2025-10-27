@@ -116,16 +116,8 @@ class LegacyPaystackService {
     }
   }
 
-// lib/Services/PaystackService/legacy_paystack_service.dart
-// ... (keep the same as previous version, but ensure this method exists):
-
-static Future<Map<String, dynamic>> verifyAndActivatePromotion({
+static Future<Map<String, dynamic>> verifyTransaction({
   required String reference,
-  required String listingId,
-  required String packageId,
-  required String packageName,
-  required int amount,
-  required int durationDays,
 }) async {
   try {
     logger.i('🔍 Verifying transaction: $reference');
@@ -145,98 +137,185 @@ static Future<Map<String, dynamic>> verifyAndActivatePromotion({
     );
 
     logger.i('📡 Paystack response status: ${verificationResponse.statusCode}');
+    logger.i('📦 Paystack response body: ${verificationResponse.body}'); // ← ADD THIS
 
     if (verificationResponse.statusCode == 200) {
       final verificationResult = json.decode(verificationResponse.body);
       
-      logger.i('📊 Paystack response data: ${verificationResult['data']?['status']}');
+      logger.i('📊 Paystack response data: ${verificationResult['data']}');
       
       if (verificationResult['data'] == null) {
         logger.e('❌ Paystack response missing data field');
         return {
-          'success': false,
+          'status': false,
           'message': 'Invalid response from Paystack',
-          'transaction_data': null,
+          'data': null,
         };
       }
       
-      if (verificationResult['data']['status'] == 'success') {
+      final transactionStatus = verificationResult['data']['status'];
+      logger.i('🎯 Transaction status: $transactionStatus');
+      
+      // 🛠️ BROADEN SUCCESS CRITERIA
+      final successStatuses = ['success', 'successful', 'completed', 'approved'];
+      if (successStatuses.contains(transactionStatus?.toString().toLowerCase())) {
         logger.i('✅ Payment verified successfully by Paystack');
-        
-        try {
-          final dates = PromotionService.calculatePromotionDates(durationDays);
-          
-          logger.i('🚀 Activating promotion for item: $listingId');
-          
-          final promotionResult = await PromotionService.activatePromotion(
-            itemId: listingId,
-            startAt: dates['start_at']!,
-            endAt: dates['end_at']!,
-            status: 'promoted',
-          );
-
-          final String? message = promotionResult['message']?.toString();
-          logger.i('📋 Promotion service message: $message');
-          
-          final bool isPromotionSuccessful = message != null && 
-              (message.toLowerCase().contains('success') || 
-               message.contains('Successfully Create Resource'));
-
-          if (isPromotionSuccessful) {
-            logger.i('🎉 Promotion activated successfully');
-            return {
-              'success': true,
-              'message': 'Payment successful and promotion activated',
-              'transaction_data': verificationResult['data'],
-            };
-          } else {
-            logger.w('⚠️ Promotion activation failed. Message: $message');
-            return {
-              'success': false,
-              'message': 'Payment successful but promotion failed: $message',
-              'transaction_data': verificationResult['data'],
-            };
-          }
-        } catch (promotionError) {
-          logger.e('❌ Error during promotion activation: $promotionError');
-          return {
-            'success': false,
-            'message': 'Payment verified but promotion activation failed',
-            'transaction_data': verificationResult['data'],
-          };
-        }
-      } else {
-        logger.w('⚠️ Payment verification failed: ${verificationResult['data']['status']}');
         return {
-          'success': false,
-          'message': 'Payment verification failed: ${verificationResult['data']['status']}',
-          'transaction_data': verificationResult['data'],
+          'status': true,
+          'message': 'Payment verified successfully',
+          'data': verificationResult['data'],
+        };
+      } else {
+        logger.w('⚠️ Payment verification failed. Status: $transactionStatus');
+        return {
+          'status': false,
+          'message': 'Payment verification failed. Status: $transactionStatus',
+          'data': verificationResult['data'],
         };
       }
     } else if (verificationResponse.statusCode == 404) {
       logger.e('❌ Transaction not found (404): $reference');
       return {
-        'success': false,
+        'status': false,
         'message': 'Transaction not found. Payment may not have been completed.',
-        'transaction_data': null,
+        'data': null,
       };
     } else {
       logger.e('❌ Paystack API error: ${verificationResponse.statusCode}');
       return {
-        'success': false,
+        'status': false,
         'message': 'Paystack API error: ${verificationResponse.statusCode}',
-        'transaction_data': null,
+        'data': null,
       };
     }
   } catch (e) {
-    logger.e('💥 Error in verifyAndActivatePromotion: $e');
+    logger.e('💥 Error in verifyTransaction: $e');
     return {
-      'success': false,
+      'status': false,
       'message': 'Payment verification error: ${e.toString()}',
-      'transaction_data': null,
+      'data': null,
     };
   }
 }
+
+  static Future<Map<String, dynamic>> verifyAndActivatePromotion({
+    required String reference,
+    required String listingId,
+    required String packageId,
+    required String packageName,
+    required int amount,
+    required int durationDays,
+  }) async {
+    try {
+      logger.i('🔍 Verifying transaction: $reference');
+
+      final verificationUri = Uri.parse('$_paystackBaseUrl/transaction/verify/$reference');
+      
+      final paystackKeys = getPaystackKeys;
+      final secretKey = paystackKeys['PAYSTACK_SECRET_KEY'];
+
+      logger.i('🌐 Calling Paystack verification API: $verificationUri');
+
+      final verificationResponse = await http.get(
+        verificationUri,
+        headers: {
+          'Authorization': 'Bearer $secretKey',
+        },
+      );
+
+      logger.i('📡 Paystack response status: ${verificationResponse.statusCode}');
+
+      if (verificationResponse.statusCode == 200) {
+        final verificationResult = json.decode(verificationResponse.body);
+        
+        logger.i('📊 Paystack response data: ${verificationResult['data']?['status']}');
+        
+        if (verificationResult['data'] == null) {
+          logger.e('❌ Paystack response missing data field');
+          return {
+            'success': false,
+            'message': 'Invalid response from Paystack',
+            'transaction_data': null,
+          };
+        }
+        
+        if (verificationResult['data']['status'] == 'success') {
+          logger.i('✅ Payment verified successfully by Paystack');
+          
+          try {
+            final dates = PromotionService.calculatePromotionDates(durationDays);
+            
+            logger.i('🚀 Activating promotion for item: $listingId');
+            
+            final promotionResult = await PromotionService.activatePromotion(
+              itemId: listingId,
+              startAt: dates['start_at']!,
+              endAt: dates['end_at']!,
+              status: 'promoted',
+            );
+
+            final String? message = promotionResult['message']?.toString();
+            logger.i('📋 Promotion service message: $message');
+            
+            final bool isPromotionSuccessful = message != null && 
+                (message.toLowerCase().contains('success') || 
+                 message.contains('Successfully Create Resource'));
+
+            if (isPromotionSuccessful) {
+              logger.i('🎉 Promotion activated successfully');
+              return {
+                'success': true,
+                'message': 'Payment successful and promotion activated',
+                'transaction_data': verificationResult['data'],
+              };
+            } else {
+              logger.w('⚠️ Promotion activation failed. Message: $message');
+              return {
+                'success': false,
+                'message': 'Payment successful but promotion failed: $message',
+                'transaction_data': verificationResult['data'],
+              };
+            }
+          } catch (promotionError) {
+            logger.e('❌ Error during promotion activation: $promotionError');
+            return {
+              'success': false,
+              'message': 'Payment verified but promotion activation failed',
+              'transaction_data': verificationResult['data'],
+            };
+          }
+        } else {
+          logger.w('⚠️ Payment verification failed: ${verificationResult['data']['status']}');
+          return {
+            'success': false,
+            'message': 'Payment verification failed: ${verificationResult['data']['status']}',
+            'transaction_data': verificationResult['data'],
+          };
+        }
+      } else if (verificationResponse.statusCode == 404) {
+        logger.e('❌ Transaction not found (404): $reference');
+        return {
+          'success': false,
+          'message': 'Transaction not found. Payment may not have been completed.',
+          'transaction_data': null,
+        };
+      } else {
+        logger.e('❌ Paystack API error: ${verificationResponse.statusCode}');
+        return {
+          'success': false,
+          'message': 'Paystack API error: ${verificationResponse.statusCode}',
+          'transaction_data': null,
+        };
+      }
+    } catch (e) {
+      logger.e('💥 Error in verifyAndActivatePromotion: $e');
+      return {
+        'success': false,
+        'message': 'Payment verification error: ${e.toString()}',
+        'transaction_data': null,
+      };
+    }
+  }
 
   static Future<Map<String, dynamic>> _getUserMetadata(BuildContext context) async {
     try {

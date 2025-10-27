@@ -23,9 +23,9 @@ mixin _$SimilarItemsResponse {
   @JsonKey(name: 'data')
   List<SimilarItem> get data => throw _privateConstructorUsedError;
   @JsonKey(name: 'links')
-  PaginationLinks get links => throw _privateConstructorUsedError;
+  PaginationLinks? get links => throw _privateConstructorUsedError;
   @JsonKey(name: 'meta')
-  PaginationMeta get meta => throw _privateConstructorUsedError;
+  PaginationMeta? get meta => throw _privateConstructorUsedError;
 
   /// Serializes this SimilarItemsResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,11 +45,11 @@ abstract class $SimilarItemsResponseCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'data') List<SimilarItem> data,
-      @JsonKey(name: 'links') PaginationLinks links,
-      @JsonKey(name: 'meta') PaginationMeta meta});
+      @JsonKey(name: 'links') PaginationLinks? links,
+      @JsonKey(name: 'meta') PaginationMeta? meta});
 
-  $PaginationLinksCopyWith<$Res> get links;
-  $PaginationMetaCopyWith<$Res> get meta;
+  $PaginationLinksCopyWith<$Res>? get links;
+  $PaginationMetaCopyWith<$Res>? get meta;
 }
 
 /// @nodoc
@@ -69,22 +69,22 @@ class _$SimilarItemsResponseCopyWithImpl<$Res,
   @override
   $Res call({
     Object? data = null,
-    Object? links = null,
-    Object? meta = null,
+    Object? links = freezed,
+    Object? meta = freezed,
   }) {
     return _then(_value.copyWith(
       data: null == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
               as List<SimilarItem>,
-      links: null == links
+      links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as PaginationLinks,
-      meta: null == meta
+              as PaginationLinks?,
+      meta: freezed == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as PaginationMeta,
+              as PaginationMeta?,
     ) as $Val);
   }
 
@@ -92,8 +92,12 @@ class _$SimilarItemsResponseCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PaginationLinksCopyWith<$Res> get links {
-    return $PaginationLinksCopyWith<$Res>(_value.links, (value) {
+  $PaginationLinksCopyWith<$Res>? get links {
+    if (_value.links == null) {
+      return null;
+    }
+
+    return $PaginationLinksCopyWith<$Res>(_value.links!, (value) {
       return _then(_value.copyWith(links: value) as $Val);
     });
   }
@@ -102,8 +106,12 @@ class _$SimilarItemsResponseCopyWithImpl<$Res,
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $PaginationMetaCopyWith<$Res> get meta {
-    return $PaginationMetaCopyWith<$Res>(_value.meta, (value) {
+  $PaginationMetaCopyWith<$Res>? get meta {
+    if (_value.meta == null) {
+      return null;
+    }
+
+    return $PaginationMetaCopyWith<$Res>(_value.meta!, (value) {
       return _then(_value.copyWith(meta: value) as $Val);
     });
   }
@@ -119,13 +127,13 @@ abstract class _$$SimilarItemsResponseImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'data') List<SimilarItem> data,
-      @JsonKey(name: 'links') PaginationLinks links,
-      @JsonKey(name: 'meta') PaginationMeta meta});
+      @JsonKey(name: 'links') PaginationLinks? links,
+      @JsonKey(name: 'meta') PaginationMeta? meta});
 
   @override
-  $PaginationLinksCopyWith<$Res> get links;
+  $PaginationLinksCopyWith<$Res>? get links;
   @override
-  $PaginationMetaCopyWith<$Res> get meta;
+  $PaginationMetaCopyWith<$Res>? get meta;
 }
 
 /// @nodoc
@@ -142,22 +150,22 @@ class __$$SimilarItemsResponseImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? data = null,
-    Object? links = null,
-    Object? meta = null,
+    Object? links = freezed,
+    Object? meta = freezed,
   }) {
     return _then(_$SimilarItemsResponseImpl(
       data: null == data
           ? _value._data
           : data // ignore: cast_nullable_to_non_nullable
               as List<SimilarItem>,
-      links: null == links
+      links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as PaginationLinks,
-      meta: null == meta
+              as PaginationLinks?,
+      meta: freezed == meta
           ? _value.meta
           : meta // ignore: cast_nullable_to_non_nullable
-              as PaginationMeta,
+              as PaginationMeta?,
     ));
   }
 }
@@ -167,8 +175,8 @@ class __$$SimilarItemsResponseImplCopyWithImpl<$Res>
 class _$SimilarItemsResponseImpl implements _SimilarItemsResponse {
   const _$SimilarItemsResponseImpl(
       {@JsonKey(name: 'data') required final List<SimilarItem> data,
-      @JsonKey(name: 'links') required this.links,
-      @JsonKey(name: 'meta') required this.meta})
+      @JsonKey(name: 'links') this.links,
+      @JsonKey(name: 'meta') this.meta})
       : _data = data;
 
   factory _$SimilarItemsResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -185,10 +193,10 @@ class _$SimilarItemsResponseImpl implements _SimilarItemsResponse {
 
   @override
   @JsonKey(name: 'links')
-  final PaginationLinks links;
+  final PaginationLinks? links;
   @override
   @JsonKey(name: 'meta')
-  final PaginationMeta meta;
+  final PaginationMeta? meta;
 
   @override
   String toString() {
@@ -231,8 +239,8 @@ class _$SimilarItemsResponseImpl implements _SimilarItemsResponse {
 abstract class _SimilarItemsResponse implements SimilarItemsResponse {
   const factory _SimilarItemsResponse(
           {@JsonKey(name: 'data') required final List<SimilarItem> data,
-          @JsonKey(name: 'links') required final PaginationLinks links,
-          @JsonKey(name: 'meta') required final PaginationMeta meta}) =
+          @JsonKey(name: 'links') final PaginationLinks? links,
+          @JsonKey(name: 'meta') final PaginationMeta? meta}) =
       _$SimilarItemsResponseImpl;
 
   factory _SimilarItemsResponse.fromJson(Map<String, dynamic> json) =
@@ -243,10 +251,10 @@ abstract class _SimilarItemsResponse implements SimilarItemsResponse {
   List<SimilarItem> get data;
   @override
   @JsonKey(name: 'links')
-  PaginationLinks get links;
+  PaginationLinks? get links;
   @override
   @JsonKey(name: 'meta')
-  PaginationMeta get meta;
+  PaginationMeta? get meta;
 
   /// Create a copy of SimilarItemsResponse
   /// with the given fields replaced by the non-null parameter values.
@@ -266,24 +274,24 @@ mixin _$SimilarItem {
   String get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
   int? get countryId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+  @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
   int? get brandModelId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
   int? get brandId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'category_id', fromJson: _parseInt)
-  int get categoryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+  int? get categoryId => throw _privateConstructorUsedError;
   @JsonKey(name: 'name')
-  String get name => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
   @JsonKey(name: 'year')
-  String get year => throw _privateConstructorUsedError;
+  String? get year => throw _privateConstructorUsedError;
   @JsonKey(name: 'slug')
-  String get slug => throw _privateConstructorUsedError;
+  String? get slug => throw _privateConstructorUsedError;
   @JsonKey(name: 'description')
   String? get description => throw _privateConstructorUsedError;
-  @JsonKey(name: 'images')
-  List<String> get images => throw _privateConstructorUsedError;
+  @JsonKey(name: 'images', fromJson: _parseStringList)
+  List<String>? get images => throw _privateConstructorUsedError;
   @JsonKey(name: 'location')
   String? get location => throw _privateConstructorUsedError;
   @JsonKey(name: 'serial_number')
@@ -300,26 +308,26 @@ mixin _$SimilarItem {
   String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: 'build_type')
   String? get buildType => throw _privateConstructorUsedError;
-  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
   int? get numberOfPassengers => throw _privateConstructorUsedError;
-  @JsonKey(name: 'features')
-  List<String> get features => throw _privateConstructorUsedError;
+  @JsonKey(name: 'features', fromJson: _parseStringList)
+  List<String>? get features => throw _privateConstructorUsedError;
   @JsonKey(name: 'status')
   String? get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'price')
-  String get price => throw _privateConstructorUsedError;
+  String? get price => throw _privateConstructorUsedError;
   @JsonKey(name: 'mileage')
   String? get mileage => throw _privateConstructorUsedError;
-  @JsonKey(name: 'warranty', fromJson: _parseInt)
+  @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
   int? get warranty => throw _privateConstructorUsedError;
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
   String? get deletedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
-  String get createdAt => throw _privateConstructorUsedError;
+  String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  String get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'Height')
   String? get height => throw _privateConstructorUsedError;
   @JsonKey(name: 'VIN')
@@ -344,15 +352,17 @@ abstract class $SimilarItemCopyWith<$Res> {
   $Res call(
       {@JsonKey(name: 'id') String id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
-      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
-      @JsonKey(name: 'category_id', fromJson: _parseInt) int categoryId,
-      @JsonKey(name: 'name') String name,
-      @JsonKey(name: 'year') String year,
-      @JsonKey(name: 'slug') String slug,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
+      int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+      int? categoryId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'year') String? year,
+      @JsonKey(name: 'slug') String? slug,
       @JsonKey(name: 'description') String? description,
-      @JsonKey(name: 'images') List<String> images,
+      @JsonKey(name: 'images', fromJson: _parseStringList) List<String>? images,
       @JsonKey(name: 'location') String? location,
       @JsonKey(name: 'serial_number') String? serialNumber,
       @JsonKey(name: 'condition') String? condition,
@@ -361,17 +371,18 @@ abstract class $SimilarItemCopyWith<$Res> {
       @JsonKey(name: 'transmission') String? transmission,
       @JsonKey(name: 'color') String? color,
       @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
       int? numberOfPassengers,
-      @JsonKey(name: 'features') List<String> features,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      List<String>? features,
       @JsonKey(name: 'status') String? status,
-      @JsonKey(name: 'price') String price,
+      @JsonKey(name: 'price') String? price,
       @JsonKey(name: 'mileage') String? mileage,
-      @JsonKey(name: 'warranty', fromJson: _parseInt) int? warranty,
+      @JsonKey(name: 'warranty', fromJson: _parseNullableInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
       @JsonKey(name: 'Height') String? height,
       @JsonKey(name: 'VIN') String? vin});
 }
@@ -396,12 +407,12 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
     Object? countryId = freezed,
     Object? brandModelId = freezed,
     Object? brandId = freezed,
-    Object? categoryId = null,
-    Object? name = null,
-    Object? year = null,
-    Object? slug = null,
+    Object? categoryId = freezed,
+    Object? name = freezed,
+    Object? year = freezed,
+    Object? slug = freezed,
     Object? description = freezed,
-    Object? images = null,
+    Object? images = freezed,
     Object? location = freezed,
     Object? serialNumber = freezed,
     Object? condition = freezed,
@@ -411,15 +422,15 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
     Object? color = freezed,
     Object? buildType = freezed,
     Object? numberOfPassengers = freezed,
-    Object? features = null,
+    Object? features = freezed,
     Object? status = freezed,
-    Object? price = null,
+    Object? price = freezed,
     Object? mileage = freezed,
     Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? height = freezed,
     Object? vin = freezed,
   }) {
@@ -444,30 +455,30 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
           ? _value.brandId
           : brandId // ignore: cast_nullable_to_non_nullable
               as int?,
-      categoryId: null == categoryId
+      categoryId: freezed == categoryId
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      name: null == name
+              as int?,
+      name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      year: null == year
+              as String?,
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
+              as String?,
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      images: null == images
+      images: freezed == images
           ? _value.images
           : images // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<String>?,
       location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
@@ -504,18 +515,18 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
           ? _value.numberOfPassengers
           : numberOfPassengers // ignore: cast_nullable_to_non_nullable
               as int?,
-      features: null == features
+      features: freezed == features
           ? _value.features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<String>?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      price: null == price
+      price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       mileage: freezed == mileage
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
@@ -532,14 +543,14 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       height: freezed == height
           ? _value.height
           : height // ignore: cast_nullable_to_non_nullable
@@ -563,15 +574,17 @@ abstract class _$$SimilarItemImplCopyWith<$Res>
   $Res call(
       {@JsonKey(name: 'id') String id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
-      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
-      @JsonKey(name: 'category_id', fromJson: _parseInt) int categoryId,
-      @JsonKey(name: 'name') String name,
-      @JsonKey(name: 'year') String year,
-      @JsonKey(name: 'slug') String slug,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
+      int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+      int? categoryId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'year') String? year,
+      @JsonKey(name: 'slug') String? slug,
       @JsonKey(name: 'description') String? description,
-      @JsonKey(name: 'images') List<String> images,
+      @JsonKey(name: 'images', fromJson: _parseStringList) List<String>? images,
       @JsonKey(name: 'location') String? location,
       @JsonKey(name: 'serial_number') String? serialNumber,
       @JsonKey(name: 'condition') String? condition,
@@ -580,17 +593,18 @@ abstract class _$$SimilarItemImplCopyWith<$Res>
       @JsonKey(name: 'transmission') String? transmission,
       @JsonKey(name: 'color') String? color,
       @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
       int? numberOfPassengers,
-      @JsonKey(name: 'features') List<String> features,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      List<String>? features,
       @JsonKey(name: 'status') String? status,
-      @JsonKey(name: 'price') String price,
+      @JsonKey(name: 'price') String? price,
       @JsonKey(name: 'mileage') String? mileage,
-      @JsonKey(name: 'warranty', fromJson: _parseInt) int? warranty,
+      @JsonKey(name: 'warranty', fromJson: _parseNullableInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
       @JsonKey(name: 'Height') String? height,
       @JsonKey(name: 'VIN') String? vin});
 }
@@ -613,12 +627,12 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
     Object? countryId = freezed,
     Object? brandModelId = freezed,
     Object? brandId = freezed,
-    Object? categoryId = null,
-    Object? name = null,
-    Object? year = null,
-    Object? slug = null,
+    Object? categoryId = freezed,
+    Object? name = freezed,
+    Object? year = freezed,
+    Object? slug = freezed,
     Object? description = freezed,
-    Object? images = null,
+    Object? images = freezed,
     Object? location = freezed,
     Object? serialNumber = freezed,
     Object? condition = freezed,
@@ -628,15 +642,15 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
     Object? color = freezed,
     Object? buildType = freezed,
     Object? numberOfPassengers = freezed,
-    Object? features = null,
+    Object? features = freezed,
     Object? status = freezed,
-    Object? price = null,
+    Object? price = freezed,
     Object? mileage = freezed,
     Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? height = freezed,
     Object? vin = freezed,
   }) {
@@ -661,30 +675,30 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
           ? _value.brandId
           : brandId // ignore: cast_nullable_to_non_nullable
               as int?,
-      categoryId: null == categoryId
+      categoryId: freezed == categoryId
           ? _value.categoryId
           : categoryId // ignore: cast_nullable_to_non_nullable
-              as int,
-      name: null == name
+              as int?,
+      name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      year: null == year
+              as String?,
+      year: freezed == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
+              as String?,
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      images: null == images
+      images: freezed == images
           ? _value._images
           : images // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<String>?,
       location: freezed == location
           ? _value.location
           : location // ignore: cast_nullable_to_non_nullable
@@ -721,18 +735,18 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
           ? _value.numberOfPassengers
           : numberOfPassengers // ignore: cast_nullable_to_non_nullable
               as int?,
-      features: null == features
+      features: freezed == features
           ? _value._features
           : features // ignore: cast_nullable_to_non_nullable
-              as List<String>,
+              as List<String>?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      price: null == price
+      price: freezed == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       mileage: freezed == mileage
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
@@ -749,14 +763,14 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
               as String?,
-      createdAt: null == createdAt
+      createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as String,
-      updatedAt: null == updatedAt
+              as String?,
+      updatedAt: freezed == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       height: freezed == height
           ? _value.height
           : height // ignore: cast_nullable_to_non_nullable
@@ -775,39 +789,41 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
 class _$SimilarItemImpl extends _SimilarItem {
   const _$SimilarItemImpl(
       {@JsonKey(name: 'id') required this.id,
-      @JsonKey(name: 'user_id') required this.userId,
-      @JsonKey(name: 'country_id', fromJson: _parseInt) required this.countryId,
-      @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
-      required this.brandModelId,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) required this.brandId,
-      @JsonKey(name: 'category_id', fromJson: _parseInt)
-      required this.categoryId,
-      @JsonKey(name: 'name') required this.name,
-      @JsonKey(name: 'year') required this.year,
-      @JsonKey(name: 'slug') required this.slug,
-      @JsonKey(name: 'description') required this.description,
-      @JsonKey(name: 'images') required final List<String> images,
-      @JsonKey(name: 'location') required this.location,
-      @JsonKey(name: 'serial_number') required this.serialNumber,
-      @JsonKey(name: 'condition') required this.condition,
-      @JsonKey(name: 'steer_position') required this.steerPosition,
-      @JsonKey(name: 'engine_capacity') required this.engineCapacity,
-      @JsonKey(name: 'transmission') required this.transmission,
-      @JsonKey(name: 'color') required this.color,
-      @JsonKey(name: 'build_type') required this.buildType,
-      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
-      required this.numberOfPassengers,
-      @JsonKey(name: 'features') required final List<String> features,
-      @JsonKey(name: 'status') required this.status,
-      @JsonKey(name: 'price') required this.price,
-      @JsonKey(name: 'mileage') required this.mileage,
-      @JsonKey(name: 'warranty', fromJson: _parseInt) required this.warranty,
-      @JsonKey(name: 'warranty_expiration') required this.warrantyExpiration,
-      @JsonKey(name: 'deleted_at') required this.deletedAt,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt,
-      @JsonKey(name: 'Height') required this.height,
-      @JsonKey(name: 'VIN') required this.vin})
+      @JsonKey(name: 'user_id') this.userId,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt) this.countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
+      this.brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) this.brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+      this.categoryId,
+      @JsonKey(name: 'name') this.name,
+      @JsonKey(name: 'year') this.year,
+      @JsonKey(name: 'slug') this.slug,
+      @JsonKey(name: 'description') this.description,
+      @JsonKey(name: 'images', fromJson: _parseStringList)
+      final List<String>? images,
+      @JsonKey(name: 'location') this.location,
+      @JsonKey(name: 'serial_number') this.serialNumber,
+      @JsonKey(name: 'condition') this.condition,
+      @JsonKey(name: 'steer_position') this.steerPosition,
+      @JsonKey(name: 'engine_capacity') this.engineCapacity,
+      @JsonKey(name: 'transmission') this.transmission,
+      @JsonKey(name: 'color') this.color,
+      @JsonKey(name: 'build_type') this.buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
+      this.numberOfPassengers,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      final List<String>? features,
+      @JsonKey(name: 'status') this.status,
+      @JsonKey(name: 'price') this.price,
+      @JsonKey(name: 'mileage') this.mileage,
+      @JsonKey(name: 'warranty', fromJson: _parseNullableInt) this.warranty,
+      @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
+      @JsonKey(name: 'deleted_at') this.deletedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'Height') this.height,
+      @JsonKey(name: 'VIN') this.vin})
       : _images = images,
         _features = features,
         super._();
@@ -822,36 +838,38 @@ class _$SimilarItemImpl extends _SimilarItem {
   @JsonKey(name: 'user_id')
   final String? userId;
   @override
-  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
   final int? countryId;
   @override
-  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+  @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
   final int? brandModelId;
   @override
-  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
   final int? brandId;
   @override
-  @JsonKey(name: 'category_id', fromJson: _parseInt)
-  final int categoryId;
+  @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+  final int? categoryId;
   @override
   @JsonKey(name: 'name')
-  final String name;
+  final String? name;
   @override
   @JsonKey(name: 'year')
-  final String year;
+  final String? year;
   @override
   @JsonKey(name: 'slug')
-  final String slug;
+  final String? slug;
   @override
   @JsonKey(name: 'description')
   final String? description;
-  final List<String> _images;
+  final List<String>? _images;
   @override
-  @JsonKey(name: 'images')
-  List<String> get images {
+  @JsonKey(name: 'images', fromJson: _parseStringList)
+  List<String>? get images {
+    final value = _images;
+    if (value == null) return null;
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_images);
+    return EqualUnmodifiableListView(value);
   }
 
   @override
@@ -879,15 +897,17 @@ class _$SimilarItemImpl extends _SimilarItem {
   @JsonKey(name: 'build_type')
   final String? buildType;
   @override
-  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
   final int? numberOfPassengers;
-  final List<String> _features;
+  final List<String>? _features;
   @override
-  @JsonKey(name: 'features')
-  List<String> get features {
+  @JsonKey(name: 'features', fromJson: _parseStringList)
+  List<String>? get features {
+    final value = _features;
+    if (value == null) return null;
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_features);
+    return EqualUnmodifiableListView(value);
   }
 
   @override
@@ -895,12 +915,12 @@ class _$SimilarItemImpl extends _SimilarItem {
   final String? status;
   @override
   @JsonKey(name: 'price')
-  final String price;
+  final String? price;
   @override
   @JsonKey(name: 'mileage')
   final String? mileage;
   @override
-  @JsonKey(name: 'warranty', fromJson: _parseInt)
+  @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
   final int? warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
@@ -910,10 +930,10 @@ class _$SimilarItemImpl extends _SimilarItem {
   final String? deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  final String createdAt;
+  final String? createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  final String updatedAt;
+  final String? updatedAt;
   @override
   @JsonKey(name: 'Height')
   final String? height;
@@ -1037,43 +1057,44 @@ class _$SimilarItemImpl extends _SimilarItem {
 abstract class _SimilarItem extends SimilarItem {
   const factory _SimilarItem(
       {@JsonKey(name: 'id') required final String id,
-      @JsonKey(name: 'user_id') required final String? userId,
-      @JsonKey(name: 'country_id', fromJson: _parseInt)
-      required final int? countryId,
-      @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
-      required final int? brandModelId,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt)
-      required final int? brandId,
-      @JsonKey(name: 'category_id', fromJson: _parseInt)
-      required final int categoryId,
-      @JsonKey(name: 'name') required final String name,
-      @JsonKey(name: 'year') required final String year,
-      @JsonKey(name: 'slug') required final String slug,
-      @JsonKey(name: 'description') required final String? description,
-      @JsonKey(name: 'images') required final List<String> images,
-      @JsonKey(name: 'location') required final String? location,
-      @JsonKey(name: 'serial_number') required final String? serialNumber,
-      @JsonKey(name: 'condition') required final String? condition,
-      @JsonKey(name: 'steer_position') required final String? steerPosition,
-      @JsonKey(name: 'engine_capacity') required final String? engineCapacity,
-      @JsonKey(name: 'transmission') required final String? transmission,
-      @JsonKey(name: 'color') required final String? color,
-      @JsonKey(name: 'build_type') required final String? buildType,
-      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
-      required final int? numberOfPassengers,
-      @JsonKey(name: 'features') required final List<String> features,
-      @JsonKey(name: 'status') required final String? status,
-      @JsonKey(name: 'price') required final String price,
-      @JsonKey(name: 'mileage') required final String? mileage,
-      @JsonKey(name: 'warranty', fromJson: _parseInt)
-      required final int? warranty,
-      @JsonKey(name: 'warranty_expiration')
-      required final String? warrantyExpiration,
-      @JsonKey(name: 'deleted_at') required final String? deletedAt,
-      @JsonKey(name: 'created_at') required final String createdAt,
-      @JsonKey(name: 'updated_at') required final String updatedAt,
-      @JsonKey(name: 'Height') required final String? height,
-      @JsonKey(name: 'VIN') required final String? vin}) = _$SimilarItemImpl;
+      @JsonKey(name: 'user_id') final String? userId,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
+      final int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
+      final int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
+      final int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+      final int? categoryId,
+      @JsonKey(name: 'name') final String? name,
+      @JsonKey(name: 'year') final String? year,
+      @JsonKey(name: 'slug') final String? slug,
+      @JsonKey(name: 'description') final String? description,
+      @JsonKey(name: 'images', fromJson: _parseStringList)
+      final List<String>? images,
+      @JsonKey(name: 'location') final String? location,
+      @JsonKey(name: 'serial_number') final String? serialNumber,
+      @JsonKey(name: 'condition') final String? condition,
+      @JsonKey(name: 'steer_position') final String? steerPosition,
+      @JsonKey(name: 'engine_capacity') final String? engineCapacity,
+      @JsonKey(name: 'transmission') final String? transmission,
+      @JsonKey(name: 'color') final String? color,
+      @JsonKey(name: 'build_type') final String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
+      final int? numberOfPassengers,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      final List<String>? features,
+      @JsonKey(name: 'status') final String? status,
+      @JsonKey(name: 'price') final String? price,
+      @JsonKey(name: 'mileage') final String? mileage,
+      @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
+      final int? warranty,
+      @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
+      @JsonKey(name: 'deleted_at') final String? deletedAt,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt,
+      @JsonKey(name: 'Height') final String? height,
+      @JsonKey(name: 'VIN') final String? vin}) = _$SimilarItemImpl;
   const _SimilarItem._() : super._();
 
   factory _SimilarItem.fromJson(Map<String, dynamic> json) =
@@ -1086,32 +1107,32 @@ abstract class _SimilarItem extends SimilarItem {
   @JsonKey(name: 'user_id')
   String? get userId;
   @override
-  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
   int? get countryId;
   @override
-  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+  @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
   int? get brandModelId;
   @override
-  @JsonKey(name: 'brand_id', fromJson: _parseInt)
+  @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
   int? get brandId;
   @override
-  @JsonKey(name: 'category_id', fromJson: _parseInt)
-  int get categoryId;
+  @JsonKey(name: 'category_id', fromJson: _parseNullableInt)
+  int? get categoryId;
   @override
   @JsonKey(name: 'name')
-  String get name;
+  String? get name;
   @override
   @JsonKey(name: 'year')
-  String get year;
+  String? get year;
   @override
   @JsonKey(name: 'slug')
-  String get slug;
+  String? get slug;
   @override
   @JsonKey(name: 'description')
   String? get description;
   @override
-  @JsonKey(name: 'images')
-  List<String> get images;
+  @JsonKey(name: 'images', fromJson: _parseStringList)
+  List<String>? get images;
   @override
   @JsonKey(name: 'location')
   String? get location;
@@ -1137,22 +1158,22 @@ abstract class _SimilarItem extends SimilarItem {
   @JsonKey(name: 'build_type')
   String? get buildType;
   @override
-  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
   int? get numberOfPassengers;
   @override
-  @JsonKey(name: 'features')
-  List<String> get features;
+  @JsonKey(name: 'features', fromJson: _parseStringList)
+  List<String>? get features;
   @override
   @JsonKey(name: 'status')
   String? get status;
   @override
   @JsonKey(name: 'price')
-  String get price;
+  String? get price;
   @override
   @JsonKey(name: 'mileage')
   String? get mileage;
   @override
-  @JsonKey(name: 'warranty', fromJson: _parseInt)
+  @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
   int? get warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
@@ -1162,10 +1183,10 @@ abstract class _SimilarItem extends SimilarItem {
   String? get deletedAt;
   @override
   @JsonKey(name: 'created_at')
-  String get createdAt;
+  String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  String get updatedAt;
+  String? get updatedAt;
   @override
   @JsonKey(name: 'Height')
   String? get height;
@@ -1318,10 +1339,10 @@ class __$$PaginationLinksImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaginationLinksImpl implements _PaginationLinks {
   const _$PaginationLinksImpl(
-      {@JsonKey(name: 'first') required this.first,
-      @JsonKey(name: 'last') required this.last,
-      @JsonKey(name: 'prev') required this.prev,
-      @JsonKey(name: 'next') required this.next});
+      {@JsonKey(name: 'first') this.first,
+      @JsonKey(name: 'last') this.last,
+      @JsonKey(name: 'prev') this.prev,
+      @JsonKey(name: 'next') this.next});
 
   factory _$PaginationLinksImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationLinksImplFromJson(json);
@@ -1378,11 +1399,10 @@ class _$PaginationLinksImpl implements _PaginationLinks {
 
 abstract class _PaginationLinks implements PaginationLinks {
   const factory _PaginationLinks(
-          {@JsonKey(name: 'first') required final String? first,
-          @JsonKey(name: 'last') required final String? last,
-          @JsonKey(name: 'prev') required final String? prev,
-          @JsonKey(name: 'next') required final String? next}) =
-      _$PaginationLinksImpl;
+      {@JsonKey(name: 'first') final String? first,
+      @JsonKey(name: 'last') final String? last,
+      @JsonKey(name: 'prev') final String? prev,
+      @JsonKey(name: 'next') final String? next}) = _$PaginationLinksImpl;
 
   factory _PaginationLinks.fromJson(Map<String, dynamic> json) =
       _$PaginationLinksImpl.fromJson;
@@ -1414,22 +1434,22 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationMeta {
-  @JsonKey(name: 'current_page', fromJson: _parseInt)
-  int get currentPage => throw _privateConstructorUsedError;
-  @JsonKey(name: 'from', fromJson: _parseInt)
+  @JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+  int? get currentPage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'from', fromJson: _parseNullableInt)
   int? get from => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_page', fromJson: _parseInt)
-  int get lastPage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_page', fromJson: _parseNullableInt)
+  int? get lastPage => throw _privateConstructorUsedError;
   @JsonKey(name: 'links')
-  List<PaginationLink> get links => throw _privateConstructorUsedError;
+  List<PaginationLink>? get links => throw _privateConstructorUsedError;
   @JsonKey(name: 'path')
-  String get path => throw _privateConstructorUsedError;
-  @JsonKey(name: 'per_page', fromJson: _parseInt)
-  int get perPage => throw _privateConstructorUsedError;
-  @JsonKey(name: 'to', fromJson: _parseInt)
+  String? get path => throw _privateConstructorUsedError;
+  @JsonKey(name: 'per_page', fromJson: _parseNullableInt)
+  int? get perPage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'to', fromJson: _parseNullableInt)
   int? get to => throw _privateConstructorUsedError;
-  @JsonKey(name: 'total', fromJson: _parseInt)
-  int get total => throw _privateConstructorUsedError;
+  @JsonKey(name: 'total', fromJson: _parseNullableInt)
+  int? get total => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMeta to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1448,14 +1468,15 @@ abstract class $PaginationMetaCopyWith<$Res> {
       _$PaginationMetaCopyWithImpl<$Res, PaginationMeta>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
-      @JsonKey(name: 'from', fromJson: _parseInt) int? from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
-      @JsonKey(name: 'links') List<PaginationLink> links,
-      @JsonKey(name: 'path') String path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
-      @JsonKey(name: 'to', fromJson: _parseInt) int? to,
-      @JsonKey(name: 'total', fromJson: _parseInt) int total});
+      {@JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+      int? currentPage,
+      @JsonKey(name: 'from', fromJson: _parseNullableInt) int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseNullableInt) int? lastPage,
+      @JsonKey(name: 'links') List<PaginationLink>? links,
+      @JsonKey(name: 'path') String? path,
+      @JsonKey(name: 'per_page', fromJson: _parseNullableInt) int? perPage,
+      @JsonKey(name: 'to', fromJson: _parseNullableInt) int? to,
+      @JsonKey(name: 'total', fromJson: _parseNullableInt) int? total});
 }
 
 /// @nodoc
@@ -1473,48 +1494,48 @@ class _$PaginationMetaCopyWithImpl<$Res, $Val extends PaginationMeta>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? currentPage = null,
+    Object? currentPage = freezed,
     Object? from = freezed,
-    Object? lastPage = null,
-    Object? links = null,
-    Object? path = null,
-    Object? perPage = null,
+    Object? lastPage = freezed,
+    Object? links = freezed,
+    Object? path = freezed,
+    Object? perPage = freezed,
     Object? to = freezed,
-    Object? total = null,
+    Object? total = freezed,
   }) {
     return _then(_value.copyWith(
-      currentPage: null == currentPage
+      currentPage: freezed == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
               as int?,
-      lastPage: null == lastPage
+      lastPage: freezed == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      links: null == links
+              as int?,
+      links: freezed == links
           ? _value.links
           : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationLink>,
-      path: null == path
+              as List<PaginationLink>?,
+      path: freezed == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
-              as String,
-      perPage: null == perPage
+              as String?,
+      perPage: freezed == perPage
           ? _value.perPage
           : perPage // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       to: freezed == to
           ? _value.to
           : to // ignore: cast_nullable_to_non_nullable
               as int?,
-      total: null == total
+      total: freezed == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ) as $Val);
   }
 }
@@ -1528,14 +1549,15 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
-      @JsonKey(name: 'from', fromJson: _parseInt) int? from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
-      @JsonKey(name: 'links') List<PaginationLink> links,
-      @JsonKey(name: 'path') String path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
-      @JsonKey(name: 'to', fromJson: _parseInt) int? to,
-      @JsonKey(name: 'total', fromJson: _parseInt) int total});
+      {@JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+      int? currentPage,
+      @JsonKey(name: 'from', fromJson: _parseNullableInt) int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseNullableInt) int? lastPage,
+      @JsonKey(name: 'links') List<PaginationLink>? links,
+      @JsonKey(name: 'path') String? path,
+      @JsonKey(name: 'per_page', fromJson: _parseNullableInt) int? perPage,
+      @JsonKey(name: 'to', fromJson: _parseNullableInt) int? to,
+      @JsonKey(name: 'total', fromJson: _parseNullableInt) int? total});
 }
 
 /// @nodoc
@@ -1551,48 +1573,48 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? currentPage = null,
+    Object? currentPage = freezed,
     Object? from = freezed,
-    Object? lastPage = null,
-    Object? links = null,
-    Object? path = null,
-    Object? perPage = null,
+    Object? lastPage = freezed,
+    Object? links = freezed,
+    Object? path = freezed,
+    Object? perPage = freezed,
     Object? to = freezed,
-    Object? total = null,
+    Object? total = freezed,
   }) {
     return _then(_$PaginationMetaImpl(
-      currentPage: null == currentPage
+      currentPage: freezed == currentPage
           ? _value.currentPage
           : currentPage // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       from: freezed == from
           ? _value.from
           : from // ignore: cast_nullable_to_non_nullable
               as int?,
-      lastPage: null == lastPage
+      lastPage: freezed == lastPage
           ? _value.lastPage
           : lastPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      links: null == links
+              as int?,
+      links: freezed == links
           ? _value._links
           : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationLink>,
-      path: null == path
+              as List<PaginationLink>?,
+      path: freezed == path
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
-              as String,
-      perPage: null == perPage
+              as String?,
+      perPage: freezed == perPage
           ? _value.perPage
           : perPage // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       to: freezed == to
           ? _value.to
           : to // ignore: cast_nullable_to_non_nullable
               as int?,
-      total: null == total
+      total: freezed == total
           ? _value.total
           : total // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
     ));
   }
 }
@@ -1601,50 +1623,52 @@ class __$$PaginationMetaImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaginationMetaImpl implements _PaginationMeta {
   const _$PaginationMetaImpl(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt)
-      required this.currentPage,
-      @JsonKey(name: 'from', fromJson: _parseInt) required this.from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt) required this.lastPage,
-      @JsonKey(name: 'links') required final List<PaginationLink> links,
-      @JsonKey(name: 'path') required this.path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt) required this.perPage,
-      @JsonKey(name: 'to', fromJson: _parseInt) required this.to,
-      @JsonKey(name: 'total', fromJson: _parseInt) required this.total})
+      {@JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+      this.currentPage,
+      @JsonKey(name: 'from', fromJson: _parseNullableInt) this.from,
+      @JsonKey(name: 'last_page', fromJson: _parseNullableInt) this.lastPage,
+      @JsonKey(name: 'links') final List<PaginationLink>? links,
+      @JsonKey(name: 'path') this.path,
+      @JsonKey(name: 'per_page', fromJson: _parseNullableInt) this.perPage,
+      @JsonKey(name: 'to', fromJson: _parseNullableInt) this.to,
+      @JsonKey(name: 'total', fromJson: _parseNullableInt) this.total})
       : _links = links;
 
   factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaImplFromJson(json);
 
   @override
-  @JsonKey(name: 'current_page', fromJson: _parseInt)
-  final int currentPage;
+  @JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+  final int? currentPage;
   @override
-  @JsonKey(name: 'from', fromJson: _parseInt)
+  @JsonKey(name: 'from', fromJson: _parseNullableInt)
   final int? from;
   @override
-  @JsonKey(name: 'last_page', fromJson: _parseInt)
-  final int lastPage;
-  final List<PaginationLink> _links;
+  @JsonKey(name: 'last_page', fromJson: _parseNullableInt)
+  final int? lastPage;
+  final List<PaginationLink>? _links;
   @override
   @JsonKey(name: 'links')
-  List<PaginationLink> get links {
+  List<PaginationLink>? get links {
+    final value = _links;
+    if (value == null) return null;
     if (_links is EqualUnmodifiableListView) return _links;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_links);
+    return EqualUnmodifiableListView(value);
   }
 
   @override
   @JsonKey(name: 'path')
-  final String path;
+  final String? path;
   @override
-  @JsonKey(name: 'per_page', fromJson: _parseInt)
-  final int perPage;
+  @JsonKey(name: 'per_page', fromJson: _parseNullableInt)
+  final int? perPage;
   @override
-  @JsonKey(name: 'to', fromJson: _parseInt)
+  @JsonKey(name: 'to', fromJson: _parseNullableInt)
   final int? to;
   @override
-  @JsonKey(name: 'total', fromJson: _parseInt)
-  final int total;
+  @JsonKey(name: 'total', fromJson: _parseNullableInt)
+  final int? total;
 
   @override
   String toString() {
@@ -1692,46 +1716,46 @@ class _$PaginationMetaImpl implements _PaginationMeta {
 
 abstract class _PaginationMeta implements PaginationMeta {
   const factory _PaginationMeta(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt)
-      required final int currentPage,
-      @JsonKey(name: 'from', fromJson: _parseInt) required final int? from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt)
-      required final int lastPage,
-      @JsonKey(name: 'links') required final List<PaginationLink> links,
-      @JsonKey(name: 'path') required final String path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt)
-      required final int perPage,
-      @JsonKey(name: 'to', fromJson: _parseInt) required final int? to,
-      @JsonKey(name: 'total', fromJson: _parseInt)
-      required final int total}) = _$PaginationMetaImpl;
+      {@JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+      final int? currentPage,
+      @JsonKey(name: 'from', fromJson: _parseNullableInt) final int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseNullableInt)
+      final int? lastPage,
+      @JsonKey(name: 'links') final List<PaginationLink>? links,
+      @JsonKey(name: 'path') final String? path,
+      @JsonKey(name: 'per_page', fromJson: _parseNullableInt)
+      final int? perPage,
+      @JsonKey(name: 'to', fromJson: _parseNullableInt) final int? to,
+      @JsonKey(name: 'total', fromJson: _parseNullableInt)
+      final int? total}) = _$PaginationMetaImpl;
 
   factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaImpl.fromJson;
 
   @override
-  @JsonKey(name: 'current_page', fromJson: _parseInt)
-  int get currentPage;
+  @JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+  int? get currentPage;
   @override
-  @JsonKey(name: 'from', fromJson: _parseInt)
+  @JsonKey(name: 'from', fromJson: _parseNullableInt)
   int? get from;
   @override
-  @JsonKey(name: 'last_page', fromJson: _parseInt)
-  int get lastPage;
+  @JsonKey(name: 'last_page', fromJson: _parseNullableInt)
+  int? get lastPage;
   @override
   @JsonKey(name: 'links')
-  List<PaginationLink> get links;
+  List<PaginationLink>? get links;
   @override
   @JsonKey(name: 'path')
-  String get path;
+  String? get path;
   @override
-  @JsonKey(name: 'per_page', fromJson: _parseInt)
-  int get perPage;
+  @JsonKey(name: 'per_page', fromJson: _parseNullableInt)
+  int? get perPage;
   @override
-  @JsonKey(name: 'to', fromJson: _parseInt)
+  @JsonKey(name: 'to', fromJson: _parseNullableInt)
   int? get to;
   @override
-  @JsonKey(name: 'total', fromJson: _parseInt)
-  int get total;
+  @JsonKey(name: 'total', fromJson: _parseNullableInt)
+  int? get total;
 
   /// Create a copy of PaginationMeta
   /// with the given fields replaced by the non-null parameter values.
@@ -1750,9 +1774,9 @@ mixin _$PaginationLink {
   @JsonKey(name: 'url')
   String? get url => throw _privateConstructorUsedError;
   @JsonKey(name: 'label')
-  String get label => throw _privateConstructorUsedError;
+  String? get label => throw _privateConstructorUsedError;
   @JsonKey(name: 'active')
-  bool get active => throw _privateConstructorUsedError;
+  bool? get active => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationLink to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1772,8 +1796,8 @@ abstract class $PaginationLinkCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(name: 'url') String? url,
-      @JsonKey(name: 'label') String label,
-      @JsonKey(name: 'active') bool active});
+      @JsonKey(name: 'label') String? label,
+      @JsonKey(name: 'active') bool? active});
 }
 
 /// @nodoc
@@ -1792,22 +1816,22 @@ class _$PaginationLinkCopyWithImpl<$Res, $Val extends PaginationLink>
   @override
   $Res call({
     Object? url = freezed,
-    Object? label = null,
-    Object? active = null,
+    Object? label = freezed,
+    Object? active = freezed,
   }) {
     return _then(_value.copyWith(
       url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
-      label: null == label
+      label: freezed == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      active: null == active
+              as String?,
+      active: freezed == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
     ) as $Val);
   }
 }
@@ -1822,8 +1846,8 @@ abstract class _$$PaginationLinkImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(name: 'url') String? url,
-      @JsonKey(name: 'label') String label,
-      @JsonKey(name: 'active') bool active});
+      @JsonKey(name: 'label') String? label,
+      @JsonKey(name: 'active') bool? active});
 }
 
 /// @nodoc
@@ -1840,22 +1864,22 @@ class __$$PaginationLinkImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? url = freezed,
-    Object? label = null,
-    Object? active = null,
+    Object? label = freezed,
+    Object? active = freezed,
   }) {
     return _then(_$PaginationLinkImpl(
       url: freezed == url
           ? _value.url
           : url // ignore: cast_nullable_to_non_nullable
               as String?,
-      label: null == label
+      label: freezed == label
           ? _value.label
           : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      active: null == active
+              as String?,
+      active: freezed == active
           ? _value.active
           : active // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as bool?,
     ));
   }
 }
@@ -1864,9 +1888,9 @@ class __$$PaginationLinkImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaginationLinkImpl implements _PaginationLink {
   const _$PaginationLinkImpl(
-      {@JsonKey(name: 'url') required this.url,
-      @JsonKey(name: 'label') required this.label,
-      @JsonKey(name: 'active') required this.active});
+      {@JsonKey(name: 'url') this.url,
+      @JsonKey(name: 'label') this.label,
+      @JsonKey(name: 'active') this.active});
 
   factory _$PaginationLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationLinkImplFromJson(json);
@@ -1876,10 +1900,10 @@ class _$PaginationLinkImpl implements _PaginationLink {
   final String? url;
   @override
   @JsonKey(name: 'label')
-  final String label;
+  final String? label;
   @override
   @JsonKey(name: 'active')
-  final bool active;
+  final bool? active;
 
   @override
   String toString() {
@@ -1919,10 +1943,9 @@ class _$PaginationLinkImpl implements _PaginationLink {
 
 abstract class _PaginationLink implements PaginationLink {
   const factory _PaginationLink(
-          {@JsonKey(name: 'url') required final String? url,
-          @JsonKey(name: 'label') required final String label,
-          @JsonKey(name: 'active') required final bool active}) =
-      _$PaginationLinkImpl;
+      {@JsonKey(name: 'url') final String? url,
+      @JsonKey(name: 'label') final String? label,
+      @JsonKey(name: 'active') final bool? active}) = _$PaginationLinkImpl;
 
   factory _PaginationLink.fromJson(Map<String, dynamic> json) =
       _$PaginationLinkImpl.fromJson;
@@ -1932,10 +1955,10 @@ abstract class _PaginationLink implements PaginationLink {
   String? get url;
   @override
   @JsonKey(name: 'label')
-  String get label;
+  String? get label;
   @override
   @JsonKey(name: 'active')
-  bool get active;
+  bool? get active;
 
   /// Create a copy of PaginationLink
   /// with the given fields replaced by the non-null parameter values.

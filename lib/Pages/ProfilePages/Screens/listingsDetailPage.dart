@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dar
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MyListingsService/myListingsService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Services/PromotionService/promotionService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
@@ -15,6 +17,7 @@ import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListingsDetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -38,6 +41,10 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   bool _isMarkingAsSold = false;
   bool _isSold = false;
   bool _isPromoted = false;
+  bool _isActivatingPromotion = false;
+  
+  // New variable to control promotion flow
+  bool canPromote = false; // Set to false initially to test payment flow
 
   @override
   void initState() {
@@ -74,6 +81,194 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     _scrollController.dispose();
     super.dispose();
   }
+
+  // ========== PROMOTION FLOW METHODS ==========
+
+  Future<void> _navigateToPromotionsPageForPromotion() async {
+    logger.i("🔄 Starting promotion flow - payment required");
+    
+    try {
+      // Store promotion data for later (similar to vehicle upload flow)
+      await _storePromotionDataForLater();
+      
+      // Navigate to promotions page with just the type (same pattern as upload)
+      final result = await Get.toNamed(
+        RouteClass.getPromotionsPage(),
+        arguments: {
+          'type': 'promotion',
+          'listing': listing, // Pass listing data if needed by promotions page
+        },
+      );
+      
+      // Handle payment result if needed
+      if (result == true && mounted) {
+        logger.i("✅ Payment completed for promotion");
+        // The actual promotion activation will happen in WebViewPaymentPage
+      }
+    } catch (e, stackTrace) {
+      logger.e("❌ Error navigating to promotions page: $e");
+      logger.e("❌ Stack trace: $stackTrace");
+      _showErrorSnackBar('Failed to start promotion process');
+    }
+  }
+
+  Future<void> _storePromotionDataForLater() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Store promotion data (following the same pattern as vehicle upload)
+      final promotionData = {
+        'item_id': listing['id']?.toString(),
+        'listing_name': getListingName(),
+        'listing_id': listing['id']?.toString(),
+        // Add any other data needed for promotion activation after payment
+      };
+      
+      await prefs.setString('pending_promotion_data', json.encode(promotionData));
+      await prefs.setBool('pending_promotion', true);
+      
+      logger.i("✅ Promotion data stored for later activation:");
+      logger.i("   - Item ID: ${listing['id']}");
+      logger.i("   - Listing Name: ${getListingName()}");
+      
+    } catch (e, stackTrace) {
+      logger.e("❌ Error storing promotion data: $e");
+      logger.e("❌ Stack trace: $stackTrace");
+      rethrow;
+    }
+  }
+
+  Future<void> _activatePromotionDirectly() async {
+    if (_isActivatingPromotion) return;
+
+    setState(() => _isActivatingPromotion = true);
+
+    try {
+      final listingId = listing['id']?.toString();
+      if (listingId == null || listingId.isEmpty) {
+        throw Exception('Invalid listing ID');
+      }
+
+      // Calculate promotion dates (7 days as default)
+      final dates = PromotionService.calculatePromotionDates(7);
+      
+      logger.i("🎯 Activating promotion directly for listing: $listingId");
+      
+      // Activate promotion using the service
+      final result = await PromotionService.activatePromotion(
+        itemId: listingId,
+        startAt: dates['start_at']!,
+        endAt: dates['end_at']!,
+        status: 'active',
+      );
+
+      if (result['success'] == true) {
+        logger.i("✅ Promotion activated successfully");
+        
+        // Show success dialog with navigation to MyListingPage
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.success,
+          animType: AnimType.bottomSlide,
+          title: 'Promotion Activated!',
+          desc: 'Your listing is now being promoted and will receive more visibility.',
+          btnOkText: 'View My Listings',
+          btnOkOnPress: () {
+            // ✅ FIXED: Navigate to MyListingPage after successful promotion
+            _navigateToMyListingPage();
+          },
+          autoHide: Duration(seconds: 4),
+        ).show();
+
+        // Update UI state
+        if (mounted) {
+          setState(() {
+            _isPromoted = true;
+          });
+        }
+
+      } else {
+        logger.e("❌ Failed to activate promotion: ${result['message']}");
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.error,
+          animType: AnimType.bottomSlide,
+          title: 'Promotion Failed',
+          desc: result['message'] ?? 'Failed to activate promotion',
+          btnOkText: 'OK',
+          btnOkOnPress: () {},
+        ).show();
+      }
+    } catch (e, stackTrace) {
+      logger.e("❌ Error activating promotion: $e");
+      logger.e("❌ Stack trace: $stackTrace");
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.error,
+        animType: AnimType.bottomSlide,
+        title: 'Error',
+        desc: 'Failed to activate promotion: ${e.toString()}',
+        btnOkText: 'OK',
+        btnOkOnPress: () {},
+      ).show();
+    } finally {
+      if (mounted) {
+        setState(() => _isActivatingPromotion = false);
+      }
+    }
+  }
+
+  void _navigateToMyListingPage() {
+    logger.i("🔄 Navigating to MyListingPage");
+    Get.offAllNamed(RouteClass.myListingPage);
+  }
+
+  void _handlePromoteButton() {
+    if (_isSold) {
+      _showErrorSnackBar('Cannot promote sold listings');
+      return;
+    }
+
+    if (_isPromoted) {
+      _showErrorSnackBar('This listing is already promoted');
+      return;
+    }
+
+    if (canPromote) {
+      // Direct promotion - no payment required
+      logger.i("🎯 Direct promotion flow - no payment required");
+      _showDirectPromotionConfirmation();
+    } else {
+      // Payment required - navigate to promotions page
+      logger.i("💰 Payment promotion flow - navigating to packages");
+      _navigateToPromotionsPageForPromotion();
+    }
+  }
+
+  void _showDirectPromotionConfirmation() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.info,
+      animType: AnimType.bottomSlide,
+      title: 'Activate Promotion?',
+      desc: 'Do you want to activate promotion for this listing? This will increase your listing visibility.',
+      btnCancelText: 'Cancel',
+      btnOkText: 'Yes, Activate',
+      btnCancelOnPress: () {},
+      btnOkOnPress: _activatePromotionDirectly,
+      btnOkColor: Colors.blue,
+    ).show();
+  }
+
+  void _showErrorSnackBar(String message) {
+    showCustomSnackBar(
+      backgroundColor: ColorGlobalVariables.redColor,
+      title: "Error",
+      message: message
+    );
+  }
+
+  // ========== EXISTING METHODS (Keep all your existing functionality) ==========
 
   // Safe data access methods
   String getListingName() {
@@ -264,11 +459,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return 'N/A';
   }
 
-  // Check if listing has warranty - similar to DetailPage logic
   bool get hasWarranty {
     try {
       final warranty = listing['warranty'];
-      // Handle different warranty formats
       if (warranty is bool) return warranty;
       if (warranty is String) return warranty.toLowerCase() == 'true' || warranty.isNotEmpty;
       if (warranty is num) return warranty > 0;
@@ -280,7 +473,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     }
   }
 
-  // Get warranty details if available
   String getWarrantyDetails() {
     if (!hasWarranty) return '';
     
@@ -300,11 +492,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     }
   }
 
-  // Build Highlights from actual listing data
   List<Map<String, String>> getHighlights() {
     final List<Map<String, String>> highlights = [];
     
-    // Add key highlights that are commonly important for vehicles
     final year = getListingYear();
     if (year != 'N/A') {
       highlights.add({'title': 'Model Year', 'value': year});
@@ -335,13 +525,11 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       highlights.add({'title': 'Transmission', 'value': transmission});
     }
     
-    // Add warranty to highlights if available
     if (hasWarranty) {
       final warrantyDetails = getWarrantyDetails();
       highlights.add({'title': 'Warranty', 'value': warrantyDetails});
     }
     
-    // If no highlights found, provide some defaults
     if (highlights.isEmpty) {
       highlights.addAll([
         {'title': 'Model Year', 'value': getListingYear()},
@@ -353,11 +541,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return highlights;
   }
 
-  // Build Specifications from actual listing data
   List<Map<String, String>> getSpecifications() {
     final List<Map<String, String>> specifications = [];
     
-    // Add comprehensive specifications
     final brand = getListingBrand();
     if (brand != 'N/A') {
       specifications.add({'title': 'Make', 'value': brand});
@@ -398,7 +584,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       specifications.add({'title': 'Transmission', 'value': transmission});
     }
     
-    // If no specifications found, provide some defaults
     if (specifications.isEmpty) {
       specifications.addAll([
         {'title': 'Make', 'value': getListingBrand()},
@@ -410,25 +595,20 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return specifications;
   }
 
-  // Build tags list - Only show warranty tag if warranty exists and verified seller if user is paid seller
   List<Widget> _buildTags(BuildContext context) {
     final List<Widget> tags = [];
     
-    // Get user provider to check if user is paid seller
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final isPaidSeller = userProvider.isPaidSeller;
     
-    // Only add warranty tag if the listing has warranty
     if (hasWarranty) {
       tags.add(_buildTag("Warranty", ColorGlobalVariables.greyColor));
     }
     
-    // Only show verified seller tag if user is a paid seller
     if (isPaidSeller) {
       tags.add(_buildVerifiedSellerTag());
     }
     
-    // Add promoted tag if applicable
     if (_isPromoted && !_isSold) {
       tags.add(_buildPromotedTag());
     }
@@ -436,7 +616,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return tags;
   }
 
-  // Mark as Sold confirmation dialog
   void _showMarkAsSoldConfirmationDialog() {
     AwesomeDialog(
       context: context,
@@ -454,7 +633,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     ).show();
   }
 
-  // Actual mark as sold operation
   Future<void> _performMarkAsSold() async {
     if (_isMarkingAsSold) return;
 
@@ -466,11 +644,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         throw Exception('Invalid listing ID');
       }
 
-      // Use the service for marking as sold
       final result = await VehicleService.markAsSold(listingId);
 
       if (result['success'] == true) {
-        // Show success dialog
         AwesomeDialog(
           context: context,
           dialogType: DialogType.success,
@@ -480,7 +656,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
           btnOkText: 'OK',
           btnOkOnPress: () {
             // Navigate back to MyListingPage after successful marking
-            Get.offAllNamed(RouteClass.myListingPage);
+            _navigateToMyListingPage();
           },
           autoHide: Duration(seconds: 3),
         ).show();
@@ -517,7 +693,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     }
   }
 
-  // Delete confirmation dialog
   void _showDeleteConfirmationDialog() {
     showDialog(
       context: context,
@@ -534,7 +709,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with icon
                 Row(
                   children: [
                     Container(
@@ -566,7 +740,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 
                 const SizedBox(height: 20),
                 
-                // Warning message
                 const Text(
                   "Are you sure you want to delete this car listing? This action cannot be undone and all data will be permanently lost.",
                   style: TextStyle(
@@ -591,7 +764,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 
                 const SizedBox(height: 24),
                 
-                // Buttons
                 Row(
                   children: [
                     Expanded(
@@ -618,8 +790,8 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
-                          _performDelete(); // Then perform deletion
+                          Navigator.of(context).pop();
+                          _performDelete();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
@@ -649,7 +821,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  // Actual delete operation using the service
   Future<void> _performDelete() async {
     if (_isDeleting) return;
 
@@ -661,7 +832,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         throw Exception('Invalid listing ID');
       }
 
-      // Use the service class for deletion
       final result = await MyListingsService.deleteListing(listingId);
 
       if (result['success'] == true) {
@@ -677,7 +847,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         // Navigate to MyListingPage after successful deletion
         await Future.delayed(const Duration(milliseconds: 800));
         if (mounted) {
-          Get.offAllNamed(RouteClass.myListingPage);
+          _navigateToMyListingPage();
         }
       } else {
         Get.snackbar(
@@ -879,7 +1049,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                     ),
                   ),
 
-                  // Sold Badge
                   if (_isSold)
                     Positioned(
                       top: 16,
@@ -901,7 +1070,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                       ),
                     ),
 
-                  // Promoted Badge
                   if (_isPromoted && !_isSold)
                     Positioned(
                       top: 16,
@@ -993,17 +1161,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(Icons.edit, color: Colors.white, size: 20),
-                ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Icon(Icons.share, color: Colors.white, size: 20),
                 ),
               ),
             ],
@@ -1116,7 +1273,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(listing['created_at']?.toString() ?? '')),
                   const SizedBox(height: 20),
                   
-                  // Dynamic tags - Only show warranty if it exists and verified seller if user is paid seller
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -1155,14 +1311,8 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                                 "Promote",
                                 FontAwesomeIcons.bullhorn,
                                 Colors.blue,
-                                onPressed: (){
-                                  Get.toNamed(
-                                    RouteClass.getPromotionsPage(),
-                                    arguments: {
-                                      'listing': listing,
-                                    }
-                                  );
-                                },
+                                onPressed: _handlePromoteButton,
+                                isLoading: _isActivatingPromotion,
                               ),
                       ),
                     ],

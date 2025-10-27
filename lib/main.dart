@@ -8,6 +8,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProv
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getNotificationsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
@@ -22,18 +23,28 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudin
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/faqProvider.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
+import 'package:gag_cars_frontend/Themes/appThemes.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
+
+// Import the new theme provider and themes
 import 'GlobalVariables/colorGlobalVariables.dart';
 import 'Routes/routeClass.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await CloudinaryService.init();
+  
   runApp(
     MultiProvider(
       providers: [
+        // Add ThemeProvider first so it's available to all other providers
+        ChangeNotifierProvider<ThemeProvider>(
+          create: (context) => ThemeProvider(),
+        ),
         ChangeNotifierProvider<HomeProvider>(
           create: (context) => HomeProvider(HomeService()),
         ),
@@ -47,18 +58,18 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => UserProvider()
-          ),
-         ChangeNotifierProvider(
+        ),
+        ChangeNotifierProvider(
           create: (context) => WishlistToggleProvider(),
-          ),
-         ChangeNotifierProvider(
+        ),
+        ChangeNotifierProvider(
           create: (context) => WishlistFetchProvider()
-          ),
-         ChangeNotifierProvider(create: (context) => CategoryDetailProvider()),
-          ChangeNotifierProvider<BlogPostProvider>(
+        ),
+        ChangeNotifierProvider(create: (context) => CategoryDetailProvider()),
+        ChangeNotifierProvider<BlogPostProvider>(
           create: (context) => BlogPostProvider(BlogPostService()),
         ), 
-        ChangeNotifierProvider( // ADD THIS NEW PROVIDER
+        ChangeNotifierProvider(
           create: (context) => WishlistManager(),
         ),
         ChangeNotifierProvider(
@@ -69,7 +80,7 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => SimilarItemsProvider(),
-          ), 
+        ), 
         ChangeNotifierProvider(
           create: (context) => BrandItemsProvider(),
         ),
@@ -81,7 +92,10 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => FaqProvider()
-          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => UserDetailsProvider(),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -99,16 +113,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(),
-      debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
-      // home: DealerDashboardPage(),
-      home: SplashPage(),
-      // home: ListingDetailPage(),
-      // home: PostItemPage(),
-      // home: MainBottomNavigationPage(),
-      getPages: RouteClass.routes,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return GetMaterialApp(
+          title: 'GAGcars',
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          themeMode: themeProvider.themeMode,
+          debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
+          home: const SplashPage(),
+          getPages: RouteClass.routes,
+        );
+      },
     );
   }
 }

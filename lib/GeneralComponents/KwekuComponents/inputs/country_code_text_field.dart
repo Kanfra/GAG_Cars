@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 
 class CountryCodeTextField extends StatefulWidget {
   final TextEditingController? controller;
@@ -134,7 +135,7 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
-                  color: Theme.of(context).primaryColor,
+                  color: ColorGlobalVariables.brownColor,
                   width: 1.5,
                 ),
               ),

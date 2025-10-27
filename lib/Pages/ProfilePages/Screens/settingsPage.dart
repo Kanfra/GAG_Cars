@@ -33,6 +33,7 @@ class _SettingsState extends State<SettingsPage> {
     final shouldLogout = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: theme.cardColor,
         title: Text('Logout', style: theme.textTheme.titleMedium),
         content: Text('Are you sure you want to logout?', 
                style: theme.textTheme.bodyMedium),
@@ -133,17 +134,20 @@ class _SettingsState extends State<SettingsPage> {
 
   // Build default profile image widget
   Widget _buildDefaultProfileImage() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Container(
       width: 100,
       height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+        color: ColorGlobalVariables.brownColor.withOpacity(isDarkMode ? 0.2 : 0.1),
       ),
       child: Icon(
         Icons.person,
         size: 50,
-        color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+        color: ColorGlobalVariables.brownColor.withOpacity(isDarkMode ? 0.4 : 0.6),
       ),
     );
   }
@@ -187,26 +191,23 @@ class _SettingsState extends State<SettingsPage> {
     }
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => Get.back(),
         isLeadingWidgetExist: false,
-        appbarBackgroundColor: ColorGlobalVariables.whiteColor,
+        appbarBackgroundColor: theme.appBarTheme.backgroundColor ?? ColorGlobalVariables.whiteColor,
         titleTextSize: 22,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
         titleText: "Settings",
-        
         titleFontWeight: FontWeight.bold,
-        titleTextColor: ColorGlobalVariables.brownColor,
+        titleTextColor: theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () => Get.toNamed(RouteClass.notificationsPage),
             icon: Icon(
               Icons.notifications_none_outlined,
-              color: isDarkMode 
-                  ? Colors.white 
-                  : ColorGlobalVariables.blackColor,
+              color: theme.iconTheme.color ?? ColorGlobalVariables.blackColor,
             ),
           ),
         ],
@@ -226,7 +227,7 @@ class _SettingsState extends State<SettingsPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    color: isDarkMode ? Colors.grey[800] : Colors.white,
+                    color: theme.cardColor,
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -263,9 +264,7 @@ class _SettingsState extends State<SettingsPage> {
                           Text(
                             joinedDate,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: isDarkMode 
-                                  ? Colors.grey[400] 
-                                  : Colors.grey[600],
+                              color: theme.textTheme.bodySmall?.color,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -374,7 +373,7 @@ class _SettingsState extends State<SettingsPage> {
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: BorderSide(
-                        color: Colors.red.withOpacity(0.5),
+                        color: Colors.red.withOpacity(isDarkMode ? 0.3 : 0.5),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -426,7 +425,6 @@ class _SettingsState extends State<SettingsPage> {
     required List<Widget> items,
   }) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,7 +434,7 @@ class _SettingsState extends State<SettingsPage> {
           child: Text(
             title,
             style: theme.textTheme.titleSmall?.copyWith(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              color: theme.textTheme.bodyMedium?.color,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -446,7 +444,7 @@ class _SettingsState extends State<SettingsPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          color: theme.cardColor,
           child: Column(
             children: items,
           ),
@@ -462,7 +460,6 @@ class _SettingsState extends State<SettingsPage> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
 
     return InkWell(
       onTap: onTap,
@@ -473,7 +470,7 @@ class _SettingsState extends State<SettingsPage> {
           children: [
             Icon(
               icon,
-              color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+              color: theme.iconTheme.color,
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -486,7 +483,7 @@ class _SettingsState extends State<SettingsPage> {
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+              color: theme.iconTheme.color?.withOpacity(0.6),
             ),
           ],
         ),

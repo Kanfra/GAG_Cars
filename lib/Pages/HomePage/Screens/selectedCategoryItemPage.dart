@@ -527,7 +527,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: 2),
           ),
         );
       }
@@ -564,8 +564,8 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
 
   @override
   Widget build(BuildContext context) {
-    final firstImage = widget.item.images.isNotEmpty
-        ? widget.item.images.first
+    final firstImage = widget.item.images?.isNotEmpty == true
+        ? widget.item.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
 
     return GestureDetector(
@@ -698,7 +698,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     children: [
                       Expanded(
                         child: Text(
-                          widget.item.name,
+                          widget.item.name ?? 'Unnamed Item',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -709,7 +709,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                         ),
                       ),
                       Text(
-                        widget.item.year,
+                        widget.item.year ?? '',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -725,7 +725,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price))}',
+                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -738,7 +738,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                             Icon(Icons.speed, size: 14, color: Colors.grey[600]),
                             const SizedBox(width: 4),
                             Text(
-                              "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
+                              "${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.mileage!) ?? 0)} km",
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -862,10 +862,10 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
   RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
     return RecommendedItem(
       id: similarItem.id,
-      name: similarItem.name,
-      price: similarItem.price,
-      year: similarItem.year,
-      images: similarItem.images,
+      name: similarItem.name ?? 'Unnamed Item',
+      price: similarItem.price ?? '0',
+      year: similarItem.year ?? '',
+      images: similarItem.images ?? [],
       mileage: similarItem.mileage,
       transmission: similarItem.transmission,
       location: similarItem.location,
@@ -893,8 +893,8 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
       deletedAt: similarItem.deletedAt != null 
           ? DateTime.tryParse(similarItem.deletedAt!) 
           : null,
-      createdAt: DateTime.tryParse(similarItem.createdAt) ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(similarItem.updatedAt) ?? DateTime.now(),
+      createdAt: DateTime.tryParse(similarItem.createdAt ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(similarItem.updatedAt ?? '') ?? DateTime.now(),
       height: similarItem.height,
       vin: similarItem.vin,
       isPromoted: false,

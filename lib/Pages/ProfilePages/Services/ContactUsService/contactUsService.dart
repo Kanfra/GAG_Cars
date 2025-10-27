@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart'; // Add GetX for navigation
+
+// Add your chat page import here
+// import 'package:gag_cars_frontend/Pages/ChatPages/chat_page.dart';
 
 class ContactUsService {
   // Configuration - Replace these with your actual details
   static const String _customerServicePhone = '+233552058759';
-  static const String _whatsappNumber = '233552058759'; // Without + for WhatsApp
+  static const String _whatsappNumber = '233530183887';
   static const String _websiteUrl = 'https://www.gagcars.com';
   static const String _facebookPageId = 'gagcars'; // Or numeric ID
   static const String _twitterHandle = 'gagcars';
@@ -19,7 +24,7 @@ class ContactUsService {
       title: 'Customer Service',
       icon: Icons.headset_mic_outlined,
       color: Colors.blue,
-      action: launchCustomerService,
+      action: navigateToChatPage, // Changed to navigation function
     ),
     ContactOption(
       title: 'WhatsApp',
@@ -53,32 +58,37 @@ class ContactUsService {
     ),
   ];
 
-  // Enhanced launch methods with better error handling
-static Future<void> launchCustomerService(BuildContext context) async {
-  final logger = Logger();
-  try {
-    final phoneNumber = _customerServicePhone.replaceAll(RegExp(r'[^0-9+]'), '');
-    
-    // Try to open the dial pad with the number pre-filled
-    final url = Uri.parse('tel:$phoneNumber');
-    
-    logger.d('Attempting to open dial pad with: $phoneNumber');
-    
-    if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.externalNonBrowserApplication, // Ensures it opens in dialer app
-      );
-    } else {
-      // Fallback: Copy to clipboard
-      await Clipboard.setData(ClipboardData(text: _customerServicePhone));
-      _showInfo(context, 'Number copied to clipboard. Please paste in dialer');
+  // Navigation function to chat page
+  static Future<void> navigateToChatPage(BuildContext context) async {
+    try {
+      // Option 1: Using GetX navigation (if you're using GetX)
+      Get.offAllNamed(
+        RouteClass.getChatPage()
+      ); // Uncomment and replace with your actual chat page
+      
+      // Option 2: Using Navigator (standard Flutter)
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => ChatPage()),
+      // );
+      
+      // Option 3: Using named routes (if you have routes set up)
+      // Get.toNamed('/chat-page');
+      // or
+      // Navigator.pushNamed(context, '/chat-page');
+      
+      // For now, showing a placeholder message
+      _showInfo(context, 'Opening customer service chat...');
+      
+      // TODO: Replace the above line with your actual navigation code
+      print('Navigate to chat page - Implement your navigation logic here');
+      
+    } catch (e) {
+      final logger = Logger();
+      logger.e('Error navigating to chat page', error: e);
+      _showError(context, 'Failed to open chat');
     }
-  } catch (e) {
-    logger.e('Error opening dial pad', error: e);
-    _showError(context, 'Failed to open dialer');
   }
-}
 
   static Future<void> launchWhatsApp(BuildContext context) async {
     final logger = Logger();

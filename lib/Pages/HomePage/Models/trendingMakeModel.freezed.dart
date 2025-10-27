@@ -20,16 +20,19 @@ TrendingMake _$TrendingMakeFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TrendingMake {
+  @JsonKey(fromJson: _safeParseInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _safeParseString)
   String? get userId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get image => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
-  String get createdAt =>
-      throw _privateConstructorUsedError; // Changed to String
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+  String get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
   String get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this TrendingMake to a JSON map.
@@ -49,13 +52,15 @@ abstract class $TrendingMakeCopyWith<$Res> {
       _$TrendingMakeCopyWithImpl<$Res, TrendingMake>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
-      String name,
-      String slug,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      {@JsonKey(fromJson: _safeParseInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _safeParseString) String? userId,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String name,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String slug,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String image,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      String updatedAt});
 }
 
 /// @nodoc
@@ -123,13 +128,15 @@ abstract class _$$TrendingMakeImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
-      String name,
-      String slug,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      {@JsonKey(fromJson: _safeParseInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _safeParseString) String? userId,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String name,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String slug,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String image,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      String updatedAt});
 }
 
 /// @nodoc
@@ -190,34 +197,39 @@ class __$$TrendingMakeImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
   const _$TrendingMakeImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
-      required this.name,
-      required this.slug,
-      required this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
+      {@JsonKey(fromJson: _safeParseInt) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _safeParseString) this.userId,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.name,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.slug,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.image,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      required this.createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      required this.updatedAt});
 
   factory _$TrendingMakeImpl.fromJson(Map<String, dynamic> json) =>
       _$$TrendingMakeImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _safeParseInt)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _safeParseString)
   final String? userId;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String name;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String slug;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String image;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
   final String createdAt;
-// Changed to String
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
   final String updatedAt;
 
   @override
@@ -278,34 +290,43 @@ class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
 
 abstract class _TrendingMake implements TrendingMake {
   const factory _TrendingMake(
-          {required final int id,
-          @JsonKey(name: 'user_id') final String? userId,
-          required final String name,
-          required final String slug,
-          required final String image,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$TrendingMakeImpl;
+      {@JsonKey(fromJson: _safeParseInt) required final int id,
+      @JsonKey(name: 'user_id', fromJson: _safeParseString)
+      final String? userId,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
+      required final String name,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
+      required final String slug,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
+      required final String image,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      required final String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      required final String updatedAt}) = _$TrendingMakeImpl;
 
   factory _TrendingMake.fromJson(Map<String, dynamic> json) =
       _$TrendingMakeImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _safeParseInt)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _safeParseString)
   String? get userId;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get name;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get slug;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get image;
   @override
-  @JsonKey(name: 'created_at')
-  String get createdAt; // Changed to String
+  @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+  String get createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
   String get updatedAt;
 
   /// Create a copy of TrendingMake
@@ -322,8 +343,11 @@ TrendingMakeResponse _$TrendingMakeResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$TrendingMakeResponse {
+  @JsonKey(fromJson: _safeParseTrendingMakeList)
   List<TrendingMake> get data => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParsePaginationLinks)
   PaginationLinks get links => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParsePaginationMeta)
   PaginationMeta get meta => throw _privateConstructorUsedError;
 
   /// Serializes this TrendingMakeResponse to a JSON map.
@@ -343,7 +367,9 @@ abstract class $TrendingMakeResponseCopyWith<$Res> {
       _$TrendingMakeResponseCopyWithImpl<$Res, TrendingMakeResponse>;
   @useResult
   $Res call(
-      {List<TrendingMake> data, PaginationLinks links, PaginationMeta meta});
+      {@JsonKey(fromJson: _safeParseTrendingMakeList) List<TrendingMake> data,
+      @JsonKey(fromJson: _safeParsePaginationLinks) PaginationLinks links,
+      @JsonKey(fromJson: _safeParsePaginationMeta) PaginationMeta meta});
 
   $PaginationLinksCopyWith<$Res> get links;
   $PaginationMetaCopyWith<$Res> get meta;
@@ -415,7 +441,9 @@ abstract class _$$TrendingMakeResponseImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {List<TrendingMake> data, PaginationLinks links, PaginationMeta meta});
+      {@JsonKey(fromJson: _safeParseTrendingMakeList) List<TrendingMake> data,
+      @JsonKey(fromJson: _safeParsePaginationLinks) PaginationLinks links,
+      @JsonKey(fromJson: _safeParsePaginationMeta) PaginationMeta meta});
 
   @override
   $PaginationLinksCopyWith<$Res> get links;
@@ -463,9 +491,10 @@ class _$TrendingMakeResponseImpl
     with DiagnosticableTreeMixin
     implements _TrendingMakeResponse {
   const _$TrendingMakeResponseImpl(
-      {required final List<TrendingMake> data,
-      required this.links,
-      required this.meta})
+      {@JsonKey(fromJson: _safeParseTrendingMakeList)
+      required final List<TrendingMake> data,
+      @JsonKey(fromJson: _safeParsePaginationLinks) required this.links,
+      @JsonKey(fromJson: _safeParsePaginationMeta) required this.meta})
       : _data = data;
 
   factory _$TrendingMakeResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -473,6 +502,7 @@ class _$TrendingMakeResponseImpl
 
   final List<TrendingMake> _data;
   @override
+  @JsonKey(fromJson: _safeParseTrendingMakeList)
   List<TrendingMake> get data {
     if (_data is EqualUnmodifiableListView) return _data;
     // ignore: implicit_dynamic_type
@@ -480,8 +510,10 @@ class _$TrendingMakeResponseImpl
   }
 
   @override
+  @JsonKey(fromJson: _safeParsePaginationLinks)
   final PaginationLinks links;
   @override
+  @JsonKey(fromJson: _safeParsePaginationMeta)
   final PaginationMeta meta;
 
   @override
@@ -534,18 +566,24 @@ class _$TrendingMakeResponseImpl
 
 abstract class _TrendingMakeResponse implements TrendingMakeResponse {
   const factory _TrendingMakeResponse(
-      {required final List<TrendingMake> data,
+      {@JsonKey(fromJson: _safeParseTrendingMakeList)
+      required final List<TrendingMake> data,
+      @JsonKey(fromJson: _safeParsePaginationLinks)
       required final PaginationLinks links,
+      @JsonKey(fromJson: _safeParsePaginationMeta)
       required final PaginationMeta meta}) = _$TrendingMakeResponseImpl;
 
   factory _TrendingMakeResponse.fromJson(Map<String, dynamic> json) =
       _$TrendingMakeResponseImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _safeParseTrendingMakeList)
   List<TrendingMake> get data;
   @override
+  @JsonKey(fromJson: _safeParsePaginationLinks)
   PaginationLinks get links;
   @override
+  @JsonKey(fromJson: _safeParsePaginationMeta)
   PaginationMeta get meta;
 
   /// Create a copy of TrendingMakeResponse
@@ -562,9 +600,13 @@ PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationLinks {
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get first => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get last => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseString)
   String? get prev => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseString)
   String? get next => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationLinks to a JSON map.
@@ -583,7 +625,11 @@ abstract class $PaginationLinksCopyWith<$Res> {
           PaginationLinks value, $Res Function(PaginationLinks) then) =
       _$PaginationLinksCopyWithImpl<$Res, PaginationLinks>;
   @useResult
-  $Res call({String first, String last, String? prev, String? next});
+  $Res call(
+      {@JsonKey(fromJson: _safeParseStringWithDefault) String first,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String last,
+      @JsonKey(fromJson: _safeParseString) String? prev,
+      @JsonKey(fromJson: _safeParseString) String? next});
 }
 
 /// @nodoc
@@ -635,7 +681,11 @@ abstract class _$$PaginationLinksImplCopyWith<$Res>
       __$$PaginationLinksImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String first, String last, String? prev, String? next});
+  $Res call(
+      {@JsonKey(fromJson: _safeParseStringWithDefault) String first,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String last,
+      @JsonKey(fromJson: _safeParseString) String? prev,
+      @JsonKey(fromJson: _safeParseString) String? next});
 }
 
 /// @nodoc
@@ -683,18 +733,25 @@ class _$PaginationLinksImpl
     with DiagnosticableTreeMixin
     implements _PaginationLinks {
   const _$PaginationLinksImpl(
-      {required this.first, required this.last, this.prev, this.next});
+      {@JsonKey(fromJson: _safeParseStringWithDefault) required this.first,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.last,
+      @JsonKey(fromJson: _safeParseString) this.prev,
+      @JsonKey(fromJson: _safeParseString) this.next});
 
   factory _$PaginationLinksImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationLinksImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String first;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String last;
   @override
+  @JsonKey(fromJson: _safeParseString)
   final String? prev;
   @override
+  @JsonKey(fromJson: _safeParseString)
   final String? next;
 
   @override
@@ -747,21 +804,28 @@ class _$PaginationLinksImpl
 
 abstract class _PaginationLinks implements PaginationLinks {
   const factory _PaginationLinks(
-      {required final String first,
-      required final String last,
-      final String? prev,
-      final String? next}) = _$PaginationLinksImpl;
+          {@JsonKey(fromJson: _safeParseStringWithDefault)
+          required final String first,
+          @JsonKey(fromJson: _safeParseStringWithDefault)
+          required final String last,
+          @JsonKey(fromJson: _safeParseString) final String? prev,
+          @JsonKey(fromJson: _safeParseString) final String? next}) =
+      _$PaginationLinksImpl;
 
   factory _PaginationLinks.fromJson(Map<String, dynamic> json) =
       _$PaginationLinksImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get first;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get last;
   @override
+  @JsonKey(fromJson: _safeParseString)
   String? get prev;
   @override
+  @JsonKey(fromJson: _safeParseString)
   String? get next;
 
   /// Create a copy of PaginationLinks
@@ -778,16 +842,21 @@ PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationMeta {
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
   int get currentPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   int get from => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
   int get lastPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
   List<PaginationMetaLink> get links => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get path => throw _privateConstructorUsedError;
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
   int get perPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   int get to => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   int get total => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMeta to a JSON map.
@@ -807,14 +876,18 @@ abstract class $PaginationMetaCopyWith<$Res> {
       _$PaginationMetaCopyWithImpl<$Res, PaginationMeta>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int from,
-      @JsonKey(name: 'last_page') int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
+      int currentPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) int from,
+      @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
+      int lastPage,
+      @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
       List<PaginationMetaLink> links,
-      String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int to,
-      int total});
+      @JsonKey(fromJson: _safeParseStringWithDefault) String path,
+      @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
+      int perPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) int to,
+      @JsonKey(fromJson: _safeParseIntWithDefault) int total});
 }
 
 /// @nodoc
@@ -887,14 +960,18 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int from,
-      @JsonKey(name: 'last_page') int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
+      int currentPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) int from,
+      @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
+      int lastPage,
+      @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
       List<PaginationMetaLink> links,
-      String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int to,
-      int total});
+      @JsonKey(fromJson: _safeParseStringWithDefault) String path,
+      @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
+      int perPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) int to,
+      @JsonKey(fromJson: _safeParseIntWithDefault) int total});
 }
 
 /// @nodoc
@@ -962,29 +1039,35 @@ class _$PaginationMetaImpl
     with DiagnosticableTreeMixin
     implements _PaginationMeta {
   const _$PaginationMetaImpl(
-      {@JsonKey(name: 'current_page') required this.currentPage,
-      required this.from,
-      @JsonKey(name: 'last_page') required this.lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
+      required this.currentPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) required this.from,
+      @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
+      required this.lastPage,
+      @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
       required final List<PaginationMetaLink> links,
-      required this.path,
-      @JsonKey(name: 'per_page') required this.perPage,
-      required this.to,
-      required this.total})
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.path,
+      @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
+      required this.perPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) required this.to,
+      @JsonKey(fromJson: _safeParseIntWithDefault) required this.total})
       : _links = links;
 
   factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaImplFromJson(json);
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
   final int currentPage;
   @override
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   final int from;
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
   final int lastPage;
   final List<PaginationMetaLink> _links;
   @override
+  @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
   List<PaginationMetaLink> get links {
     if (_links is EqualUnmodifiableListView) return _links;
     // ignore: implicit_dynamic_type
@@ -992,13 +1075,16 @@ class _$PaginationMetaImpl
   }
 
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String path;
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
   final int perPage;
   @override
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   final int to;
   @override
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   final int total;
 
   @override
@@ -1062,36 +1148,47 @@ class _$PaginationMetaImpl
 
 abstract class _PaginationMeta implements PaginationMeta {
   const factory _PaginationMeta(
-      {@JsonKey(name: 'current_page') required final int currentPage,
-      required final int from,
-      @JsonKey(name: 'last_page') required final int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
+      required final int currentPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) required final int from,
+      @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
+      required final int lastPage,
+      @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
       required final List<PaginationMetaLink> links,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
       required final String path,
-      @JsonKey(name: 'per_page') required final int perPage,
-      required final int to,
+      @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
+      required final int perPage,
+      @JsonKey(fromJson: _safeParseIntWithDefault) required final int to,
+      @JsonKey(fromJson: _safeParseIntWithDefault)
       required final int total}) = _$PaginationMetaImpl;
 
   factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaImpl.fromJson;
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault)
   int get currentPage;
   @override
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   int get from;
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _safeParseIntWithDefault)
   int get lastPage;
   @override
+  @JsonKey(fromJson: _safeParsePaginationMetaLinkList)
   List<PaginationMetaLink> get links;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get path;
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _safeParseIntWithDefault)
   int get perPage;
   @override
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   int get to;
   @override
+  @JsonKey(fromJson: _safeParseIntWithDefault)
   int get total;
 
   /// Create a copy of PaginationMeta
@@ -1108,8 +1205,11 @@ PaginationMetaLink _$PaginationMetaLinkFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationMetaLink {
+  @JsonKey(fromJson: _safeParseString)
   String? get url => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get label => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseBoolWithDefault)
   bool get active => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationMetaLink to a JSON map.
@@ -1128,7 +1228,10 @@ abstract class $PaginationMetaLinkCopyWith<$Res> {
           PaginationMetaLink value, $Res Function(PaginationMetaLink) then) =
       _$PaginationMetaLinkCopyWithImpl<$Res, PaginationMetaLink>;
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call(
+      {@JsonKey(fromJson: _safeParseString) String? url,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String label,
+      @JsonKey(fromJson: _safeParseBoolWithDefault) bool active});
 }
 
 /// @nodoc
@@ -1175,7 +1278,10 @@ abstract class _$$PaginationMetaLinkImplCopyWith<$Res>
       __$$PaginationMetaLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call(
+      {@JsonKey(fromJson: _safeParseString) String? url,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String label,
+      @JsonKey(fromJson: _safeParseBoolWithDefault) bool active});
 }
 
 /// @nodoc
@@ -1218,16 +1324,21 @@ class _$PaginationMetaLinkImpl
     with DiagnosticableTreeMixin
     implements _PaginationMetaLink {
   const _$PaginationMetaLinkImpl(
-      {this.url, required this.label, required this.active});
+      {@JsonKey(fromJson: _safeParseString) this.url,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.label,
+      @JsonKey(fromJson: _safeParseBoolWithDefault) required this.active});
 
   factory _$PaginationMetaLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationMetaLinkImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _safeParseString)
   final String? url;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   final String label;
   @override
+  @JsonKey(fromJson: _safeParseBoolWithDefault)
   final bool active;
 
   @override
@@ -1278,18 +1389,23 @@ class _$PaginationMetaLinkImpl
 
 abstract class _PaginationMetaLink implements PaginationMetaLink {
   const factory _PaginationMetaLink(
-      {final String? url,
+      {@JsonKey(fromJson: _safeParseString) final String? url,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
       required final String label,
+      @JsonKey(fromJson: _safeParseBoolWithDefault)
       required final bool active}) = _$PaginationMetaLinkImpl;
 
   factory _PaginationMetaLink.fromJson(Map<String, dynamic> json) =
       _$PaginationMetaLinkImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _safeParseString)
   String? get url;
   @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
   String get label;
   @override
+  @JsonKey(fromJson: _safeParseBoolWithDefault)
   bool get active;
 
   /// Create a copy of PaginationMetaLink

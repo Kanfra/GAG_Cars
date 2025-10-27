@@ -8,6 +8,7 @@ class ApiEndpoint{
   static const String verifyOtp = "/otp/verify";
   static const String authenticateUser = "/user"; // verifies token to keep user logged in
   static const String updateProfile = "/update-profile";
+  static const String deleteUser = "/user";
 
   // homepage
   static const String items = "/items"; // recommended items

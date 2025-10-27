@@ -171,8 +171,8 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-      height: json['height'] as String?,
-      vin: json['vin'] as String?,
+      height: json['Height'] as String?,
+      vin: json['VIN'] as String?,
       brand: json['brand'] == null
           ? null
           : Brand.fromJson(json['brand'] as Map<String, dynamic>),
@@ -220,8 +220,8 @@ Map<String, dynamic> _$$RecommendedItemImplToJson(
       'deleted_at': instance.deletedAt?.toIso8601String(),
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
-      'height': instance.height,
-      'vin': instance.vin,
+      'Height': instance.height,
+      'VIN': instance.vin,
       'brand': instance.brand,
       'category': instance.category,
       'brand_model': instance.brandModel,
@@ -269,14 +269,14 @@ _$RecommendedMetaImpl _$$RecommendedMetaImplFromJson(
         Map<String, dynamic> json) =>
     _$RecommendedMetaImpl(
       currentPage: (json['current_page'] as num).toInt(),
-      from: (json['from'] as num).toInt(),
+      from: (json['from'] as num?)?.toInt(),
       lastPage: (json['last_page'] as num).toInt(),
       links: (json['links'] as List<dynamic>)
           .map((e) => RecommendedMetaLink.fromJson(e as Map<String, dynamic>))
           .toList(),
       path: json['path'] as String,
       perPage: (json['per_page'] as num).toInt(),
-      to: (json['to'] as num).toInt(),
+      to: (json['to'] as num?)?.toInt(),
       total: (json['total'] as num).toInt(),
     );
 
@@ -298,6 +298,7 @@ _$RecommendedMetaLinkImpl _$$RecommendedMetaLinkImplFromJson(
     _$RecommendedMetaLinkImpl(
       url: json['url'] as String?,
       label: json['label'] as String,
+      page: (json['page'] as num?)?.toInt(),
       active: json['active'] as bool,
     );
 
@@ -306,5 +307,6 @@ Map<String, dynamic> _$$RecommendedMetaLinkImplToJson(
     <String, dynamic>{
       'url': instance.url,
       'label': instance.label,
+      'page': instance.page,
       'active': instance.active,
     };

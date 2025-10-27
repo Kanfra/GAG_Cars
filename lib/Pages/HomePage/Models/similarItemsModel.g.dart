@@ -12,8 +12,12 @@ _$SimilarItemsResponseImpl _$$SimilarItemsResponseImplFromJson(
       data: (json['data'] as List<dynamic>)
           .map((e) => SimilarItem.fromJson(e as Map<String, dynamic>))
           .toList(),
-      links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
+      links: json['links'] == null
+          ? null
+          : PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
+      meta: json['meta'] == null
+          ? null
+          : PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$SimilarItemsResponseImplToJson(
@@ -28,16 +32,15 @@ _$SimilarItemImpl _$$SimilarItemImplFromJson(Map<String, dynamic> json) =>
     _$SimilarItemImpl(
       id: json['id'] as String,
       userId: json['user_id'] as String?,
-      countryId: _parseInt(json['country_id']),
-      brandModelId: _parseInt(json['brand_model_id']),
-      brandId: _parseInt(json['brand_id']),
-      categoryId: _parseInt(json['category_id']),
-      name: json['name'] as String,
-      year: json['year'] as String,
-      slug: json['slug'] as String,
+      countryId: _parseNullableInt(json['country_id']),
+      brandModelId: _parseNullableInt(json['brand_model_id']),
+      brandId: _parseNullableInt(json['brand_id']),
+      categoryId: _parseNullableInt(json['category_id']),
+      name: json['name'] as String?,
+      year: json['year'] as String?,
+      slug: json['slug'] as String?,
       description: json['description'] as String?,
-      images:
-          (json['images'] as List<dynamic>).map((e) => e as String).toList(),
+      images: _parseStringList(json['images']),
       location: json['location'] as String?,
       serialNumber: json['serial_number'] as String?,
       condition: json['condition'] as String?,
@@ -46,17 +49,16 @@ _$SimilarItemImpl _$$SimilarItemImplFromJson(Map<String, dynamic> json) =>
       transmission: json['transmission'] as String?,
       color: json['color'] as String?,
       buildType: json['build_type'] as String?,
-      numberOfPassengers: _parseInt(json['number_of_passengers']),
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
+      numberOfPassengers: _parseNullableInt(json['number_of_passengers']),
+      features: _parseStringList(json['features']),
       status: json['status'] as String?,
-      price: json['price'] as String,
+      price: json['price'] as String?,
       mileage: json['mileage'] as String?,
-      warranty: _parseInt(json['warranty']),
+      warranty: _parseNullableInt(json['warranty']),
       warrantyExpiration: json['warranty_expiration'] as String?,
       deletedAt: json['deleted_at'] as String?,
-      createdAt: json['created_at'] as String,
-      updatedAt: json['updated_at'] as String,
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
       height: json['Height'] as String?,
       vin: json['VIN'] as String?,
     );
@@ -116,16 +118,16 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
 
 _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
     _$PaginationMetaImpl(
-      currentPage: _parseInt(json['current_page']),
-      from: _parseInt(json['from']),
-      lastPage: _parseInt(json['last_page']),
-      links: (json['links'] as List<dynamic>)
-          .map((e) => PaginationLink.fromJson(e as Map<String, dynamic>))
+      currentPage: _parseNullableInt(json['current_page']),
+      from: _parseNullableInt(json['from']),
+      lastPage: _parseNullableInt(json['last_page']),
+      links: (json['links'] as List<dynamic>?)
+          ?.map((e) => PaginationLink.fromJson(e as Map<String, dynamic>))
           .toList(),
-      path: json['path'] as String,
-      perPage: _parseInt(json['per_page']),
-      to: _parseInt(json['to']),
-      total: _parseInt(json['total']),
+      path: json['path'] as String?,
+      perPage: _parseNullableInt(json['per_page']),
+      to: _parseNullableInt(json['to']),
+      total: _parseNullableInt(json['total']),
     );
 
 Map<String, dynamic> _$$PaginationMetaImplToJson(
@@ -144,8 +146,8 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
 _$PaginationLinkImpl _$$PaginationLinkImplFromJson(Map<String, dynamic> json) =>
     _$PaginationLinkImpl(
       url: json['url'] as String?,
-      label: json['label'] as String,
-      active: json['active'] as bool,
+      label: json['label'] as String?,
+      active: json['active'] as bool?,
     );
 
 Map<String, dynamic> _$$PaginationLinkImplToJson(

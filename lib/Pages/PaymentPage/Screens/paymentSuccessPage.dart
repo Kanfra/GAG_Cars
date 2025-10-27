@@ -1,6 +1,7 @@
 // lib/Pages/Payment/payment_success_page.dart
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:pdf/pdf.dart';
@@ -31,6 +32,35 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   void initState() {
     super.initState();
     logger.i('✅ Payment success initialized: ${widget.allJson}');
+    
+    // Show appropriate message based on upload status
+    if (widget.allJson['uploadError'] != null) {
+      _showUploadErrorSnackbar();
+    } else if (widget.allJson['promotionError'] != null) {
+      _showPromotionErrorSnackbar();
+    }
+  }
+
+  void _showUploadErrorSnackbar() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showCustomSnackBar(
+        backgroundColor: ColorGlobalVariables.redColor,
+        title: "Upload Failed",
+        message: "Payment was successful but vehicle upload failed. Please try uploading again from My Listings.",
+        duration: Duration(seconds: 5),
+      );
+    });
+  }
+
+  void _showPromotionErrorSnackbar() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showCustomSnackBar(
+        backgroundColor: ColorGlobalVariables.redColor,
+        title: "Promotion Failed", 
+        message: "Payment was successful but promotion activation failed. Please contact support.",
+        duration: Duration(seconds: 5),
+      );
+    });
   }
 
   double _getAmountInGhs() {
@@ -138,9 +168,65 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     }
   }
 
+  String _getSuccessMessage() {
+    final type = widget.allJson['type'] ?? 'upload';
+    final uploadError = widget.allJson['uploadError'];
+    final promotionError = widget.allJson['promotionError'];
+    
+    if (uploadError != null) {
+      return 'Payment successful but upload failed';
+    } else if (promotionError != null) {
+      return 'Payment successful but promotion failed';
+    } else if (type == 'upload') {
+      return 'Your vehicle has been listed successfully!';
+    } else {
+      return 'Your listing is now being promoted!';
+    }
+  }
+
+  String _getSubMessage() {
+    final type = widget.allJson['type'] ?? 'upload';
+    final uploadError = widget.allJson['uploadError'];
+    final promotionError = widget.allJson['promotionError'];
+    
+    if (uploadError != null) {
+      return 'Please try uploading again from My Listings';
+    } else if (promotionError != null) {
+      return 'Please contact support for assistance';
+    } else if (type == 'upload') {
+      return 'Your vehicle is now visible to potential buyers';
+    } else {
+      return 'You will receive more visibility and inquiries';
+    }
+  }
+
+  Color _getStatusColor() {
+    final uploadError = widget.allJson['uploadError'];
+    final promotionError = widget.allJson['promotionError'];
+    
+    if (uploadError != null || promotionError != null) {
+      return Colors.orange;
+    }
+    return Colors.green;
+  }
+
+  IconData _getStatusIcon() {
+    final uploadError = widget.allJson['uploadError'];
+    final promotionError = widget.allJson['promotionError'];
+    
+    if (uploadError != null || promotionError != null) {
+      return Icons.warning_amber_rounded;
+    }
+    return Icons.check_circle;
+  }
+
   @override
   Widget build(BuildContext context) {
     final amountInGhs = _getAmountInGhs();
+    final statusColor = _getStatusColor();
+    final statusIcon = _getStatusIcon();
+    final successMessage = _getSuccessMessage();
+    final subMessage = _getSubMessage();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -155,20 +241,21 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: statusColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle, color: Colors.green, size: 60),
+                child: Icon(statusIcon, color: statusColor, size: 60),
               ),
               const SizedBox(height: 32),
 
-              const Text(
-                'Payment Successful!',
+              Text(
+                successMessage,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: statusColor,
                 ),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
 
@@ -221,10 +308,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Get.offNamedUntil(
-                         RouteClass.getMyListingPage(),
-                         (route) => route.isFirst,
-                        );
+                        Get.offAllNamed(RouteClass.getMyListingPage());
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorGlobalVariables.redColor,
@@ -269,14 +353,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               ),
               const SizedBox(height: 16),
 
-              const Text(
-                'Your listing is now being promoted!',
-                style: TextStyle(color: Colors.green, fontSize: 14),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'You will receive more visibility and inquiries.',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+              Text(
+                subMessage,
+                style: TextStyle(color: statusColor, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
             ],

@@ -15,8 +15,10 @@ import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dar
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/similarItemsModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/userDetailsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
@@ -41,6 +43,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   final ScrollController _scrollController = ScrollController();
+  final _similarItemsScrollThreshold = 200.0;
   double _appBarHeight = 300;
   double _imageOpacity = 1.0;
   int selectedIndex = 0;
@@ -51,6 +54,7 @@ class _DetailPageState extends State<DetailPage> {
   
   late int _currentItemCategoryId;
   late String _currentItemId;
+  String? _currentUserId;
 
   @override
   void initState() {
@@ -62,27 +66,54 @@ class _DetailPageState extends State<DetailPage> {
     _currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']) ?? 0;
     _currentItemId = item['id']?.toString() ?? '';
     
+    // FIXED: Correctly extract user ID from the user map
+    final user = item['user'];
+    if (user is Map<String, dynamic>) {
+      _currentUserId = user['id']?.toString();
+    } else {
+      // Fallback: try to access as object if it's not a map
+      try {
+        _currentUserId = user.id?.toString();
+      } catch (e) {
+        _currentUserId = null;
+      }
+    }
+    
+    final logger = Logger();
+    logger.w('🔍 [DETAIL PAGE] Extracted user ID: $_currentUserId');
+    logger.w('🔍 [DETAIL PAGE] Item user data: $user');
+    logger.w('🔍 [DETAIL PAGE] Full item data: $item');
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadCategoryDetails();
       _loadSimilarItems();
+      _fetchUserDetails();
     });
     
-    _scrollController.addListener(() {
-      if (mounted) {
-        setState(() {
-          final scrollOffset = _scrollController.offset;
-          _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
-          
-          if (scrollOffset > 0) {
-            _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
-          } else {
-            _appBarHeight = 300.0;
-          }
-        });
-      }
+    _scrollController.addListener(_onScroll);
+  }
 
-      _checkLazyLoading();
-    });
+  void _onScroll() {
+    if (mounted) {
+      setState(() {
+        final scrollOffset = _scrollController.offset;
+        _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
+        
+        if (scrollOffset > 0) {
+          _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
+        } else {
+          _appBarHeight = 300.0;
+        }
+      });
+    }
+
+    // Check for lazy loading
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    
+    if (maxScroll - currentScroll <= _similarItemsScrollThreshold) {
+      _loadMoreSimilarItems();
+    }
   }
 
   void _preloadCategoryDetails() {
@@ -113,16 +144,24 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  void _checkLazyLoading() {
-    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+  void _fetchUserDetails() {
+    if (!mounted || _currentUserId == null || _currentUserId!.isEmpty) return;
     
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 500 &&
-        !similarItemsProvider.isLoadingMore &&
-        similarItemsProvider.hasMore) {
+    // Wait until after build to get the provider to ensure we're using the same instance
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userDetailsProvider = Provider.of<UserDetailsProvider>(context, listen: false);
       
-      _loadMoreSimilarItems();
-    }
+      final logger = Logger();
+      logger.w('🔍 [DETAIL PAGE FETCH] Fetching details for user ID: $_currentUserId');
+      logger.w('🔍 [DETAIL PAGE FETCH] Provider current user: ${userDetailsProvider.userDetails?.id}');
+      logger.w('🔍 [DETAIL PAGE FETCH] Provider current itemsCount: ${userDetailsProvider.itemsCount}');
+      
+      if (!userDetailsProvider.hasUserDetails(_currentUserId!)) {
+        userDetailsProvider.fetchUserDetails(_currentUserId!);
+      } else {
+        logger.w('🔍 [DETAIL PAGE FETCH] User details already cached for: $_currentUserId');
+      }
+    });
   }
 
   int? _extractCategoryId(dynamic category) {
@@ -149,34 +188,35 @@ class _DetailPageState extends State<DetailPage> {
     super.dispose();
   }
 
-  Widget _buildShimmerPlaceholder(double? width, double? height) {
+  Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+      highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
       child: Container(
         width: width,
         height: height,
-        color: Colors.white,
+        color: theme.cardColor,
       ),
     );
   }
 
-  Widget _buildCustomErrorWidget(double? width, double? height) {
+  Widget _buildCustomErrorWidget(double? width, double? height, ThemeData theme) {
     return Container(
       width: width,
       height: height,
-      color: Colors.grey[300],
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[300],
       child: Center(
         child: Icon(
           Icons.broken_image,
           size: (width ?? 45) * 0.4,
-          color: Colors.grey[400],
+          color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
         ),
       ),
     );
   }
 
   Widget buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+    final theme = Theme.of(context);
     try {
       if (imagePath.isNotEmpty) {
         return Image.network(
@@ -184,16 +224,16 @@ class _DetailPageState extends State<DetailPage> {
           width: width,
           height: height,
           fit: fit,
-          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height),
+          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height, theme),
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
-            return _buildShimmerPlaceholder(width, height);
+            return _buildShimmerPlaceholder(width, height, theme);
           },
           frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
             if (wasSynchronouslyLoaded) return child;
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: frame != null ? child : _buildShimmerPlaceholder(width, height),
+              child: frame != null ? child : _buildShimmerPlaceholder(width, height, theme),
             );
           },
         );
@@ -204,20 +244,20 @@ class _DetailPageState extends State<DetailPage> {
           width: width,
           height: height,
           fit: fit,
-          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height),
+          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height, theme),
           frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
             if (wasSynchronouslyLoaded) return child;
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: frame != null ? child : _buildShimmerPlaceholder(width, height),
+              child: frame != null ? child : _buildShimmerPlaceholder(width, height, theme),
             );
           },
         );
       } else {
-        return _buildCustomErrorWidget(width, height);
+        return _buildCustomErrorWidget(width, height, theme);
       }
     } catch (e) {
-      return _buildCustomErrorWidget(width, height);
+      return _buildCustomErrorWidget(width, height, theme);
     }
   }
 
@@ -268,13 +308,14 @@ class _DetailPageState extends State<DetailPage> {
   void _showContactDialog() {
     final phoneNumber = _getUserPhoneNumber();
     final userName = _getUserName();
+    final theme = Theme.of(context);
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
+          backgroundColor: theme.cardColor,
+          surfaceTintColor: theme.cardColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -300,13 +341,13 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         "Contact Information",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                       ),
                     ),
@@ -317,21 +358,21 @@ class _DetailPageState extends State<DetailPage> {
                 
                 Text(
                   "Seller: $userName",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: theme.textTheme.titleLarge?.color,
                   ),
                 ),
                 
                 const SizedBox(height: 16),
                 
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
-                  const Text(
+                  Text(
                     "Phone Number:",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black54,
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -339,16 +380,16 @@ class _DetailPageState extends State<DetailPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
+                      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
+                      border: Border.all(color: theme.dividerColor),
                     ),
                     child: Text(
                       phoneNumber,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: theme.textTheme.titleLarge?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -358,24 +399,24 @@ class _DetailPageState extends State<DetailPage> {
                     "You can call or message this number to contact the seller.",
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[600],
+                      color: theme.textTheme.bodyMedium?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ] else ...[
                   Column(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.contact_phone_outlined,
                         size: 48,
-                        color: Colors.grey,
+                        color: theme.iconTheme.color,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         "No contact information available",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey[600],
+                          color: theme.textTheme.bodyMedium?.color,
                           fontWeight: FontWeight.w500,
                       ),
                       textAlign: TextAlign.center,
@@ -385,7 +426,7 @@ class _DetailPageState extends State<DetailPage> {
                       "The seller hasn't provided contact details",
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[500],
+                        color: theme.textTheme.bodyMedium?.color,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -404,14 +445,14 @@ class _DetailPageState extends State<DetailPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: BorderSide(color: Colors.grey[300]!),
+                        side: BorderSide(color: theme.dividerColor),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Close",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black54,
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
                       ),
                     ),
@@ -471,6 +512,7 @@ class _DetailPageState extends State<DetailPage> {
 
   List<Widget> _buildVerificationBadges() {
     final List<Widget> badges = [];
+    final theme = Theme.of(context);
     
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     
@@ -479,10 +521,10 @@ class _DetailPageState extends State<DetailPage> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
           decoration: BoxDecoration(
-            color: Colors.lightBlue[100],
+            color: theme.brightness == Brightness.dark ? Colors.blue[900]! : Colors.lightBlue[100]!,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
@@ -490,9 +532,10 @@ class _DetailPageState extends State<DetailPage> {
                 style: TextStyle(
                   fontSize: 12.0,
                   fontWeight: FontWeight.w500,
+                  color: theme.brightness == Brightness.dark ? Colors.blue[100] : Colors.blue[800],
                 ),
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               CircleAvatar(
                 radius: 8,
                 backgroundColor: Colors.blue,
@@ -509,10 +552,10 @@ class _DetailPageState extends State<DetailPage> {
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
           decoration: BoxDecoration(
-            color: Colors.green[100],
+            color: theme.brightness == Brightness.dark ? Colors.green[900]! : Colors.green[100]!,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
@@ -520,9 +563,10 @@ class _DetailPageState extends State<DetailPage> {
                 style: TextStyle(
                   fontSize: 12.0,
                   fontWeight: FontWeight.w500,
+                  color: theme.brightness == Brightness.dark ? Colors.green[100] : Colors.green[800],
                 ),
               ),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               CircleAvatar(
                 radius: 8,
                 backgroundColor: Colors.green,
@@ -642,6 +686,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildInfoItem(String title, String value, {bool isSpecification = false}) {
+    final theme = Theme.of(context);
     return IntrinsicWidth(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -650,7 +695,7 @@ class _DetailPageState extends State<DetailPage> {
             title,
             style: TextStyle(
               fontSize: 14.0,
-              color: isSpecification ? Colors.black54 : Colors.black87,
+              color: isSpecification ? theme.textTheme.bodyMedium?.color : theme.textTheme.titleLarge?.color,
               fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
             ),
           ),
@@ -660,7 +705,7 @@ class _DetailPageState extends State<DetailPage> {
             style: TextStyle(
               fontSize: 16.0,
               fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
-              color: Colors.black87,
+              color: theme.textTheme.titleLarge?.color,
             ),
           ),
         ],
@@ -669,25 +714,28 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final theme = Theme.of(context);
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20.0,
         fontWeight: FontWeight.w600,
+        color: theme.textTheme.titleLarge?.color,
       ),
     );
   }
 
   Widget _buildInfoRow(IconData icon, String text) {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, color: Colors.grey[600], size: 20),
+        Icon(icon, color: theme.iconTheme.color, size: 20),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.grey[700],
+              color: theme.textTheme.bodyMedium?.color,
               fontSize: 15.0,
             ),
           ),
@@ -697,17 +745,19 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildTag(String text, Color color) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
-        color: color,
+        color: theme.brightness == Brightness.dark ? color.withOpacity(0.3) : color,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13.0,
           fontWeight: FontWeight.w500,
+          color: theme.brightness == Brightness.dark ? Colors.white70 : Colors.black87,
         ),
       ),
     );
@@ -773,50 +823,200 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
-    return RecommendedItem(
-      id: similarItem.id,
-      name: similarItem.name,
-      price: similarItem.price,
-      year: similarItem.year,
-      images: similarItem.images,
-      mileage: similarItem.mileage,
-      transmission: similarItem.transmission,
-      location: similarItem.location,
-      condition: similarItem.condition,
-      description: similarItem.description,
-      userId: similarItem.userId,
-      countryId: similarItem.countryId,
-      brandModelId: similarItem.brandModelId,
-      brandId: similarItem.brandId,
-      categoryId: similarItem.categoryId,
-      slug: similarItem.slug,
-      serialNumber: similarItem.serialNumber,
-      steerPosition: similarItem.steerPosition,
-      engineCapacity: similarItem.engineCapacity,
-      color: similarItem.color,
-      buildType: similarItem.buildType,
-      numberOfPassengers: similarItem.numberOfPassengers,
-      features: similarItem.features,
-      status: similarItem.status,
-      warranty: similarItem.warranty,
-      warrantyExpiration: similarItem.warrantyExpiration != null 
-          ? DateTime.tryParse(similarItem.warrantyExpiration!) 
-          : null,
-      deletedAt: similarItem.deletedAt != null 
-          ? DateTime.tryParse(similarItem.deletedAt!) 
-          : null,
-      createdAt: DateTime.tryParse(similarItem.createdAt) ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(similarItem.updatedAt) ?? DateTime.now(),
-      height: similarItem.height,
-      vin: similarItem.vin,
-      isPromoted: false,
-      brand: null,
+  Widget _buildSimilarItemsSection(SimilarItemsProvider similarItemsProvider) {
+    final theme = Theme.of(context);
+    
+    if (similarItemsProvider.isLoading && similarItemsProvider.items.isEmpty) {
+      return _buildSimilarItemsShimmer();
+    }
+
+    if (similarItemsProvider.items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40),
+        child: Center(
+          child: Text(
+            'No similar items found',
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
+          child: Text(
+            'Similar Items',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.titleLarge?.color,
+            ),
+          ),
+        ),
+        
+        GridView.builder(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          itemCount: similarItemsProvider.items.length + (similarItemsProvider.isLoadingMore ? 1 : 0),
+          shrinkWrap: true,
+          primary: false,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.72,
+          ),
+          itemBuilder: (context, index) {
+            if (index >= similarItemsProvider.items.length) {
+              return _buildLoadingMoreGridItem();
+            }
+            
+            final similarItem = similarItemsProvider.items[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => DetailPage(
+                      allJson: {
+                        'product': similarItem.toJson(),
+                        'item': similarItem.toJson(),
+                        'type': 'details',
+                      },
+                    ),
+                  ),
+                );
+              },
+              child: _buildSimilarItem(similarItem, MediaQuery.of(context).size),
+            );
+          },
+        ),
+        
+        if (similarItemsProvider.isLoadingMore)
+          _buildLoadingMoreIndicator(),
+        
+        if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Center(
+              child: Text(
+                'No more similar items',
+                style: TextStyle(
+                  color: theme.textTheme.bodyMedium?.color,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSimilarItemsShimmer() {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+          child: Text(
+            'Similar Items',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.titleLarge?.color,
+            ),
+          ),
+        ),
+        GridView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: 4,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.72,
+          ),
+          itemBuilder: (context, index) {
+            return Shimmer.fromColors(
+              baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+              highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingMoreGridItem() {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingMoreIndicator() {
+    return const Padding(
+      padding: EdgeInsets.all(16),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+        ),
+      ),
+    );
+  }
+
+  // FIXED: Build dynamic ads count widget with proper provider instance
+  Widget _buildAdsCount() {
+    return Consumer<UserDetailsProvider>(
+      builder: (context, userDetailsProvider, child) {
+        final formattedAdsCount = userDetailsProvider.formattedAdsCount;
+        final userDetails = userDetailsProvider.userDetails;
+        
+        // DEBUG: Comprehensive check to verify we're using the same provider
+        final logger = Logger();
+        logger.w('🔍 [UI BUILD] Current adsCount: $formattedAdsCount');
+        logger.w('🔍 [UI BUILD] Provider user ID: ${userDetails?.id}');
+        logger.w('🔍 [UI BUILD] Expected user ID: $_currentUserId');
+        logger.w('🔍 [UI BUILD] User match: ${userDetails?.id == _currentUserId}');
+        
+        return Text(
+          formattedAdsCount.toString(),
+          style: TextStyle(
+            fontSize: 13.0,
+            fontWeight: FontWeight.w600,
+            color: ColorGlobalVariables.greenColor,
+            decoration: TextDecoration.underline,
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final images = getItemImages();
     final currentImage = images.isNotEmpty && selectedIndex < images.length 
         ? images[selectedIndex] 
@@ -824,14 +1024,15 @@ class _DetailPageState extends State<DetailPage> {
 
     final highlights = getHighlights();
     final specifications = getSpecifications();
-    final screenSize = MediaQuery.of(context).size;
 
+    // FIXED: Removed MultiProvider that was creating new UserDetailsProvider instance
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Consumer<SimilarItemsProvider>(
-        builder: (context, similarItemsProvider, child) {
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Consumer2<SimilarItemsProvider, UserDetailsProvider>(
+        builder: (context, similarItemsProvider, userDetailsProvider, child) {
           return CustomScrollView(
             controller: _scrollController,
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             slivers: [
               SliverAppBar(
                 expandedHeight: 350,
@@ -950,35 +1151,23 @@ class _DetailPageState extends State<DetailPage> {
                     ],
                   ),
                 ),
-                actions: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.share, color: Colors.white, size: 18),
-                    ),
-                  ),
-                ],
               ),
               
               SliverToBoxAdapter(
                 child: Container(
-                  color: Colors.grey[50],
+                  color: theme.scaffoldBackgroundColor,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 16, bottom: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, bottom: 8),
                         child: Text(
                           "Gallery",
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.w600,
+                            color: theme.textTheme.titleLarge?.color,
                           ),
                         ),
                       ),
@@ -1064,29 +1253,29 @@ class _DetailPageState extends State<DetailPage> {
                           children: [
                             Text(
                               item['name'] ?? 'Unnamed Item',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 22.0,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: theme.textTheme.titleLarge?.color,
                               ),
                             ),
                             const SizedBox(height: 6),
                             Text(
                               'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                                color: theme.textTheme.titleLarge?.color,
                               ),
                             ),
                             const SizedBox(height: 16),
                             if (item['description'] != null) ...[
                               Text(
                                 item['description'],
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 15.0,
                                   height: 1.5,
-                                  color: Colors.black87,
+                                  color: theme.textTheme.bodyLarge?.color,
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -1108,13 +1297,13 @@ class _DetailPageState extends State<DetailPage> {
                             
                             Links(
                               linkTextType: 'Notify price drops', 
-                              linkTextColor: ColorGlobalVariables.blackColor, 
+                              linkTextColor: theme.textTheme.titleLarge?.color ?? ColorGlobalVariables.blackColor, 
                               isTextSmall: true, 
-                              textDecorationColor: ColorGlobalVariables.blackColor,
+                              textDecorationColor: theme.textTheme.titleLarge?.color ?? ColorGlobalVariables.blackColor,
                               isIconWidgetRequiredAtEnd: false, 
                               isIconWidgetRequiredAtFront: true, 
                               iconData: Icons.notifications_outlined,
-                              iconColor: ColorGlobalVariables.blackColor,
+                              iconColor: theme.textTheme.titleLarge?.color ?? ColorGlobalVariables.blackColor,
                               onClickFunction: _showComingSoonMessage,
                             ),
                             
@@ -1126,7 +1315,7 @@ class _DetailPageState extends State<DetailPage> {
                                 if(item["warranty"] != null)
                                 _buildTag(
                                   "Warranty", 
-                                  Colors.grey[300]!),
+                                  theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -1158,8 +1347,8 @@ class _DetailPageState extends State<DetailPage> {
                             ),
                             const SizedBox(height: 16),
                             
-                            const Divider(
-                              color: ColorGlobalVariables.fadedBlackColor,
+                            Divider(
+                              color: theme.dividerColor,
                               height: 12,
                               thickness: 0.5,
                             ),
@@ -1176,10 +1365,10 @@ class _DetailPageState extends State<DetailPage> {
                                         children: [
                                           Text(
                                             item["user"] == null ? "User name" : _safeGetString(item["user"], 'name') ?? "User name",
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
+                                              color: theme.textTheme.titleLarge?.color,
                                             ),
                                           ),
                                           const SizedBox(width: 6),
@@ -1195,28 +1384,21 @@ class _DetailPageState extends State<DetailPage> {
                                         ],
                                       ),
                                         const SizedBox(height: 6),
-                                      Text(
-                                        item["user"] == null ? "No date" : "Joined: ${formatTimeAgo(_safeGetString(item['user'], 'createdAt') ?? '')}",
-                                        style: TextStyle(
-                                          fontSize: 13.0,
-                                          color: Colors.grey[600],
-                                        ),
+                                        // date
+                                    Text(
+                                      item["user"] == null ? "No date" : "Joined: ${formatTimeAgo(_safeGetString(item['user'], 'createdAt') ?? '')}",
+                                      style: TextStyle(
+                                        fontSize: 13.0,
+                                        color: theme.textTheme.bodyMedium?.color,
                                       ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '34 Ads',
-                                        style: const TextStyle(
-                                          fontSize: 13.0,
-                                          fontWeight: FontWeight.w600,
-                                          color: ColorGlobalVariables.greenColor,
-                                          decoration: TextDecoration.underline,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // FIXED: DYNAMIC ADS COUNT - Now using the same provider instance
+                                    _buildAdsCount(),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                          ]),
                             const SizedBox(height: 16),
                             Row(
                               children: [
@@ -1224,7 +1406,7 @@ class _DetailPageState extends State<DetailPage> {
                                   child: CustomTextButton(
                                     buttonTextType: 'Chat', 
                                     textTypeColor: ColorGlobalVariables.redColor, 
-                                    borderColor: ColorGlobalVariables.fadedBlackColor,
+                                    borderColor: theme.dividerColor,
                                     isFullButtonWidthRequired: false, 
                                     buttonBackgroundColor: Colors.transparent, 
                                     onClickFunction: (){
@@ -1238,7 +1420,7 @@ class _DetailPageState extends State<DetailPage> {
                                 Expanded(
                                   child: CustomTextButton(
                                     buttonTextType: 'Show contact', 
-                                    borderColor: ColorGlobalVariables.fadedBlackColor,
+                                    borderColor: theme.dividerColor,
                                     textTypeColor: ColorGlobalVariables.redColor, 
                                     isFullButtonWidthRequired: false, 
                                     buttonBackgroundColor: Colors.transparent, 
@@ -1246,124 +1428,23 @@ class _DetailPageState extends State<DetailPage> {
                                   ),
                                 )
                               ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      
+                      _buildSimilarItemsSection(similarItemsProvider),
+                      
+                      const SizedBox(height: 40),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-                  
-                  if (similarItemsProvider.isLoading && similarItemsProvider.items.isEmpty) ...[
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 40),
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-                        ),
-                      ),
-                    ),
-                  ] else if (similarItemsProvider.items.isNotEmpty) ...[
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(8, 0, 8, 12),
-                      child: Text(
-                        'Similar Items',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    
-                    GridView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      itemCount: similarItemsProvider.items.length + (similarItemsProvider.isLoadingMore ? 1 : 0),
-                      shrinkWrap: true,
-                      primary: false,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.72,
-                      ),
-                      itemBuilder: (context, index) {
-                        if (index >= similarItemsProvider.items.length) {
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-                            ),
-                          );
-                        }
-                        
-                        final similarItem = similarItemsProvider.items[index];
-                        return GestureDetector(
-                          onTap: () {
-                            final logger = Logger();
-                            logger.w("Similar items detailpage data: $similarItem");
-                            print("Similar items detailpage data: $similarItem");
-                            Navigator.of(context).pushReplacement(  // Use Navigator instead of GetX
-                            MaterialPageRoute(
-                              builder: (context) => DetailPage(
-                                allJson: {
-                                  'product': similarItem.toJson(),
-                                  'item': similarItem.toJson(),
-                                  'type': 'details',
-                                },
-                              ),
-                            ),
-                          );
-                            // Get.offNamed(
-                            //   RouteClass.getDetailPage(),
-                            //   arguments: {
-                            //     'product': similarItem.toJson(),
-                            //     // _convertToRecommendedItem(widget.item).toJson(),
-                            //     'item': similarItem.toJson(),
-                            //     // _convertToRecommendedItem(widget.item).toJson(),
-                            //     'type': 'details',
-                            //     'uniqueKey': similarItem.id,
-                            //   },
-                            // );
-                          },
-                          child: _buildSimilarItem(similarItem, screenSize)
-                          );
-                      },
-                    ),
-                    
-                    if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(
-                          child: Text(
-                            'No more similar items',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ] else if (!similarItemsProvider.isLoading && similarItemsProvider.items.isEmpty) ...[
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Center(
-                        child: Text(
-                          'No similar items found',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
-      );
-    },
-  ),
-);
+            ],
+          );
+        },
+      ),
+    );
   }
 }
 
@@ -1494,7 +1575,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -1531,13 +1612,14 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
 
   @override
   Widget build(BuildContext context) {
-    final firstImage = widget.item.images.isNotEmpty
-        ? widget.item.images.first
+    final theme = Theme.of(context);
+    final firstImage = widget.item.images?.isNotEmpty == true
+        ? widget.item.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -1557,8 +1639,8 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                 child: Container(
                   height: 120,
                   width: double.infinity,
-                  color: Colors.grey[100],
-                  child: _buildItemImage(firstImage),
+                  color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
+                  child: _buildItemImage(firstImage, theme),
                 ),
               ),
               
@@ -1599,7 +1681,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.cardColor,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -1628,7 +1710,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                                     size: 18,
                                     color: _isLiked 
                                         ? _colorAnimation.value 
-                                        : Colors.grey[600],
+                                        : theme.iconTheme.color,
                                   );
                                 },
                               ),
@@ -1649,21 +1731,21 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                   children: [
                     Expanded(
                       child: Text(
-                        widget.item.name,
-                        style: const TextStyle(
+                        widget.item.name ?? 'Unnamed Item',
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: theme.textTheme.titleLarge?.color,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Text(
-                      widget.item.year,
+                      widget.item.year ?? '',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: theme.textTheme.bodyMedium?.color,
                       ),
                     ),
                   ],
@@ -1675,7 +1757,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price))}',
+                      'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -1685,13 +1767,13 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     if (widget.item.mileage != null)
                       Row(
                         children: [
-                          Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                          Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
                           const SizedBox(width: 4),
                           Text(
-                            "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
+                            "${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.mileage!) ?? 0)} km",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -1709,13 +1791,13 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     if (widget.item.transmission != null)
                       Row(
                         children: [
-                          Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                          Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
                           const SizedBox(width: 4),
                           Text(
                             widget.item.transmission!,
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -1725,14 +1807,14 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                       Flexible(
                         child: Row(
                           children: [
-                            Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                            Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 widget.item.location!,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.grey[600],
+                                  color: theme.textTheme.bodyMedium?.color,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -1751,7 +1833,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
     );
   }
 
-  Widget _buildItemImage(String imageUrl) {
+  Widget _buildItemImage(String imageUrl, ThemeData theme) {
     final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     
     if (isAssetImage) {
@@ -1759,7 +1841,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         imageUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return _buildImageErrorPlaceholder();
+          return _buildImageErrorPlaceholder(theme);
         },
       );
     } else {
@@ -1778,73 +1860,31 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
           );
         },
         errorWidget: (context, url, error) {
-          return _buildImageErrorPlaceholder();
+          return _buildImageErrorPlaceholder(theme);
         },
       );
     }
   }
 
-  Widget _buildImageErrorPlaceholder() {
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: Colors.grey[200],
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: theme.textTheme.bodySmall?.color,
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
-    return RecommendedItem(
-      id: similarItem.id,
-      name: similarItem.name,
-      price: similarItem.price,
-      year: similarItem.year,
-      images: similarItem.images,
-      mileage: similarItem.mileage,
-      transmission: similarItem.transmission,
-      location: similarItem.location,
-      condition: similarItem.condition,
-      description: similarItem.description,
-      userId: similarItem.userId,
-      countryId: similarItem.countryId,
-      brandModelId: similarItem.brandModelId,
-      brandId: similarItem.brandId,
-      categoryId: similarItem.categoryId,
-      slug: similarItem.slug,
-      serialNumber: similarItem.serialNumber,
-      steerPosition: similarItem.steerPosition,
-      engineCapacity: similarItem.engineCapacity,
-      color: similarItem.color,
-      buildType: similarItem.buildType,
-      numberOfPassengers: similarItem.numberOfPassengers,
-      features: similarItem.features,
-      status: similarItem.status,
-      warranty: similarItem.warranty,
-      warrantyExpiration: similarItem.warrantyExpiration != null 
-          ? DateTime.tryParse(similarItem.warrantyExpiration!) 
-          : null,
-      deletedAt: similarItem.deletedAt != null 
-          ? DateTime.tryParse(similarItem.deletedAt!) 
-          : null,
-      createdAt: DateTime.tryParse(similarItem.createdAt) ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(similarItem.updatedAt) ?? DateTime.now(),
-      height: similarItem.height,
-      vin: similarItem.vin,
-      isPromoted: false,
-      brand: null,
     );
   }
 }

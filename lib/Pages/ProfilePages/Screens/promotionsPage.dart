@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,13 +11,14 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PromotionsPage extends StatefulWidget {
-  final Map<String, dynamic> allJson;
+  final Map<String, dynamic>? allJson;
 
   const PromotionsPage({
     super.key,
-    required this.allJson,
+    this.allJson,
   });
 
   @override
@@ -28,8 +30,11 @@ class _PromotionsPageState extends State<PromotionsPage> {
   bool _isProcessing = false;
   int? _selectedIndex;
   final PageController _pageController = PageController(viewportFraction: 0.85);
+  bool _initialized = false;
 
-  late final Map<String, dynamic> listing;
+  late String _packageType;
+  Map<String, dynamic> _vehicleData = {};
+  String _vehicleName = 'Vehicle Upload';
 
   // Color schemes for different package tiers
   final List<Map<String, dynamic>> _colorSchemes = [
@@ -69,52 +74,173 @@ class _PromotionsPageState extends State<PromotionsPage> {
     return _colorSchemes[index % _colorSchemes.length];
   }
 
-  Map<String, dynamic> _convertToUIPackage(Package package, int index) {
-    final colorScheme = _getColorScheme(index);
-    
-    // Use the helper to parse the price
-    final price = PackageHelper.parsePrice(package);
-    
-    bool isPopular = index == 1;
-    String description = package.description ?? 'Boost your listing visibility';
-    
-    // Handle nullable numberOfListings with proper null checking
-    final listingCount = package.numberOfListings ?? 1;
-    
-    List<String> features = [
-      '$listingCount listing${listingCount > 1 ? 's' : ''}',
-      'Premium visibility',
-      '24/7 customer support',
-    ];
-    
-    if (listingCount > 1) {
-      features.add('Multiple listing support');
-    }
-    
-    if (price > 50) {
-      features.add('Priority placement');
-      features.add('Enhanced analytics');
-    }
-    
-    if (price > 100) {
-      features.add('Featured listing');
-      features.add('Social media promotion');
-    }
+  @override
+  void initState() {
+    super.initState();
+    _initializeFromArguments();
+    _loadVehicleDataFromStorage();
+  }
 
-    return {
-      "id": package.id,
-      "startText": "${package.promotionDays ?? 7} Days",
-      "endText": "GH₵ ${price.toStringAsFixed(2)}",
-      "price": price,
-      "durationDays": package.promotionDays ?? 7,
-      "name": package.name,
-      "description": description,
-      "icon": colorScheme['icon'],
-      "color": colorScheme['iconColor'],
-      "gradient": colorScheme['gradient'],
-      "features": features,
-      "popular": isPopular,
-    };
+  void _initializeFromArguments() {
+    // Get arguments from both GetX navigation and widget constructor
+    final getXArguments = Get.arguments as Map<String, dynamic>? ?? {};
+    final constructorArguments = widget.allJson ?? {};
+    
+    // Merge arguments (GetX arguments take priority over constructor arguments)
+    final allArguments = {...constructorArguments, ...getXArguments};
+    
+    _packageType = allArguments['type'] ?? 'upload';
+    
+    _logger.i("PromotionsPage initialized with:");
+    _logger.i("  - GetX arguments: $getXArguments");
+    _logger.i("  - Constructor arguments: $constructorArguments");
+    _logger.i("  - Final package_type: $_packageType");
+  }
+
+  Future<void> _loadVehicleDataFromStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final vehicleDataString = prefs.getString('pending_vehicle_data');
+      
+      if (vehicleDataString != null && vehicleDataString.isNotEmpty) {
+        _vehicleData = jsonDecode(vehicleDataString);
+        _vehicleName = _vehicleData['name']?.toString() ?? 'Vehicle Upload';
+        
+        _logger.i("✅ Vehicle data loaded from SharedPreferences:");
+        _logger.i("  - Vehicle name: $_vehicleName");
+        _logger.i("  - Data keys: ${_vehicleData.keys.toList()}");
+        _logger.i("  - Images count: ${_vehicleData['images']?.length ?? 0}");
+        
+        if (mounted) {
+          setState(() {});
+        }
+      } else {
+        _logger.w("⚠️ No vehicle data found in SharedPreferences");
+        _vehicleName = 'Vehicle Upload';
+        _vehicleData = {};
+      }
+    } catch (e, stackTrace) {
+      _logger.e("❌ ERROR loading vehicle data from storage: $e, stackTrace: $stackTrace");
+      _vehicleName = 'Vehicle Upload';
+      _vehicleData = {};
+    }
+  }
+
+  Future<void> _savePaymentIntentToStorage(String reference, Map<String, dynamic> promotion, Map<String, dynamic> vehicleData) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      final paymentIntentData = {
+        'reference': reference,
+        'packageId': promotion['id'],
+        'packageName': promotion['name'],
+        'packageType': _packageType,
+        'amount': (promotion['price'] * 100).toInt(),
+        'durationDays': promotion['durationDays'],
+        'vehicleData': vehicleData,
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+      
+      await prefs.setString('payment_intent_$reference', json.encode(paymentIntentData));
+      _logger.i("✅ Payment intent saved to storage with reference: $reference");
+    } catch (e, stackTrace) {
+      _logger.e("❌ ERROR saving payment intent: $e, stackTrace: $stackTrace");
+    }
+  }
+
+  Future<void> _clearVehicleDataAfterPayment() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('pending_vehicle_data');
+      _logger.i("✅ Vehicle data cleared from storage after payment");
+    } catch (e) {
+      _logger.e("❌ ERROR clearing vehicle data: $e");
+    }
+  }
+
+  // Filter packages by package_type and convert to UI format
+  List<Map<String, dynamic>> _getFilteredUIPackages(List<Package> allPackages) {
+    // Filter packages based on package_type from arguments
+    final filteredPackages = allPackages.where((package) {
+      return package.packageType == _packageType;
+    }).toList();
+
+    _logger.i("Filtered packages for type '$_packageType': ${filteredPackages.length} packages found");
+
+    // Convert filtered packages to UI format
+    return filteredPackages.asMap().entries.map((entry) {
+      final package = entry.value;
+      final index = entry.key;
+      final colorScheme = _getColorScheme(index);
+      
+      // Use the helper to parse the price
+      final price = PackageHelper.parsePrice(package);
+      
+      bool isPopular = index == 1;
+      String description = package.description ?? 'Boost your listing visibility';
+      
+      // Get currency symbol from country data
+      final currencySymbol = package.country.currencySymbol;
+      
+      List<String> features = [];
+      
+      // Customize features based on package_type
+      if (_packageType == 'upload') {
+        // Only add listing count feature if numberOfListings is not null
+        if (package.numberOfListings != null) {
+          features.add('${package.numberOfListings} listing${package.numberOfListings! > 1 ? 's' : ''}');
+        }
+        
+        features.addAll([
+          'Premium visibility',
+          '24/7 customer support',
+        ]);
+        
+        if (package.numberOfListings != null && package.numberOfListings! > 1) {
+          features.add('Multiple listing support');
+        }
+      } else if (_packageType == 'promotion') {
+        final promotionDays = package.promotionDays ?? 7;
+        features = [
+          '$promotionDays days promotion',
+          'Featured listing placement',
+          'Increased visibility',
+          'Priority in search results',
+        ];
+      }
+      
+      if (price > 50) {
+        features.add('Priority placement');
+        features.add('Enhanced analytics');
+      }
+      
+      if (price > 100) {
+        features.add('Featured listing');
+        features.add('Social media promotion');
+      }
+
+      return {
+        "id": package.id,
+        "startText": _packageType == 'promotion' 
+            ? "${package.promotionDays ?? 7} Days" 
+            : package.numberOfListings != null 
+                ? "${package.numberOfListings} Listings" 
+                : "Unlimited Listings",
+        "endText": "$currencySymbol ${price.toStringAsFixed(2)}",
+        "price": price,
+        "durationDays": package.promotionDays ?? 7,
+        "name": package.name,
+        "description": description,
+        "icon": colorScheme['icon'],
+        "color": colorScheme['iconColor'],
+        "gradient": colorScheme['gradient'],
+        "features": features,
+        "popular": isPopular,
+        "packageType": package.packageType,
+        "currencySymbol": currencySymbol,
+        "numberOfListings": package.numberOfListings,
+      };
+    }).toList();
   }
 
   Future<void> _handlePromotionSelection(int index, List<Map<String, dynamic>> uiPackages) async {
@@ -127,7 +253,18 @@ class _PromotionsPageState extends State<PromotionsPage> {
     if (user == null) {
       Get.snackbar(
         'Login Required',
-        'Please login to promote your listing',
+        'Please login to purchase upload package',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    // Validate that we have vehicle data for upload packages
+    if (_packageType == 'upload' && _vehicleData.isEmpty) {
+      Get.snackbar(
+        'Vehicle Data Missing',
+        'Please go back and fill in your vehicle details first',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -145,41 +282,65 @@ class _PromotionsPageState extends State<PromotionsPage> {
       // Convert price to int for Paystack (kobo/cent amount)
       final amountInKobo = (promotion['price'] * 100).toInt();
       
+      // Save payment intent to storage for recovery
+      await _savePaymentIntentToStorage(reference, promotion, _vehicleData);
+      
+      _logger.i("💰 Payment details:");
+      _logger.i("  - Reference: $reference");
+      _logger.i("  - Amount: $amountInKobo");
+      _logger.i("  - Package: ${promotion['name']}");
+      _logger.i("  - Vehicle: $_vehicleName");
+      
       final result = await LegacyPaystackService.initializeTransaction(
         context: context,
         amount: amountInKobo,
         reference: reference,
         packageId: promotion['id'],
         packageName: promotion['name'],
-        listingId: listing['id']?.toString() ?? 'unknown_id',
-        listingName: listing['name']?.toString() ?? 'Unknown Listing',
+        listingId: 'pending_vehicle_upload',
+        listingName: _vehicleName,
         durationDays: promotion['durationDays'],
       );
 
       if (result['status'] == true) {
         final authorizationUrl = result['data']['authorization_url'];
         
+        // Prepare payment data
         final paymentData = {
           'authorizationUrl': authorizationUrl,
           'reference': reference,
           'amount': amountInKobo,
           'packageName': promotion['name'],
-          'listingName': listing['name']?.toString() ?? 'Unknown Listing',
-          'listingId': listing['id']?.toString() ?? 'unknown_id',
+          'listingName': _vehicleName,
+          'listingId': 'pending_vehicle_upload',
           'packageId': promotion['id'],
           'durationDays': promotion['durationDays'],
+          'type': _packageType,
+          'vehicle_data': _vehicleData,
+          // 'return_to_upload': _packageType == 'upload',
         };
         
-        Get.toNamed(
+        _logger.i("✅ Payment initialized successfully, navigating to WebView");
+        
+        // Navigate to payment page and wait for result
+        final paymentResult = await Get.toNamed(
           RouteClass.getWebViewPaymentPage(),
           arguments: paymentData,
         );
+        
+        // Handle payment result callback
+        if (paymentResult == true && mounted) {
+          // Return success to the original upload page
+          Get.back(result: true);
+        }
+      } else {
+        throw Exception('Failed to initialize payment: ${result['message']}');
       }
     } catch (e) {
-      _logger.e('Payment error: $e');
+      _logger.e('Payment initialization error: $e');
       Get.snackbar(
         'Payment Error',
-        'Failed to process payment. Please try again.',
+        'Failed to initialize payment. Please try again.',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -205,10 +366,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
   }
 
   Widget _buildPromotionDetailsSheet(Map<String, dynamic> promotion, int index, List<Map<String, dynamic>> uiPackages) {
-    final listingFeature = promotion['features'].firstWhere(
-      (f) => f.toString().toLowerCase().contains('listing'),
-      orElse: () => '${promotion['features'].length} features',
-    );
+    final listingFeature = promotion['features'].isNotEmpty ? promotion['features'][0] : 'Premium features';
 
     return Container(
       decoration: BoxDecoration(
@@ -273,6 +431,22 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: _packageType == 'upload' ? Colors.blue[50] : Colors.green[50],
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          _packageType == 'upload' ? 'UPLOAD PACKAGE' : 'PROMOTION PACKAGE',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: _packageType == 'upload' ? Colors.blue[700] : Colors.green[700],
+                          ),
                         ),
                       ),
                     ],
@@ -346,9 +520,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                child: const Text(
-                  'Select This Package',
-                  style: TextStyle(
+                child: Text(
+                  _packageType == 'upload' ? 'Purchase Upload Package' : 'Purchase Promotion Package',
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -382,6 +556,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
   Widget _buildPromotionCard(Map<String, dynamic> promotion, int index, List<Map<String, dynamic>> uiPackages) {
     final isSelected = _selectedIndex == index;
     final gradientColors = promotion['gradient'] as List<Color>;
+    final currencySymbol = promotion['currencySymbol'] ?? 'GH₵';
+    final numberOfListings = promotion['numberOfListings'];
 
     return GestureDetector(
       onTap: () => _showPromotionDetails(index, uiPackages),
@@ -465,7 +641,24 @@ class _PromotionsPageState extends State<PromotionsPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 8),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _packageType == 'upload' ? Colors.blue[50] : Colors.green[50],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        _packageType == 'upload' ? 'UPLOAD' : 'PROMOTION',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: _packageType == 'upload' ? Colors.blue[700] : Colors.green[700],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -474,7 +667,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Duration',
+                              _packageType == 'upload' ? 'Listings' : 'Duration',
                               style: TextStyle(
                                 color: Colors.grey[500],
                                 fontSize: 12,
@@ -488,6 +681,19 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                 color: Colors.black87,
                               ),
                             ),
+                            // Show number of listings for upload packages if available
+                            if (_packageType == 'upload' && numberOfListings != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  '${numberOfListings} items',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.green[700],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                         Column(
@@ -556,15 +762,17 @@ class _PromotionsPageState extends State<PromotionsPage> {
             ),
 
             if (isSelected)
-              Container(
-                decoration: BoxDecoration(
-                  color: gradientColors[0].withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Center(
-                  child: _isProcessing
-                      ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
-                      : const Icon(Icons.check_circle, size: 40, color: Colors.white),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: gradientColors[0].withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: _isProcessing
+                        ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.white))
+                        : const Icon(Icons.check_circle, size: 40, color: Colors.white),
+                  ),
                 ),
               ),
           ],
@@ -574,15 +782,23 @@ class _PromotionsPageState extends State<PromotionsPage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    listing = widget.allJson['listing'] ?? {};
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     
-    final userProvider = context.read<UserProvider>();
-    final packageProvider = context.read<PackageProvider>();
-    
-    if (userProvider.user != null) {
-      packageProvider.getPackages();
+    // Load packages only once and only if user is logged in
+    if (!_initialized) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final packageProvider = Provider.of<PackageProvider>(context, listen: false);
+      
+      if (userProvider.user != null) {
+        _initialized = true;
+        // Use Future.microtask to schedule the call after the current build phase
+        Future.microtask(() {
+          if (mounted) {
+            packageProvider.getPackages();
+          }
+        });
+      }
     }
   }
 
@@ -592,11 +808,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
       backgroundColor: const Color(0xFFF8FAFD),
       body: Consumer<PackageProvider>(
         builder: (context, packageProvider, child) {
-          final uiPackages = packageProvider.packages
-              .asMap()
-              .entries
-              .map((entry) => _convertToUIPackage(entry.value, entry.key))
-              .toList();
+          // Get filtered packages based on package_type
+          final uiPackages = _getFilteredUIPackages(packageProvider.packages);
 
           return Column(
             children: [
@@ -633,16 +846,16 @@ class _PromotionsPageState extends State<PromotionsPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                "Boost Your Listing",
-                                style: TextStyle(
+                              Text(
+                                _packageType == 'upload' ? "Upload Packages" : "Promotion Packages",
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black87,
                                 ),
                               ),
                               Text(
-                                "${listing['name'] ?? 'Unknown Listing'} Listing",
+                                "$_vehicleName - ${_packageType == 'upload' ? 'Upload' : 'Promotion'}",
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 12,
@@ -714,18 +927,27 @@ class _PromotionsPageState extends State<PromotionsPage> {
                             ),
                           )
                         : uiPackages.isEmpty
-                            ? const Center(
+                            ? Center(
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey),
-                                    SizedBox(height: 16),
+                                    const SizedBox(height: 16),
                                     Text(
-                                      'No packages available',
-                                      style: TextStyle(
+                                      'No ${_packageType == 'upload' ? 'upload' : 'promotion'} packages available',
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         color: Colors.grey,
                                       ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Please check back later for ${_packageType == 'upload' ? 'upload' : 'promotion'} packages',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
                                   ],
                                 ),
@@ -735,24 +957,28 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 24),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 24),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            "Choose Your Boost",
-                                            style: TextStyle(
+                                            _packageType == 'upload' 
+                                                ? "Choose Your Upload Package" 
+                                                : "Boost Your Listing",
+                                            style: const TextStyle(
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.black87,
                                               height: 1.2,
                                             ),
                                           ),
-                                          SizedBox(height: 8),
+                                          const SizedBox(height: 8),
                                           Text(
-                                            "Select a promotion package to increase visibility and get more buyers for your listing",
-                                            style: TextStyle(
+                                            _packageType == 'upload'
+                                                ? "Select an upload package to list your vehicle and reach potential buyers"
+                                                : "Select a promotion package to increase visibility and get more buyers for your listing",
+                                            style: const TextStyle(
                                               color: Colors.grey,
                                               fontSize: 14,
                                               height: 1.4,
