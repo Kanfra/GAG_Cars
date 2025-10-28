@@ -112,16 +112,22 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
     
     return ChangeNotifierProvider.value(
       value: _provider,
       child: Scaffold(
+        backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
           elevation: 1,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: ColorGlobalVariables.blackColor, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios, 
+              color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor, 
+              size: 20
+            ),
             onPressed: (){
               Get.offAllNamed(
                 RouteClass.getMainBottomNavigationPage(),
@@ -134,7 +140,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
           title: Text(
             "My Listings",
             style: TextStyle(
-              color: ColorGlobalVariables.brownColor,
+              color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
               fontWeight: FontWeight.bold,
               fontSize: 22,
             ),
@@ -146,7 +152,11 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
               child: Stack(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.notifications_none, color: ColorGlobalVariables.blackColor, size: 24),
+                    icon: Icon(
+                      Icons.notifications_none, 
+                      color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor, 
+                      size: 24
+                    ),
                     onPressed: () {
                       Get.toNamed(
                         RouteClass.getNotificationsPage(),
@@ -172,15 +182,17 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(60),
             child: Container(
-              color: Colors.white,
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Container(
                   height: 45,
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[200]!),
+                    border: Border.all(
+                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[200]!
+                    ),
                   ),
                   child: TabBar(
                     controller: _tabController,
@@ -203,7 +215,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                       ],
                     ),
                     labelColor: Colors.white,
-                    unselectedLabelColor: Colors.grey[600],
+                    unselectedLabelColor: isDarkMode ? Colors.white70 : Colors.grey[600],
                     labelStyle: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -253,20 +265,20 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                 width: screenSize.width,
                 height: screenSize.height,
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
                 ),
                 child: Column(
                   children: [
                     // Tab Bar Stats
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      color: Colors.white,
+                      color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildStatItem(_liveListings.length, 'Active', Colors.blue),
-                          _buildStatItem(_soldListings.length, 'Sold', Colors.green),
-                          _buildStatItem(_liveListings.length + _soldListings.length, 'Total', ColorGlobalVariables.brownColor),
+                          _buildStatItem(_liveListings.length, 'Active', Colors.blue, isDarkMode),
+                          _buildStatItem(_soldListings.length, 'Sold', Colors.green, isDarkMode),
+                          _buildStatItem(_liveListings.length + _soldListings.length, 'Total', ColorGlobalVariables.brownColor, isDarkMode),
                         ],
                       ),
                     ),
@@ -279,10 +291,10 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                         controller: _tabController,
                         children: [
                           // Live Tab
-                          _buildTabContent(_liveListings, provider, isLiveTab: true),
+                          _buildTabContent(_liveListings, provider, isLiveTab: true, isDarkMode: isDarkMode),
                           
                           // Sold Tab
-                          _buildTabContent(_soldListings, provider, isLiveTab: false),
+                          _buildTabContent(_soldListings, provider, isLiveTab: false, isDarkMode: isDarkMode),
                         ],
                       ),
                     ),
@@ -296,7 +308,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildStatItem(int count, String label, Color color) {
+  Widget _buildStatItem(int count, String label, Color color, bool isDarkMode) {
     return Column(
       children: [
         Text(
@@ -312,31 +324,31 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTabContent(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab}) {
+  Widget _buildTabContent(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab, required bool isDarkMode}) {
     if (provider.isInitialLoad && provider.isLoading) {
-      return _buildLoadingState();
+      return _buildLoadingState(isDarkMode);
     }
 
     if (provider.error != null && listings.isEmpty) {
-      return _buildErrorState(provider);
+      return _buildErrorState(provider, isDarkMode);
     }
 
     return isLiveTab 
       ? RefreshIndicator(
           onRefresh: _refreshListings,
-          child: _buildListView(listings, provider, isLiveTab: isLiveTab),
+          child: _buildListView(listings, provider, isLiveTab: isLiveTab, isDarkMode: isDarkMode),
         )
-      : _buildListView(listings, provider, isLiveTab: isLiveTab);
+      : _buildListView(listings, provider, isLiveTab: isLiveTab, isDarkMode: isDarkMode);
   }
 
-  Widget _buildListView(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab}) {
+  Widget _buildListView(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab, required bool isDarkMode}) {
     return CustomScrollView(
       controller: isLiveTab ? _scrollController : null,
       physics: const AlwaysScrollableScrollPhysics(),
@@ -353,14 +365,14 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 Text(
                   '${listings.length}${isLiveTab && provider.totalCount > 0 ? '/${provider.totalCount}' : ''} items',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: isDarkMode ? Colors.white70 : Colors.grey[600],
                   ),
                 ),
               ],
@@ -382,7 +394,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final listing = listings[index];
-                  return _buildListingItem(listing, isLiveTab: isLiveTab);
+                  return _buildListingItem(listing, isLiveTab: isLiveTab, isDarkMode: isDarkMode);
                 },
                 childCount: listings.length,
               ),
@@ -392,25 +404,25 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
         // Loading More Indicator (only for Live tab)
         if (isLiveTab && provider.isLoading && provider.hasMore)
           SliverToBoxAdapter(
-            child: _buildLoadMoreIndicator(),
+            child: _buildLoadMoreIndicator(isDarkMode),
           ),
 
         // No More Items Message (only for Live tab)
         if (isLiveTab && !provider.hasMore && listings.isNotEmpty)
           SliverToBoxAdapter(
-            child: _buildNoMoreItems(),
+            child: _buildNoMoreItems(isDarkMode),
           ),
 
         // Empty State
         if (listings.isEmpty && !provider.isLoading)
           SliverToBoxAdapter(
-            child: _buildEmptyState(isLiveTab: isLiveTab),
+            child: _buildEmptyState(isLiveTab: isLiveTab, isDarkMode: isDarkMode),
           ),
       ],
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -422,7 +434,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
           Text(
             'Loading your listings...',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 16,
             ),
           ),
@@ -431,16 +443,19 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildErrorState(MyListingsProvider provider) {
+  Widget _buildErrorState(MyListingsProvider provider, bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          Icon(Icons.error_outline, size: 64, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             provider.error ?? 'Failed to load listings',
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.grey[600], 
+              fontSize: 16
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
@@ -460,7 +475,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildLoadMoreIndicator() {
+  Widget _buildLoadMoreIndicator(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Center(
@@ -473,7 +488,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
             Text(
               'Loading more listings...',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 fontSize: 14,
               ),
             ),
@@ -483,14 +498,14 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildNoMoreItems() {
+  Widget _buildNoMoreItems(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Center(
         child: Text(
           'All listings loaded',
           style: TextStyle(
-            color: Colors.grey[600],
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
             fontSize: 14,
             fontStyle: FontStyle.italic,
           ),
@@ -499,21 +514,25 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildEmptyState({required bool isLiveTab}) {
+  Widget _buildEmptyState({required bool isLiveTab, required bool isDarkMode}) {
     return Padding(
       padding: const EdgeInsets.all(40),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.car_repair, size: 64, color: Colors.grey[400]),
+            Icon(
+              Icons.car_repair, 
+              size: 64, 
+              color: isDarkMode ? Colors.grey[500] : Colors.grey[400]
+            ),
             const SizedBox(height: 16),
             Text(
               isLiveTab ? 'No listings yet' : 'No sold items',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.grey[600],
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
             ),
             const SizedBox(height: 8),
@@ -522,7 +541,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                 ? 'Start by adding your first vehicle listing'
                 : 'Items you mark as sold will appear here',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: isDarkMode ? Colors.white60 : Colors.grey[500],
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -553,7 +572,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildListingItem(MyListing listing, {required bool isLiveTab}) {
+  Widget _buildListingItem(MyListing listing, {required bool isLiveTab, required bool isDarkMode}) {
     final price = _parseSafeDouble(listing.price) ?? 0;
     final mileage = _parseSafeDouble(listing.mileage) ?? 0;
     final condition = listing.condition?.toString() ?? "Used";
@@ -577,7 +596,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -598,9 +617,9 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                    color: Colors.grey[100],
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
                   ),
-                  child: _buildListingImage(listing),
+                  child: _buildListingImage(listing, isDarkMode),
                 ),
                 
                 // Category Badge - NOW USING ACTUAL CATEGORY NAME FROM API
@@ -693,7 +712,9 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isLiveTab ? Colors.black87 : Colors.grey[600],
+                            color: isLiveTab 
+                              ? (isDarkMode ? Colors.white : Colors.black87)
+                              : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -703,7 +724,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                         condition,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600],
                         ),
                       ),
                     ],
@@ -720,18 +741,24 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: isLiveTab ? ColorGlobalVariables.redColor : Colors.grey[600],
+                          color: isLiveTab 
+                            ? ColorGlobalVariables.redColor 
+                            : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                         ),
                       ),
                       Row(
                         children: [
-                          Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                          Icon(
+                            Icons.speed, 
+                            size: 14, 
+                            color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             "${_formatNumber(mileage)} km",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[600],
+                              color: isDarkMode ? Colors.white60 : Colors.grey[600],
                             ),
                           ),
                         ],
@@ -748,13 +775,17 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                       // Transmission
                       Row(
                         children: [
-                          Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                          Icon(
+                            Icons.settings, 
+                            size: 14, 
+                            color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             transmission,
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey[600],
+                              color: isDarkMode ? Colors.white60 : Colors.grey[600],
                             ),
                           ),
                         ],
@@ -764,14 +795,18 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                       Flexible(
                         child: Row(
                           children: [
-                            Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                            Icon(
+                              Icons.location_on, 
+                              size: 14, 
+                              color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                            ),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 location,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.grey[600],
+                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -791,14 +826,14 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildListingImage(MyListing listing) {
+  Widget _buildListingImage(MyListing listing, bool isDarkMode) {
     if (listing.images.isEmpty) {
-      return _buildImageErrorPlaceholder();
+      return _buildImageErrorPlaceholder(isDarkMode);
     }
 
     final imageUrl = listing.images.first;
     if (imageUrl.isEmpty) {
-      return _buildImageErrorPlaceholder();
+      return _buildImageErrorPlaceholder(isDarkMode);
     }
 
     try {
@@ -819,29 +854,33 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
             );
           },
           errorWidget: (context, url, error) {
-            return _buildImageErrorPlaceholder();
+            return _buildImageErrorPlaceholder(isDarkMode);
           },
         ),
       );
     } catch (e) {
-      return _buildImageErrorPlaceholder();
+      return _buildImageErrorPlaceholder(isDarkMode);
     }
   }
 
-  Widget _buildImageErrorPlaceholder() {
+  Widget _buildImageErrorPlaceholder(bool isDarkMode) {
     return Container(
-      color: Colors.grey[200],
+      color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            Icon(
+              Icons.image_not_supported, 
+              size: 32, 
+              color: isDarkMode ? Colors.grey[500] : Colors.grey[400]
+            ),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
               ),
             ),
           ],
@@ -869,12 +908,12 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
   }
 
   // NEW: Get category display name from the actual category object
-String _getCategoryDisplayName(String categoryName) {
-  // You can customize the display name if needed
-  // For example, shorten "Parts & accessories" to "Parts"
-  // if (categoryName == "Parts & accessories") {
-  //   return "Parts";
-  // }
-  return categoryName;
-}
+  String _getCategoryDisplayName(String categoryName) {
+    // You can customize the display name if needed
+    // For example, shorten "Parts & accessories" to "Parts"
+    // if (categoryName == "Parts & accessories") {
+    //   return "Parts";
+    // }
+    return categoryName;
+  }
 }

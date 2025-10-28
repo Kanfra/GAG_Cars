@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:edge_detection/edge_detection.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DealerLoginPage extends StatefulWidget {
@@ -194,16 +194,17 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     required File? file,
     required VoidCallback onTap,
     Color? accentColor,
+    required bool isDarkMode,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
         const SizedBox(height: 8),
@@ -211,7 +212,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           description,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
             height: 1.4,
           ),
         ),
@@ -223,7 +224,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isCaptured 
@@ -260,7 +261,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isCaptured ? Colors.green : Colors.black87,
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -268,7 +269,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   isCaptured ? "Ready for verification" : "Take a clear photo",
                   style: TextStyle(
                     fontSize: 14,
-                    color: isCaptured ? Colors.green : Colors.grey[600],
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -283,7 +284,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -299,8 +302,11 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.error_outline, color: Colors.grey),
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    child: Icon(
+                      Icons.error_outline, 
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey
+                    ),
                   );
                 },
               ),
@@ -311,10 +317,19 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: onTap,
-              icon: const Icon(Icons.camera_alt, size: 18),
-              label: const Text("Retake"),
+              icon: Icon(
+                Icons.camera_alt, 
+                size: 18,
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+              label: Text(
+                "Retake",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                ),
+              ),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.grey[600],
+                foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
             ),
           ),
@@ -325,14 +340,14 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
   }
 
   // ================== PROGRESS INDICATOR ==================
-  Widget _buildProgressStep(String label, int stepNumber, bool isCompleted) {
+  Widget _buildProgressStep(String label, int stepNumber, bool isCompleted, bool isDarkMode) {
     return Column(
       children: [
         Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: isCompleted ? Colors.green : Colors.grey[300],
+            color: isCompleted ? Colors.green : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -341,7 +356,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                 : Text(
                     stepNumber.toString(),
                     style: TextStyle(
-                      color: Colors.grey[700],
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                     ),
@@ -354,7 +369,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: isCompleted ? Colors.green : Colors.grey[600],
+            color: isCompleted ? Colors.green : (isDarkMode ? Colors.white70 : Colors.grey[600]),
           ),
         ),
       ],
@@ -450,21 +465,25 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           "Dealer Registration",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 20,
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
           ),
         ),
         centerTitle: true,
-        backgroundColor: isDarkMode ? Colors.grey[800] : Colors.white,
-        foregroundColor: ColorGlobalVariables.brownColor,
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        foregroundColor: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
+          ),
           onPressed: () => Get.back(), // Simple pop back
         ),
       ),
@@ -486,14 +505,19 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          ColorGlobalVariables.brownColor.withOpacity(0.1),
-                          ColorGlobalVariables.maroonColor.withOpacity(0.05),
-                        ],
+                        colors: isDarkMode
+                            ? [
+                                Colors.grey[800]!,
+                                Colors.grey[700]!,
+                              ]
+                            : [
+                                ColorGlobalVariables.brownColor.withOpacity(0.1),
+                                ColorGlobalVariables.maroonColor.withOpacity(0.05),
+                              ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                        color: isDarkMode ? Colors.grey[600]! : ColorGlobalVariables.brownColor.withOpacity(0.2),
                       ),
                     ),
                     child: Column(
@@ -514,24 +538,24 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Expanded(
+                            Expanded(
                               child: Text(
                                 "Dealer Registration",
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: isDarkMode ? Colors.white : Colors.black87,
                                 ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           "Register your dealership to access premium features and reach more customers. Complete all steps to get verified.",
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey,
+                            color: isDarkMode ? Colors.white70 : Colors.grey,
                             height: 1.5,
                           ),
                         ),
@@ -544,22 +568,22 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildProgressStep("Business", 1, _garageName.text.isNotEmpty && (_currentPosition != null || _selectedLocation != null)),
-                      _buildProgressStep("Selfie", 2, _isSelfieCaptured),
-                      _buildProgressStep("ID Front", 3, _isFrontCaptured),
-                      _buildProgressStep("ID Back", 4, _isBackCaptured),
-                      _buildProgressStep("Company", 5, _isCompanyDocCaptured),
+                      _buildProgressStep("Business", 1, _garageName.text.isNotEmpty && (_currentPosition != null || _selectedLocation != null), isDarkMode),
+                      _buildProgressStep("Selfie", 2, _isSelfieCaptured, isDarkMode),
+                      _buildProgressStep("ID Front", 3, _isFrontCaptured, isDarkMode),
+                      _buildProgressStep("ID Back", 4, _isBackCaptured, isDarkMode),
+                      _buildProgressStep("Company", 5, _isCompanyDocCaptured, isDarkMode),
                     ],
                   ),
                   const SizedBox(height: 32),
 
                   // Business Information Section
-                  const Text(
+                  Text(
                     "Business Information",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -567,7 +591,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     "Tell us about your dealership business",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: isDarkMode ? Colors.white70 : Colors.grey[600],
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -576,16 +600,16 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   TitleWithTextformfieldComponent(
                     title: "Garage/Dealership Name",
                     fontWeight: FontWeight.w600,
-                    textColor: Colors.black87,
+                    textColor: isDarkMode ? Colors.white : Colors.black87,
                     obscureText: false,
                     textSize: 14,
                     borderRadius: 12,
                     cursorColor: ColorGlobalVariables.maroonColor,
                     iconSize: 22,
                     focusedBorderColor: ColorGlobalVariables.maroonColor,
-                    fillColor: Colors.white,
-                    backgroundColor: Colors.white,
-                    enabledBorderColor: Colors.grey.shade300,
+                    fillColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+                    backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+                    enabledBorderColor: isDarkMode ? Colors.grey[600]! : Colors.grey.shade300,
                     borderWidth: 1.5,
                     prefixIconData: Icons.business_outlined,
                     fieldWidth: double.infinity,
@@ -605,9 +629,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     iconSize: 22,
                     borderRadius: 12,
                     fontWeight: FontWeight.w600,
-                    textColor: Colors.black87,
+                    textColor: isDarkMode ? Colors.white : Colors.black87,
                     obscureText: false,
-                    borderColor: Colors.grey.shade300,
+                    borderColor: isDarkMode ? Colors.grey[600]! : Colors.grey.shade300,
                     isTitleWithContainerWidgetRequired: true,
                     hintText: _currentPosition != null
                         ? "Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}, Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}"
@@ -616,6 +640,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     isSuffixIconRequired: false,
                     isPrefixIconRequired: true,
                     isFieldHeightRequired: false,
+                    fillColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+                    backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
                     onTitleWithContainerWidgetClickFunction: () async {
                       final result = await Get.toNamed(RouteClass.getLocationSearchPage());
                       if (result != null) {
@@ -629,12 +655,12 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   const SizedBox(height: 32),
 
                   // Verification Documents Section
-                  const Text(
+                  Text(
                     "Verification Documents",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -642,7 +668,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     "Upload required documents for verification",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: isDarkMode ? Colors.white70 : Colors.grey[600],
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -656,6 +682,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     file: _selfieImage,
                     onTap: _takeSelfie,
                     accentColor: Colors.blue,
+                    isDarkMode: isDarkMode,
                   ),
 
                   // National ID front
@@ -667,6 +694,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     file: _nationalIdFront,
                     onTap: () => _captureNationalId(true),
                     accentColor: Colors.orange,
+                    isDarkMode: isDarkMode,
                   ),
 
                   // National ID back
@@ -678,6 +706,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     file: _nationalIdBack,
                     onTap: () => _captureNationalId(false),
                     accentColor: Colors.purple,
+                    isDarkMode: isDarkMode,
                   ),
 
                   // Company doc
@@ -689,6 +718,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     file: _companyDocument,
                     onTap: _pickCompanyDocument,
                     accentColor: Colors.teal,
+                    isDarkMode: isDarkMode,
                   ),
 
                   const SizedBox(height: 24),
@@ -698,9 +728,11 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.05),
+                      color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                      border: Border.all(
+                        color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2)
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -716,7 +748,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                             "All documents are encrypted and securely stored. We comply with data protection regulations and only use them for verification purposes.",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey[700],
+                              color: isDarkMode ? Colors.white70 : Colors.grey[700],
                               height: 1.4,
                             ),
                           ),
@@ -734,7 +766,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _validateForm() 
                             ? ColorGlobalVariables.brownColor 
-                            : Colors.grey[400],
+                            : (isDarkMode ? Colors.grey[600] : Colors.grey[400]),
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

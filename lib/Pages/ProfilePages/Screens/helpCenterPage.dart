@@ -35,13 +35,14 @@ class _HelpCenterPageState extends State<HelpCenterPage>
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => Get.back(),
         isLeadingWidgetExist: true,
-        appbarBackgroundColor: ColorGlobalVariables.whiteColor,
+        appbarBackgroundColor: isDarkMode ? const Color(0xFF424242) : ColorGlobalVariables.whiteColor,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
-        titleTextColor: ColorGlobalVariables.brownColor,
+        leadingIconDataColor: isDarkMode ? Colors.white : Colors.black87,
+        titleTextColor: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
         titleFontWeight: FontWeight.bold,
         titleTextSize: 22,
         titleText: 'Help Center',
@@ -52,14 +53,13 @@ class _HelpCenterPageState extends State<HelpCenterPage>
           // Custom Tab Bar with smooth animation
           Container(
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[850] : Colors.white,
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               boxShadow: [
-                if (!isDarkMode)
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(isDarkMode ? 0.1 : 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
               ],
             ),
             child: Column(
@@ -79,7 +79,7 @@ class _HelpCenterPageState extends State<HelpCenterPage>
                     ),
                     labelColor: ColorGlobalVariables.brownColor,
                     unselectedLabelColor: isDarkMode 
-                        ? Colors.grey[400] 
+                        ? Colors.white70 
                         : Colors.grey[600],
                     labelStyle: const TextStyle(
                       fontSize: 16,
@@ -98,7 +98,7 @@ class _HelpCenterPageState extends State<HelpCenterPage>
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   height: _tabIndicatorHeight,
-                  color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                  color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
                 ),
               ],
             ),
@@ -106,12 +106,15 @@ class _HelpCenterPageState extends State<HelpCenterPage>
 
           // TabBarView content with fade transition
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildPageWithPadding(const Faq()),
-                _buildPageWithPadding(const ContactUs()),
-              ],
+            child: Container(
+              color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildPageWithPadding(const Faq(), isDarkMode),
+                  _buildPageWithPadding(const ContactUs(), isDarkMode),
+                ],
+              ),
             ),
           ),
         ],
@@ -119,10 +122,13 @@ class _HelpCenterPageState extends State<HelpCenterPage>
     );
   }
 
-  Widget _buildPageWithPadding(Widget child) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: child,
+  Widget _buildPageWithPadding(Widget child, bool isDarkMode) {
+    return Container(
+      color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: child,
+      ),
     );
   }
 }

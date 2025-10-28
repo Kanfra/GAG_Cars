@@ -150,6 +150,41 @@ class _PostItemPageState extends State<PostItemPage> {
     super.dispose();
   }
 
+  // Theme helper methods
+  bool get _isDarkMode => Theme.of(context).brightness == Brightness.dark;
+  
+  Color _getBackgroundColor() {
+    return _isDarkMode ? const Color(0xFF303030) : const Color(0xFFFAFAFA);
+  }
+  
+  Color _getCardColor() {
+    return _isDarkMode ? const Color(0xFF424242) : Colors.white;
+  }
+  
+  Color _getTextColor() {
+    return _isDarkMode ? const Color(0xB3FFFFFF) : const Color(0xDD000000);
+  }
+  
+  Color _getHintTextColor() {
+    return _isDarkMode ? const Color(0x66FFFFFF) : const Color(0x8A000000);
+  }
+  
+  Color _getBorderColor() {
+    return _isDarkMode ? const Color(0xFF616161) : const Color(0xFFE0E0E0);
+  }
+  
+  Color _getInputBackgroundColor() {
+    return _isDarkMode ? const Color(0xFF424242) : const Color(0xFFF5F5F5);
+  }
+  
+  Color _getDialogBackgroundColor() {
+    return _isDarkMode ? const Color(0xFF424242) : Colors.white;
+  }
+  
+  Color _getDialogSurfaceColor() {
+    return _isDarkMode ? const Color(0xFF303030) : const Color(0xFFFAFAFA);
+  }
+
   Future<void> _loadInitialData() async {
     logger.i("Loading initial data...");
     setState(() => _isLoading = true);
@@ -458,7 +493,7 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   // =============================================
-  // FIXED COLOR PICKER - SAME AS EDIT ITEM PAGE
+  // FIXED COLOR PICKER - WITH DARK THEME SUPPORT
   // =============================================
 
   void _showSimpleColorPicker() {
@@ -470,7 +505,7 @@ class _PostItemPageState extends State<PostItemPage> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.white,
+        backgroundColor: _getDialogBackgroundColor(),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
         ),
@@ -533,7 +568,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     Text(
                       'Select Color',
                       style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
+                        color: _getTextColor(),
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -542,7 +577,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     Text(
                       'Choose from common color names',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: _getHintTextColor(),
                         fontSize: 13,
                       ),
                     ),
@@ -563,10 +598,10 @@ class _PostItemPageState extends State<PostItemPage> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.grey[50],
+                            color: _getInputBackgroundColor(),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.grey[300]!,
+                              color: _getBorderColor(),
                               width: 1.5,
                             ),
                           ),
@@ -579,7 +614,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                   color: color,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: Colors.grey[400]!,
+                                    color: _getBorderColor(),
                                     width: 2,
                                   ),
                                   boxShadow: [
@@ -599,7 +634,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                     Text(
                                       'Selected Color',
                                       style: TextStyle(
-                                        color: Colors.grey[600],
+                                        color: _getHintTextColor(),
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -608,7 +643,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                     Text(
                                       colorName,
                                       style: TextStyle(
-                                        color: ColorGlobalVariables.blackColor,
+                                        color: _getTextColor(),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -630,7 +665,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 padding: const EdgeInsets.all(16),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: _getInputBackgroundColor(),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -655,12 +690,12 @@ class _PostItemPageState extends State<PostItemPage> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       hintStyle: TextStyle(
-                        color: Colors.grey[500],
+                        color: _getHintTextColor(),
                         fontSize: 14,
                       ),
                     ),
                     style: TextStyle(
-                      color: ColorGlobalVariables.blackColor,
+                      color: _getTextColor(),
                       fontSize: 14,
                     ),
                     onChanged: (value) {
@@ -721,7 +756,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: _getInputBackgroundColor(),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
@@ -734,7 +769,7 @@ class _PostItemPageState extends State<PostItemPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.grey[400]!,
+                          color: _getBorderColor(),
                           width: 1.5,
                         ),
                       ),
@@ -748,7 +783,7 @@ class _PostItemPageState extends State<PostItemPage> {
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Colors.grey[700],
+                                color: _getHintTextColor(),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -839,10 +874,10 @@ class _PostItemPageState extends State<PostItemPage> {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _getCardColor(),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
+              color: isSelected ? ColorGlobalVariables.brownColor : _getBorderColor(),
               width: isSelected ? 2.5 : 1.2,
             ),
             boxShadow: [
@@ -863,7 +898,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   color: colorOption['color'],
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.grey[400]!,
+                    color: _getBorderColor(),
                     width: 1.5,
                   ),
                   boxShadow: [
@@ -888,7 +923,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 child: Text(
                   colorOption['name'],
                   style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
+                    color: _getTextColor(),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -915,20 +950,20 @@ class _PostItemPageState extends State<PostItemPage> {
               width: 70,
               height: 70,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: _getInputBackgroundColor(),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.color_lens_rounded,
                 size: 35,
-                color: Colors.grey[400],
+                color: _getHintTextColor(),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               'No colors found',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: _getHintTextColor(),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -937,7 +972,7 @@ class _PostItemPageState extends State<PostItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: _getHintTextColor(),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -949,7 +984,7 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   // =============================================
-  // FIXED YEAR PICKER - SAME AS EDIT ITEM PAGE
+  // FIXED YEAR PICKER - WITH DARK THEME SUPPORT
   // =============================================
 
   void _showBeautifulYearPicker() {
@@ -960,7 +995,7 @@ class _PostItemPageState extends State<PostItemPage> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.white,
+        backgroundColor: _getDialogBackgroundColor(),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(28),
         ),
@@ -1022,7 +1057,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     Text(
                       'Select Year',
                       style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
+                        color: _getTextColor(),
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1031,7 +1066,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     Text(
                       'Choose the manufacturing year of your vehicle',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: _getHintTextColor(),
                         fontSize: 15,
                       ),
                       textAlign: TextAlign.center,
@@ -1045,10 +1080,10 @@ class _PostItemPageState extends State<PostItemPage> {
                   padding: const EdgeInsets.all(20),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: _getCardColor(),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.grey[300]!,
+                        color: _getBorderColor(),
                         width: 2,
                       ),
                     ),
@@ -1092,12 +1127,12 @@ class _PostItemPageState extends State<PostItemPage> {
                                         decoration: BoxDecoration(
                                           color: isSelected
                                               ? ColorGlobalVariables.brownColor
-                                              : Colors.grey[200],
+                                              : _getInputBackgroundColor(),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(
                                           isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
-                                          color: isSelected ? Colors.white : Colors.grey[600],
+                                          color: isSelected ? Colors.white : _getHintTextColor(),
                                           size: 20,
                                         ),
                                       ),
@@ -1108,7 +1143,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                           style: TextStyle(
                                             color: isSelected 
                                                 ? ColorGlobalVariables.brownColor
-                                                : ColorGlobalVariables.blackColor,
+                                                : _getTextColor(),
                                             fontSize: 18,
                                             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                                           ),
@@ -1136,7 +1171,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: _getInputBackgroundColor(),
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
@@ -1149,7 +1184,7 @@ class _PostItemPageState extends State<PostItemPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Colors.grey[400]!,
+                          color: _getBorderColor(),
                           width: 1.5,
                         ),
                       ),
@@ -1163,7 +1198,7 @@ class _PostItemPageState extends State<PostItemPage> {
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Colors.grey[700],
+                                color: _getHintTextColor(),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
@@ -1247,12 +1282,12 @@ class _PostItemPageState extends State<PostItemPage> {
 
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: _isDarkMode ? const Color(0xFF424242) : Colors.white,
       elevation: 0,
       title: Text(
         'Post New Item',
         style: TextStyle(
-          color: ColorGlobalVariables.brownColor,
+          color: _isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -1298,10 +1333,15 @@ class _PostItemPageState extends State<PostItemPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.white,
-            Colors.grey.shade50,
-          ],
+          colors: _isDarkMode 
+              ? [
+                  const Color(0xFF303030),
+                  const Color(0xFF424242),
+                ]
+              : [
+                  Colors.white,
+                  Colors.grey.shade50,
+                ],
         ),
       ),
       child: Form(
@@ -1333,7 +1373,7 @@ class _PostItemPageState extends State<PostItemPage> {
     
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1380,7 +1420,7 @@ class _PostItemPageState extends State<PostItemPage> {
                       Text(
                         'Category',
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: _getHintTextColor(),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1390,8 +1430,8 @@ class _PostItemPageState extends State<PostItemPage> {
                         selectedCategory?.name ?? "Select a Category",
                         style: TextStyle(
                           color: selectedCategory != null 
-                            ? ColorGlobalVariables.blackColor 
-                            : Colors.grey[400],
+                            ? _getTextColor() 
+                            : _getHintTextColor(),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1401,7 +1441,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
                 Icon(
                   Icons.arrow_drop_down_rounded,
-                  color: Colors.grey[500],
+                  color: _getHintTextColor(),
                   size: 24,
                 ),
               ],
@@ -1453,7 +1493,7 @@ class _PostItemPageState extends State<PostItemPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1493,7 +1533,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 title,
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1503,10 +1543,10 @@ class _PostItemPageState extends State<PostItemPage> {
           const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: _getInputBackgroundColor(),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
-                color: Colors.grey[300]!,
+                color: _getBorderColor(),
                 width: 1.5,
               ),
             ),
@@ -1514,7 +1554,7 @@ class _PostItemPageState extends State<PostItemPage> {
               controller: controller,
               maxLines: isFieldHeightRequired ? 4 : 1,
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: _getTextColor(),
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -1523,7 +1563,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 hintText: hintText,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 hintStyle: TextStyle(
-                  color: Colors.grey[500],
+                  color: _getHintTextColor(),
                   fontSize: 15,
                 ),
               ),
@@ -1543,7 +1583,7 @@ class _PostItemPageState extends State<PostItemPage> {
   Widget _buildMakeModelRow(MakeAndModelProvider provider) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1582,7 +1622,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 "Make & Model",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1614,7 +1654,7 @@ class _PostItemPageState extends State<PostItemPage> {
           'Make',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1628,10 +1668,10 @@ class _PostItemPageState extends State<PostItemPage> {
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -1642,8 +1682,8 @@ class _PostItemPageState extends State<PostItemPage> {
                       selectedMake?['name'] ?? "Select Make",
                       style: TextStyle(
                         color: selectedMake != null 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1651,7 +1691,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   ),
                   Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 24,
                   ),
                 ],
@@ -1671,7 +1711,7 @@ class _PostItemPageState extends State<PostItemPage> {
           'Model',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1691,10 +1731,10 @@ class _PostItemPageState extends State<PostItemPage> {
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -1705,8 +1745,8 @@ class _PostItemPageState extends State<PostItemPage> {
                       selectedModel?.name ?? "Select Model",
                       style: TextStyle(
                         color: selectedModel != null 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1714,7 +1754,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   ),
                   Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 24,
                   ),
                 ],
@@ -1732,7 +1772,7 @@ class _PostItemPageState extends State<PostItemPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1771,7 +1811,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 "Vehicle Details",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1811,7 +1851,7 @@ class _PostItemPageState extends State<PostItemPage> {
           field.label,
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1835,10 +1875,10 @@ class _PostItemPageState extends State<PostItemPage> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -1849,8 +1889,8 @@ class _PostItemPageState extends State<PostItemPage> {
                       currentValue.isNotEmpty ? currentValue : "Select ${field.label}",
                       style: TextStyle(
                         color: currentValue.isNotEmpty 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1858,7 +1898,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   ),
                   Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 20,
                   ),
                 ],
@@ -1873,7 +1913,7 @@ class _PostItemPageState extends State<PostItemPage> {
   Widget _buildLocationAndPrice() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1912,7 +1952,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 "Location & Price",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1944,7 +1984,7 @@ class _PostItemPageState extends State<PostItemPage> {
           'Location',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1966,10 +2006,10 @@ class _PostItemPageState extends State<PostItemPage> {
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -1977,7 +2017,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 children: [
                   Icon(
                     Icons.location_on_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -1986,8 +2026,8 @@ class _PostItemPageState extends State<PostItemPage> {
                       selectedLocation ?? "Search Location",
                       style: TextStyle(
                         color: selectedLocation != null 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -2011,7 +2051,7 @@ class _PostItemPageState extends State<PostItemPage> {
           'Price',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -2020,10 +2060,10 @@ class _PostItemPageState extends State<PostItemPage> {
           height: 56,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: _getInputBackgroundColor(),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
-              color: Colors.grey[300]!,
+              color: _getBorderColor(),
               width: 1.5,
             ),
           ),
@@ -2050,15 +2090,15 @@ class _PostItemPageState extends State<PostItemPage> {
                   controller: _priceController,
                   keyboardType: TextInputType.number,
                   style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
+                    color: _getTextColor(),
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Enter price',
                     hintStyle: TextStyle(
-                      color: Colors.grey,
+                      color: _getHintTextColor(),
                     ),
                   ),
                   validator: (value) {
@@ -2085,7 +2125,7 @@ class _PostItemPageState extends State<PostItemPage> {
     
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -2125,7 +2165,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 'Features',
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -2165,17 +2205,17 @@ class _PostItemPageState extends State<PostItemPage> {
                     ],
                   )
                 : null,
-            color: isSelected ? null : Colors.white,
+            color: isSelected ? null : _getCardColor(),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
+              color: isSelected ? ColorGlobalVariables.brownColor : _getBorderColor(),
               width: 2,
             ),
           ),
           child: Text(
             feature,
             style: TextStyle(
-              color: isSelected ? Colors.white : ColorGlobalVariables.blackColor,
+              color: isSelected ? Colors.white : _getTextColor(),
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -2188,7 +2228,7 @@ class _PostItemPageState extends State<PostItemPage> {
   Widget _buildImagePickerSection() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -2228,7 +2268,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 "Vehicle Images",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -2239,7 +2279,7 @@ class _PostItemPageState extends State<PostItemPage> {
           Text(
             "Tap to add images ($minImagesRequired-$maxImagesAllowed required)",
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getHintTextColor(),
               fontSize: 14,
             ),
           ),
@@ -2253,10 +2293,10 @@ class _PostItemPageState extends State<PostItemPage> {
                 height: 240,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: _getInputBackgroundColor(),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.grey[300]!,
+                    color: _getBorderColor(),
                     width: 2,
                   ),
                 ),
@@ -2333,13 +2373,13 @@ class _PostItemPageState extends State<PostItemPage> {
         Icon(
           Icons.add_photo_alternate_rounded,
           size: 50,
-          color: Colors.grey[400],
+          color: _getHintTextColor(),
         ),
         const SizedBox(height: 12),
         Text(
           "Tap to Add Images",
           style: TextStyle(
-            color: Colors.grey[500],
+            color: _getHintTextColor(),
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
@@ -2348,7 +2388,7 @@ class _PostItemPageState extends State<PostItemPage> {
         Text(
           "$minImagesRequired-$maxImagesAllowed images required",
           style: TextStyle(
-            color: Colors.grey[400],
+            color: _getHintTextColor(),
             fontSize: 14,
           ),
         ),
@@ -2380,7 +2420,7 @@ class _PostItemPageState extends State<PostItemPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey[300]!,
+          color: _getBorderColor(),
           width: 2,
         ),
       ),
@@ -2398,18 +2438,18 @@ class _PostItemPageState extends State<PostItemPage> {
             )
           else if (index == selectedImages.length && canAddMore)
             Container(
-              color: Colors.grey[100],
+              color: _getInputBackgroundColor(),
               child: Center(
                 child: Icon(
                   Icons.add_photo_alternate_rounded,
-                  color: Colors.grey[400],
+                  color: _getHintTextColor(),
                   size: 32,
                 ),
               ),
             )
           else
             Container(
-              color: Colors.grey[50],
+              color: _getInputBackgroundColor(),
             ),
           
           if (hasImage)
@@ -2543,7 +2583,7 @@ class _PostItemPageState extends State<PostItemPage> {
     final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: _getBackgroundColor(),
       appBar: _buildAppBar(),
       body: _isLoading
           ? _buildLoadingIndicator()
@@ -2580,7 +2620,7 @@ class _PostItemPageState extends State<PostItemPage> {
             Text(
               'Unable to Load Data',
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: _getTextColor(),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -2589,7 +2629,7 @@ class _PostItemPageState extends State<PostItemPage> {
             Text(
               categoriesProvider.error ?? makeModelProvider.error ?? 'Unknown error occurred',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: _getHintTextColor(),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -2759,7 +2799,7 @@ class _PostItemPageState extends State<PostItemPage> {
     final filteredItems = ValueNotifier<List<T>>(items);
 
     return Dialog(
-      backgroundColor: Colors.white,
+      backgroundColor: _getDialogBackgroundColor(),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -2811,7 +2851,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: ColorGlobalVariables.blackColor,
+                      color: _getTextColor(),
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -2820,7 +2860,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: _getHintTextColor(),
                       fontSize: 15,
                     ),
                     textAlign: TextAlign.center,
@@ -2833,7 +2873,7 @@ class _PostItemPageState extends State<PostItemPage> {
               padding: const EdgeInsets.all(24),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: _getInputBackgroundColor(),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: TextField(
@@ -2843,6 +2883,12 @@ class _PostItemPageState extends State<PostItemPage> {
                     prefixIcon: Icon(Icons.search_rounded, color: ColorGlobalVariables.brownColor),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    hintStyle: TextStyle(
+                      color: _getHintTextColor(),
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: _getTextColor(),
                   ),
                   onChanged: (value) {
                     filteredItems.value = items.where((item) {
@@ -2862,7 +2908,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     itemCount: filteredItems.length,
                     separatorBuilder: (context, index) => Divider(
                       height: 1,
-                      color: Colors.grey[200],
+                      color: _getBorderColor(),
                     ),
                     itemBuilder: (context, index) {
                       final item = filteredItems[index];
@@ -2899,7 +2945,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                   child: Text(
                                     itemBuilder(item),
                                     style: TextStyle(
-                                      color: ColorGlobalVariables.blackColor,
+                                      color: _getTextColor(),
                                       fontSize: 17,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -2919,7 +2965,7 @@ class _PostItemPageState extends State<PostItemPage> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(28),
                   bottomRight: Radius.circular(28),
@@ -2933,7 +2979,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Colors.grey[700],
+                        color: _getHintTextColor(),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -2970,7 +3016,7 @@ class _PostItemPageState extends State<PostItemPage> {
     await showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.white,
+        backgroundColor: _getDialogBackgroundColor(),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Container(
           constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
@@ -3002,7 +3048,7 @@ class _PostItemPageState extends State<PostItemPage> {
               Text(
                 'Enter $fieldLabel',
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -3011,17 +3057,23 @@ class _PostItemPageState extends State<PostItemPage> {
               
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: _getInputBackgroundColor(),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(color: _getBorderColor()),
                 ),
                 child: TextField(
                   controller: controller,
                   keyboardType: fieldType == "number" ? TextInputType.number : TextInputType.text,
+                  style: TextStyle(
+                    color: _getTextColor(),
+                  ),
                   decoration: InputDecoration(
                     hintText: "Enter $fieldLabel",
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    hintStyle: TextStyle(
+                      color: _getHintTextColor(),
+                    ),
                   ),
                   autofocus: true,
                 ),
@@ -3036,7 +3088,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Colors.grey[700],
+                        color: _getHintTextColor(),
                         fontWeight: FontWeight.w600,
                       ),
                     ),

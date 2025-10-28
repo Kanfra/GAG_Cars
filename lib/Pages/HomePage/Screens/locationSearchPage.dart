@@ -173,10 +173,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   }
 
   void _showLocationServiceDialog() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
@@ -210,7 +212,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               Text(
                 'Location Services Disabled',
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -220,7 +222,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               Text(
                 'Please enable location services to use this feature and get accurate location results.',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
                   fontSize: 14,
                 ),
                 textAlign: TextAlign.center,
@@ -240,7 +242,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -296,10 +298,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
   }
 
   void _showLocationPermissionDialog() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
@@ -333,7 +337,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               Text(
                 'Location Permission Required',
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -343,7 +347,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               Text(
                 'This app needs location permission to determine your current location and provide accurate search results.',
                 style: TextStyle(
-                  color: Colors.grey[600],
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
                   fontSize: 14,
                 ),
                 textAlign: TextAlign.center,
@@ -363,7 +367,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -461,30 +465,37 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildBeautifulAppBar(),
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
+      appBar: _buildBeautifulAppBar(isDarkMode),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.white,
-              Colors.grey.shade50,
-            ],
+            colors: isDarkMode
+                ? [
+                    const Color(0xFF303030),
+                    const Color(0xFF424242),
+                  ]
+                : [
+                    Colors.white,
+                    Colors.grey.shade50,
+                  ],
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              _buildBeautifulSearchBar(),
+              _buildBeautifulSearchBar(isDarkMode),
               const SizedBox(height: 16),
-              if (_locationPermissionDenied) _buildBeautifulPermissionWarning(),
-              if (!_locationServiceEnabled) _buildBeautifulLocationServiceWarning(),
+              if (_locationPermissionDenied) _buildBeautifulPermissionWarning(isDarkMode),
+              if (!_locationServiceEnabled) _buildBeautifulLocationServiceWarning(isDarkMode),
               const SizedBox(height: 20),
-              Expanded(child: _buildBeautifulLocationList()),
+              Expanded(child: _buildBeautifulLocationList(isDarkMode)),
             ],
           ),
         ),
@@ -492,14 +503,14 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     );
   }
 
-  AppBar _buildBeautifulAppBar() {
+  AppBar _buildBeautifulAppBar(bool isDarkMode) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
       elevation: 0,
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+          color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -512,7 +523,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         child: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: ColorGlobalVariables.brownColor,
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
             size: 20,
           ),
           onPressed: () => Navigator.pop(context),
@@ -521,7 +532,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       title: Text(
         'Select Location',
         style: TextStyle(
-          color: ColorGlobalVariables.brownColor,
+          color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -532,7 +543,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
           Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: isDarkMode ? Colors.grey[700] : Colors.grey[50],
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -545,7 +556,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             child: IconButton(
               icon: Icon(
                 Icons.check_rounded,
-                color: ColorGlobalVariables.brownColor,
+                color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
                 size: 22,
               ),
               onPressed: () {
@@ -564,10 +575,10 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     );
   }
 
-  Widget _buildBeautifulSearchBar() {
+  Widget _buildBeautifulSearchBar(bool isDarkMode) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -584,10 +595,10 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.grey[300]!,
+                    color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
                     width: 1.5,
                   ),
                 ),
@@ -597,7 +608,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                       padding: const EdgeInsets.only(left: 16),
                       child: Icon(
                         Icons.search_rounded,
-                        color: Colors.grey[500],
+                        color: isDarkMode ? Colors.white60 : Colors.grey[500],
                         size: 22,
                       ),
                     ),
@@ -607,16 +618,16 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                         controller: _searchController,
                         focusNode: _searchFocusNode,
                         style: TextStyle(
-                          color: ColorGlobalVariables.blackColor,
+                          color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Search for a city or location...',
-                          border: InputBorder.none,
                           hintStyle: TextStyle(
-                            color: Colors.grey,
+                            color: isDarkMode ? Colors.white60 : Colors.grey,
                           ),
+                          border: InputBorder.none,
                         ),
                       ),
                     ),
@@ -626,7 +637,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                         child: IconButton(
                           icon: Icon(
                             Icons.clear_rounded,
-                            color: Colors.grey[500],
+                            color: isDarkMode ? Colors.white60 : Colors.grey[500],
                             size: 20,
                           ),
                           onPressed: () {
@@ -684,7 +695,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     );
   }
 
-  Widget _buildBeautifulPermissionWarning() {
+  Widget _buildBeautifulPermissionWarning(bool isDarkMode) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -696,14 +707,19 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.red.shade50,
-                Colors.red.shade100,
-              ],
+              colors: isDarkMode
+                  ? [
+                      Colors.red.withOpacity(0.2),
+                      Colors.red.withOpacity(0.1),
+                    ]
+                  : [
+                      Colors.red.shade50,
+                      Colors.red.shade100,
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.red.shade200,
+              color: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.shade200,
               width: 1.5,
             ),
             boxShadow: [
@@ -720,12 +736,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.red.shade100,
+                  color: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.shade100,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.warning_rounded,
-                  color: Colors.red.shade600,
+                  color: isDarkMode ? Colors.red[300] : Colors.red.shade600,
                   size: 24,
                 ),
               ),
@@ -737,7 +753,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     Text(
                       'Location Access Required',
                       style: TextStyle(
-                        color: Colors.red.shade800,
+                        color: isDarkMode ? Colors.red[300] : Colors.red.shade800,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -746,7 +762,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     Text(
                       'Tap to enable location permissions for accurate results',
                       style: TextStyle(
-                        color: Colors.red.shade600,
+                        color: isDarkMode ? Colors.red[200] : Colors.red.shade600,
                         fontSize: 14,
                       ),
                     ),
@@ -755,7 +771,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.red.shade600,
+                color: isDarkMode ? Colors.red[300] : Colors.red.shade600,
                 size: 24,
               ),
             ],
@@ -765,7 +781,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     );
   }
 
-  Widget _buildBeautifulLocationServiceWarning() {
+  Widget _buildBeautifulLocationServiceWarning(bool isDarkMode) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -777,14 +793,19 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.orange.shade50,
-                Colors.orange.shade100,
-              ],
+              colors: isDarkMode
+                  ? [
+                      Colors.orange.withOpacity(0.2),
+                      Colors.orange.withOpacity(0.1),
+                    ]
+                  : [
+                      Colors.orange.shade50,
+                      Colors.orange.shade100,
+                    ],
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.orange.shade200,
+              color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.shade200,
               width: 1.5,
             ),
             boxShadow: [
@@ -801,12 +822,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.orange.shade100,
+                  color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.shade100,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.location_off_rounded,
-                  color: Colors.orange.shade600,
+                  color: isDarkMode ? Colors.orange[300] : Colors.orange.shade600,
                   size: 24,
                 ),
               ),
@@ -818,7 +839,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     Text(
                       'Location Services Off',
                       style: TextStyle(
-                        color: Colors.orange.shade800,
+                        color: isDarkMode ? Colors.orange[300] : Colors.orange.shade800,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -827,7 +848,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     Text(
                       'Enable location services for better experience',
                       style: TextStyle(
-                        color: Colors.orange.shade600,
+                        color: isDarkMode ? Colors.orange[200] : Colors.orange.shade600,
                         fontSize: 14,
                       ),
                     ),
@@ -836,7 +857,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.orange.shade600,
+                color: isDarkMode ? Colors.orange[300] : Colors.orange.shade600,
                 size: 24,
               ),
             ],
@@ -846,7 +867,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
     );
   }
 
-  Widget _buildBeautifulLocationList() {
+  Widget _buildBeautifulLocationList(bool isDarkMode) {
     if (_isLoading) {
       return Center(
         child: Column(
@@ -856,7 +877,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withOpacity(0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -868,7 +889,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               ),
               child: Icon(
                 Icons.search_rounded,
-                color: ColorGlobalVariables.brownColor,
+                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
                 size: 36,
               ),
             ),
@@ -876,7 +897,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             Text(
               'Searching Locations...',
               style: TextStyle(
-                color: ColorGlobalVariables.brownColor,
+                color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -885,7 +906,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             Text(
               'Finding the best matches for you',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 fontSize: 14,
               ),
             ),
@@ -906,10 +927,15 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    ColorGlobalVariables.brownColor.withOpacity(0.1),
-                    ColorGlobalVariables.brownColor.withOpacity(0.05),
-                  ],
+                  colors: isDarkMode
+                      ? [
+                          Colors.grey[700]!,
+                          Colors.grey[600]!,
+                        ]
+                      : [
+                          ColorGlobalVariables.brownColor.withOpacity(0.1),
+                          ColorGlobalVariables.brownColor.withOpacity(0.05),
+                        ],
                 ),
                 borderRadius: BorderRadius.circular(60),
                 boxShadow: [
@@ -923,7 +949,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               child: Icon(
                 Icons.explore_rounded,
                 size: 50,
-                color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor.withOpacity(0.6),
               ),
             ),
             const SizedBox(height: 24),
@@ -932,7 +958,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                   ? 'Find Your Location'
                   : 'No Locations Found',
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -943,7 +969,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                   ? 'Search for a city or use your current location to get started'
                   : 'Try searching with different keywords or check your spelling',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -1023,7 +1049,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -1033,7 +1059,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     ),
                   ],
                   border: Border.all(
-                    color: Colors.grey[200]!,
+                    color: isDarkMode ? Colors.grey[600]! : Colors.grey[200]!,
                     width: 1,
                   ),
                 ),
@@ -1043,12 +1069,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                        color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         Icons.location_on_rounded,
-                        color: ColorGlobalVariables.brownColor,
+                        color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
                         size: 24,
                       ),
                     ),
@@ -1060,7 +1086,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                           Text(
                             prediction.structuredFormatting?.mainText ?? '',
                             style: TextStyle(
-                              color: ColorGlobalVariables.blackColor,
+                              color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1070,7 +1096,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                             Text(
                               prediction.structuredFormatting!.secondaryText!,
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                color: isDarkMode ? Colors.white70 : Colors.grey[600],
                                 fontSize: 14,
                               ),
                             ),
@@ -1080,7 +1106,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     ),
                     Icon(
                       Icons.chevron_right_rounded,
-                      color: Colors.grey[400],
+                      color: isDarkMode ? Colors.white60 : Colors.grey[400],
                       size: 24,
                     ),
                   ],

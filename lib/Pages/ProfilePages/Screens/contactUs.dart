@@ -12,13 +12,8 @@ class ContactUs extends StatelessWidget {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Contact Us'),
-      //   centerTitle: true,
-      //   elevation: 0,
-      // ),
       body: Container(
-        color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+        color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
         child: ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: ContactUsService.contactOptions.length,
@@ -31,7 +26,7 @@ class ContactUs extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                color: isDarkMode ? Colors.grey[800] : Colors.white,
+                color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () => option.action(context),
@@ -49,6 +44,7 @@ class ContactUs extends StatelessWidget {
                           option.title,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w500,
+                            color: isDarkMode ? Colors.white : Colors.black87,
                           ),
                         ),
                         const Spacer(),

@@ -152,15 +152,17 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     required VoidCallback onTap,
     Color? accentColor,
   }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
         const SizedBox(height: 8),
@@ -168,7 +170,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
           description,
           style: TextStyle(
             fontSize: 14,
-            color: Colors.grey[600],
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
             height: 1.4,
           ),
         ),
@@ -180,7 +182,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isCaptured 
@@ -217,7 +219,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isCaptured ? Colors.green : Colors.black87,
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -225,7 +227,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                   isCaptured ? "Ready for verification" : "Take a clear photo",
                   style: TextStyle(
                     fontSize: 14,
-                    color: isCaptured ? Colors.green : Colors.grey[600],
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -240,7 +242,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -256,8 +258,11 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.error_outline, color: Colors.grey),
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    child: Icon(
+                      Icons.error_outline, 
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey
+                    ),
                   );
                 },
               ),
@@ -268,10 +273,19 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: onTap,
-              icon: const Icon(Icons.camera_alt, size: 18),
-              label: const Text("Retake"),
+              icon: Icon(
+                Icons.camera_alt, 
+                size: 18,
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+              label: Text(
+                "Retake",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                ),
+              ),
               style: TextButton.styleFrom(
-                foregroundColor: Colors.grey[600],
+                foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
             ),
           ),
@@ -359,25 +373,19 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     // Option 1: Navigate back to Settings page (index 4 in bottom nav)
     // This will return to the Settings page within the bottom navigation
     Navigator.of(context).popUntil((route) => route.isFirst);
-    
-    // Option 2: If you need to specifically set the bottom nav index to 4 (Settings)
-    // You can use a different approach depending on your navigation structure
-    
-    // Since GetVerifiedPage is pushed on top of SettingsPage,
-    // popping twice should take us back to Settings within the bottom nav
-    // Navigator.of(context).pop(); // Pop GetVerifiedPage
-    // This should leave us in SettingsPage within the bottom navigation structure
   }
 
   // ================== PROGRESS INDICATOR ==================
   Widget _buildProgressStep(String label, int stepNumber, bool isCompleted) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Column(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: isCompleted ? Colors.green : Colors.grey[300],
+            color: isCompleted ? Colors.green : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -386,7 +394,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 : Text(
                     stepNumber.toString(),
                     style: TextStyle(
-                      color: Colors.grey[700],
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -399,7 +407,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            color: isCompleted ? Colors.green : Colors.grey[600],
+            color: isCompleted ? Colors.green : (isDarkMode ? Colors.white70 : Colors.grey[600]),
           ),
         ),
       ],
@@ -412,13 +420,16 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => _navigateBackToSettings(),
         isLeadingWidgetExist: true,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
+        leadingIconDataColor: isDarkMode ? Colors.white : Colors.black87,
         titleText: "Get Verified",
-        titleTextColor: ColorGlobalVariables.brownColor,
+        titleTextWeight: FontWeight.bold,
+        titleTextSize: 22,
+        titleTextColor: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
         centerTitle: true,
       ),
       body: Stack(
@@ -437,14 +448,19 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        ColorGlobalVariables.brownColor.withOpacity(0.1),
-                        ColorGlobalVariables.maroonColor.withOpacity(0.05),
-                      ],
+                      colors: isDarkMode
+                          ? [
+                              Colors.grey[800]!,
+                              Colors.grey[700]!,
+                            ]
+                          : [
+                              ColorGlobalVariables.brownColor.withOpacity(0.1),
+                              ColorGlobalVariables.maroonColor.withOpacity(0.05),
+                            ],
                     ),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                      color: isDarkMode ? Colors.grey[600]! : ColorGlobalVariables.brownColor.withOpacity(0.2),
                     ),
                   ),
                   child: Column(
@@ -465,24 +481,24 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: Text(
                               "Identity Verification",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         "Complete your verification to build trust with customers and access premium features. All documents are securely processed.",
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: isDarkMode ? Colors.white70 : Colors.grey,
                           height: 1.5,
                         ),
                       ),
@@ -542,9 +558,9 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.05),
+                    color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                    border: Border.all(color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2)),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,7 +576,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                           "Your documents are encrypted and securely stored. We only use them for verification purposes and comply with data protection regulations.",
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[700],
+                            color: isDarkMode ? Colors.white70 : Colors.grey[700],
                             height: 1.4,
                           ),
                         ),

@@ -73,22 +73,27 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       appBar: AppBar(
         title: Text(
           'Notifications',
           style: TextStyle(
-            color: ColorGlobalVariables.brownColor,
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(
+            Icons.arrow_back, 
+            color: isDarkMode ? Colors.white : Colors.black87
+          ),
           onPressed: () => Get.back(),
         ),
         actions: [
@@ -105,16 +110,27 @@ class _NotificationPageState extends State<NotificationPage> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              isDarkMode ? Colors.white : ColorGlobalVariables.brownColor
+                            ),
                           ),
                         ),
                       )
                     : TextButton.icon(
                         onPressed: () => _markAllAsRead(provider),
-                        icon: Icon(Icons.done_all, size: 20),
-                        label: Text('Mark all as read'),
+                        icon: Icon(
+                          Icons.done_all, 
+                          size: 20,
+                          color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+                        ),
+                        label: Text(
+                          'Mark all as read',
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+                          ),
+                        ),
                         style: TextButton.styleFrom(
-                          foregroundColor: ColorGlobalVariables.brownColor,
+                          foregroundColor: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
                         ),
                       );
               }
@@ -126,19 +142,21 @@ class _NotificationPageState extends State<NotificationPage> {
       body: Consumer<NotificationProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading && provider.notifications.isEmpty) {
-            return _buildLoadingState();
+            return _buildLoadingState(isDarkMode);
           }
 
           if (provider.errorMessage.isNotEmpty && provider.notifications.isEmpty) {
-            return _buildErrorState(provider);
+            return _buildErrorState(provider, isDarkMode);
           }
 
           if (provider.notifications.isEmpty) {
-            return _buildEmptyState();
+            return _buildEmptyState(isDarkMode);
           }
 
           return RefreshIndicator(
             onRefresh: () async => _onRefresh(),
+            backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+            color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
             child: ListView.builder(
               itemCount: provider.notifications.length,
               itemBuilder: (context, index) {
@@ -151,6 +169,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     await currentProvider.markAsRead(notification.id);
                   },
                   formatDate: _formatDate,
+                  isDarkMode: isDarkMode,
                 );
               },
             ),
@@ -160,19 +179,21 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor
+            ),
           ),
           SizedBox(height: 16),
           Text(
             'Loading notifications...',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 16,
             ),
           ),
@@ -181,16 +202,23 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget _buildErrorState(NotificationProvider provider) {
+  Widget _buildErrorState(NotificationProvider provider, bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          Icon(
+            Icons.error_outline, 
+            size: 64, 
+            color: isDarkMode ? Colors.grey[500] : Colors.grey[400]
+          ),
           SizedBox(height: 16),
           Text(
             provider.errorMessage,
-            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.grey[600], 
+              fontSize: 16
+            ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
@@ -210,17 +238,21 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.notifications_off, size: 80, color: Colors.grey[300]),
+          Icon(
+            Icons.notifications_off, 
+            size: 80, 
+            color: isDarkMode ? Colors.grey[600] : Colors.grey[300]
+          ),
           SizedBox(height: 16),
           Text(
             'No notifications yet',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 18,
               fontWeight: FontWeight.w500,
             ),
@@ -229,7 +261,7 @@ class _NotificationPageState extends State<NotificationPage> {
           Text(
             'We\'ll notify you when something arrives',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
               fontSize: 14,
             ),
           ),
@@ -243,18 +275,21 @@ class _NotificationItem extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback onTap;
   final String Function(String) formatDate;
+  final bool isDarkMode;
 
   const _NotificationItem({
     required this.notification,
     required this.onTap,
     required this.formatDate,
+    required this.isDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      elevation: 1,
+      elevation: isDarkMode ? 2 : 1,
+      color: isDarkMode ? const Color(0xFF424242) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         contentPadding: EdgeInsets.all(16),
@@ -276,7 +311,9 @@ class _NotificationItem extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-            color: notification.isRead ? Colors.grey[700] : Colors.black87,
+            color: notification.isRead 
+              ? (isDarkMode ? Colors.white70 : Colors.grey[700])
+              : (isDarkMode ? Colors.white : Colors.black87),
           ),
         ),
         subtitle: Column(
@@ -287,7 +324,9 @@ class _NotificationItem extends StatelessWidget {
               notification.message,
               style: TextStyle(
                 fontSize: 14,
-                color: notification.isRead ? Colors.grey[600] : Colors.grey[800],
+                color: notification.isRead 
+                  ? (isDarkMode ? Colors.white60 : Colors.grey[600])
+                  : (isDarkMode ? Colors.white70 : Colors.grey[800]),
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -297,7 +336,7 @@ class _NotificationItem extends StatelessWidget {
               formatDate(notification.createdAt),
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[500],
+                color: isDarkMode ? Colors.white54 : Colors.grey[500],
               ),
             ),
           ],

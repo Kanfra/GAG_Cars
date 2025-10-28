@@ -88,41 +88,60 @@ Future<void>  pickImage(ImageSource source, ImagePicker picker, ValueChanged set
 }
 
 // pick image dialog
-  void showImageSourceDialog({
-    required ImagePicker picker, 
-    required ValueChanged setStateFunction
-    }) {
-    Get.bottomSheet(
-      Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20)),
-        ),
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.camera, picker, setStateFunction);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
-              onTap: () {
-                Get.back();
-                pickImage(ImageSource.gallery, picker, setStateFunction);
-              },
-            ),
-          ],
-        ),
+void showImageSourceDialog({
+  required ImagePicker picker, 
+  required ValueChanged setStateFunction
+}) {
+  final isDarkMode = Get.isDarkMode;
+  
+  Get.bottomSheet(
+    Container(
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20)),
       ),
-    );
-  }
+      child: Wrap(
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.camera_alt,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+            title: Text(
+              'Take Photo',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            onTap: () {
+              Get.back();
+              pickImage(ImageSource.camera, picker, setStateFunction);
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.photo_library,
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+            title: Text(
+              'Choose from Gallery',
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            onTap: () {
+              Get.back();
+              pickImage(ImageSource.gallery, picker, setStateFunction);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 // bubble snackbar for sign up
 void showCustomSnackBar({
   String? title,
@@ -182,25 +201,43 @@ void showCustomAppSnackBar({
   required BuildContext context, 
   required String message,
   Color backgroundColor = ColorGlobalVariables.redColor,
-  }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
+}) {
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(
+          color: Colors.white,
+        ),
       ),
-    );
-  }
+      backgroundColor: backgroundColor,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: const EdgeInsets.all(16),
+    ),
+  );
+}
 
 void showFilterBottomSheet({
   required BuildContext context,
   required Widget widget,
 }) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => widget
-    );
-  }
+  final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+  
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) => widget
+  );
+}
 
 String createSlug({required String name, required bool isUniqueRandomSlugRequiredOrTimestampSlug}){
   String input = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s-]'), ''). trim().replaceAll(RegExp(r'\s+'), '-').replaceAll(RegExp(r'-+'), '-');
@@ -242,12 +279,12 @@ Future<void> showFieldInputDialog({
       child: Dialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
-          ),
+        ),
         backgroundColor: Colors.transparent,
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[900] : Colors.white,
+            color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -281,12 +318,15 @@ Future<void> showFieldInputDialog({
                 ),
                 decoration: InputDecoration(
                   hintText: "Enter $fieldLabel...",
+                  hintStyle: TextStyle(
+                    color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                  ),
                   labelText: fieldName,
                   labelStyle: TextStyle(
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                   filled: true,
-                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+                  fillColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[100],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -298,6 +338,13 @@ Future<void> showFieldInputDialog({
                     borderSide: BorderSide(
                       color: theme.primaryColor,
                       width: 2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                      width: 1,
                     ),
                   ),
                 ),
@@ -318,7 +365,7 @@ Future<void> showFieldInputDialog({
                     child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -364,6 +411,186 @@ Future<void> showFieldInputDialog({
       setStateFunction(result);
     });
   }
+}
+
+// Enhanced image picker with dark mode support
+Future<void> showEnhancedImageSourceDialog({
+  required ImagePicker picker, 
+  required ValueChanged setStateFunction,
+  BuildContext? context,
+}) async {
+  final isDarkMode = context != null 
+      ? Theme.of(context).brightness == Brightness.dark
+      : Get.isDarkMode;
+
+  await Get.bottomSheet(
+    Container(
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDarkMode ? Colors.grey[700]! : Colors.grey[200]!,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.photo_camera,
+                    color: isDarkMode ? Colors.white70 : Colors.black87,
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Choose Photo',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Options
+            ListTile(
+              leading: Icon(
+                Icons.camera_alt,
+                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+              ),
+              title: Text(
+                'Take Photo',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              subtitle: Text(
+                'Use your camera',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                ),
+              ),
+              onTap: () {
+                Get.back();
+                pickImage(ImageSource.camera, picker, setStateFunction);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.photo_library,
+                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+              ),
+              title: Text(
+                'Choose from Gallery',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              subtitle: Text(
+                'Select from your photos',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                ),
+              ),
+              onTap: () {
+                Get.back();
+                pickImage(ImageSource.gallery, picker, setStateFunction);
+              },
+            ),
+            // Cancel Button
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Get.back(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(
+                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                    ),
+                  ),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+// Enhanced snackbar with dark mode detection
+void showEnhancedCustomSnackBar({
+  String? title,
+  required String message,
+  Color? backgroundColor,
+  Color? textColor,
+  Duration? duration,
+  SnackPosition? position,
+  bool success = false,
+  bool warning = false,
+  bool error = false,
+}) {
+  final isDarkMode = Get.isDarkMode;
+  
+  // Determine background color based on type
+  Color bgColor;
+  if (backgroundColor != null) {
+    bgColor = backgroundColor;
+  } else if (success) {
+    bgColor = ColorGlobalVariables.greenColor;
+  } else if (warning) {
+    bgColor = Colors.orange;
+  } else if (error) {
+    bgColor = ColorGlobalVariables.redColor;
+  } else {
+    bgColor = isDarkMode ? Colors.grey[800]! : ColorGlobalVariables.brownColor;
+  }
+
+  Get.snackbar(
+    title ?? (success ? 'Success' : warning ? 'Warning' : error ? 'Error' : 'Info'),
+    message,
+    backgroundColor: bgColor,
+    colorText: textColor ?? Colors.white,
+    duration: duration ?? const Duration(seconds: 3),
+    snackPosition: position ?? SnackPosition.BOTTOM,
+    margin: const EdgeInsets.all(16),
+    borderRadius: 12,
+    boxShadows: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 8,
+        offset: const Offset(0, 2),
+      ),
+    ],
+    isDismissible: true,
+    dismissDirection: DismissDirection.horizontal,
+  );
 }
 
 // helper widget for proper disposal

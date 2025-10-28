@@ -121,29 +121,47 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   }
 
   void _showSuccessDialog(String message) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Row(
+          title: Row(
             children: [
               Icon(Icons.check_circle, color: Colors.green, size: 24),
-              SizedBox(width: 8),
-              Text('Success'),
+              const SizedBox(width: 8),
+              Text(
+                'Success',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
             ],
           ),
-          content: Text(message),
+          content: Text(
+            message,
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.black87,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 Get.back(); // Return to previous page
               },
-              child: const Text('OK'),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+                ),
+              ),
             ),
           ],
         );
@@ -179,6 +197,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final screenSize = MediaQuery.of(context).size;
     
     return Scaffold(
@@ -186,12 +205,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         onLeadingIconClickFunction: () => Get.back(),
         isLeadingWidgetExist: true,
         leadingIconData: Icons.arrow_back_ios,
+        leadingIconDataColor: isDarkMode ? Colors.white : Colors.black87,
         centerTitle: true,
         titleText: "Change Password",
-        titleTextColor: ColorGlobalVariables.brownColor,
+        titleTextSize: 22,
+        titleFontWeight: FontWeight.bold,
+        titleTextColor: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
       ),
       body: Container(
-        color: Colors.grey[50],
+        color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
         child: Form(
           key: _formKey,
           child: Column(
@@ -201,7 +223,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(20),
                     bottomRight: Radius.circular(20),
@@ -217,10 +239,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.lock_outline,
                       size: 48,
-                      color: ColorGlobalVariables.brownColor,
+                      color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -228,7 +250,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
+                        color: isDarkMode ? Colors.white : Colors.grey[800],
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -236,7 +258,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       'Create a strong, unique password to secure your account',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey[600],
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
                       ),
                     ),
                   ],
@@ -257,6 +279,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         obscureText: _obscureOldPassword,
                         onToggleVisibility: _toggleOldPasswordVisibility,
                         validator: _validateOldPassword,
+                        isDarkMode: isDarkMode,
                       ),
                       
                       const SizedBox(height: 20),
@@ -269,6 +292,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         obscureText: _obscureNewPassword,
                         onToggleVisibility: _toggleNewPasswordVisibility,
                         validator: _validateNewPassword,
+                        isDarkMode: isDarkMode,
                       ),
                       
                       // Password Requirements
@@ -277,9 +301,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue[50],
+                          color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue[50],
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.blue[100]!),
+                          border: Border.all(
+                            color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue[100]!,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,15 +315,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.blue[800],
+                                color: isDarkMode ? Colors.blue[200] : Colors.blue[800],
                               ),
                             ),
                             const SizedBox(height: 4),
-                            _buildRequirement('At least 8 characters'),
-                            _buildRequirement('One uppercase letter'),
-                            _buildRequirement('One lowercase letter'),
-                            _buildRequirement('One number'),
-                            _buildRequirement('One special character'),
+                            _buildRequirement('At least 8 characters', isDarkMode),
+                            _buildRequirement('One uppercase letter', isDarkMode),
+                            _buildRequirement('One lowercase letter', isDarkMode),
+                            _buildRequirement('One number', isDarkMode),
+                            _buildRequirement('One special character', isDarkMode),
                           ],
                         ),
                       ),
@@ -312,6 +338,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         obscureText: _obscureConfirmPassword,
                         onToggleVisibility: _toggleConfirmPasswordVisibility,
                         validator: _validateConfirmPassword,
+                        isDarkMode: isDarkMode,
                       ),
                       
                       const SizedBox(height: 32),
@@ -359,14 +386,16 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         child: OutlinedButton(
                           onPressed: _isLoading ? null : () => Get.back(),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.grey[700],
-                            side: BorderSide(color: Colors.grey[300]!),
+                            foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[700],
+                            side: BorderSide(
+                              color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Cancel',
                             style: TextStyle(
                               fontSize: 16,
@@ -393,6 +422,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     required bool obscureText,
     required VoidCallback onToggleVisibility,
     required String? Function(String?) validator,
+    required bool isDarkMode,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -402,7 +432,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
+            color: isDarkMode ? Colors.white70 : Colors.grey[700],
           ),
         ),
         const SizedBox(height: 8),
@@ -410,23 +440,35 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           controller: controller,
           obscureText: obscureText,
           validator: validator,
-          style: const TextStyle(fontSize: 16),
+          style: TextStyle(
+            fontSize: 16,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey[500]),
+            hintStyle: TextStyle(
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
+            ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(
+                color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: BorderSide(
+                color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: ColorGlobalVariables.brownColor!),
+              borderSide: BorderSide(
+                color: ColorGlobalVariables.brownColor!,
+                width: 2,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -444,7 +486,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               onPressed: onToggleVisibility,
               icon: Icon(
                 obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                color: Colors.grey[500],
+                color: isDarkMode ? Colors.white60 : Colors.grey[500],
               ),
             ),
           ),
@@ -453,7 +495,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget _buildRequirement(String text) {
+  Widget _buildRequirement(String text, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.only(top: 2),
       child: Row(
@@ -461,14 +503,14 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           Icon(
             Icons.circle,
             size: 4,
-            color: Colors.blue[600],
+            color: isDarkMode ? Colors.blue[300] : Colors.blue[600],
           ),
           const SizedBox(width: 8),
           Text(
             text,
             style: TextStyle(
               fontSize: 12,
-              color: Colors.blue[800],
+              color: isDarkMode ? Colors.blue[200] : Colors.blue[800],
             ),
           ),
         ],

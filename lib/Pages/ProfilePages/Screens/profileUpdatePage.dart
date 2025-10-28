@@ -142,16 +142,28 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   ) {
     final controller = TextEditingController(text: currentValue);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
     Get.dialog(
       AlertDialog(
-        title: Text("Edit $fieldName"),
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        title: Text(
+          "Edit $fieldName",
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
         content: TextField(
           controller: controller,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
             ),
+            filled: isDarkMode,
+            fillColor: isDarkMode ? const Color(0xFF303030) : null,
           ),
           onChanged: (_) {
             userProvider.clearError();
@@ -160,7 +172,12 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text("Cancel"),
+            child: Text(
+              "Cancel",
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.black54,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -184,6 +201,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   }
 
   void _showCountrySelectionDialog() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final countryProvider = Provider.of<CountryProvider>(context, listen: false);
     final countries = countryProvider.countriesSortedByName;
     _filteredCountries = countries;
@@ -195,7 +213,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         insetPadding: const EdgeInsets.all(20),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -252,18 +270,22 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                 padding: const EdgeInsets.all(16),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: Colors.grey[300]!,
+                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
                     ),
                   ),
                   child: TextField(
                     controller: _searchController,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isDarkMode ? Colors.white : Colors.grey[800],
+                    ),
                     decoration: InputDecoration(
                       hintText: "Search countries...",
                       hintStyle: TextStyle(
-                        color: Colors.grey[500],
+                        color: isDarkMode ? Colors.white60 : Colors.grey[500],
                         fontSize: 16,
                       ),
                       border: InputBorder.none,
@@ -276,7 +298,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                           ? IconButton(
                               icon: Icon(
                                 Icons.clear_rounded,
-                                color: Colors.grey[500],
+                                color: isDarkMode ? Colors.white60 : Colors.grey[500],
                                 size: 20,
                               ),
                               onPressed: () {
@@ -290,10 +312,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         horizontal: 16,
                         vertical: 16,
                       ),
-                    ),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[800],
                     ),
                     onChanged: (value) {
                       setState(() {
@@ -322,14 +340,14 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                             children: [
                               Icon(
                                 Icons.error_outline_rounded,
-                                color: Colors.grey[400],
+                                color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
                                 size: 48,
                               ),
                               const SizedBox(height: 16),
                               Text(
                                 'Failed to load countries',
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
                                   fontSize: 16,
                                 ),
                               ),
@@ -357,14 +375,14 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                 children: [
                                   Icon(
                                     Icons.search_off_rounded,
-                                    color: Colors.grey[400],
+                                    color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
                                     size: 48,
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
                                     'No countries found',
                                     style: TextStyle(
-                                      color: Colors.grey[600],
+                                      color: isDarkMode ? Colors.white70 : Colors.grey[600],
                                       fontSize: 16,
                                     ),
                                   ),
@@ -372,7 +390,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                   Text(
                                     'Try a different search term',
                                     style: TextStyle(
-                                      color: Colors.grey[500],
+                                      color: isDarkMode ? Colors.white60 : Colors.grey[500],
                                       fontSize: 14,
                                     ),
                                   ),
@@ -417,7 +435,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                               height: 32,
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(6),
-                                                color: Colors.grey[100],
+                                                color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
                                               ),
                                               alignment: Alignment.center,
                                               child: Text(
@@ -437,7 +455,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                                     style: TextStyle(
                                                       fontSize: 16,
                                                       fontWeight: FontWeight.w500,
-                                                      color: Colors.grey[800],
+                                                      color: isDarkMode ? Colors.white : Colors.grey[800],
                                                     ),
                                                   ),
                                                   const SizedBox(height: 4),
@@ -445,7 +463,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                                     '+${country.phoneCode} • ${country.iso2}',
                                                     style: TextStyle(
                                                       fontSize: 14,
-                                                      color: Colors.grey[600],
+                                                      color: isDarkMode ? Colors.white60 : Colors.grey[600],
                                                     ),
                                                   ),
                                                 ],
@@ -506,6 +524,8 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Consumer2<UserProvider, CountryProvider>(
       builder: (context, userProvider, countryProvider, child){
         final user = userProvider.user;
@@ -528,11 +548,11 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         }
 
         return Scaffold(
-          backgroundColor: Colors.grey[100],
-          appBar: _buildAppBar(),
+          backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[100],
+          appBar: _buildAppBar(isDarkMode),
           body: Stack(
             children: [
-              _buildProfileForm(userProvider, countryProvider, user, hasExistingCountry),
+              _buildProfileForm(userProvider, countryProvider, user, hasExistingCountry, isDarkMode),
               if(userProvider.isLoading)
               Container(
                 color: ColorGlobalVariables.blackColor.withOpacity(0.3),
@@ -547,18 +567,22 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(bool isDarkMode) {
     return AppBar(
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+        icon: Icon(
+          Icons.arrow_back_ios_new, 
+          size: 20,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
         onPressed: () => Get.back(),
       ),
       title: Text(
         "Edit Profile",
         style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: ColorGlobalVariables.blackColor,
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
         ),
       ),
       centerTitle: true,
@@ -567,12 +591,12 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildProfileForm(UserProvider userProvider, CountryProvider countryProvider, UserModel? user, bool hasExistingCountry) {
+  Widget _buildProfileForm(UserProvider userProvider, CountryProvider countryProvider, UserModel? user, bool hasExistingCountry, bool isDarkMode) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
         children: [
-          _buildProfileHeader(user, countryProvider, hasExistingCountry),
+          _buildProfileHeader(user, countryProvider, hasExistingCountry, isDarkMode),
           const SizedBox(height: 32),
           _buildEditableField(
             label: "Full Name",
@@ -581,6 +605,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               final updatedUser = user?.copyWith(name: value);
               if (updatedUser != null) userProvider.setUser(updatedUser);
             }),
+            isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 20),
           _buildEditableField(
@@ -590,6 +615,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               final updatedUser = user?.copyWith(phoneNumber: value);
               if (updatedUser != null) userProvider.setUser(updatedUser);
             }),
+            isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 20),
           _buildEditableField(
@@ -599,9 +625,10 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               final updatedUser = user?.copyWith(email: value);
               if (updatedUser != null) userProvider.setUser(updatedUser);
             }),
+            isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 20),
-          _buildCountrySelectionField(hasExistingCountry),
+          _buildCountrySelectionField(hasExistingCountry, isDarkMode),
           const SizedBox(height: 40),
           _buildUpdateButton(userProvider),
         ],
@@ -609,7 +636,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildProfileHeader(UserModel? user, CountryProvider countryProvider, bool hasExistingCountry) {
+  Widget _buildProfileHeader(UserModel? user, CountryProvider countryProvider, bool hasExistingCountry, bool isDarkMode) {
     String? countryName;
     String? countryFlag;
     
@@ -670,7 +697,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
           ),
         ),
         const SizedBox(height: 4),
@@ -690,7 +717,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                 countryName,
                 style: TextStyle(
                   fontSize: 12,
-                  color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+                  color: isDarkMode ? Colors.white70 : ColorGlobalVariables.blackColor.withOpacity(0.6),
                 ),
               ),
             ],
@@ -701,7 +728,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
             : "Not available",
           style: TextStyle(
             fontSize: 12,
-            color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
           ),
         ),
       ],
@@ -712,13 +739,14 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     required String label,
     required String value,
     required VoidCallback onTap,
+    required bool isDarkMode,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -738,7 +766,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     label,
                     style: TextStyle(
                       fontSize: 12,
-                      color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+                      color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -747,7 +775,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: ColorGlobalVariables.blackColor,
+                      color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                     ),
                   ),
                 ],
@@ -764,7 +792,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildCountrySelectionField(bool hasExistingCountry) {
+  Widget _buildCountrySelectionField(bool hasExistingCountry, bool isDarkMode) {
     final displayCountry = _selectedCountry;
     final hasSelectedCountry = displayCountry != null;
 
@@ -773,7 +801,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -795,7 +823,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         "Country",
                         style: TextStyle(
                           fontSize: 12,
-                          color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+                          color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
                         ),
                       ),
                       if (hasExistingCountry)
@@ -828,7 +856,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                             height: 24,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: Colors.grey[100],
+                              color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
                             ),
                             alignment: Alignment.center,
                             child: Text(
@@ -846,7 +874,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    color: ColorGlobalVariables.blackColor,
+                                    color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                                   ),
                                 ),
                                 if (hasExistingCountry)
@@ -854,7 +882,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                                     "Tap to change country",
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: ColorGlobalVariables.blackColor.withOpacity(0.5),
+                                      color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.5),
                                     ),
                                   ),
                               ],
@@ -864,7 +892,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                             '+${displayCountry.phoneCode}',
                             style: TextStyle(
                               fontSize: 14,
-                              color: ColorGlobalVariables.blackColor.withOpacity(0.6),
+                              color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
                             ),
                           ),
                         ],
@@ -877,7 +905,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: ColorGlobalVariables.blackColor.withOpacity(0.4),
+                              color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.4),
                             ),
                           ),
                           Text(

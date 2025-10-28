@@ -595,28 +595,36 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return specifications;
   }
 
+  // ========== DARK MODE AWARE WIDGETS ==========
+
   List<Widget> _buildTags(BuildContext context) {
     final List<Widget> tags = [];
     
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final isPaidSeller = userProvider.isPaidSeller;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
     if (hasWarranty) {
-      tags.add(_buildTag("Warranty", ColorGlobalVariables.greyColor));
+      tags.add(_buildTag(
+        "Warranty", 
+        isDarkMode ? Colors.grey[700]! : ColorGlobalVariables.greyColor
+      ));
     }
     
     if (isPaidSeller) {
-      tags.add(_buildVerifiedSellerTag());
+      tags.add(_buildVerifiedSellerTag(isDarkMode));
     }
     
     if (_isPromoted && !_isSold) {
-      tags.add(_buildPromotedTag());
+      tags.add(_buildPromotedTag(isDarkMode));
     }
     
     return tags;
   }
 
   void _showMarkAsSoldConfirmationDialog() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     AwesomeDialog(
       context: context,
       dialogType: DialogType.question,
@@ -694,12 +702,14 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   }
 
   void _showDeleteConfirmationDialog() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -725,13 +735,13 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Text(
                         "Delete Listing?",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                     ),
@@ -740,11 +750,11 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 
                 const SizedBox(height: 20),
                 
-                const Text(
+                Text(
                   "Are you sure you want to delete this car listing? This action cannot be undone and all data will be permanently lost.",
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.black54,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
                     height: 1.5,
                   ),
                 ),
@@ -753,10 +763,10 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 
                 Text(
                   getListingName(),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -774,14 +784,16 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: BorderSide(color: Colors.grey[300]!),
+                          side: BorderSide(
+                            color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!
+                          ),
                         ),
-                        child: const Text(
+                        child: Text(
                           "Cancel",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black54,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
                           ),
                         ),
                       ),
@@ -874,27 +886,31 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   }
 
   Widget _buildShimmerPlaceholder(double? width, double? height) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+      highlightColor: isDarkMode ? Colors.grey[600]! : Colors.grey[100]!,
       child: Container(
         width: width,
         height: height,
-        color: Colors.white,
+        color: isDarkMode ? Colors.grey[800]! : Colors.white,
       ),
     );
   }
 
   Widget _buildCustomErrorWidget(double? width, double? height) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Container(
       width: width,
       height: height,
-      color: Colors.grey[300],
+      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300],
       child: Center(
         child: Icon(
           Icons.broken_image,
           size: (width ?? 45) * 0.4,
-          color: Colors.grey[400],
+          color: isDarkMode ? Colors.grey[500]! : Colors.grey[400],
         ),
       ),
     );
@@ -947,6 +963,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final carHighlights = getHighlights();
     final carSpecifications = getSpecifications();
     final images = getListingImages();
@@ -955,6 +972,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
 
     return Scaffold(
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
@@ -1168,18 +1186,19 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
           
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.grey[50],
+              color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 25, bottom: 12),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25, bottom: 12),
                     child: Text(
                       "Gallery",
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w600,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
                   ),
@@ -1259,18 +1278,21 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 children: [
                   Text(
                     getListingDescription(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16.0,
                       height: 1.6,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white70 : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Divider(height: 1),
+                  Divider(
+                    height: 1,
+                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300],
+                  ),
                   const SizedBox(height: 20),
-                  _buildInfoRow(Icons.location_on_outlined, getListingLocation()),
+                  _buildInfoRow(Icons.location_on_outlined, getListingLocation(), isDarkMode),
                   const SizedBox(height: 12),
-                  _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(listing['created_at']?.toString() ?? '')),
+                  _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(listing['created_at']?.toString() ?? ''), isDarkMode),
                   const SizedBox(height: 20),
                   
                   Wrap(
@@ -1280,19 +1302,19 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   ),
                   
                   const SizedBox(height: 28),
-                  _buildSectionTitle("Highlights"),
+                  _buildSectionTitle("Highlights", isDarkMode),
                   const SizedBox(height: 16),
-                  _buildWrapItems(carHighlights),
+                  _buildWrapItems(carHighlights, isDarkMode),
                   const SizedBox(height: 28),
-                  _buildSectionTitle("Specifications"),
+                  _buildSectionTitle("Specifications", isDarkMode),
                   const SizedBox(height: 16),
-                  _buildWrapItems(carSpecifications, isSpecification: true),
+                  _buildWrapItems(carSpecifications, isDarkMode, isSpecification: true),
                   const SizedBox(height: 32),
                   Row(
                     children: [
                       Expanded(
                         child: _isSold 
-                          ? _buildSoldButton()
+                          ? _buildSoldButton(isDarkMode)
                           : _buildActionButton(
                               "Mark as Sold",
                               Icons.check,
@@ -1304,7 +1326,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: _isSold 
-                          ? _buildSoldPromoteButton()
+                          ? _buildSoldPromoteButton(isDarkMode)
                           : _isPromoted 
                             ? _buildPromotedButton()
                             : _buildActionButton(
@@ -1327,15 +1349,15 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text) {
+  Widget _buildInfoRow(IconData icon, String text, bool isDarkMode) {
     return Row(
       children: [
-        Icon(icon, color: Colors.grey[600], size: 20),
+        Icon(icon, color: isDarkMode ? Colors.white70 : Colors.grey[600], size: 20),
         const SizedBox(width: 12),
         Text(
           text,
           style: TextStyle(
-            color: Colors.grey[700],
+            color: isDarkMode ? Colors.white70 : Colors.grey[700],
             fontSize: 15.0,
           ),
         ),
@@ -1352,30 +1374,31 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14.0,
           fontWeight: FontWeight.w500,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
         ),
       ),
     );
   }
 
-  Widget _buildPromotedTag() {
+  Widget _buildPromotedTag(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: BoxDecoration(
-        color: Colors.amber[100],
+        color: isDarkMode ? Colors.amber[800]!.withOpacity(0.3) : Colors.amber[100],
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star, color: Colors.amber[700], size: 16),
+          Icon(Icons.star, color: isDarkMode ? Colors.amber[300] : Colors.amber[700], size: 16),
           const SizedBox(width: 6),
           Text(
             "Promoted",
             style: TextStyle(
-              color: Colors.amber[800],
+              color: isDarkMode ? Colors.amber[300] : Colors.amber[800],
               fontSize: 14.0,
               fontWeight: FontWeight.w600,
             ),
@@ -1385,14 +1408,14 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  Widget _buildVerifiedSellerTag() {
+  Widget _buildVerifiedSellerTag(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: BoxDecoration(
-        color: Colors.lightBlue[100],
+        color: isDarkMode ? Colors.lightBlue[800]!.withOpacity(0.3) : Colors.lightBlue[100],
         borderRadius: BorderRadius.circular(18),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
@@ -1400,30 +1423,32 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
             style: TextStyle(
               fontSize: 14.0,
               fontWeight: FontWeight.w500,
+              color: isDarkMode ? Colors.lightBlue[300] : Colors.black87,
             ),
           ),
-          SizedBox(width: 6),
+          const SizedBox(width: 6),
           CircleAvatar(
             radius: 10,
-            backgroundColor: Colors.blue,
-            child: Icon(Icons.check, size: 14, color: Colors.white),
+            backgroundColor: isDarkMode ? Colors.lightBlue[300]! : Colors.blue,
+            child: Icon(Icons.check, size: 14, color: isDarkMode ? Colors.black87 : Colors.white),
           )
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, bool isDarkMode) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 20.0,
         fontWeight: FontWeight.w600,
+        color: isDarkMode ? Colors.white : Colors.black87,
       ),
     );
   }
 
-  Widget _buildWrapItems(List<Map<String, String>> items, {bool isSpecification = false}) {
+  Widget _buildWrapItems(List<Map<String, String>> items, bool isDarkMode, {bool isSpecification = false}) {
     return Wrap(
       spacing: 24.0,
       runSpacing: 16.0,
@@ -1436,7 +1461,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 item["title"] ?? "N/A",
                 style: TextStyle(
                   fontSize: 14.0,
-                  color: isSpecification ? Colors.black54 : Colors.black87,
+                  color: isDarkMode 
+                    ? (isSpecification ? Colors.white60 : Colors.white70)
+                    : (isSpecification ? Colors.black54 : Colors.black87),
                   fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
                 ),
               ),
@@ -1446,7 +1473,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 style: TextStyle(
                   fontSize: 16.0,
                   fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
-                  color: Colors.black87,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
             ],
@@ -1456,7 +1483,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  Widget _buildSoldButton() {
+  Widget _buildSoldButton(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
@@ -1517,18 +1544,18 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  Widget _buildSoldPromoteButton() {
+  Widget _buildSoldPromoteButton(bool isDarkMode) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.grey[400],
+        color: isDarkMode ? Colors.grey[700]! : Colors.grey[400]!,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.block, color: Colors.white, size: 20),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
             "Cannot Promote",
             style: TextStyle(

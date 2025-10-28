@@ -151,6 +151,33 @@ class _EditItemPageState extends State<EditItemPage> {
     super.dispose();
   }
 
+  // Theme helper methods - Using actual ThemeData
+  bool get _isDarkMode => Theme.of(context).brightness == Brightness.dark;
+  
+  Color _getCardColor() {
+    return Theme.of(context).cardColor;
+  }
+  
+  Color _getBackgroundColor() {
+    return Theme.of(context).scaffoldBackgroundColor;
+  }
+  
+  Color _getTextColor() {
+    return Theme.of(context).textTheme.bodyLarge!.color!;
+  }
+  
+  Color _getHintTextColor() {
+    return _isDarkMode ? const Color(0x66FFFFFF) : const Color(0x8A000000);
+  }
+  
+  Color _getBorderColor() {
+    return Theme.of(context).dividerColor;
+  }
+  
+  Color _getInputBackgroundColor() {
+    return Theme.of(context).inputDecorationTheme.fillColor!;
+  }
+
   Future<void> _loadInitialData() async {
     logger.i("Loading initial data for editing...");
     setState(() => _isLoading = true);
@@ -452,7 +479,7 @@ class _EditItemPageState extends State<EditItemPage> {
     final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: _getBackgroundColor(),
       appBar: _buildBeautifulAppBar(),
       body: _isLoading
           ? _buildBeautifulLoadingIndicator()
@@ -464,12 +491,12 @@ class _EditItemPageState extends State<EditItemPage> {
 
   AppBar _buildBeautifulAppBar() {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: _isDarkMode ? const Color(0xFF424242) : Colors.white,
       elevation: 0,
       title: Text(
         'Update Item',
         style: TextStyle(
-          color: ColorGlobalVariables.brownColor,
+          color: _isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -478,7 +505,7 @@ class _EditItemPageState extends State<EditItemPage> {
       leading: IconButton(
         icon: Icon(
           Icons.arrow_back_ios_rounded,
-          color: ColorGlobalVariables.brownColor,
+          color: _isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
         ),
         onPressed: () => Navigator.pop(context),
       ),
@@ -486,7 +513,7 @@ class _EditItemPageState extends State<EditItemPage> {
         Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: _getInputBackgroundColor(),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -499,7 +526,7 @@ class _EditItemPageState extends State<EditItemPage> {
           child: IconButton(
             icon: Icon(
               Icons.help_outline_rounded,
-              color: Colors.grey[600],
+              color: _getHintTextColor(),
               size: 20,
             ),
             onPressed: () {
@@ -548,7 +575,7 @@ class _EditItemPageState extends State<EditItemPage> {
           Text(
             'Getting everything ready for editing',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getHintTextColor(),
               fontSize: 14,
             ),
           ),
@@ -563,10 +590,15 @@ class _EditItemPageState extends State<EditItemPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            Colors.white,
-            Colors.grey.shade50,
-          ],
+          colors: _isDarkMode 
+              ? [
+                  const Color(0xFF303030),
+                  const Color(0xFF424242),
+                ]
+              : [
+                  Colors.white,
+                  Colors.grey.shade50,
+                ],
         ),
       ),
       child: Form(
@@ -598,7 +630,7 @@ class _EditItemPageState extends State<EditItemPage> {
     
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -645,7 +677,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       Text(
                         'Category',
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: _getHintTextColor(),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -655,8 +687,8 @@ class _EditItemPageState extends State<EditItemPage> {
                         selectedCategory?.name ?? "Select a Category",
                         style: TextStyle(
                           color: selectedCategory != null 
-                            ? ColorGlobalVariables.blackColor 
-                            : Colors.grey[400],
+                            ? _getTextColor() 
+                            : _getHintTextColor(),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -668,12 +700,12 @@ class _EditItemPageState extends State<EditItemPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: _getInputBackgroundColor(),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 24,
                   ),
                 ),
@@ -726,7 +758,7 @@ class _EditItemPageState extends State<EditItemPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -766,7 +798,7 @@ class _EditItemPageState extends State<EditItemPage> {
               Text(
                 title,
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -776,10 +808,10 @@ class _EditItemPageState extends State<EditItemPage> {
           const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey[50],
+              color: _getInputBackgroundColor(),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
-                color: Colors.grey[300]!,
+                color: _getBorderColor(),
                 width: 1.5,
               ),
             ),
@@ -787,7 +819,7 @@ class _EditItemPageState extends State<EditItemPage> {
               controller: controller,
               maxLines: isFieldHeightRequired ? 4 : 1,
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: _getTextColor(),
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -796,7 +828,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 hintText: hintText,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 hintStyle: TextStyle(
-                  color: Colors.grey[500],
+                  color: _getHintTextColor(),
                   fontSize: 15,
                 ),
               ),
@@ -816,7 +848,7 @@ class _EditItemPageState extends State<EditItemPage> {
   Widget _buildBeautifulMakeModelRow(MakeAndModelProvider provider) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -855,7 +887,7 @@ class _EditItemPageState extends State<EditItemPage> {
               Text(
                 "Make & Model",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -887,7 +919,7 @@ class _EditItemPageState extends State<EditItemPage> {
           'Make',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -901,10 +933,10 @@ class _EditItemPageState extends State<EditItemPage> {
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -915,8 +947,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       selectedMake?['name'] ?? "Select Make",
                       style: TextStyle(
                         color: selectedMake != null 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -924,7 +956,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                   Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 24,
                   ),
                 ],
@@ -944,7 +976,7 @@ class _EditItemPageState extends State<EditItemPage> {
           'Model',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -964,10 +996,10 @@ class _EditItemPageState extends State<EditItemPage> {
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -978,8 +1010,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       selectedModel?.name ?? "Select Model",
                       style: TextStyle(
                         color: selectedModel != null 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -987,7 +1019,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                   Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 24,
                   ),
                 ],
@@ -1005,7 +1037,7 @@ class _EditItemPageState extends State<EditItemPage> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1044,7 +1076,7 @@ class _EditItemPageState extends State<EditItemPage> {
               Text(
                 "Vehicle Details",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1084,7 +1116,7 @@ class _EditItemPageState extends State<EditItemPage> {
           field.label,
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1108,10 +1140,10 @@ class _EditItemPageState extends State<EditItemPage> {
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -1122,8 +1154,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       currentValue.isNotEmpty ? currentValue : "Select ${field.label}",
                       style: TextStyle(
                         color: currentValue.isNotEmpty 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1131,7 +1163,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                   Icon(
                     Icons.arrow_drop_down_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 20,
                   ),
                 ],
@@ -1146,7 +1178,7 @@ class _EditItemPageState extends State<EditItemPage> {
   Widget _buildBeautifulLocationAndPrice() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1185,7 +1217,7 @@ class _EditItemPageState extends State<EditItemPage> {
               Text(
                 "Location & Price",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1217,7 +1249,7 @@ class _EditItemPageState extends State<EditItemPage> {
           'Location',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1239,10 +1271,10 @@ class _EditItemPageState extends State<EditItemPage> {
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
+                color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: Colors.grey[300]!,
+                  color: _getBorderColor(),
                   width: 1.5,
                 ),
               ),
@@ -1250,7 +1282,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 children: [
                   Icon(
                     Icons.location_on_rounded,
-                    color: Colors.grey[500],
+                    color: _getHintTextColor(),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -1259,8 +1291,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       selectedLocation ?? "Search Location",
                       style: TextStyle(
                         color: selectedLocation != null 
-                          ? ColorGlobalVariables.blackColor 
-                          : Colors.grey[500],
+                          ? _getTextColor() 
+                          : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1284,7 +1316,7 @@ class _EditItemPageState extends State<EditItemPage> {
           'Price',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.blackColor,
+            color: _getTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1293,10 +1325,10 @@ class _EditItemPageState extends State<EditItemPage> {
           height: 56,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.grey[50],
+            color: _getInputBackgroundColor(),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
-              color: Colors.grey[300]!,
+              color: _getBorderColor(),
               width: 1.5,
             ),
           ),
@@ -1323,15 +1355,15 @@ class _EditItemPageState extends State<EditItemPage> {
                   controller: _priceController,
                   keyboardType: TextInputType.number,
                   style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
+                    color: _getTextColor(),
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Enter price',
                     hintStyle: TextStyle(
-                      color: Colors.grey,
+                      color: _getHintTextColor(),
                     ),
                   ),
                   validator: (value) {
@@ -1358,7 +1390,7 @@ class _EditItemPageState extends State<EditItemPage> {
     
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1398,7 +1430,7 @@ class _EditItemPageState extends State<EditItemPage> {
               Text(
                 'Features',
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1438,10 +1470,10 @@ class _EditItemPageState extends State<EditItemPage> {
                     ],
                   )
                 : null,
-            color: isSelected ? null : Colors.white,
+            color: isSelected ? null : _getCardColor(),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
+              color: isSelected ? ColorGlobalVariables.brownColor : _getBorderColor(),
               width: 2,
             ),
             boxShadow: [
@@ -1462,7 +1494,7 @@ class _EditItemPageState extends State<EditItemPage> {
           child: Text(
             feature,
             style: TextStyle(
-              color: isSelected ? Colors.white : ColorGlobalVariables.blackColor,
+              color: isSelected ? Colors.white : _getTextColor(),
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -1475,7 +1507,7 @@ class _EditItemPageState extends State<EditItemPage> {
   Widget _buildBeautifulImagePickerSection() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -1515,7 +1547,7 @@ class _EditItemPageState extends State<EditItemPage> {
               Text(
                 "Vehicle Images",
                 style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
+                  color: _getTextColor(),
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -1526,7 +1558,7 @@ class _EditItemPageState extends State<EditItemPage> {
           Text(
             "Tap to add images ($minImagesRequired-$maxImagesAllowed required)",
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getHintTextColor(),
               fontSize: 14,
             ),
           ),
@@ -1540,10 +1572,10 @@ class _EditItemPageState extends State<EditItemPage> {
                 height: 240,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: _getInputBackgroundColor(),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.grey[300]!,
+                    color: _getBorderColor(),
                     width: 2,
                     style: BorderStyle.solid,
                   ),
@@ -1621,13 +1653,13 @@ class _EditItemPageState extends State<EditItemPage> {
         Icon(
           Icons.add_photo_alternate_rounded,
           size: 50,
-          color: Colors.grey[400],
+          color: _getHintTextColor(),
         ),
         const SizedBox(height: 12),
         Text(
           "Tap to Add Images",
           style: TextStyle(
-            color: Colors.grey[500],
+            color: _getHintTextColor(),
             fontWeight: FontWeight.w600,
             fontSize: 16,
           ),
@@ -1636,7 +1668,7 @@ class _EditItemPageState extends State<EditItemPage> {
         Text(
           "$minImagesRequired-$maxImagesAllowed images required",
           style: TextStyle(
-            color: Colors.grey[400],
+            color: _getHintTextColor(),
             fontSize: 14,
           ),
         ),
@@ -1669,7 +1701,7 @@ class _EditItemPageState extends State<EditItemPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.grey[300]!,
+          color: _getBorderColor(),
           width: 2,
         ),
         boxShadow: [
@@ -1696,22 +1728,22 @@ class _EditItemPageState extends State<EditItemPage> {
             )
           else if (index == selectedImages.length && canAddMore)
             Container(
-              color: Colors.grey[100],
+              color: _getInputBackgroundColor(),
               child: Center(
                 child: Icon(
                   Icons.add_photo_alternate_rounded,
-                  color: Colors.grey[400],
+                  color: _getHintTextColor(),
                   size: 32,
                 ),
               ),
             )
           else
             Container(
-              color: Colors.grey[50],
+              color: _getInputBackgroundColor(),
               child: Center(
                 child: Icon(
                   Icons.block_rounded,
-                  color: Colors.grey[300],
+                  color: _getHintTextColor(),
                   size: 24,
                 ),
               ),
@@ -1905,7 +1937,7 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Unable to Load Data',
               style: TextStyle(
-                color: ColorGlobalVariables.blackColor,
+                color: _getTextColor(),
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -1914,7 +1946,7 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               categoriesProvider.error ?? makeModelProvider.error ?? 'Unknown error occurred',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: _getHintTextColor(),
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
@@ -1968,7 +2000,7 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   // =============================================
-  // FIXED COLOR PICKER - PROPERLY UPDATES FORM FIELD
+  // FIXED COLOR PICKER - WITH DARK THEME SUPPORT
   // =============================================
 
   void _showSimpleColorPicker() {
@@ -1979,359 +2011,362 @@ class _EditItemPageState extends State<EditItemPage> {
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        elevation: 25,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.7,
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
+      builder: (context) => Theme(
+        data: Theme.of(context),
+        child: Dialog(
+          backgroundColor: Theme.of(context).cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header Section
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
-                    ],
+          elevation: 25,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header Section
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        ColorGlobalVariables.brownColor.withOpacity(0.15),
+                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
+                    ),
                   ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              ColorGlobalVariables.brownColor,
+                              ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            ],
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                              blurRadius: 15,
+                              offset: const Offset(0, 6),
+                            ),
                           ],
                         ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.palette_rounded,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Select Color',
-                      style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Choose from common color names',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Selected Color Preview
-              ValueListenableBuilder<String>(
-                valueListenable: dialogSelectedColorName,
-                builder: (context, colorName, child) {
-                  return ValueListenableBuilder<Color>(
-                    valueListenable: dialogSelectedColor,
-                    builder: (context, color, child) {
-                      if (colorName.isEmpty) return const SizedBox();
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[50],
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.grey[300]!,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Colors.grey[400]!,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Selected Color',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      colorName,
-                                      style: TextStyle(
-                                        color: ColorGlobalVariables.blackColor,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                        child: Icon(
+                          Icons.palette_rounded,
+                          color: Colors.white,
+                          size: 28,
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
-
-              // Search Section
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[50],
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Select Color',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Choose from common color names',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search colors... (e.g., red, blue, dark)',
-                      prefixIcon: Container(
-                        margin: const EdgeInsets.all(12),
-                        child: Icon(
-                          Icons.search_rounded, 
-                          color: ColorGlobalVariables.brownColor,
-                          size: 20,
-                        ),
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                      hintStyle: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 14,
-                      ),
-                    ),
-                    style: TextStyle(
-                      color: ColorGlobalVariables.blackColor,
-                      fontSize: 14,
-                    ),
-                    onChanged: (value) {
-                      filteredColors.value = colorOptions.where((color) {
-                        final colorName = color['name'].toString().toLowerCase();
-                        return colorName.contains(value.toLowerCase());
-                      }).toList();
-                    },
-                  ),
                 ),
-              ),
 
-              // Colors Grid
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ValueListenableBuilder<List<Map<String, dynamic>>>(
-                    valueListenable: filteredColors,
-                    builder: (context, filteredColors, child) {
-                      if (filteredColors.isEmpty) {
-                        return _buildColorEmptyState();
-                      }
-                      
-                      return ValueListenableBuilder<String>(
-                        valueListenable: dialogSelectedColorName,
-                        builder: (context, selectedName, child) {
-                          return GridView.builder(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                              childAspectRatio: 0.85,
-                            ),
-                            itemCount: filteredColors.length,
-                            itemBuilder: (context, index) {
-                              final colorOption = filteredColors[index];
-                              final isSelected = selectedName == colorOption['name'];
-                              
-                              return _buildColorOptionItem(
-                                colorOption, 
-                                isSelected,
-                                onTap: () {
-                                  dialogSelectedColorName.value = colorOption['name'];
-                                  dialogSelectedColor.value = colorOption['color'];
-                                }
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              // Footer Section
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(28),
-                    bottomRight: Radius.circular(28),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: Colors.grey[400]!,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(14),
-                          onTap: () => Navigator.pop(context),
+                // Selected Color Preview
+                ValueListenableBuilder<String>(
+                  valueListenable: dialogSelectedColorName,
+                  builder: (context, colorName, child) {
+                    return ValueListenableBuilder<Color>(
+                      valueListenable: dialogSelectedColor,
+                      builder: (context, color, child) {
+                        if (colorName.isEmpty) return const SizedBox();
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).inputDecorationTheme.fillColor,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: Theme.of(context).dividerColor,
+                                width: 1.5,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    ValueListenableBuilder<String>(
-                      valueListenable: dialogSelectedColorName,
-                      builder: (context, colorName, child) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                ColorGlobalVariables.brownColor,
-                                ColorGlobalVariables.brownColor.withOpacity(0.8),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(14),
-                              onTap: () {
-                                if (colorName.isNotEmpty) {
-                                  // FIX: Update the form state when color is selected
-                                  setState(() {
-                                    selectedColorName = colorName;
-                                    selectedColor = dialogSelectedColor.value;
-                                    _colorController.text = colorName;
-                                    
-                                    // Also update the selectedFields for the form field
-                                    for (final field in selectedCategory?.itemFields ?? []) {
-                                      if (field.label.toLowerCase().contains("color")) {
-                                        selectedFields[field.name] = colorName;
-                                      }
-                                    }
-                                  });
-                                  Navigator.pop(context);
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-                                child: Text(
-                                  'Confirm',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: color,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Theme.of(context).dividerColor,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Selected Color',
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        colorName,
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );
                       },
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
-            ],
+
+                // Search Section
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).inputDecorationTheme.fillColor,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search colors... (e.g., red, blue, dark)',
+                        prefixIcon: Container(
+                          margin: const EdgeInsets.all(12),
+                          child: Icon(
+                            Icons.search_rounded, 
+                            color: ColorGlobalVariables.brownColor,
+                            size: 20,
+                          ),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
+                        fontSize: 14,
+                      ),
+                      onChanged: (value) {
+                        filteredColors.value = colorOptions.where((color) {
+                          final colorName = color['name'].toString().toLowerCase();
+                          return colorName.contains(value.toLowerCase());
+                        }).toList();
+                      },
+                    ),
+                  ),
+                ),
+
+                // Colors Grid
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: ValueListenableBuilder<List<Map<String, dynamic>>>(
+                      valueListenable: filteredColors,
+                      builder: (context, filteredColors, child) {
+                        if (filteredColors.isEmpty) {
+                          return _buildColorEmptyState();
+                        }
+                        
+                        return ValueListenableBuilder<String>(
+                          valueListenable: dialogSelectedColorName,
+                          builder: (context, selectedName, child) {
+                            return GridView.builder(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                                childAspectRatio: 0.85,
+                              ),
+                              itemCount: filteredColors.length,
+                              itemBuilder: (context, index) {
+                                final colorOption = filteredColors[index];
+                                final isSelected = selectedName == colorOption['name'];
+                                
+                                return _buildColorOptionItem(
+                                  colorOption, 
+                                  isSelected,
+                                  onTap: () {
+                                    dialogSelectedColorName.value = colorOption['name'];
+                                    dialogSelectedColor.value = colorOption['color'];
+                                  }
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+
+                // Footer Section
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).inputDecorationTheme.fillColor,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ValueListenableBuilder<String>(
+                        valueListenable: dialogSelectedColorName,
+                        builder: (context, colorName, child) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  ColorGlobalVariables.brownColor,
+                                  ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: () {
+                                  if (colorName.isNotEmpty) {
+                                    // FIX: Update the form state when color is selected
+                                    setState(() {
+                                      selectedColorName = colorName;
+                                      selectedColor = dialogSelectedColor.value;
+                                      _colorController.text = colorName;
+                                      
+                                      // Also update the selectedFields for the form field
+                                      for (final field in selectedCategory?.itemFields ?? []) {
+                                        if (field.label.toLowerCase().contains("color")) {
+                                          selectedFields[field.name] = colorName;
+                                        }
+                                      }
+                                    });
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                                  child: Text(
+                                    'Confirm',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -2350,10 +2385,10 @@ class _EditItemPageState extends State<EditItemPage> {
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : Colors.grey[300]!,
+              color: isSelected ? ColorGlobalVariables.brownColor : Theme.of(context).dividerColor,
               width: isSelected ? 2.5 : 1.2,
             ),
             boxShadow: [
@@ -2374,7 +2409,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   color: colorOption['color'],
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.grey[400]!,
+                    color: Theme.of(context).dividerColor,
                     width: 1.5,
                   ),
                   boxShadow: [
@@ -2399,7 +2434,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 child: Text(
                   colorOption['name'],
                   style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
+                    color: Theme.of(context).textTheme.bodyLarge!.color,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -2426,20 +2461,20 @@ class _EditItemPageState extends State<EditItemPage> {
               width: 70,
               height: 70,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(context).inputDecorationTheme.fillColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.color_lens_rounded,
                 size: 35,
-                color: Colors.grey[400],
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               'No colors found',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -2448,7 +2483,7 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -2460,7 +2495,7 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   // =============================================
-  // FIXED YEAR PICKER - PROPERLY UPDATES FORM FIELD
+  // FIXED YEAR PICKER - WITH DARK THEME SUPPORT
   // =============================================
 
   void _showBeautifulYearPicker() {
@@ -2470,280 +2505,283 @@ class _EditItemPageState extends State<EditItemPage> {
 
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        elevation: 25,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
+      builder: (context) => Theme(
+        data: Theme.of(context),
+        child: Dialog(
+          backgroundColor: Theme.of(context).cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
-                    ],
-                  ),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
-                          ],
-                        ),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                            blurRadius: 15,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.calendar_today_rounded,
-                        color: Colors.white,
-                        size: 36,
-                      ),
+          elevation: 25,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        ColorGlobalVariables.brownColor.withOpacity(0.15),
+                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Select Year',
-                      style: TextStyle(
-                        color: ColorGlobalVariables.blackColor,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Choose the manufacturing year of your vehicle',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 15,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey[300]!,
-                        width: 2,
-                      ),
-                    ),
-                    child: ValueListenableBuilder<int>(
-                      valueListenable: dialogSelectedYear,
-                      builder: (context, selectedYear, child) {
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: years.length,
-                          itemBuilder: (context, index) {
-                            final yearValue = years[index];
-                            final isSelected = selectedYear == yearValue;
-                            
-                            return Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  dialogSelectedYear.value = yearValue;
-                                },
-                                borderRadius: BorderRadius.circular(12),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-                                  decoration: BoxDecoration(
-                                    color: isSelected 
-                                        ? ColorGlobalVariables.brownColor.withOpacity(0.1)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: isSelected
-                                        ? Border.all(
-                                            color: ColorGlobalVariables.brownColor,
-                                            width: 2,
-                                          )
-                                        : null,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? ColorGlobalVariables.brownColor
-                                              : Colors.grey[200],
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
-                                          color: isSelected ? Colors.white : Colors.grey[600],
-                                          size: 20,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: Text(
-                                          yearValue.toString(),
-                                          style: TextStyle(
-                                            color: isSelected 
-                                                ? ColorGlobalVariables.brownColor
-                                                : ColorGlobalVariables.blackColor,
-                                            fontSize: 18,
-                                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                      if (isSelected)
-                                        Icon(
-                                          Icons.check_circle_rounded,
-                                          color: ColorGlobalVariables.brownColor,
-                                          size: 24,
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
                     ),
                   ),
-                ),
-              ),
-              
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(28),
-                    bottomRight: Radius.circular(28),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: Colors.grey[400]!,
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    ValueListenableBuilder<int>(
-                      valueListenable: dialogSelectedYear,
-                      builder: (context, selectedYear, child) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                ColorGlobalVariables.brownColor,
-                                ColorGlobalVariables.brownColor.withOpacity(0.8),
-                              ],
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              ColorGlobalVariables.brownColor,
+                              ColorGlobalVariables.brownColor.withOpacity(0.7),
                             ],
                           ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () {
-                                // FIX: Update the form state when year is selected
-                                setState(() {
-                                  year = selectedYear;
-                                  
-                                  // Also update the selectedFields for the form field
-                                  for (final field in selectedCategory?.itemFields ?? []) {
-                                    if (field.label.toLowerCase().contains("year")) {
-                                      selectedFields[field.name] = selectedYear.toString();
-                                    }
-                                  }
-                                });
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                                child: Text(
-                                  'Confirm',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                              blurRadius: 15,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          Icons.calendar_today_rounded,
+                          color: Colors.white,
+                          size: 36,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Select Year',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Choose the manufacturing year of your vehicle',
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                          fontSize: 15,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+                
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                          width: 2,
+                        ),
+                      ),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: dialogSelectedYear,
+                        builder: (context, selectedYear, child) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: years.length,
+                            itemBuilder: (context, index) {
+                              final yearValue = years[index];
+                              final isSelected = selectedYear == yearValue;
+                              
+                              return Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    dialogSelectedYear.value = yearValue;
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                                    decoration: BoxDecoration(
+                                      color: isSelected 
+                                          ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: isSelected
+                                          ? Border.all(
+                                              color: ColorGlobalVariables.brownColor,
+                                              width: 2,
+                                            )
+                                          : null,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? ColorGlobalVariables.brownColor
+                                                : Theme.of(context).inputDecorationTheme.fillColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
+                                            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                                            size: 20,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Text(
+                                            yearValue.toString(),
+                                            style: TextStyle(
+                                              color: isSelected 
+                                                  ? ColorGlobalVariables.brownColor
+                                                  : Theme.of(context).textTheme.bodyLarge!.color,
+                                              fontSize: 18,
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        if (isSelected)
+                                          Icon(
+                                            Icons.check_circle_rounded,
+                                            color: ColorGlobalVariables.brownColor,
+                                            size: 24,
+                                          ),
+                                      ],
+                                    ),
                                   ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).inputDecorationTheme.fillColor,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
                                 ),
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      ValueListenableBuilder<int>(
+                        valueListenable: dialogSelectedYear,
+                        builder: (context, selectedYear, child) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  ColorGlobalVariables.brownColor,
+                                  ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  // FIX: Update the form state when year is selected
+                                  setState(() {
+                                    year = selectedYear;
+                                    
+                                    // Also update the selectedFields for the form field
+                                    for (final field in selectedCategory?.itemFields ?? []) {
+                                      if (field.label.toLowerCase().contains("year")) {
+                                        selectedFields[field.name] = selectedYear.toString();
+                                      }
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                                  child: Text(
+                                    'Confirm',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -2831,262 +2869,265 @@ class _EditItemPageState extends State<EditItemPage> {
     final searchController = TextEditingController();
     final filteredItems = ValueNotifier<List<T>>(items);
 
-    return Dialog(
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(28),
-      ),
-      elevation: 25,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-          maxWidth: MediaQuery.of(context).size.width * 0.9,
+    return Theme(
+      data: Theme.of(context),
+      child: Dialog(
+        backgroundColor: Theme.of(context).cardColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    ColorGlobalVariables.brownColor.withOpacity(0.15),
-                    ColorGlobalVariables.brownColor.withOpacity(0.08),
-                  ],
+        elevation: 25,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(28),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withOpacity(0.15),
+                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
+                  ),
                 ),
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(28),
-                  topRight: Radius.circular(28),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 70,
+                      height: 70,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            blurRadius: 15,
+                            offset: const Offset(0, 6),
+                          ),
                         ],
                       ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                          blurRadius: 15,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
+                      child: Icon(
+                        icon,
+                        color: Colors.white,
+                        size: 32,
+                      ),
                     ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 32,
+                    const SizedBox(height: 20),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: ColorGlobalVariables.blackColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 15,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                    const SizedBox(height: 8),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                        fontSize: 15,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    prefixIcon: Container(
-                      margin: const EdgeInsets.all(14),
-                      child: Icon(
-                        Icons.search_rounded, 
-                        color: ColorGlobalVariables.brownColor,
-                        size: 22,
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).inputDecorationTheme.fillColor,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.all(14),
+                        child: Icon(
+                          Icons.search_rounded, 
+                          color: ColorGlobalVariables.brownColor,
+                          size: 22,
+                        ),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                        fontSize: 16,
                       ),
                     ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                    hintStyle: TextStyle(
-                      color: Colors.grey[500],
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyLarge!.color,
                       fontSize: 16,
                     ),
+                    onChanged: (value) {
+                      filteredItems.value = items.where((item) {
+                        final itemName = itemBuilder(item).toLowerCase();
+                        return itemName.contains(value.toLowerCase());
+                      }).toList();
+                    },
                   ),
-                  style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
-                    fontSize: 16,
-                  ),
-                  onChanged: (value) {
-                    filteredItems.value = items.where((item) {
-                      final itemName = itemBuilder(item).toLowerCase();
-                      return itemName.contains(value.toLowerCase());
-                    }).toList();
-                  },
                 ),
               ),
-            ),
 
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
+                  ),
+                  child: ValueListenableBuilder<List<T>>(
+                    valueListenable: filteredItems,
+                    builder: (context, filteredItems, child) {
+                      if (filteredItems.isEmpty) {
+                        return _buildPremiumEmptyState();
+                      }
+                      
+                      return ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: filteredItems.length,
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          color: Theme.of(context).dividerColor,
+                          indent: 20,
+                          endIndent: 20,
+                        ),
+                        itemBuilder: (context, index) {
+                          final item = filteredItems[index];
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => onItemSelected(item),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            ColorGlobalVariables.brownColor.withOpacity(0.15),
+                                            ColorGlobalVariables.brownColor.withOpacity(0.08),
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: Icon(
+                                        Icons.check_circle_outline_rounded,
+                                        color: ColorGlobalVariables.brownColor,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 18),
+                                    Expanded(
+                                      child: Text(
+                                        itemBuilder(item),
+                                        style: TextStyle(
+                                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                                      size: 24,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).inputDecorationTheme.fillColor,
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(28),
                     bottomRight: Radius.circular(28),
                   ),
                 ),
-                child: ValueListenableBuilder<List<T>>(
-                  valueListenable: filteredItems,
-                  builder: (context, filteredItems, child) {
-                    if (filteredItems.isEmpty) {
-                      return _buildPremiumEmptyState();
-                    }
-                    
-                    return ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: filteredItems.length,
-                      separatorBuilder: (context, index) => Divider(
-                        height: 1,
-                        color: Colors.grey[200],
-                        indent: 20,
-                        endIndent: 20,
-                      ),
-                      itemBuilder: (context, index) {
-                        final item = filteredItems[index];
-                        return Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => onItemSelected(item),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          ColorGlobalVariables.brownColor.withOpacity(0.15),
-                                          ColorGlobalVariables.brownColor.withOpacity(0.08),
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Icon(
-                                      Icons.check_circle_outline_rounded,
-                                      color: ColorGlobalVariables.brownColor,
-                                      size: 24,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 18),
-                                  Expanded(
-                                    child: Text(
-                                      itemBuilder(item),
-                                      style: TextStyle(
-                                        color: ColorGlobalVariables.blackColor,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.chevron_right_rounded,
-                                    color: Colors.grey[400],
-                                    size: 24,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(28),
-                  bottomRight: Radius.circular(28),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey[400]!,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -3103,20 +3144,20 @@ class _EditItemPageState extends State<EditItemPage> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: Theme.of(context).inputDecorationTheme.fillColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.search_off_rounded,
                 size: 50,
-                color: Colors.grey[400],
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'No results found',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -3125,7 +3166,7 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -3161,184 +3202,187 @@ class _EditItemPageState extends State<EditItemPage> {
 
     await showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        elevation: 25,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.85,
+      builder: (context) => Theme(
+        data: Theme.of(context),
+        child: Dialog(
+          backgroundColor: Theme.of(context).cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
           ),
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: ColorGlobalVariables.brownColor.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.edit_rounded,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Enter $fieldLabel',
-                style: TextStyle(
-                  color: ColorGlobalVariables.blackColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Please provide the $fieldLabel details',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 15,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 28),
-              
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: Colors.grey[300]!,
-                    width: 2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: controller,
-                  keyboardType: fieldType == "number" ? TextInputType.number : TextInputType.text,
-                  style: TextStyle(
-                    color: ColorGlobalVariables.blackColor,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: "Enter $fieldLabel",
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    hintStyle: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 16,
-                    ),
-                  ),
-                  autofocus: true,
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey[400]!,
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
+          elevation: 25,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.85,
+            ),
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        ColorGlobalVariables.brownColor,
+                        ColorGlobalVariables.brownColor.withOpacity(0.7),
                       ],
                     ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.edit_rounded,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'Enter $fieldLabel',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyLarge!.color,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Please provide the $fieldLabel details',
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                    fontSize: 15,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 28),
+                
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).inputDecorationTheme.fillColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(context).dividerColor,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: controller,
+                    keyboardType: fieldType == "number" ? TextInputType.number : TextInputType.text,
+                    style: TextStyle(
+                      color: Theme.of(context).textTheme.bodyLarge!.color,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: "Enter $fieldLabel",
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      hintStyle: TextStyle(
+                        color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                        fontSize: 16,
+                      ),
+                    ),
+                    autofocus: true,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          if (controller.text.trim().isNotEmpty) {
-                            setState(() {
-                              selectedFields[fieldName] = controller.text.trim();
-                            });
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                          child: Text(
-                            'Confirm',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 16),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            if (controller.text.trim().isNotEmpty) {
+                              setState(() {
+                                selectedFields[fieldName] = controller.text.trim();
+                              });
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                            child: Text(
+                              'Confirm',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

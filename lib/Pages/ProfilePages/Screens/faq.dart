@@ -40,11 +40,11 @@ class _FaqState extends State<Faq> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       body: Consumer<FaqProvider>(
         builder: (context, faqProvider, child) {
           if (faqProvider.isLoading && faqProvider.categories.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -53,8 +53,13 @@ class _FaqState extends State<Faq> {
                       ColorGlobalVariables.brownColor,
                     ),
                   ),
-                  SizedBox(height: 16),
-                  Text('Loading FAQs...'),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading FAQs...',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                    ),
+                  ),
                 ],
               ),
             );
@@ -70,16 +75,22 @@ class _FaqState extends State<Faq> {
                     size: 64,
                     color: Colors.red,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     'Error: ${faqProvider.error}',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: faqProvider.retry,
-                    child: Text('Retry'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Retry'),
                   ),
                 ],
               ),
@@ -94,17 +105,23 @@ class _FaqState extends State<Faq> {
                   Icon(
                     Icons.help_outline,
                     size: 64,
-                    color: Colors.grey,
+                    color: isDarkMode ? Colors.grey[500] : Colors.grey,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Text(
                     'No FAQs available',
-                    style: theme.textTheme.bodyLarge,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: faqProvider.retry,
-                    child: Text('Reload'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Reload'),
                   ),
                 ],
               ),
@@ -122,6 +139,7 @@ class _FaqState extends State<Faq> {
                     'Frequently Asked Questions',
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),
@@ -145,8 +163,11 @@ class _FaqState extends State<Faq> {
                               _expandedQuestionIndices.clear();
                             },
                             selectedColor: ColorGlobalVariables.brownColor,
+                            backgroundColor: isDarkMode ? Colors.grey[700] : Colors.grey[200],
                             labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : theme.textTheme.bodyLarge?.color,
+                              color: isSelected 
+                                ? Colors.white 
+                                : (isDarkMode ? Colors.white70 : theme.textTheme.bodyLarge?.color),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -171,7 +192,7 @@ class _FaqState extends State<Faq> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          color: isDarkMode ? Colors.grey[800] : Colors.white,
+                          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                           child: ExpansionTile(
                             initiallyExpanded: _isExpanded(index),
                             onExpansionChanged: (_) => _toggleExpansion(index),
@@ -181,13 +202,14 @@ class _FaqState extends State<Faq> {
                               faq['question'],
                               style: theme.textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                             trailing: Icon(
                               _isExpanded(index)
                                   ? Icons.keyboard_arrow_up
                                   : Icons.keyboard_arrow_down,
-                              color: theme.primaryColor,
+                              color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
                             ),
                             children: [
                               Padding(
@@ -196,7 +218,7 @@ class _FaqState extends State<Faq> {
                                   faq['answer'],
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: isDarkMode 
-                                        ? Colors.grey[300] 
+                                        ? Colors.white70 
                                         : Colors.grey[700],
                                   ),
                                 ),

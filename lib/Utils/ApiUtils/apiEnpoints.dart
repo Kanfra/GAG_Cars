@@ -37,6 +37,9 @@ class ApiEndpoint{
   static const String faqs = "/faqs";
   static const String faqCategories = "/faq-categories";
 
+  // chat
+  static const String fetchMessages = "/chat/fetchMessages";
+
   // payment
   static const String packagesByCategory = "/app/packages-by-category";
 }
