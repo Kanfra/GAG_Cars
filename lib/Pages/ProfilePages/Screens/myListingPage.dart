@@ -1,4 +1,4 @@
- import 'dart:async';
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
@@ -58,29 +58,28 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     _isFirstLoad = false;
   }
 
-void _scrollListener() {
-  final pixels = _scrollController.position.pixels;
-  final maxScroll = _scrollController.position.maxScrollExtent;
-  final shouldLoad = (pixels >= maxScroll - 200) && 
+  void _scrollListener() {
+    final pixels = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final shouldLoad = (pixels >= maxScroll - 200) && 
                     !_provider.isLoading && 
                     _provider.hasMore && 
                     _currentTabIndex == 0;
 
-  print('📜 Scroll Debug:');
-  print('   Position: $pixels / $maxScroll');
-  print('   Should load: $shouldLoad');
-  print('   isLoading: ${_provider.isLoading}');
-  print('   hasMore: ${_provider.hasMore}');
-  print('   Current tab: $_currentTabIndex');
-  
-  if (shouldLoad) {
-    // print('🚀 LAZY LOADING TRIGGERED - Loading page ${_provider._currentPage}');
-    _loadMoreDebouncer?.cancel();
-    _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), () {
-      _provider.loadMoreListings();
-    });
+    print('📜 Scroll Debug:');
+    print('   Position: $pixels / $maxScroll');
+    print('   Should load: $shouldLoad');
+    print('   isLoading: ${_provider.isLoading}');
+    print('   hasMore: ${_provider.hasMore}');
+    print('   Current tab: $_currentTabIndex');
+    
+    if (shouldLoad) {
+      _loadMoreDebouncer?.cancel();
+      _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), () {
+        _provider.loadMoreListings();
+      });
+    }
   }
-}
 
   Future<void> _loadInitialData() async {
     await _provider.loadInitialListings();
@@ -390,7 +389,7 @@ void _scrollListener() {
             ),
           ),
 
-        // Loading More Indicator (only for Live tab) - LAZY LOADING IMPLEMENTATION
+        // Loading More Indicator (only for Live tab)
         if (isLiveTab && provider.isLoading && provider.hasMore)
           SliverToBoxAdapter(
             child: _buildLoadMoreIndicator(),
@@ -561,6 +560,9 @@ void _scrollListener() {
     final transmission = listing.transmission ?? "Manual";
     final location = listing.location.isNotEmpty ? listing.location : "Unknown";
     final isPromoted = listing.isPromoted == true;
+    
+    // Get category name directly from the category object
+    final categoryName = _getCategoryDisplayName(listing.category?.name ?? 'Vehicle');
 
     return GestureDetector(
       onTap: () {
@@ -601,7 +603,7 @@ void _scrollListener() {
                   child: _buildListingImage(listing),
                 ),
                 
-                // Category Badge
+                // Category Badge - NOW USING ACTUAL CATEGORY NAME FROM API
                 Positioned(
                   top: 8,
                   left: 8,
@@ -612,7 +614,7 @@ void _scrollListener() {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      _getCategoryName(listing.categoryId),
+                      categoryName,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -866,16 +868,13 @@ void _scrollListener() {
     return number.toStringAsFixed(0);
   }
 
-  String _getCategoryName(int categoryId) {
-    switch (categoryId) {
-      case 1:
-        return 'Car';
-      case 2:
-        return 'Motorcycle';
-      case 4:
-        return 'Truck';
-      default:
-        return 'Vehicle';
-    }
-  }
+  // NEW: Get category display name from the actual category object
+String _getCategoryDisplayName(String categoryName) {
+  // You can customize the display name if needed
+  // For example, shorten "Parts & accessories" to "Parts"
+  // if (categoryName == "Parts & accessories") {
+  //   return "Parts";
+  // }
+  return categoryName;
+}
 }

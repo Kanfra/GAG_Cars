@@ -39,9 +39,29 @@ class MyListing with _$MyListing {
     @JsonKey(name: 'updated_at') required String updatedAt,
     dynamic Height,
     dynamic VIN,
-    @JsonKey(name: 'is_promoted') bool? isPromoted, // New field
+    Category? category,
+    @JsonKey(name: 'is_promoted') bool? isPromoted,
   }) = _MyListing;
 
   factory MyListing.fromJson(Map<String, dynamic> json) =>
       _$MyListingFromJson(json);
+}
+
+@freezed
+class Category with _$Category {
+  const factory Category({
+    required int id,
+    @JsonKey(name: 'user_id') dynamic userId,
+    @JsonKey(name: 'parent_id') dynamic parentId,
+    required String name,
+    required String slug,
+    required String description,
+    required List<dynamic> features,
+    required String image,
+    @JsonKey(name: 'created_at') required String createdAt,
+    @JsonKey(name: 'updated_at') required String updatedAt,
+  }) = _Category;
+
+  factory Category.fromJson(Map<String, dynamic> json) =>
+      _$CategoryFromJson(json);
 }

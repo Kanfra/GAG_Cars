@@ -33,6 +33,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
   bool _initialized = false;
 
   late String _packageType;
+  late Map<String, dynamic> listing;
   Map<String, dynamic> _vehicleData = {};
   String _vehicleName = 'Vehicle Upload';
 
@@ -90,6 +91,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
     final allArguments = {...constructorArguments, ...getXArguments};
     
     _packageType = allArguments['type'] ?? 'upload';
+    listing = widget.allJson?['listing'];
+    _logger.e('listing: $listing');
     
     _logger.i("PromotionsPage initialized with:");
     _logger.i("  - GetX arguments: $getXArguments");
@@ -180,7 +183,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
       String description = package.description ?? 'Boost your listing visibility';
       
       // Get currency symbol from country data
-      final currencySymbol = package.country.currencySymbol;
+      final currencySymbol = package.country?.currencySymbol ?? 'GH₵';
       
       List<String> features = [];
       
@@ -795,7 +798,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
         // Use Future.microtask to schedule the call after the current build phase
         Future.microtask(() {
           if (mounted) {
-            packageProvider.getPackages();
+            packageProvider.getPackages(categoryId: listing['category_id']);
           }
         });
       }

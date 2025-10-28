@@ -9,8 +9,10 @@ import 'package:logger/Logger.dart';
 class PackageService {
   final logger = Logger();
   
-  Future<PackageResponse> getPackages() async {
-    final uri = Uri.parse('$baseApiUrl${ApiEndpoint.packages}');
+  Future<List<Package>> getPackages({
+    required int categoryId
+  }) async {
+    final uri = Uri.parse('$baseApiUrl${ApiEndpoint.packagesByCategory}/$categoryId');
     
     logger.i("🔄 Starting package fetch from: $uri");
     
@@ -28,6 +30,7 @@ class PackageService {
       );
 
       logger.i("📡 HTTP Response Status: ${response.statusCode}");
+      logger.i("📦 Response Body: ${response.body}"); // ADDED: Log the actual response
 
       if (response.statusCode == 200) {
         logger.i("✅ Success: Received 200 OK");
@@ -35,22 +38,47 @@ class PackageService {
         try {
           final jsonResponse = json.decode(response.body);
           logger.i("✅ JSON decoded successfully");
+          logger.i("📊 Response Type: ${jsonResponse.runtimeType}");
           
-          // ✅ CRITICAL: Use the original JSON response directly
-          // DO NOT convert prices - let the freezed model handle the String prices
-          logger.i("🔄 Parsing response with freezed models...");
-          final packageResponse = PackageResponse.fromJson(jsonResponse);
-          
-          logger.i("✅ Successfully parsed ${packageResponse.data.length} packages");
-          return packageResponse;
+          // ✅ Direct array parsing - no wrapper object
+          if (jsonResponse is List) {
+            logger.i("🔄 Processing ${jsonResponse.length} packages");
+            
+            final packages = <Package>[];
+            for (var i = 0; i < jsonResponse.length; i++) {
+              try {
+                final item = jsonResponse[i] as Map<String, dynamic>;
+                logger.i("📦 Package $i: ${item.keys}");
+                
+                // Check if country exists in response
+                if (!item.containsKey('country')) {
+                  logger.w("⚠️ Package $i missing 'country' object, only has country_id: ${item['country_id']}");
+                }
+                
+                final package = Package.fromJson(item);
+                packages.add(package);
+              } catch (e) {
+                logger.e("❌ Error parsing package $i: $e");
+                rethrow;
+              }
+            }
+            
+            logger.i("✅ Successfully parsed ${packages.length} packages");
+            return packages;
+          } else {
+            logger.e("❌ Expected List but got: ${jsonResponse.runtimeType}");
+            throw Exception('Invalid response format: Expected array');
+          }
           
         } catch (jsonError) {
           logger.e("❌ JSON Decoding Error: $jsonError");
+          logger.e("❌ Response body that caused error: ${response.body}");
           throw Exception('JSON parsing error: $jsonError');
         }
         
       } else {
         logger.e("❌ HTTP Error: ${response.statusCode}");
+        logger.e("❌ Response body: ${response.body}");
         throw Exception('Failed to load packages: HTTP ${response.statusCode}');
       }
       
@@ -59,6 +87,4 @@ class PackageService {
       throw Exception('Network error: $e');
     }
   }
-
-  // ✅ REMOVED: All price conversion methods (_convertPriceStringsToDoubles, _convertPackagePrices)
 }

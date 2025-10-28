@@ -38,5 +38,5 @@ class ApiEndpoint{
   static const String faqCategories = "/faq-categories";
 
   // payment
-  static const String packages = "/packages";
+  static const String packagesByCategory = "/app/packages-by-category";
 }

@@ -40,6 +40,9 @@ _$MyListingImpl _$$MyListingImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] as String,
       Height: json['Height'],
       VIN: json['VIN'],
+      category: json['category'] == null
+          ? null
+          : Category.fromJson(json['category'] as Map<String, dynamic>),
       isPromoted: json['is_promoted'] as bool?,
     );
 
@@ -76,5 +79,34 @@ Map<String, dynamic> _$$MyListingImplToJson(_$MyListingImpl instance) =>
       'updated_at': instance.updatedAt,
       'Height': instance.Height,
       'VIN': instance.VIN,
+      'category': instance.category,
       'is_promoted': instance.isPromoted,
+    };
+
+_$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
+    _$CategoryImpl(
+      id: (json['id'] as num).toInt(),
+      userId: json['user_id'],
+      parentId: json['parent_id'],
+      name: json['name'] as String,
+      slug: json['slug'] as String,
+      description: json['description'] as String,
+      features: json['features'] as List<dynamic>,
+      image: json['image'] as String,
+      createdAt: json['created_at'] as String,
+      updatedAt: json['updated_at'] as String,
+    );
+
+Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user_id': instance.userId,
+      'parent_id': instance.parentId,
+      'name': instance.name,
+      'slug': instance.slug,
+      'description': instance.description,
+      'features': instance.features,
+      'image': instance.image,
+      'created_at': instance.createdAt,
+      'updated_at': instance.updatedAt,
     };
