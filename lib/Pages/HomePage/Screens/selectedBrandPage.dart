@@ -136,24 +136,86 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     await provider.refresh();
   }
 
+  Color _getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF303030) // grey[900]
+        : Colors.grey[50]!;
+  }
+
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
+
+  Color _getIconColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getSearchContainerColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getImagePlaceholderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.grey[200]!;
+  }
+
+  Color _getStatsBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF1E3A5F) // dark blue
+        : Colors.blue[50]!;
+  }
+
+  Color _getStatsTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF90CAF9) // light blue
+        : Colors.blue[700]!;
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 360;
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: _getBackgroundColor(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF424242) // grey[800]
+            : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black87),
+          icon: Icon(
+            Icons.arrow_back_ios, 
+            size: 20, 
+            color: _getIconColor(context)
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
           _selectedBrand['name'] ?? 'Brand',
           style: TextStyle(
-            color: ColorGlobalVariables.brownColor,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : ColorGlobalVariables.brownColor,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -165,7 +227,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           builder: (context, provider, child) {
             return RefreshIndicator(
               onRefresh: () async => _onRefresh(),
-              backgroundColor: Colors.white,
+              backgroundColor: _getCardColor(context),
               color: ColorGlobalVariables.brownColor,
               child: Stack(
                 children: [
@@ -177,14 +239,14 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                     left: 0,
                     right: 0,
                     child: AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                       transform: Matrix4.translationValues(
                         0, 
                         _showSearchBar ? 0 : -100, 
                         0
                       ),
-                      child: _buildSearchWidget(),
+                      child: _buildSearchWidget(context),
                     ),
                   ),
                 ],
@@ -210,49 +272,49 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: _buildHeaderSection(provider),
+            child: _buildHeaderSection(provider, context),
           ),
         ),
 
         // Content based on state
         if (provider.isLoading && provider.items.isEmpty)
-          const SliverToBoxAdapter(
-            child: _LoadingState(),
+          SliverToBoxAdapter(
+            child: _LoadingState(context: context),
           )
         else if (provider.hasError && provider.items.isEmpty)
           SliverToBoxAdapter(
-            child: _buildErrorState(provider.error!),
+            child: _buildErrorState(provider.error!, context),
           )
         else if (provider.isEmpty)
           SliverToBoxAdapter(
-            child: _buildEmptyState(),
+            child: _buildEmptyState(context),
           )
         else
-          _buildItemsGrid(provider, isSmallScreen),
+          _buildItemsGrid(provider, isSmallScreen, context),
 
         // Load More Indicator
         if (provider.hasMore)
           SliverToBoxAdapter(
-            child: _buildLoadMoreIndicator(provider),
+            child: _buildLoadMoreIndicator(provider, context),
           )
         else if (provider.hasItems)
-          const SliverToBoxAdapter(
-            child: _NoMoreItemsIndicator(),
+          SliverToBoxAdapter(
+            child: _NoMoreItemsIndicator(context: context),
           ),
       ],
     );
   }
 
-  Widget _buildSearchWidget() {
+  Widget _buildSearchWidget(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _getSearchContainerColor(context),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 8,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -263,17 +325,19 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         },
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _getSearchContainerColor(context),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
                 blurRadius: 12,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
             border: Border.all(
-              color: Colors.grey.withOpacity(0.2),
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF616161) // grey[700]
+                  : Colors.grey.withOpacity(0.2),
               width: 1,
             ),
           ),
@@ -286,19 +350,19 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                   color: ColorGlobalVariables.blueColor,
                   size: 24,
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Search ${_selectedBrand['name'] ?? 'brand'} vehicles...',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: _getSecondaryTextColor(context),
                       fontSize: 16,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: ColorGlobalVariables.blueColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -310,7 +374,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                         color: ColorGlobalVariables.blueColor,
                         size: 16,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         'Filter',
                         style: TextStyle(
@@ -330,29 +394,29 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildHeaderSection(BrandItemsProvider provider) {
+  Widget _buildHeaderSection(BrandItemsProvider provider, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           _selectedBrand['name'] ?? 'Brand',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: _getTextColor(context),
           ),
         ),
         const SizedBox(height: 4),
         Text(
           _buildResultsText(provider),
           style: TextStyle(
-            color: Colors.grey[600],
+            color: _getSecondaryTextColor(context),
             fontSize: 14,
           ),
         ),
         if (provider.hasItems) ...[
           const SizedBox(height: 8),
-          _buildStatsSection(provider),
+          _buildStatsSection(provider, context),
         ],
       ],
     );
@@ -368,12 +432,12 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     }
   }
 
-  Widget _buildStatsSection(BrandItemsProvider provider) {
+  Widget _buildStatsSection(BrandItemsProvider provider, BuildContext context) {
     final priceRange = _calculatePriceRange(provider.items);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
+        color: _getStatsBackgroundColor(context),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -382,7 +446,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           Text(
             'Price range: GH₵${formatNumber(shortenerRequired: true, number: priceRange['min']!.toInt())} - GH₵${formatNumber(shortenerRequired: true, number: priceRange['max']!.toInt())}',
             style: TextStyle(
-              color: Colors.blue[700],
+              color: _getStatsTextColor(context),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -391,7 +455,9 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             Text(
               '• More available',
               style: TextStyle(
-                color: Colors.green[600],
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.green[300]
+                    : Colors.green[600],
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -413,7 +479,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     };
   }
 
-  Widget _buildItemsGrid(BrandItemsProvider provider, bool isSmallScreen) {
+  Widget _buildItemsGrid(BrandItemsProvider provider, bool isSmallScreen, BuildContext context) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       sliver: SliverGrid(
@@ -437,19 +503,21 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildLoadMoreIndicator(BrandItemsProvider provider) {
+  Widget _buildLoadMoreIndicator(BrandItemsProvider provider, BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(
         child: provider.isLoadingMore
             ? Column(
                 children: [
-                  const CircularProgressIndicator(),
+                  CircularProgressIndicator(
+                    color: ColorGlobalVariables.brownColor,
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     'Loading more vehicles...',
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: _getSecondaryTextColor(context),
                       fontSize: 14,
                     ),
                   ),
@@ -460,18 +528,22 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.blue[50],
+                    color: _getStatsBackgroundColor(context),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.refresh, color: Colors.blue[700], size: 20),
+                      Icon(
+                        Icons.refresh, 
+                        color: _getStatsTextColor(context), 
+                        size: 20
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         'Load More Vehicles',
                         style: TextStyle(
-                          color: Colors.blue[700],
+                          color: _getStatsTextColor(context),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -484,7 +556,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Container(
       height: 400,
       padding: const EdgeInsets.all(32.0),
@@ -494,7 +566,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           Icon(
             Icons.directions_car_outlined,
             size: 80,
-            color: Colors.grey[400],
+            color: _getSecondaryTextColor(context),
           ),
           const SizedBox(height: 24),
           Text(
@@ -502,7 +574,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
+              color: _getTextColor(context),
             ),
           ),
           const SizedBox(height: 12),
@@ -510,7 +582,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             'We couldn\'t find any ${_selectedBrand['name'] ?? 'brand'} vehicles at the moment.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getSecondaryTextColor(context),
               fontSize: 16,
             ),
           ),
@@ -519,7 +591,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             'Check back later or try another brand.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey[500],
+              color: _getSecondaryTextColor(context),
               fontSize: 14,
             ),
           ),
@@ -538,7 +610,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildErrorState(String error) {
+  Widget _buildErrorState(String error, BuildContext context) {
     return Container(
       height: 400,
       padding: const EdgeInsets.all(32.0),
@@ -551,12 +623,12 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             color: Colors.red[400],
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Unable to Load Vehicles',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: _getTextColor(context),
             ),
           ),
           const SizedBox(height: 12),
@@ -564,7 +636,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             _extractErrorMessage(error),
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getSecondaryTextColor(context),
               fontSize: 16,
             ),
           ),
@@ -583,7 +655,12 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
               const SizedBox(width: 12),
               TextButton(
                 onPressed: () => Get.back(),
-                child: const Text('Go Back'),
+                child: Text(
+                  'Go Back',
+                  style: TextStyle(
+                    color: _getSecondaryTextColor(context),
+                  ),
+                ),
               ),
             ],
           ),
@@ -608,22 +685,25 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
 
 // Loading State Widget
 class _LoadingState extends StatelessWidget {
-  const _LoadingState();
+  final BuildContext context;
+  const _LoadingState({required this.context});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 200,
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
+            CircularProgressIndicator(
+              color: ColorGlobalVariables.brownColor,
+            ),
+            const SizedBox(height: 16),
             Text(
               'Loading vehicles...',
               style: TextStyle(
-                color: Colors.grey,
+                color: _getSecondaryTextColor(context),
                 fontSize: 16,
               ),
             ),
@@ -632,11 +712,18 @@ class _LoadingState extends StatelessWidget {
       ),
     );
   }
+
+  static Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
 }
 
 // No More Items Indicator
 class _NoMoreItemsIndicator extends StatelessWidget {
-  const _NoMoreItemsIndicator();
+  final BuildContext context;
+  const _NoMoreItemsIndicator({required this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -646,12 +733,18 @@ class _NoMoreItemsIndicator extends StatelessWidget {
         child: Text(
           'All vehicles loaded',
           style: TextStyle(
-            color: Colors.grey[500],
+            color: _getSecondaryTextColor(context),
             fontSize: 14,
           ),
         ),
       ),
     );
+  }
+
+  static Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[500]!;
   }
 }
 
@@ -745,6 +838,30 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
     }
   }
 
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
+
+  Color _getImagePlaceholderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.grey[200]!;
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -770,7 +887,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _getCardColor(context),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -791,8 +908,8 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: Colors.grey[100],
-                    child: _buildItemImage(firstImage),
+                    color: _getImagePlaceholderColor(context),
+                    child: _buildItemImage(firstImage, context),
                   ),
                 ),
                 // Condition badge
@@ -829,7 +946,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: _getCardColor(context),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -845,13 +962,13 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                                   height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                                    valueColor: AlwaysStoppedAnimation<Color>(_getSecondaryTextColor(context)),
                                   ),
                                 )
                               : Icon(
                                   _isLiked ? Icons.favorite : Icons.favorite_border,
                                   size: 18,
-                                  color: _isLiked ? Colors.red : Colors.grey[600],
+                                  color: _isLiked ? Colors.red : _getSecondaryTextColor(context),
                                 ),
                         ),
                       ),
@@ -872,10 +989,10 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                       Expanded(
                         child: Text(
                           widget.item.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: _getTextColor(context),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -885,7 +1002,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                         widget.item.year,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: _getSecondaryTextColor(context),
                         ),
                       ),
                     ],
@@ -905,13 +1022,13 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                       if (widget.item.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                            Icon(Icons.speed, size: 14, color: _getSecondaryTextColor(context)),
                             const SizedBox(width: 4),
                             Text(
                               "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: _getSecondaryTextColor(context),
                               ),
                             ),
                           ],
@@ -926,13 +1043,13 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                       if (widget.item.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                            Icon(Icons.settings, size: 14, color: _getSecondaryTextColor(context)),
                             const SizedBox(width: 4),
                             Text(
                               widget.item.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: _getSecondaryTextColor(context),
                               ),
                             ),
                           ],
@@ -941,14 +1058,14 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                         Flexible(
                           child: Row(
                             children: [
-                              Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                              Icon(Icons.location_on, size: 14, color: _getSecondaryTextColor(context)),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   widget.item.location,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[600],
+                                    color: _getSecondaryTextColor(context),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -968,14 +1085,14 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
     );
   }
 
-  Widget _buildItemImage(String imageUrl) {
+  Widget _buildItemImage(String imageUrl, BuildContext context) {
     final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
 
     if (isAssetImage) {
       return Image.asset(
         imageUrl,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildImageErrorPlaceholder(),
+        errorBuilder: (context, error, stackTrace) => _buildImageErrorPlaceholder(context),
       );
     } else {
       return CachedNetworkImage(
@@ -988,25 +1105,29 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
             valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
           ),
         ),
-        errorWidget: (context, url, error) => _buildImageErrorPlaceholder(),
+        errorWidget: (context, url, error) => _buildImageErrorPlaceholder(context),
       );
     }
   }
 
-  Widget _buildImageErrorPlaceholder() {
+  Widget _buildImageErrorPlaceholder(BuildContext context) {
     return Container(
-      color: Colors.grey[200],
-      child: const Center(
+      color: _getImagePlaceholderColor(context),
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey),
-            SizedBox(height: 4),
+            Icon(
+              Icons.image_not_supported, 
+              size: 32, 
+              color: _getSecondaryTextColor(context)
+            ),
+            const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey,
+                color: _getSecondaryTextColor(context),
               ),
             ),
           ],

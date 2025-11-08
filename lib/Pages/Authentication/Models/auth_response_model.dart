@@ -7,10 +7,11 @@ part 'auth_response_model.g.dart';
 @freezed
 class AuthResponseModel with _$AuthResponseModel {
   const factory AuthResponseModel({
+    String? message,
     String? token,
     required UserModel user,
-    bool? verified,  // ← Changed to nullable
-    @JsonKey(name: 'verified_dealer') bool? verifiedDealer, // ← Changed to nullable
+    bool? verified,
+    @JsonKey(name: 'verified_dealer') bool? verifiedDealer,
   }) = _AuthResponseModel;
 
   factory AuthResponseModel.fromJson(Map<String, dynamic> json) =>

@@ -8,7 +8,7 @@ class CountryCodeTextField extends StatefulWidget {
   final ValueChanged<Country>? onCountryChanged;
   final ValueChanged<String>? onPhoneNumberChanged;
   final FormFieldValidator<String>? validator;
-  final String? hintText; // Added hintText parameter
+  final String? hintText;
 
   const CountryCodeTextField({
     super.key,
@@ -16,7 +16,7 @@ class CountryCodeTextField extends StatefulWidget {
     this.onCountryChanged,
     this.onPhoneNumberChanged,
     this.validator,
-    this.hintText, // Added to constructor
+    this.hintText,
   });
 
   @override
@@ -77,28 +77,46 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           height: 64,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF424242) : Colors.white,
             borderRadius: BorderRadius.circular(10),
-            boxShadow: const [
-              BoxShadow(
-                color: Color.fromRGBO(50, 50, 71, 0.05),
-                offset: Offset(0, 3),
-                blurRadius: 8,
-                spreadRadius: -1,
-              ),
-              BoxShadow(
-                color: Color.fromRGBO(12, 26, 75, 0.24),
-                offset: Offset(0, 0),
-                blurRadius: 1,
-                spreadRadius: 0,
-              ),
-            ],
+            boxShadow: isDark 
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    offset: const Offset(0, 3),
+                    blurRadius: 8,
+                    spreadRadius: -1,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.4),
+                    offset: const Offset(0, 0),
+                    blurRadius: 1,
+                    spreadRadius: 0,
+                  ),
+                ]
+              : const [
+                  BoxShadow(
+                    color: Color.fromRGBO(50, 50, 71, 0.05),
+                    offset: Offset(0, 3),
+                    blurRadius: 8,
+                    spreadRadius: -1,
+                  ),
+                  BoxShadow(
+                    color: Color.fromRGBO(12, 26, 75, 0.24),
+                    offset: Offset(0, 0),
+                    blurRadius: 1,
+                    spreadRadius: 0,
+                  ),
+                ],
           ),
           child: TextFormField(
             controller: _controller,
@@ -107,6 +125,11 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
               FilteringTextInputFormatter.digitsOnly,
             ],
             validator: _validateInput,
+            style: TextStyle(
+              color: isDark ? const Color(0xFFFFFFFF) : Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
             onChanged: (value) {
               widget.onPhoneNumberChanged?.call(value);
               setState(() {
@@ -115,12 +138,12 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
             },
             decoration: InputDecoration(
               filled: true,
-              fillColor: Colors.white,
-              hintText: widget.hintText ?? 'Phone Number', // Use provided hintText or default
-              hintStyle: const TextStyle(
+              fillColor: isDark ? const Color(0xFF424242) : Colors.white,
+              hintText: widget.hintText ?? 'Phone Number',
+              hintStyle: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 16,
-                color: Color.fromRGBO(168, 175, 185, 1),
+                color: isDark ? const Color(0xB3FFFFFF) : const Color.fromRGBO(168, 175, 185, 1),
               ),
               errorMaxLines: 2,
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
@@ -159,17 +182,47 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
                     context: context,
                     countryListTheme: CountryListThemeData(
                       flagSize: 25,
-                      backgroundColor: Colors.white,
+                      backgroundColor: isDark ? const Color(0xFF424242) : Colors.white,
+                      textStyle: TextStyle(
+                        color: isDark ? const Color(0xFFFFFFFF) : Colors.black,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                       inputDecoration: InputDecoration(
                         labelText: 'Search',
                         hintText: 'Start typing to search',
-                        prefixIcon: const Icon(Icons.search),
+                        hintStyle: TextStyle(
+                          color: isDark ? const Color(0xB3FFFFFF) : const Color(0xFF8C98A8),
+                        ),
+                        labelStyle: TextStyle(
+                          color: isDark ? const Color(0xFFFFFFFF) : Colors.black,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: isDark ? const Color(0xFFFFFFFF) : const Color(0xFF8C98A8),
+                        ),
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF303030) : Colors.white,
                         border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: const Color(0xFF8C98A8).withOpacity(0.2),
+                            color: isDark ? const Color(0xFF616161) : const Color(0xFF8C98A8).withOpacity(0.2),
                           ),
                         ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: isDark ? const Color(0xFF616161) : const Color(0xFF8C98A8).withOpacity(0.2),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(
+                            color: isDark ? ColorGlobalVariables.brownColor : const Color(0xFF8C98A8),
+                          ),
+                        ),
+                      ),
+                      searchTextStyle: TextStyle(
+                        color: isDark ? const Color(0xFFFFFFFF) : Colors.black,
                       ),
                     ),
                     showPhoneCode: true,
@@ -195,12 +248,15 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
                       const SizedBox(width: 6),
                       Text(
                         '+${selectedCountry.phoneCode}',
-                        style: const TextStyle(
-                          color: Colors.black,
+                        style: TextStyle(
+                          color: isDark ? const Color(0xFFFFFFFF) : Colors.black,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const Icon(Icons.arrow_drop_down),
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: isDark ? const Color(0xFFFFFFFF) : Colors.black,
+                      ),
                     ],
                   ),
                 ),

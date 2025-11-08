@@ -39,6 +39,8 @@ class ApiEndpoint{
 
   // chat
   static const String fetchMessages = "/chat/fetchMessages";
+  static const String getContacts = "/chat/getContacts";
+  static const String sendMessage = "/chat/sendMessage";
 
   // payment
   static const String packagesByCategory = "/app/packages-by-category";

@@ -87,21 +87,77 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
     super.dispose();
   }
 
+  Color _getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF303030) // grey[900]
+        : Colors.grey[50]!;
+  }
+
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
+
+  Color _getIconColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getImagePlaceholderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.grey[200]!;
+  }
+
+  Color _getEmptyStateIconColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF90CAF9) // light blue
+        : Colors.blue[400]!;
+  }
+
+  Color _getEmptyStateBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF1E3A5F) // dark blue
+        : Colors.blue[50]!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: _getBackgroundColor(context),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF424242) // grey[800]
+            : Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_rounded, size: 20, color: Colors.black87),
+          icon: Icon(
+            Icons.arrow_back_ios_rounded, 
+            size: 20, 
+            color: _getIconColor(context)
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
           _category.name,
-          style: const TextStyle(
-            color: ColorGlobalVariables.brownColor,
+          style: TextStyle(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : ColorGlobalVariables.brownColor,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -114,34 +170,36 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
       body: SafeArea(
         child: Consumer<SimilarItemsProvider>(
           builder: (context, provider, child) {
-            return _buildContent(provider);
+            return _buildContent(provider, context);
           },
         ),
       ),
     );
   }
 
-  Widget _buildContent(SimilarItemsProvider provider) {
+  Widget _buildContent(SimilarItemsProvider provider, BuildContext context) {
     // Show empty state if no items and not loading (this is normal, not an error)
     if (!provider.isLoading && provider.items.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
 
     return RefreshIndicator(
       onRefresh: () => provider.refresh(),
+      backgroundColor: _getCardColor(context),
+      color: ColorGlobalVariables.brownColor,
       child: CustomScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
           // Header Section
           SliverToBoxAdapter(
-            child: _buildHeaderSection(provider),
+            child: _buildHeaderSection(provider, context),
           ),
 
           // Loading State (initial load)
           if (provider.isLoading && provider.items.isEmpty)
-            const SliverFillRemaining(
-              child: _LoadingState(),
+            SliverFillRemaining(
+              child: _LoadingState(context: context),
             ),
 
           // Grid Items - Show only if we have items
@@ -170,21 +228,21 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
 
           // Loading More Indicator
           if (provider.isLoadingMore)
-            const SliverToBoxAdapter(
-              child: _LoadingMoreIndicator(),
+            SliverToBoxAdapter(
+              child: _LoadingMoreIndicator(context: context),
             ),
 
           // End of List Indicator
           if (!provider.hasMore && provider.items.isNotEmpty)
-            const SliverToBoxAdapter(
-              child: _EndOfListIndicator(),
+            SliverToBoxAdapter(
+              child: _EndOfListIndicator(context: context),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderSection(SimilarItemsProvider provider) {
+  Widget _buildHeaderSection(SimilarItemsProvider provider, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
       child: Column(
@@ -192,10 +250,10 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
         children: [
           Text(
             _category.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: _getTextColor(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -205,7 +263,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
                 : 'No items available',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: _getSecondaryTextColor(context),
             ),
           ),
         ],
@@ -213,7 +271,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -225,13 +283,13 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
             width: 140,
             height: 140,
             decoration: BoxDecoration(
-              color: Colors.blue[50],
+              color: _getEmptyStateBackgroundColor(context),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.inventory_2_outlined,
               size: 60,
-              color: Colors.blue[400],
+              color: _getEmptyStateIconColor(context),
             ),
           ),
           const SizedBox(height: 32),
@@ -241,7 +299,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: _getTextColor(context),
             ),
           ),
           const SizedBox(height: 12),
@@ -250,7 +308,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
             'There are currently no items available in the "${_category.name}" category.',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey[600],
+              color: _getSecondaryTextColor(context),
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -260,7 +318,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
             'Please check back later or explore other categories.',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[500],
+              color: _getSecondaryTextColor(context),
             ),
             textAlign: TextAlign.center,
           ),
@@ -287,7 +345,9 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
               TextButton(
                 onPressed: () => Provider.of<SimilarItemsProvider>(context, listen: false).refresh(),
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue[600],
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF90CAF9) // light blue
+                      : Colors.blue[600],
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 child: const Text('Refresh'),
@@ -302,7 +362,8 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
 
 // Loading State Widget
 class _LoadingState extends StatelessWidget {
-  const _LoadingState();
+  final BuildContext context;
+  const _LoadingState({required this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +378,7 @@ class _LoadingState extends StatelessWidget {
         Text(
           'Loading Items...',
           style: TextStyle(
-            color: Colors.grey[600],
+            color: _getSecondaryTextColor(context),
             fontSize: 16,
           ),
         ),
@@ -325,18 +386,25 @@ class _LoadingState extends StatelessWidget {
         Text(
           'Please wait while we fetch the latest items',
           style: TextStyle(
-            color: Colors.grey[500],
+            color: _getSecondaryTextColor(context),
             fontSize: 14,
           ),
         ),
       ],
     );
   }
+
+  static Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
 }
 
 // Loading More Indicator Widget
 class _LoadingMoreIndicator extends StatelessWidget {
-  const _LoadingMoreIndicator();
+  final BuildContext context;
+  const _LoadingMoreIndicator({required this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +420,7 @@ class _LoadingMoreIndicator extends StatelessWidget {
           Text(
             'Loading more items...',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getSecondaryTextColor(context),
               fontSize: 14,
             ),
           ),
@@ -360,11 +428,18 @@ class _LoadingMoreIndicator extends StatelessWidget {
       ),
     );
   }
+
+  static Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
 }
 
 // End of List Indicator Widget
 class _EndOfListIndicator extends StatelessWidget {
-  const _EndOfListIndicator();
+  final BuildContext context;
+  const _EndOfListIndicator({required this.context});
 
   @override
   Widget build(BuildContext context) {
@@ -375,13 +450,15 @@ class _EndOfListIndicator extends StatelessWidget {
           Icon(
             Icons.check_circle_outline_rounded,
             size: 40,
-            color: Colors.green[400],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.green[300]
+                : Colors.green[400],
           ),
           const SizedBox(height: 8),
           Text(
             'You\'ve reached the end',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: _getSecondaryTextColor(context),
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
@@ -390,13 +467,19 @@ class _EndOfListIndicator extends StatelessWidget {
           Text(
             'No more items to load',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: _getSecondaryTextColor(context),
               fontSize: 14,
             ),
           ),
         ],
       ),
     );
+  }
+
+  static Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[500]!;
   }
 }
 
@@ -556,6 +639,30 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
     }
   }
 
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[600]!;
+  }
+
+  Color _getImagePlaceholderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.grey[200]!;
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -581,7 +688,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: _getCardColor(context),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -602,8 +709,8 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: Colors.grey[100],
-                    child: _buildItemImage(firstImage),
+                    color: _getImagePlaceholderColor(context),
+                    child: _buildItemImage(firstImage, context),
                   ),
                 ),
                 
@@ -645,7 +752,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: _getCardColor(context),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -662,7 +769,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.grey,
+                                      _getSecondaryTextColor(context),
                                     ),
                                   ),
                                 )
@@ -674,7 +781,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                                       size: 18,
                                       color: _isLiked 
                                           ? _colorAnimation.value 
-                                          : Colors.grey[600],
+                                          : _getSecondaryTextColor(context),
                                     );
                                   },
                                 ),
@@ -699,10 +806,10 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                       Expanded(
                         child: Text(
                           widget.item.name ?? 'Unnamed Item',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: _getTextColor(context),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -712,7 +819,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                         widget.item.year ?? '',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[600],
+                          color: _getSecondaryTextColor(context),
                         ),
                       ),
                     ],
@@ -735,13 +842,17 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                       if (widget.item.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                            Icon(
+                              Icons.speed, 
+                              size: 14, 
+                              color: _getSecondaryTextColor(context)
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               "${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.mileage!) ?? 0)} km",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey[600],
+                                color: _getSecondaryTextColor(context),
                               ),
                             ),
                           ],
@@ -760,13 +871,17 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                       if (widget.item.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                            Icon(
+                              Icons.settings, 
+                              size: 14, 
+                              color: _getSecondaryTextColor(context)
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               widget.item.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: _getSecondaryTextColor(context),
                               ),
                             ),
                           ],
@@ -776,14 +891,18 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                         Flexible(
                           child: Row(
                             children: [
-                              Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                              Icon(
+                                Icons.location_on, 
+                                size: 14, 
+                                color: _getSecondaryTextColor(context)
+                              ),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   widget.item.location!,
                                   style: TextStyle(
                                     fontSize: 11,
-                                    color: Colors.grey[600],
+                                    color: _getSecondaryTextColor(context),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -803,7 +922,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
     );
   }
 
-  Widget _buildItemImage(String imageUrl) {
+  Widget _buildItemImage(String imageUrl, BuildContext context) {
     final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     
     if (isAssetImage) {
@@ -811,7 +930,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
         imageUrl,
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return _buildImageErrorPlaceholder();
+          return _buildImageErrorPlaceholder(context);
         },
       );
     } else {
@@ -830,26 +949,30 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
           );
         },
         errorWidget: (context, url, error) {
-          return _buildImageErrorPlaceholder();
+          return _buildImageErrorPlaceholder(context);
         },
       );
     }
   }
 
-  Widget _buildImageErrorPlaceholder() {
+  Widget _buildImageErrorPlaceholder(BuildContext context) {
     return Container(
-      color: Colors.grey[200],
+      color: _getImagePlaceholderColor(context),
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            Icon(
+              Icons.image_not_supported, 
+              size: 32, 
+              color: _getSecondaryTextColor(context)
+            ),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: _getSecondaryTextColor(context),
               ),
             ),
           ],

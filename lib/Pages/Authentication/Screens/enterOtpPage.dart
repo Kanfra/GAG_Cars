@@ -17,18 +17,13 @@ class EnterOtpPage extends StatefulWidget {
   const EnterOtpPage({
     super.key, 
     required this.allJson,  
-
-
-
-
-    
   });
 
   @override
   State<EnterOtpPage> createState() => _EnterOtpPageState();
 }
 
-class _EnterOtpPageState extends State<EnterOtpPage> {
+class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderStateMixin {
   final List<TextEditingController> _otpControllers = List.generate(6, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
   bool _isLoading = false;
@@ -38,13 +33,77 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
   bool _isAutoFilling = false;
   final logger = Logger();
   
+  // Animation controllers
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<Color?> _containerColorAnimation;
+
   @override
   void initState() {
     super.initState();
+    _initAnimations();
     // Auto-focus first field
     _focusNodes[0].requestFocus();
     // Start clipboard monitoring
     _startClipboardMonitoring();
+  }
+
+  void _initAnimations() {
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeInOut),
+      ),
+    );
+
+    _slideAnimation = Tween<double>(begin: 60.0, end: 0.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.4, 1.0, curve: Curves.elasticOut),
+      ),
+    );
+
+    _containerColorAnimation = ColorTween(
+      begin: Colors.transparent,
+      end: Colors.red.withOpacity(0.1),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _animationController.forward();
+  }
+
+  Future<void> _successAnimation() async {
+    await _animationController.animateTo(
+      1.1,
+      duration: const Duration(milliseconds: 300),
+    );
+    await _animationController.animateBack(
+      1.0,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
+
+  void _errorShakeAnimation() {
+    _animationController.animateBack(0.1, duration: const Duration(milliseconds: 100))
+        .then((_) => _animationController.forward());
   }
 
   void _startClipboardMonitoring() {
@@ -103,6 +162,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
 
   @override
   void dispose() {
+    _animationController.dispose();
     for (var controller in _otpControllers) {
       controller.dispose();
     }
@@ -168,6 +228,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
         _isError = true;
         _errorMessage = 'Please enter a complete 6-digit OTP';
       });
+      _errorShakeAnimation();
       return;
     }
 
@@ -182,6 +243,8 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
       );
 
       // If we reach here, verification was successful
+      await _successAnimation();
+      
       showCustomSnackBar(
         title: "Success",
         message: 'OTP verified successfully',
@@ -203,6 +266,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
         _isError = true;
         _errorMessage = 'Invalid OTP. Please try again.';
       });
+      _errorShakeAnimation();
       showCustomSnackBar(
         message: 'Invalid OTP. Please try again.',
       );
@@ -275,100 +339,142 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? Colors.grey[900] : Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF121212) : Colors.grey[50],
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Back button
-              IconButton(
-                icon: Icon(Icons.arrow_back, color: ColorGlobalVariables.blackColor),
-                onPressed: () => Navigator.pop(context),
-              ).animate().fadeIn().slideX(),
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Transform(
+                transform: Matrix4.identity()
+                  ..scale(_scaleAnimation.value),
+                alignment: Alignment.center,
+                child: Opacity(
+                  opacity: _fadeAnimation.value,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Back button
+                      Transform.translate(
+                        offset: Offset(-_slideAnimation.value, 0),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.arrow_back, 
+                            color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
 
-              const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-              // Title
-              Text(
-                'Verify OTP',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onBackground,
-                ),
-              ).animate().fadeIn(delay: 100.ms).slideY(),
+                      // Title
+                      Transform.translate(
+                        offset: Offset(_slideAnimation.value, 0),
+                        child: Text(
+                          'Verify OTP',
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ),
 
-              const SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
-              // Subtitle
-              RichText(
-                text: TextSpan(
-                  text: 'Enter the 6-digit code sent to ',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onBackground.withOpacity(0.7),
+                      // Subtitle
+                      Transform.translate(
+                        offset: Offset(-_slideAnimation.value, 0),
+                        child: RichText(
+                          text: TextSpan(
+                            text: 'Enter the 6-digit code sent to ',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: isDarkMode ? Colors.white70 : Colors.black54,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: widget.allJson['email'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' and ',
+                              ),
+                              TextSpan(
+                                text: widget.allJson['phone'],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Auto-fill info card
+                      const SizedBox(height: 16),
+                      _buildAutoFillInfoCard(isDarkMode),
+
+                      const SizedBox(height: 40),
+
+                      // OTP Input Fields with Paste button
+                      Transform.translate(
+                        offset: Offset(0, _slideAnimation.value),
+                        child: _buildOTPInputSection(theme, isDarkMode),
+                      ),
+
+                      if (_isError) ...[
+                        const SizedBox(height: 20),
+                        _buildErrorSection(theme, isDarkMode),
+                      ],
+
+                      const SizedBox(height: 40),
+
+                      // Verify Button
+                      Transform.translate(
+                        offset: Offset(0, _slideAnimation.value * 0.5),
+                        child: _buildVerifyButton(theme),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Resend OTP
+                      FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: _buildResendSection(theme, isDarkMode),
+                      ),
+                    ],
                   ),
-                  children: [
-                    TextSpan(
-                      text: widget.allJson['email'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    TextSpan(
-                      text: ' and ',
-                    ),
-                    TextSpan(
-                      text: widget.allJson['phone'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
                 ),
-              ).animate().fadeIn(delay: 200.ms).slideY(),
-
-              // Auto-fill info card
-              const SizedBox(height: 16),
-              _buildAutoFillInfoCard(),
-
-              const SizedBox(height: 40),
-
-              // OTP Input Fields with Paste button
-              _buildOTPInputSection(theme, isDarkMode),
-
-              if (_isError) ...[
-                const SizedBox(height: 20),
-                _buildErrorSection(theme),
-              ],
-
-              const SizedBox(height: 40),
-
-              // Verify Button
-              _buildVerifyButton(theme),
-
-              const SizedBox(height: 20),
-
-              // Resend OTP
-              _buildResendSection(theme),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildAutoFillInfoCard() {
+  Widget _buildAutoFillInfoCard(bool isDarkMode) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.blue.shade100),
+        color: isDarkMode ? const Color(0xFF1E3A5F) : Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDarkMode ? const Color(0xFF2D4F7C) : Colors.blue.shade100,
+        ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.auto_awesome_motion,
-            color: Colors.blue.shade600,
-            size: 20,
+            color: isDarkMode ? const Color(0xFF64B5F6) : Colors.blue.shade600,
+            size: 24,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -380,7 +486,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.blue.shade800,
+                    color: isDarkMode ? const Color(0xFFE3F2FD) : Colors.blue.shade800,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -388,7 +494,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                   'Use the paste button or we\'ll auto-detect OTP from clipboard',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.blue.shade700,
+                    color: isDarkMode ? const Color(0xFFBBDEFB) : Colors.blue.shade700,
                   ),
                 ),
               ],
@@ -397,17 +503,19 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
           if (_isAutoFilling) ...[
             const SizedBox(width: 8),
             SizedBox(
-              width: 16,
-              height: 16,
+              width: 20,
+              height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDarkMode ? const Color(0xFF64B5F6) : Colors.blue.shade600
+                ),
               ),
             ),
           ],
         ],
       ),
-    ).animate().fadeIn(delay: 250.ms).slideY();
+    ).animate().fadeIn(delay: 300.ms).slideY();
   }
 
   Widget _buildOTPInputSection(ThemeData theme, bool isDarkMode) {
@@ -420,33 +528,51 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
               'Enter 6-digit OTP',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
-            TextButton.icon(
-              onPressed: _pasteFromClipboard,
-              icon: Icon(
-                Icons.paste,
-                size: 18,
-                color: ColorGlobalVariables.brownColor,
-              ),
-              label: Text(
-                'Paste',
-                style: TextStyle(
-                  color: ColorGlobalVariables.brownColor,
-                  fontWeight: FontWeight.w600,
+            GestureDetector(
+              onTap: _pasteFromClipboard,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? const Color(0xFF2D2D2D) : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.paste,
+                        size: 18,
+                        color: ColorGlobalVariables.brownColor,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Paste',
+                        style: TextStyle(
+                          color: ColorGlobalVariables.brownColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(6, (index) {
               return SizedBox(
-                width: 50,
-                height: 60,
+                width: 52,
+                height: 64,
                 child: TextField(
                   controller: _otpControllers[index],
                   focusNode: _focusNodes[index],
@@ -456,6 +582,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                   maxLength: 1,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                   decoration: InputDecoration(
                     counterText: '',
@@ -465,7 +592,8 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                       borderSide: BorderSide(
                         color: _isError 
                           ? theme.colorScheme.error 
-                          : theme.colorScheme.outline.withOpacity(0.3),
+                          : isDarkMode ? Colors.grey[600]! : Colors.grey[400]!,
+                        width: 2,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -473,7 +601,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                       borderSide: BorderSide(
                         color: _isError 
                           ? theme.colorScheme.error 
-                          : ColorGlobalVariables.brownColor,
+                          : ColorGlobalVariables.brownColor!,
                         width: 2,
                       ),
                     ),
@@ -481,11 +609,12 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                         color: theme.colorScheme.error,
+                        width: 2,
                       ),
                     ),
                     filled: true,
                     fillColor: isDarkMode 
-                      ? Colors.grey[800]!.withOpacity(0.5) 
+                      ? const Color(0xFF2D2D2D)
                       : Colors.white,
                   ),
                   onChanged: (value) => _onOTPChanged(index, value),
@@ -493,7 +622,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                     FilteringTextInputFormatter.digitsOnly,
                   ],
                 ),
-              ).animate().fadeIn(delay: (300 + (index * 100)).ms).slideY();
+              ).animate().fadeIn(delay: (400 + (index * 100)).ms).slideY(begin: 0.3);
             }),
           ),
         ),
@@ -501,123 +630,152 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
     );
   }
 
-  Widget _buildErrorSection(ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.error_outline,
-          color: theme.colorScheme.error,
-          size: 20,
+  Widget _buildErrorSection(ThemeData theme, bool isDarkMode) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.red.withOpacity(0.1) : Colors.red.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.shade200,
         ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            _errorMessage ?? 'Invalid OTP. Please try again.',
-            style: TextStyle(color: theme.colorScheme.error),
-            textAlign: TextAlign.center,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            color: theme.colorScheme.error,
+            size: 20,
           ),
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: _clearAllFields,
-          child: Text(
-            'Clear',
-            style: TextStyle(
-              color: ColorGlobalVariables.brownColor,
-              fontWeight: FontWeight.w600,
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(
+              _errorMessage ?? 'Invalid OTP. Please try again.',
+              style: TextStyle(
+                color: theme.colorScheme.error,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
-        ),
-      ],
-    ).animate().shake().fadeIn();
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: _clearAllFields,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Text(
+                'Clear',
+                style: TextStyle(
+                  color: ColorGlobalVariables.brownColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ).animate().shakeX(duration: 600.ms).fadeIn();
   }
 
   Widget _buildVerifyButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
-      child: FilledButton(
-        onPressed: _isLoading ? null : _verifyOTP,
-        style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        child: FilledButton(
+          onPressed: _isLoading ? null : _verifyOTP,
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            backgroundColor: ColorGlobalVariables.brownColor,
+            foregroundColor: Colors.white,
           ),
-          backgroundColor: ColorGlobalVariables.brownColor,
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_isAutoFilling) ...[
-                    Icon(Icons.auto_awesome, size: 20),
-                    SizedBox(width: 8),
-                  ],
-                  Text(
-                    _isAutoFilling ? 'Verifying...' : 'Verify',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
                   ),
-                ],
-              ),
-      ),
-    ).animate().fadeIn(delay: 900.ms).slideY();
-  }
-
-  Widget _buildResendSection(ThemeData theme) {
-    return Center(
-      child: TextButton(
-        onPressed: _isResending ? null : _resendOTP,
-        child: _isResending
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: ColorGlobalVariables.brownColor,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Resending...',
-                    style: TextStyle(
-                      color: ColorGlobalVariables.brownColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              )
-            : RichText(
-                text: TextSpan(
-                  text: "Didn't receive code? ",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onBackground.withOpacity(0.7),
-                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextSpan(
-                      text: 'Resend',
-                      style: TextStyle(
-                        color: ColorGlobalVariables.brownColor,
+                    if (_isAutoFilling) ...[
+                      Icon(Icons.auto_awesome, size: 20),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      _isAutoFilling ? 'Verifying...' : 'Verify OTP',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-              ),
+        ),
       ),
-    ).animate().fadeIn(delay: 1000.ms).slideY();
+    ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.5);
+  }
+
+  Widget _buildResendSection(ThemeData theme, bool isDarkMode) {
+    return Center(
+      child: GestureDetector(
+        onTap: _isResending ? null : _resendOTP,
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: _isResending
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: ColorGlobalVariables.brownColor,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Resending...',
+                        style: TextStyle(
+                          color: ColorGlobalVariables.brownColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  )
+                : RichText(
+                    text: TextSpan(
+                      text: "Didn't receive code? ",
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: 'Resend',
+                          style: TextStyle(
+                            color: ColorGlobalVariables.brownColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
   }
 }

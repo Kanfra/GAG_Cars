@@ -9,6 +9,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvid
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getNotificationsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserListingsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getWishlistProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
@@ -20,6 +21,8 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeServic
 import 'package:gag_cars_frontend/Pages/HomePage/Services/ItemCategoryService/itemCategoryService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/makeAndModelService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Providers/contactsProvider.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Providers/messagesProvider.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/faqProvider.dart';
@@ -95,6 +98,15 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (context) => UserDetailsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ContactsProvider()
+        ),
+        ChangeNotifierProvider(
+          create: (context) => MessagesProvider()
+        ),
+        ChangeNotifierProvider(
+          create:(context) => UserListingsProvider(),
         ),
       ],
       child: const MyApp(),

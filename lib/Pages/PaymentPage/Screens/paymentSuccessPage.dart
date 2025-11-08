@@ -1,5 +1,6 @@
 // lib/Pages/Payment/payment_success_page.dart
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import 'dart:typed_data';
 
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/myListingPage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:provider/provider.dart';
 
 class PaymentSuccessPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -222,6 +224,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    
     final amountInGhs = _getAmountInGhs();
     final statusColor = _getStatusColor();
     final statusIcon = _getStatusIcon();
@@ -229,7 +234,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     final subMessage = _getSubMessage();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -261,22 +266,29 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
               Text(
                 'GH₵ ${amountInGhs.toStringAsFixed(2)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
               const SizedBox(height: 8),
 
               Text(
                 widget.allJson['packageName']?.toString() ?? 'Unknown Package',
-                style: const TextStyle(fontSize: 18, color: Colors.grey)
+                style: TextStyle(
+                  fontSize: 18, 
+                  color: isDarkMode ? Colors.white70 : Colors.grey
+                )
               ),
               const SizedBox(height: 4),
 
               Text(
                 widget.allJson['listingName']?.toString() ?? 'Unknown Listing',
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 14, 
+                  color: isDarkMode ? Colors.white60 : Colors.grey
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -284,18 +296,27 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(
+                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200]!
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.receipt, size: 16, color: Colors.grey),
+                    Icon(
+                      Icons.receipt, 
+                      size: 16, 
+                      color: isDarkMode ? Colors.white60 : Colors.grey
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       'Ref: ${widget.allJson['transactionReference']?.toString() ?? 'N/A'}',
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 12, 
+                        color: isDarkMode ? Colors.white60 : Colors.grey
+                      ),
                     ),
                   ],
                 ),
@@ -332,19 +353,34 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        side: BorderSide(
+                          color: isDarkMode ? Colors.white60 : Colors.grey[400]!
+                        ),
                       ),
                       child: _isSharing
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                              ),
                             )
-                          : const Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.share, size: 20),
-                                SizedBox(width: 8),
-                                Text('Share Receipt'),
+                                Icon(
+                                  Icons.share, 
+                                  size: 20,
+                                  color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Share Receipt',
+                                  style: TextStyle(
+                                    color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                  ),
+                                ),
                               ],
                             ),
                     ),
@@ -355,7 +391,10 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
               Text(
                 subMessage,
-                style: TextStyle(color: statusColor, fontSize: 14),
+                style: TextStyle(
+                  color: statusColor, 
+                  fontSize: 14
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

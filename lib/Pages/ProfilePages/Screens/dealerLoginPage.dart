@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
@@ -11,9 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:edge_detection/edge_detection.dart';
 import 'package:logger/Logger.dart';
-import 'package:path_provider/path_provider.dart';
 
 class DealerLoginPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -51,8 +48,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
   // UI states
   bool _isLoading = false;
 
-  // Camera & ML
-  CameraController? _cameraController;
+  // Face detection
   FaceDetector? _faceDetector;
   final ImagePicker _picker = ImagePicker();
 
@@ -116,38 +112,32 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     }
   }
 
-  // ================== NATIONAL ID CAPTURE ==================
+  // ================== NATIONAL ID CAPTURE - SIMPLE CAMERA ==================
   Future<void> _captureNationalId(bool isFront) async {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
         preferredCameraDevice: CameraDevice.rear,
       );
+      
       if (image == null) return;
 
-      final tempDir = await getTemporaryDirectory();
-      final outputPath =
-          "${tempDir.path}/id_${isFront ? 'front' : 'back'}_${DateTime.now().millisecondsSinceEpoch}.jpg";
-
-      final success = await EdgeDetection.detectEdge(outputPath);
-      if (success) {
-        setState(() {
-          if (isFront) {
-            _nationalIdFront = File(outputPath);
-            _isFrontCaptured = true;
-          } else {
-            _nationalIdBack = File(outputPath);
-            _isBackCaptured = true;
-          }
-        });
-        
-        showCustomSnackBar(
-          title: "Success",
-          message: "ID ${isFront ? 'front' : 'back'} captured successfully.",
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-        );
-      }
+      setState(() {
+        if (isFront) {
+          _nationalIdFront = File(image.path);
+          _isFrontCaptured = true;
+        } else {
+          _nationalIdBack = File(image.path);
+          _isBackCaptured = true;
+        }
+      });
+      
+      showCustomSnackBar(
+        title: "Success",
+        message: "ID ${isFront ? 'front' : 'back'} captured successfully.",
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
     } catch (e) {
       showCustomSnackBar(
         title: "Error",
@@ -195,6 +185,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     required VoidCallback onTap,
     Color? accentColor,
     required bool isDarkMode,
+    required String captureButtonText,
+    required String retakeButtonText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,7 +249,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isCaptured ? "Successfully Captured!" : "Tap to Capture",
+                  isCaptured ? "Successfully Captured!" : captureButtonText,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -323,7 +315,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                 color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
               label: Text(
-                "Retake",
+                retakeButtonText,
                 style: TextStyle(
                   color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 ),
@@ -428,11 +420,10 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           textColor: Colors.white,
         );
         
-        // FIXED: Simple pop back to Settings page after success
+        // Simple pop back to Settings page after success
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             Navigator.of(context).popUntil((route) => route.isFirst);
-            // Get.back(); // This will return to Settings page
           }
         });
       } else {
@@ -471,7 +462,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           "Dealer Registration",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 20,
+            fontSize: 22,
             color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
           ),
         ),
@@ -482,9 +473,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
-          onPressed: () => Get.back(), // Simple pop back
+          onPressed: () => Get.back(),
         ),
       ),
       body: Stack(
@@ -673,7 +664,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Selfie
+                  // Selfie - Uses Retake button
                   _buildDocumentSection(
                     title: "1. Business Owner Selfie",
                     description: "Take a clear selfie to verify your identity as the business owner.",
@@ -683,9 +674,11 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     onTap: _takeSelfie,
                     accentColor: Colors.blue,
                     isDarkMode: isDarkMode,
+                    captureButtonText: "Tap to Capture",
+                    retakeButtonText: "Retake",
                   ),
 
-                  // National ID front
+                  // National ID front - Uses Recapture button
                   _buildDocumentSection(
                     title: "2. National ID (Front Side)",
                     description: "Capture the front side of your government-issued ID card.",
@@ -695,9 +688,11 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     onTap: () => _captureNationalId(true),
                     accentColor: Colors.orange,
                     isDarkMode: isDarkMode,
+                    captureButtonText: "Tap to Capture",
+                    retakeButtonText: "Recapture",
                   ),
 
-                  // National ID back
+                  // National ID back - Uses Recapture button
                   _buildDocumentSection(
                     title: "3. National ID (Back Side)",
                     description: "Capture the back side of your government-issued ID card.",
@@ -707,9 +702,11 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     onTap: () => _captureNationalId(false),
                     accentColor: Colors.purple,
                     isDarkMode: isDarkMode,
+                    captureButtonText: "Tap to Capture",
+                    retakeButtonText: "Recapture",
                   ),
 
-                  // Company doc
+                  // Company doc - Uses Choose Different File button
                   _buildDocumentSection(
                     title: "4. Company Registration Document",
                     description: "Upload your business registration certificate or company documents.",
@@ -719,6 +716,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     onTap: _pickCompanyDocument,
                     accentColor: Colors.teal,
                     isDarkMode: isDarkMode,
+                    captureButtonText: "Tap to Upload",
+                    retakeButtonText: "Choose Different File",
                   ),
 
                   const SizedBox(height: 24),
@@ -817,7 +816,6 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
   @override
   void dispose() {
     _garageName.dispose();
-    _cameraController?.dispose();
     _faceDetector?.close();
     super.dispose();
   }

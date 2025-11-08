@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -145,40 +146,57 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
-      body: _buildBody(),
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
+      appBar: _buildAppBar(isDarkMode),
+      body: _buildBody(isDarkMode),
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(bool isDarkMode) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_rounded, color: Colors.black87),
+        icon: Icon(
+          Icons.arrow_back_ios_rounded, 
+          color: isDarkMode ? Colors.white : Colors.black87
+        ),
         onPressed: () => Get.back(),
       ),
       title: Container(
         height: 45,
         decoration: BoxDecoration(
-          color: Colors.grey[50],
+          color: isDarkMode ? const Color(0xFF616161) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[300]!),
+          border: Border.all(
+            color: isDarkMode ? const Color(0xFF757575) : Colors.grey[300]!
+          ),
         ),
         child: TextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
           autofocus: true,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
           decoration: InputDecoration(
             hintText: 'Search cars, brands, models...',
-            hintStyle: TextStyle(color: Colors.grey[500]),
+            hintStyle: TextStyle(color: isDarkMode ? Colors.white60 : Colors.grey[500]),
             border: InputBorder.none,
-            prefixIcon: Icon(Icons.search_rounded, color: Colors.grey[500]),
+            prefixIcon: Icon(
+              Icons.search_rounded, 
+              color: isDarkMode ? Colors.white60 : Colors.grey[500]
+            ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(Icons.clear_rounded, color: Colors.grey[500]),
+                    icon: Icon(
+                      Icons.clear_rounded, 
+                      color: isDarkMode ? Colors.white60 : Colors.grey[500]
+                    ),
                     onPressed: _clearSearch,
                   )
                 : null,
@@ -192,31 +210,31 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(bool isDarkMode) {
     return Consumer<SearchProvider>(
       builder: (context, searchProvider, child) {
         if (_showInitialState) {
-          return _buildSearchSuggestions();
+          return _buildSearchSuggestions(isDarkMode);
         }
 
         if (searchProvider.isLoading) {
-          return _buildLoadingState();
+          return _buildLoadingState(isDarkMode);
         }
 
         if (searchProvider.hasError) {
-          return _buildErrorState(searchProvider);
+          return _buildErrorState(searchProvider, isDarkMode);
         }
 
         if (searchProvider.hasResults) {
-          return _buildSearchResults(searchProvider.searchResults);
+          return _buildSearchResults(searchProvider.searchResults, isDarkMode);
         }
 
-        return _buildNoResultsState();
+        return _buildNoResultsState(isDarkMode);
       },
     );
   }
 
-  Widget _buildSearchSuggestions() {
+  Widget _buildSearchSuggestions(bool isDarkMode) {
     final homeProvider = Provider.of<HomeProvider>(context, listen: true);
     
     return SingleChildScrollView(
@@ -226,30 +244,30 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
         children: [
           // Recent Searches - THESE WILL TRIGGER SEARCH
           if (_recentSearches.isNotEmpty) ...[
-            _buildSectionHeader('Recent Searches'),
+            _buildSectionHeader('Recent Searches', isDarkMode),
             SizedBox(height: 12),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: _recentSearches.map((search) {
-                return _buildChip(search, Icons.history_rounded);
+                return _buildChip(search, Icons.history_rounded, isDarkMode);
               }).toList(),
             ),
             SizedBox(height: 24),
           ],
 
           // Browse Categories - THESE WILL TRIGGER SEARCH BY CATEGORY NAME
-          _buildSectionHeader('Browse Categories'),
+          _buildSectionHeader('Browse Categories', isDarkMode),
           SizedBox(height: 16),
-          _buildCategoriesGrid(homeProvider.categories),
+          _buildCategoriesGrid(homeProvider.categories, isDarkMode),
           SizedBox(height: 24),
 
           // Popular Searches - THESE WILL TRIGGER SEARCH
-          _buildSectionHeader('Popular Searches'),
+          _buildSectionHeader('Popular Searches', isDarkMode),
           SizedBox(height: 12),
           Column(
             children: _popularSearches.map((search) {
-              return _buildSearchSuggestionItem(search);
+              return _buildSearchSuggestionItem(search, isDarkMode);
             }).toList(),
           ),
         ],
@@ -258,9 +276,9 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   }
 
   // Categories Grid - NOW TRIGGERS SEARCH BY CATEGORY NAME
-  Widget _buildCategoriesGrid(List<Categories> categories) {
+  Widget _buildCategoriesGrid(List<Categories> categories, bool isDarkMode) {
     if (categories.isEmpty) {
-      return _buildCategoriesLoading();
+      return _buildCategoriesLoading(isDarkMode);
     }
 
     return GridView.builder(
@@ -275,12 +293,12 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final category = categories[index];
-        return _buildCategoryCard(category);
+        return _buildCategoryCard(category, isDarkMode);
       },
     );
   }
 
-  Widget _buildCategoriesLoading() {
+  Widget _buildCategoriesLoading(bool isDarkMode) {
     return GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -292,15 +310,15 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
       ),
       itemCount: 6,
       itemBuilder: (context, index) {
-        return _buildCategoryShimmer();
+        return _buildCategoryShimmer(isDarkMode);
       },
     );
   }
 
-  Widget _buildCategoryShimmer() {
+  Widget _buildCategoryShimmer(bool isDarkMode) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: isDarkMode ? const Color(0xFF424242) : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
@@ -312,7 +330,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: isDarkMode ? Colors.grey[600] : Colors.grey[200],
                 shape: BoxShape.circle,
               ),
             ),
@@ -320,13 +338,13 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
             Container(
               width: 50,
               height: 10,
-              color: Colors.grey[200],
+              color: isDarkMode ? Colors.grey[600] : Colors.grey[200],
             ),
             SizedBox(height: 4),
             Container(
               width: 35,
               height: 8,
-              color: Colors.grey[200],
+              color: isDarkMode ? Colors.grey[600] : Colors.grey[200],
             ),
           ],
         ),
@@ -335,7 +353,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   }
 
   // Category Card - NOW TRIGGERS SEARCH BY CATEGORY NAME
-  Widget _buildCategoryCard(Categories category) {
+  Widget _buildCategoryCard(Categories category, bool isDarkMode) {
     return GestureDetector(
       onTap: () => _performSearch(category.name), // Search by category name
       child: Container(
@@ -346,16 +364,18 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
             maxHeight: 120,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
                 blurRadius: 6,
                 offset: Offset(0, 2),
               ),
             ],
-            border: Border.all(color: Colors.grey[100]!),
+            border: Border.all(
+              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[100]!
+            ),
           ),
           child: Padding(
             padding: const EdgeInsets.all(8),
@@ -382,7 +402,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 2,
@@ -393,7 +413,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                 Text(
                   '${_getCategoryCount(category.name)} items',
                   style: TextStyle(
-                    color: Colors.grey[500],
+                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
                     fontSize: 10,
                   ),
                   maxLines: 1,
@@ -466,7 +486,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     }
   }
 
-  Widget _buildSearchResults(List<SearchItem> results) {
+  Widget _buildSearchResults(List<SearchItem> results, bool isDarkMode) {
     return Column(
       children: [
         Padding(
@@ -479,14 +499,14 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
+                  color: isDarkMode ? Colors.white70 : Colors.grey[700],
                 ),
               ),
               Text(
                 'for "${_searchController.text}"',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
                 ),
               ),
             ],
@@ -503,7 +523,10 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
             ),
             itemCount: results.length,
             itemBuilder: (context, index) {
-              return _SearchResultItemWidget(searchItem: results[index]);
+              return _SearchResultItemWidget(
+                searchItem: results[index],
+                isDarkMode: isDarkMode,
+              );
             },
           ),
         ),
@@ -511,7 +534,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -523,7 +546,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           Text(
             'Searching...',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 16,
             ),
           ),
@@ -532,17 +555,21 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     );
   }
 
-  Widget _buildErrorState(SearchProvider searchProvider) {
+  Widget _buildErrorState(SearchProvider searchProvider, bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          Icon(
+            Icons.error_outline, 
+            size: 64, 
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[400]
+          ),
           SizedBox(height: 16),
           Text(
             'Search failed',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 16,
               fontWeight: FontWeight.w600,
             ),
@@ -550,7 +577,10 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           SizedBox(height: 8),
           Text(
             searchProvider.errorMessage,
-            style: TextStyle(color: Colors.grey[500], fontSize: 14),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white60 : Colors.grey[500], 
+              fontSize: 14
+            ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
@@ -573,7 +603,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     );
   }
 
-  Widget _buildNoResultsState() {
+  Widget _buildNoResultsState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -581,13 +611,13 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           Icon(
             Icons.search_off_rounded,
             size: 64,
-            color: Colors.grey[300],
+            color: isDarkMode ? Colors.grey[500] : Colors.grey[300],
           ),
           SizedBox(height: 16),
           Text(
             'No results found for "${_searchController.text}"',
             style: TextStyle(
-              color: Colors.grey[600],
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 16,
             ),
             textAlign: TextAlign.center,
@@ -596,7 +626,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           Text(
             'Try different keywords or check spelling',
             style: TextStyle(
-              color: Colors.grey[500],
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
               fontSize: 14,
             ),
           ),
@@ -619,37 +649,43 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, bool isDarkMode) {
     return Text(
       title,
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
-        color: Colors.black87,
+        color: isDarkMode ? Colors.white : Colors.black87,
       ),
     );
   }
 
   // Chip for Recent Searches - WILL TRIGGER SEARCH
-  Widget _buildChip(String text, IconData icon) {
+  Widget _buildChip(String text, IconData icon, bool isDarkMode) {
     return GestureDetector(
       onTap: () => _performSearch(text),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.grey[50],
+          color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey[300]!),
+          border: Border.all(
+            color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: Colors.grey[600]),
+            Icon(
+              icon, 
+              size: 16, 
+              color: isDarkMode ? Colors.white60 : Colors.grey[600]
+            ),
             SizedBox(width: 6),
             Text(
               text,
               style: TextStyle(
-                color: Colors.grey[700],
+                color: isDarkMode ? Colors.white70 : Colors.grey[700],
                 fontSize: 14,
               ),
             ),
@@ -660,14 +696,24 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   }
 
   // Search Suggestion Item for Popular Searches - WILL TRIGGER SEARCH
-  Widget _buildSearchSuggestionItem(String search) {
+  Widget _buildSearchSuggestionItem(String search, bool isDarkMode) {
     return ListTile(
-      leading: Icon(Icons.trending_up_rounded, color: Colors.grey[500], size: 20),
+      leading: Icon(
+        Icons.trending_up_rounded, 
+        color: isDarkMode ? Colors.white60 : Colors.grey[500], 
+        size: 20
+      ),
       title: Text(
         search,
-        style: TextStyle(color: Colors.grey[700]),
+        style: TextStyle(
+          color: isDarkMode ? Colors.white70 : Colors.grey[700]
+        ),
       ),
-      trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey[400]),
+      trailing: Icon(
+        Icons.arrow_forward_ios_rounded, 
+        size: 16, 
+        color: isDarkMode ? Colors.white60 : Colors.grey[400]
+      ),
       onTap: () => _performSearch(search),
       contentPadding: EdgeInsets.symmetric(horizontal: 4),
     );
@@ -676,8 +722,12 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
 
 class _SearchResultItemWidget extends StatelessWidget {
   final SearchItem searchItem;
+  final bool isDarkMode;
 
-  const _SearchResultItemWidget({required this.searchItem});
+  const _SearchResultItemWidget({
+    required this.searchItem,
+    required this.isDarkMode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -698,11 +748,11 @@ class _SearchResultItemWidget extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.12),
               blurRadius: 6,
               offset: Offset(0, 2),
             ),
@@ -718,7 +768,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: Colors.grey[100],
+                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey[100],
                     child: _buildSearchItemImage(firstImage),
                   ),
                 ),
@@ -753,7 +803,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -775,7 +825,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                           searchItem.year!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: isDarkMode ? Colors.white60 : Colors.grey[600],
                           ),
                         ),
                     ],
@@ -787,13 +837,17 @@ class _SearchResultItemWidget extends StatelessWidget {
                       if (searchItem.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: Colors.grey[600]),
+                            Icon(
+                              Icons.settings, 
+                              size: 14, 
+                              color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                            ),
                             SizedBox(width: 4),
                             Text(
                               searchItem.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -801,13 +855,17 @@ class _SearchResultItemWidget extends StatelessWidget {
                       if (searchItem.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                            Icon(
+                              Icons.speed, 
+                              size: 14, 
+                              color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                            ),
                             SizedBox(width: 4),
                             Text(
                               "${_formatMileage(searchItem.mileage!)} km",
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey[600],
+                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -818,14 +876,18 @@ class _SearchResultItemWidget extends StatelessWidget {
                   if (searchItem.location != null)
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                        Icon(
+                          Icons.location_on, 
+                          size: 14, 
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                        ),
                         SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             searchItem.location!,
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey[600],
+                              color: isDarkMode ? Colors.white60 : Colors.grey[600],
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -869,18 +931,22 @@ class _SearchResultItemWidget extends StatelessWidget {
 
   Widget _buildImageErrorPlaceholder() {
     return Container(
-      color: Colors.grey[200],
+      color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: Colors.grey[400]),
+            Icon(
+              Icons.image_not_supported, 
+              size: 32, 
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[400]
+            ),
             SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: Colors.grey[500],
+                color: isDarkMode ? Colors.white60 : Colors.grey[500],
               ),
             ),
           ],

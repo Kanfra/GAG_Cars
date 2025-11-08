@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/sizeGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/GetVerifiedService/getVerifiedService.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:edge_detection/edge_detection.dart';
@@ -100,45 +99,88 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     }
   }
 
-  // ================== NATIONAL ID CAPTURE ==================
+  // ================== NATIONAL ID CAPTURE WITH FRAME VALIDATION ==================
   Future<void> _captureNationalId(bool isFront) async {
     try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        preferredCameraDevice: CameraDevice.rear,
-      );
-      if (image == null) return;
-
+      // Use edge detection for document scanning with frame guidance
       final tempDir = await getTemporaryDirectory();
-      final outputPath =
-          "${tempDir.path}/id_${isFront ? 'front' : 'back'}_${DateTime.now().millisecondsSinceEpoch}.jpg";
+      final outputPath = "${tempDir.path}/id_${isFront ? 'front' : 'back'}_${DateTime.now().millisecondsSinceEpoch}.jpg";
 
-      final success = await EdgeDetection.detectEdge(outputPath);
-      if (success) {
-        setState(() {
-          if (isFront) {
-            _nationalIdFront = File(outputPath);
-            _isFrontCaptured = true;
-          } else {
-            _nationalIdBack = File(outputPath);
-            _isBackCaptured = true;
-          }
-        });
-        
+      bool? success = await EdgeDetection.detectEdge(
+        outputPath,
+        canUseGallery: false,
+        androidScanTitle: 'Scan ID Card - ${isFront ? 'Front' : 'Back'} Side',
+        androidCropTitle: 'Crop',
+        androidCropBlackWhiteTitle: 'Black & White',
+        androidCropReset: 'Reset',
+      );
+
+      if (success != true) {
+        // User cancelled or error occurred
+        return;
+      }
+
+      // Validate the captured image
+      bool isValid = await _validateDocumentCapture(File(outputPath));
+      
+      if (!isValid) {
         showCustomSnackBar(
-          title: "Success",
-          message: "ID ${isFront ? 'front' : 'back'} captured successfully.",
-          backgroundColor: Colors.green,
+          title: "Invalid Capture",
+          message: "Please ensure the entire ID card is clearly visible within the frame.",
+          backgroundColor: Colors.orange,
           textColor: Colors.white,
         );
+        return;
       }
+
+      setState(() {
+        if (isFront) {
+          _nationalIdFront = File(outputPath);
+          _isFrontCaptured = true;
+        } else {
+          _nationalIdBack = File(outputPath);
+          _isBackCaptured = true;
+        }
+      });
+      
+      showCustomSnackBar(
+        title: "Success",
+        message: "ID ${isFront ? 'front' : 'back'} captured successfully!",
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
     } catch (e) {
       showCustomSnackBar(
         title: "Error",
-        message: "Failed to capture ID: $e",
+        message: "Failed to capture ID: ${e.toString()}",
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
+    }
+  }
+
+  // ================== DOCUMENT VALIDATION ==================
+  Future<bool> _validateDocumentCapture(File imageFile) async {
+    try {
+      // Basic file validation
+      if (!await imageFile.exists()) {
+        return false;
+      }
+
+      // Check file size (minimum 50KB to ensure quality)
+      final fileStat = await imageFile.stat();
+      if (fileStat.size < 50 * 1024) {
+        return false;
+      }
+
+      // You can add more sophisticated validation here:
+      // - Check image dimensions
+      // - Use ML Kit to detect document boundaries
+      // - Verify image clarity/sharpness
+      
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -215,7 +257,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isCaptured ? "Successfully Captured!" : "Tap to Capture",
+                  isCaptured ? "Successfully Captured!" : "Tap to Scan",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -224,13 +266,45 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  isCaptured ? "Ready for verification" : "Take a clear photo",
+                  isCaptured ? "Ready for verification" : "Scan with frame guide",
                   style: TextStyle(
                     fontSize: 14,
                     color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                   ),
                   textAlign: TextAlign.center,
                 ),
+                if (!isCaptured) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: (accentColor ?? ColorGlobalVariables.brownColor).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: (accentColor ?? ColorGlobalVariables.brownColor).withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 14,
+                          color: accentColor ?? ColorGlobalVariables.brownColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "Frame guidance included",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: accentColor ?? ColorGlobalVariables.brownColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -279,7 +353,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
               label: Text(
-                "Retake",
+                "Rescan",
                 style: TextStyle(
                   color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 ),
@@ -341,7 +415,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
           textColor: Colors.white,
         );
 
-        // FIXED: Navigate back to Settings page within bottom navigation
+        // Navigate back to Settings page within bottom navigation
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
             _navigateBackToSettings();
@@ -368,9 +442,9 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     }
   }
 
-  // ================== FIXED NAVIGATION ==================
+  // ================== NAVIGATION ==================
   void _navigateBackToSettings() {
-    // Option 1: Navigate back to Settings page (index 4 in bottom nav)
+    // Navigate back to Settings page (index 4 in bottom nav)
     // This will return to the Settings page within the bottom navigation
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
@@ -532,7 +606,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 // National ID Front
                 _buildDocumentSection(
                   title: "2. National ID (Front Side)",
-                  description: "Capture the front side of your government-issued ID card. Make sure all details are clearly visible.",
+                  description: "Scan the front side of your government-issued ID card. Use the frame guide to ensure all details are clearly visible.",
                   icon: Icons.credit_card,
                   isCaptured: _isFrontCaptured,
                   file: _nationalIdFront,
@@ -543,7 +617,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 // National ID Back
                 _buildDocumentSection(
                   title: "3. National ID (Back Side)",
-                  description: "Capture the back side of your government-issued ID card. Ensure all information is readable.",
+                  description: "Scan the back side of your government-issued ID card. Use the frame guide to ensure all information is readable.",
                   icon: Icons.credit_card_outlined,
                   isCaptured: _isBackCaptured,
                   file: _nationalIdBack,
@@ -552,6 +626,54 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 ),
 
                 const SizedBox(height: 24),
+
+                // Scanning Instructions
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.orange.withOpacity(0.1) : Colors.orange.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.tips_and_updates,
+                        color: Colors.orange,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Scanning Tips",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "• Place ID card on a flat surface\n• Ensure good lighting\n• Align card within the frame\n• Keep camera steady\n• Avoid shadows and glare",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
 
                 // Security Notice
                 Container(
@@ -586,7 +708,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // Submit Button - FIXED with proper navigation
+                // Submit Button
                 CustomTextButton(
                   buttonTextType: _isLoading ? "Submitting..." : "Submit Verification",
                   textTypeColor: Colors.white,
@@ -622,4 +744,4 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     _faceDetector?.close();
     super.dispose();
   }
-}
+} 

@@ -26,9 +26,10 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -55,34 +56,32 @@ class _DetailPageState extends State<DetailPage> {
   late int _currentItemCategoryId;
   late String _currentItemId;
   String? _currentUserId;
+  late Map<String, dynamic> user;
+  final logger = Logger();
 
   @override
   void initState() {
     super.initState();
     item = widget.allJson['item'] as Map<String, dynamic>;
     product = widget.allJson['product'] as Map<String, dynamic>;
+    logger.e('This is the user: ${product?['user']}');
+
     type = widget.allJson['type'] as String?;
     
     _currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']) ?? 0;
     _currentItemId = item['id']?.toString() ?? '';
     
-    // FIXED: Correctly extract user ID from the user map
-    final user = item['user'];
-    if (user is Map<String, dynamic>) {
-      _currentUserId = user['id']?.toString();
-    } else {
-      // Fallback: try to access as object if it's not a map
-      try {
-        _currentUserId = user.id?.toString();
-      } catch (e) {
-        _currentUserId = null;
-      }
-    }
+    // Handle user object properly
+    final dynamic userObj = item['user'];
+    user = _convertUserToMap(userObj);
     
-    final logger = Logger();
+    logger.e('Posted User is: $user');
+    
+    // Extract user ID safely
+    _currentUserId = _extractUserId(userObj)?.toString();
+    
     logger.w('🔍 [DETAIL PAGE] Extracted user ID: $_currentUserId');
     logger.w('🔍 [DETAIL PAGE] Item user data: $user');
-    logger.w('🔍 [DETAIL PAGE] Full item data: $item');
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadCategoryDetails();
@@ -91,6 +90,144 @@ class _DetailPageState extends State<DetailPage> {
     });
     
     _scrollController.addListener(_onScroll);
+  }
+
+  // Enhanced Helper method to safely convert user object to Map
+  Map<String, dynamic> _convertUserToMap(dynamic userObj) {
+    if (userObj == null) return {};
+    
+    if (userObj is Map<String, dynamic>) {
+      return userObj;
+    }
+    
+    // Handle Freezed object case - use toJson() method first
+    try {
+      if (userObj is dynamic && userObj.toJson != null) {
+        final jsonResult = userObj.toJson();
+        if (jsonResult is Map<String, dynamic>) {
+          logger.w('🔍 [USER CONVERSION] Using toJson() result: $jsonResult');
+          return jsonResult;
+        }
+      }
+    } catch (e) {
+      logger.e('Error using toJson() on user object: $e');
+    }
+    
+    // Fallback to reflection-based approach
+    try {
+      final Map<String, dynamic> result = {};
+      
+      // Try common user properties with both camelCase and snake_case
+      if (_hasProperty(userObj, 'id')) result['id'] = userObj.id;
+      if (_hasProperty(userObj, 'name')) result['name'] = userObj.name;
+      if (_hasProperty(userObj, 'username')) result['username'] = userObj.username;
+      if (_hasProperty(userObj, 'email')) result['email'] = userObj.email;
+      
+      // Handle profile photo with both camelCase and snake_case
+      if (_hasProperty(userObj, 'profilePhoto')) {
+        result['profilePhoto'] = userObj.profilePhoto;
+        result['profile_photo'] = userObj.profilePhoto; // Set both keys
+      }
+      if (_hasProperty(userObj, 'profile_photo')) {
+        result['profile_photo'] = userObj.profile_photo;
+        result['profilePhoto'] = userObj.profile_photo; // Set both keys
+      }
+      
+      // Handle created date with both camelCase and snake_case
+      if (_hasProperty(userObj, 'createdAt')) {
+        result['createdAt'] = userObj.createdAt;
+        result['created_at'] = userObj.createdAt; // Set both keys
+      }
+      if (_hasProperty(userObj, 'created_at')) {
+        result['created_at'] = userObj.created_at;
+        result['createdAt'] = userObj.created_at; // Set both keys
+      }
+      
+      // Handle phone with both camelCase and snake_case
+      if (_hasProperty(userObj, 'phone')) {
+        result['phone'] = userObj.phone;
+        result['phone_number'] = userObj.phone; // Set both keys
+      }
+      if (_hasProperty(userObj, 'phone_number')) {
+        result['phone_number'] = userObj.phone_number;
+        result['phone'] = userObj.phone_number; // Set both keys
+      }
+      
+      logger.w('🔍 [USER CONVERSION] Converted user object: $result');
+      
+      return result;
+    } catch (e) {
+      logger.e('Error converting user object to map: $e');
+      return {};
+    }
+  }
+
+  // Enhanced method to get user created date
+  String? _getUserCreatedAt() {
+    // First try the converted user map which has both keys
+    if (user.containsKey('createdAt') && user['createdAt'] != null) {
+      return user['createdAt']?.toString();
+    }
+    if (user.containsKey('created_at') && user['created_at'] != null) {
+      return user['created_at']?.toString();
+    }
+    
+    // Fallback to direct object access
+    final dynamic userObj = item['user'];
+    if (userObj is Map<String, dynamic>) {
+      return userObj['createdAt']?.toString() ?? userObj['created_at']?.toString();
+    } else {
+      try {
+        return userObj.createdAt?.toString() ?? userObj.created_at?.toString();
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  String? _extractUserId(dynamic userObj) {
+    if (userObj == null) return null;
+    
+    if (userObj is Map<String, dynamic>) {
+      return userObj['id']?.toString();
+    }
+    
+    // Try to access id property on object
+    try {
+      return userObj.id?.toString();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  bool _hasProperty(dynamic obj, String propertyName) {
+    try {
+      final value = _getProperty(obj, propertyName);
+      return value != null;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  dynamic _getProperty(dynamic obj, String propertyName) {
+    try {
+      // Try direct property access for both camelCase and snake_case
+      switch (propertyName) {
+        case 'id': return obj.id;
+        case 'name': return obj.name;
+        case 'username': return obj.username;
+        case 'email': return obj.email;
+        case 'profilePhoto': return obj.profilePhoto;
+        case 'profile_photo': return obj.profile_photo;
+        case 'phone': return obj.phone;
+        case 'phone_number': return obj.phone_number;
+        case 'createdAt': return obj.createdAt;
+        case 'created_at': return obj.created_at;
+        default: return null;
+      }
+    } catch (e) {
+      return null;
+    }
   }
 
   void _onScroll() {
@@ -147,19 +284,14 @@ class _DetailPageState extends State<DetailPage> {
   void _fetchUserDetails() {
     if (!mounted || _currentUserId == null || _currentUserId!.isEmpty) return;
     
-    // Wait until after build to get the provider to ensure we're using the same instance
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userDetailsProvider = Provider.of<UserDetailsProvider>(context, listen: false);
       
       final logger = Logger();
       logger.w('🔍 [DETAIL PAGE FETCH] Fetching details for user ID: $_currentUserId');
-      logger.w('🔍 [DETAIL PAGE FETCH] Provider current user: ${userDetailsProvider.userDetails?.id}');
-      logger.w('🔍 [DETAIL PAGE FETCH] Provider current itemsCount: ${userDetailsProvider.itemsCount}');
       
       if (!userDetailsProvider.hasUserDetails(_currentUserId!)) {
         userDetailsProvider.fetchUserDetails(_currentUserId!);
-      } else {
-        logger.w('🔍 [DETAIL PAGE FETCH] User details already cached for: $_currentUserId');
       }
     });
   }
@@ -186,6 +318,287 @@ class _DetailPageState extends State<DetailPage> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  // ========== ENHANCED BUTTON UI METHODS ==========
+
+  Widget _buildDefaultProfileAvatar({double size = 60}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade400,
+            Colors.purple.shade400,
+          ],
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person,
+          size: size * 0.5,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  // Enhanced User Profile Image with better error handling
+  Widget _buildUserProfileImage() {
+    final dynamic userObj = item['user'];
+    String? profilePhoto;
+    
+    // Try to get profile photo from converted user map first
+    if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
+      profilePhoto = user['profilePhoto'];
+    } else if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
+      profilePhoto = user['profile_photo'];
+    } else {
+      // Fallback to direct access
+      if (userObj is Map<String, dynamic>) {
+        profilePhoto = userObj['profilePhoto'] ?? userObj['profile_photo'];
+      } else {
+        try {
+          profilePhoto = userObj.profilePhoto ?? userObj.profile_photo;
+        } catch (e) {
+          profilePhoto = null;
+        }
+      }
+    }
+    
+    logger.w('🔍 [PROFILE PHOTO] Final profile photo: $profilePhoto');
+    
+    if (profilePhoto != null && profilePhoto.isNotEmpty) {
+      return Container(
+        width: 60,
+        height: 60,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            width: 2,
+          ),
+        ),
+        child: ClipOval(
+          child: _buildSafeImage(
+            getImageUrl(profilePhoto, null),
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    } else {
+      return _buildDefaultProfileAvatar(size: 60);
+    }
+  }
+
+  // Enhanced Chat Button
+  Widget _buildChatButton() {
+    final theme = Theme.of(context);
+    
+    return Expanded(
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              ColorGlobalVariables.redColor.withOpacity(0.9),
+              ColorGlobalVariables.redColor.withOpacity(0.7),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: ColorGlobalVariables.redColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              final userId = _extractUserId(item['user']);
+              final userName = _getUserName();
+              final userProfilePhoto = _getUserProfilePhoto();
+              final userPhone = _getUserPhoneNumber();
+              
+              if (userId != null) {
+                logger.e("User id for detailPage is: $userId");
+                Get.toNamed(
+                  RouteClass.getChatPage(),
+                  arguments: {
+                    'contactId': userId,
+                    'contactName': userName,
+                    'contactImage': userProfilePhoto,
+                    'contactPhone': userPhone,
+                  }
+                );
+              } else {
+                Get.snackbar(
+                  'Error',
+                  'Unable to start chat. Seller information not available.',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Chat',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Enhanced Show Contact Button
+  Widget _buildShowContactButton() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final hasContact = _getUserPhoneNumber() != null;
+    
+    return Expanded(
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _showContactDialog,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withOpacity(0.8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.contact_phone_outlined,
+                      color: hasContact ? ColorGlobalVariables.greenColor : Colors.grey,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Contact',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        hasContact ? 'Show details' : 'No contact',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: hasContact ? 
+                            (isDarkMode ? Colors.green[300] : ColorGlobalVariables.greenColor) : 
+                            (isDarkMode ? Colors.grey[400] : Colors.grey[500]),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ========== EXISTING METHODS (KEEPING ALL FUNCTIONALITY) ==========
+
+  // Phone Call Functionality
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    
+    try {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        Get.snackbar(
+          'Error',
+          'Could not launch phone app',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to make phone call: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
@@ -215,7 +628,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
     final theme = Theme.of(context);
     try {
       if (imagePath.isNotEmpty) {
@@ -268,63 +681,126 @@ class _DetailPageState extends State<DetailPage> {
         return images.whereType<String>().toList();
       }
     } catch (e) {
+      // Fall through to default
     }
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
   }
 
+  // Enhanced User Phone Number getter
   String? _getUserPhoneNumber() {
     try {
-      final user = item['user'];
-      if (user is Map<String, dynamic>) {
-        return user['phoneNumber']?.toString() ?? 
-               user['phone_number']?.toString() ??
-               user['contact']?.toString() ??
-               user['mobile']?.toString();
+      // First try the converted user map
+      if (user.containsKey('phone') && user['phone'] != null) {
+        return user['phone']?.toString();
+      }
+      if (user.containsKey('phone_number') && user['phone_number'] != null) {
+        return user['phone_number']?.toString();
       }
       
-      return item['phoneNumber']?.toString() ?? 
-             item['phone_number']?.toString() ??
-             item['contact']?.toString() ??
-             item['mobile']?.toString();
+      final dynamic userObj = item['user'];
+      
+      // Handle both Map and Object cases
+      if (userObj is Map<String, dynamic>) {
+        return userObj['phone']?.toString() ?? 
+               userObj['phone_number']?.toString() ??
+               userObj['contact']?.toString() ??
+               userObj['mobile']?.toString();
+      } else {
+        // Handle object case
+        try {
+          return userObj.phone?.toString() ?? 
+                 userObj.phone_number?.toString() ??
+                 userObj.contact?.toString() ??
+                 userObj.mobile?.toString();
+        } catch (e) {
+          // Fall back to item properties
+          return item['phone']?.toString() ?? 
+                 item['phone_number']?.toString() ??
+                 item['contact']?.toString() ??
+                 item['mobile']?.toString();
+        }
+      }
     } catch (e) {
       return null;
     }
   }
 
+  // Enhanced User Profile Photo getter
+  String? _getUserProfilePhoto() {
+    // First try the converted user map
+    if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
+      return user['profilePhoto'];
+    }
+    if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
+      return user['profile_photo'];
+    }
+    
+    final dynamic userObj = item['user'];
+    if (userObj is Map<String, dynamic>) {
+      return userObj['profilePhoto'] ?? userObj['profile_photo'];
+    } else {
+      try {
+        return userObj.profilePhoto ?? userObj.profile_photo;
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  // Enhanced User Name getter
   String _getUserName() {
+    // First try the converted user map
+    if (user.containsKey('name') && user['name'] != null) {
+      return user['name']!.toString();
+    }
+    if (user.containsKey('username') && user['username'] != null) {
+      return user['username']!.toString();
+    }
+    
     try {
-      final user = item['user'];
-      if (user is Map<String, dynamic>) {
-        return user['name']?.toString() ?? 
-               user['username']?.toString() ??
+      final dynamic userObj = item['user'];
+      if (userObj is Map<String, dynamic>) {
+        return userObj['name']?.toString() ?? 
+               userObj['username']?.toString() ??
                'Seller';
       }
-      return 'Seller';
+      
+      // Handle object case
+      try {
+        return userObj.name?.toString() ?? 
+               userObj.username?.toString() ??
+               'Seller';
+      } catch (e) {
+        return 'Seller';
+      }
     } catch (e) {
       return 'Seller';
     }
   }
 
+  // Enhanced Contact Dialog with Call Functionality
   void _showContactDialog() {
     final phoneNumber = _getUserPhoneNumber();
     final userName = _getUserName();
     final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: theme.cardColor,
-          surfaceTintColor: theme.cardColor,
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Padding(
+          child: Container(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Header
                 Row(
                   children: [
                     Container(
@@ -347,7 +823,7 @@ class _DetailPageState extends State<DetailPage> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: theme.textTheme.titleLarge?.color,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                     ),
@@ -356,52 +832,58 @@ class _DetailPageState extends State<DetailPage> {
                 
                 const SizedBox(height: 20),
                 
+                // Seller name
                 Text(
                   "Seller: $userName",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: theme.textTheme.titleLarge?.color,
+                    color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
                 
                 const SizedBox(height: 16),
                 
+                // Phone number
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
-                  Text(
-                    "Phone Number:",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.textTheme.bodyMedium?.color,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: theme.dividerColor),
-                    ),
-                    child: Text(
-                      phoneNumber,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: theme.textTheme.titleLarge?.color,
+                  Column(
+                    children: [
+                      Text(
+                        "Phone Number:",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white70 : Colors.black54,
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "You can call or message this number to contact the seller.",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.textTheme.bodyMedium?.color,
-                    ),
-                    textAlign: TextAlign.center,
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+                        ),
+                        child: Text(
+                          phoneNumber,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "You can call or message this number to contact the seller.",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ] else ...[
                   Column(
@@ -409,95 +891,312 @@ class _DetailPageState extends State<DetailPage> {
                       Icon(
                         Icons.contact_phone_outlined,
                         size: 48,
-                        color: theme.iconTheme.color,
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         "No contact information available",
                         style: TextStyle(
                           fontSize: 16,
-                          color: theme.textTheme.bodyMedium?.color,
+                          color: isDarkMode ? Colors.white70 : Colors.grey[600],
                           fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "The seller hasn't provided contact details",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: theme.textTheme.bodyMedium?.color,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              
-              const SizedBox(height: 24),
-              
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                        side: BorderSide(color: theme.dividerColor),
+                        textAlign: TextAlign.center,
                       ),
-                      child: Text(
-                        "Close",
+                      const SizedBox(height: 8),
+                      Text(
+                        "The seller hasn't provided contact details",
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: theme.textTheme.bodyMedium?.color,
+                          fontSize: 14,
+                          color: isDarkMode ? Colors.white60 : Colors.grey[500],
                         ),
+                        textAlign: TextAlign.center,
                       ),
-                    ),
+                    ],
                   ),
-                  if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
-                    const SizedBox(width: 12),
+                ],
+                
+                const SizedBox(height: 24),
+                
+                // Buttons
+                Row(
+                  children: [
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Get.snackbar(
-                            'Call',
-                            'Calling $phoneNumber',
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          elevation: 0,
+                          side: BorderSide(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
                         ),
-                        child: const Text(
-                          "Call",
+                        child: Text(
+                          "Close",
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w500,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
                           ),
                         ),
                       ),
                     ),
+                    if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _makePhoneCall(phoneNumber);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.phone, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                "Call",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Image Zoom Dialog
+  void _showFullScreenImage(String imageUrl, int imageIndex) {
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: Stack(
+            children: [
+              // Full screen image with zoom capability
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: _buildSafeImage(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              
+              // Close button
+              Positioned(
+                top: 50,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Image counter
+              Positioned(
+                top: 50,
+                left: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${imageIndex + 1}/${getItemImages().length}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ),
             ],
-          ]),
-        ),
-      );
-    },
-  );
-}
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          ),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  // Enhanced Gallery Item with View Button
+  Widget _buildGalleryItem(String image, int index, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
+    return Container(
+      width: 120,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Image container
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                border: Border.all(
+                  color: index == selectedIndex 
+                      ? ColorGlobalVariables.brownColor
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                ),
+                child: Stack(
+                  children: [
+                    _buildSafeImage(
+                      image,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    if (index == selectedIndex)
+                      Container(
+                        color: Colors.black.withOpacity(0.3),
+                        child: const Center(
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // View button section
+          Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Image ${index + 1}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                // View button
+                Container(
+                  height: 28,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showFullScreenImage(image, index);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.visibility, size: 12),
+                        SizedBox(width: 4),
+                        Text(
+                          'View',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _showComingSoonMessage() {
     Get.snackbar(
@@ -609,20 +1308,27 @@ class _DetailPageState extends State<DetailPage> {
       return value?.toString();
     }
     
+    // Handle object case
     try {
       switch (key) {
-        case 'name':
-          return obj.name?.toString();
-        case 'id':
-          return obj.id?.toString();
-        case 'label':
-          return obj.label?.toString();
-        case 'createdAt':
-          return obj.createdAt?.toString();
-        case 'profilePhoto':
-          return obj.profilePhoto?.toString();
-        default:
-          return obj.toString();
+        case 'id': return obj.id?.toString();
+        case 'name': return obj.name?.toString();
+        case 'username': return obj.username?.toString();
+        case 'email': return obj.email?.toString();
+        case 'profilePhoto': return obj.profilePhoto?.toString();
+        case 'profile_photo': return obj.profile_photo?.toString();
+        case 'phoneNumber': return obj.phoneNumber?.toString();
+        case 'phone_number': return obj.phone_number?.toString();
+        case 'createdAt': return obj.createdAt?.toString();
+        case 'created_at': return obj.created_at?.toString();
+        case 'label': return obj.label?.toString();
+        default: 
+          try {
+            final dynamic value = _getProperty(obj, key);
+            return value?.toString();
+          } catch (e) {
+            return obj.toString();
+          }
       }
     } catch (e) {
       return obj.toString();
@@ -763,59 +1469,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Widget _buildDefaultProfileAvatar({double size = 60}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade400,
-            Colors.purple.shade400,
-          ],
-        ),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Icon(
-          Icons.person,
-          size: size * 0.5,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUserProfileImage() {
-    final user = item['user'];
-    final profilePhoto = _safeGetString(user, 'profilePhoto');
-    
-    if (profilePhoto != null && profilePhoto.isNotEmpty) {
-      return CustomImage(
-        imagePath: getImageUrl(profilePhoto, null), 
-        isAssetImage: false,
-        imageBackgroundColor: Colors.transparent,
-        useShimmerEffect: true,
-        imageWidth: 60,
-        imageHeight: 60,
-        imageBorderRadius: 30,
-        fit: BoxFit.cover, 
-        isImageBorderRadiusRequired: true
-      );
-    } else {
-      return _buildDefaultProfileAvatar(size: 60);
-    }
-  }
-
   Widget _buildSimilarItem(SimilarItem similarItem, Size screenSize) {
     return _SimilarItemWidget(
       item: similarItem,
@@ -823,6 +1476,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  // OPTIMIZED: Use SliverGrid instead of GridView.builder for smooth scrolling
   Widget _buildSimilarItemsSection(SimilarItemsProvider similarItemsProvider) {
     final theme = Theme.of(context);
     
@@ -831,55 +1485,45 @@ class _DetailPageState extends State<DetailPage> {
     }
 
     if (similarItemsProvider.items.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40),
-        child: Center(
-          child: Text(
-            'No similar items found',
-            style: TextStyle(
-              color: theme.textTheme.bodyMedium?.color,
-              fontSize: 16,
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40),
+          child: Center(
+            child: Text(
+              'No similar items found',
+              style: TextStyle(
+                color: theme.textTheme.bodyMedium?.color,
+                fontSize: 16,
+              ),
             ),
           ),
         ),
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
-          child: Text(
-            'Similar Items',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: theme.textTheme.titleLarge?.color,
-            ),
-          ),
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.72,
         ),
-        
-        GridView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          itemCount: similarItemsProvider.items.length + (similarItemsProvider.isLoadingMore ? 1 : 0),
-          shrinkWrap: true,
-          primary: false,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.72,
-          ),
-          itemBuilder: (context, index) {
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
             if (index >= similarItemsProvider.items.length) {
               return _buildLoadingMoreGridItem();
             }
             
             final similarItem = similarItemsProvider.items[index];
+            
             return GestureDetector(
               onTap: () {
+                logger.e('🔍 [SIMILAR ITEM TAP] User data: ${similarItem.user?.toJson()}');
+                logger.e('🔍 [SIMILAR ITEM TAP] Profile photo: ${similarItem.user?.profilePhoto}');
+                logger.e('🔍 [SIMILAR ITEM TAP] Created at: ${similarItem.user?.createdAt}');
+                
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => DetailPage(
@@ -895,69 +1539,55 @@ class _DetailPageState extends State<DetailPage> {
               child: _buildSimilarItem(similarItem, MediaQuery.of(context).size),
             );
           },
+          childCount: similarItemsProvider.items.length + (similarItemsProvider.isLoadingMore ? 1 : 0),
         ),
-        
-        if (similarItemsProvider.isLoadingMore)
-          _buildLoadingMoreIndicator(),
-        
-        if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Center(
-              child: Text(
-                'No more similar items',
-                style: TextStyle(
-                  color: theme.textTheme.bodyMedium?.color,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-      ],
+      ),
     );
   }
 
   Widget _buildSimilarItemsShimmer() {
     final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-          child: Text(
-            'Similar Items',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: theme.textTheme.titleLarge?.color,
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Text(
+              'Similar Items',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
           ),
-        ),
-        GridView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          itemCount: 4,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 0.72,
-          ),
-          itemBuilder: (context, index) {
-            return Shimmer.fromColors(
-              baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-              highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(16),
+          GridView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: 4,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.72,
+            ),
+            itemBuilder: (context, index) {
+              return Shimmer.fromColors(
+                baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-      ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -987,27 +1617,30 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // FIXED: Build dynamic ads count widget with proper provider instance
   Widget _buildAdsCount() {
     return Consumer<UserDetailsProvider>(
       builder: (context, userDetailsProvider, child) {
         final formattedAdsCount = userDetailsProvider.formattedAdsCount;
-        final userDetails = userDetailsProvider.userDetails;
         
-        // DEBUG: Comprehensive check to verify we're using the same provider
-        final logger = Logger();
-        logger.w('🔍 [UI BUILD] Current adsCount: $formattedAdsCount');
-        logger.w('🔍 [UI BUILD] Provider user ID: ${userDetails?.id}');
-        logger.w('🔍 [UI BUILD] Expected user ID: $_currentUserId');
-        logger.w('🔍 [UI BUILD] User match: ${userDetails?.id == _currentUserId}');
-        
-        return Text(
-          formattedAdsCount.toString(),
-          style: TextStyle(
-            fontSize: 13.0,
-            fontWeight: FontWeight.w600,
-            color: ColorGlobalVariables.greenColor,
-            decoration: TextDecoration.underline,
+        return GestureDetector(
+          onTap: (){
+            Get.toNamed(
+              RouteClass.getAdsPage(),
+              arguments: {
+                'user': user,
+                'phoneNumber': _getUserPhoneNumber(),
+                'type': 'adsPage' 
+              }
+            );
+          },
+          child: Text(
+            formattedAdsCount.toString(),
+            style: TextStyle(
+              fontSize: 13.0,
+              fontWeight: FontWeight.w600,
+              color: ColorGlobalVariables.greenColor,
+              decoration: TextDecoration.underline,
+            ),
           ),
         );
       },
@@ -1025,7 +1658,6 @@ class _DetailPageState extends State<DetailPage> {
     final highlights = getHighlights();
     final specifications = getSpecifications();
 
-    // FIXED: Removed MultiProvider that was creating new UserDetailsProvider instance
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Consumer2<SimilarItemsProvider, UserDetailsProvider>(
@@ -1070,7 +1702,7 @@ class _DetailPageState extends State<DetailPage> {
                     children: [
                       Opacity(
                         opacity: _imageOpacity,
-                        child: buildSafeImage(
+                        child: _buildSafeImage(
                           getImageUrl(currentImage, null),
                           width: double.infinity,
                           height: double.infinity,
@@ -1143,36 +1775,27 @@ class _DetailPageState extends State<DetailPage> {
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12.0,
-                                ),
                               ),
                             ),
                           ),
                         ),
+                      ),
                     ],
                   ),
                 ),
               ),
               
+              // Enhanced Gallery Section with View Buttons
               SliverToBoxAdapter(
                 child: Container(
                   color: theme.scaffoldBackgroundColor,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, bottom: 8),
-                        child: Text(
-                          "Gallery",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: theme.textTheme.titleLarge?.color,
-                          ),
-                        ),
-                      ),
+                      // Gallery with view buttons
                       SizedBox(
-                        height: 80,
+                        height: 140,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: images.length,
@@ -1187,51 +1810,22 @@ class _DetailPageState extends State<DetailPage> {
                                   });
                                 }
                               },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: index == selectedIndex 
-                                        ? ColorGlobalVariables.redColor 
-                                        : Colors.transparent,
-                                    width: 2,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 4,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Stack(
-                                    children: [
-                                      buildSafeImage(
-                                        image,
-                                        width: 100,
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                      ),
-                                      if (index == selectedIndex)
-                                        Container(
-                                          color: Colors.black.withOpacity(0.3),
-                                          child: const Center(
-                                            child: Icon(
-                                              Icons.check_circle,
-                                              color: Colors.white,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              child: _buildGalleryItem(image, index, theme),
                             );
                           },
+                        ),
+                      ),
+                      
+                      // Instructions
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Text(
+                          "Tap image to set as main display • Tap 'View' to see full size",
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            color: theme.textTheme.bodyMedium?.color,
+                            fontStyle: FontStyle.italic,
+                          ),
                         ),
                       ),
                     ],
@@ -1295,18 +1889,6 @@ class _DetailPageState extends State<DetailPage> {
                             
                             const SizedBox(height: 16),
                             
-                            Links(
-                              linkTextType: 'Notify price drops', 
-                              linkTextColor: theme.textTheme.titleLarge?.color ?? ColorGlobalVariables.blackColor, 
-                              isTextSmall: true, 
-                              textDecorationColor: theme.textTheme.titleLarge?.color ?? ColorGlobalVariables.blackColor,
-                              isIconWidgetRequiredAtEnd: false, 
-                              isIconWidgetRequiredAtFront: true, 
-                              iconData: Icons.notifications_outlined,
-                              iconColor: theme.textTheme.titleLarge?.color ?? ColorGlobalVariables.blackColor,
-                              onClickFunction: _showComingSoonMessage,
-                            ),
-                            
                             const SizedBox(height: 20),
                             Wrap(
                               spacing: 8,
@@ -1364,7 +1946,7 @@ class _DetailPageState extends State<DetailPage> {
                                       Row(
                                         children: [
                                           Text(
-                                            item["user"] == null ? "User name" : _safeGetString(item["user"], 'name') ?? "User name",
+                                            _getUserName(),
                                             style: TextStyle(
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.bold,
@@ -1383,62 +1965,81 @@ class _DetailPageState extends State<DetailPage> {
                                             ),
                                         ],
                                       ),
-                                        const SizedBox(height: 6),
-                                        // date
-                                    Text(
-                                      item["user"] == null ? "No date" : "Joined: ${formatTimeAgo(_safeGetString(item['user'], 'createdAt') ?? '')}",
-                                      style: TextStyle(
-                                        fontSize: 13.0,
-                                        color: theme.textTheme.bodyMedium?.color,
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        "Joined: ${formatTimeAgo(_getUserCreatedAt() ?? '')}",
+                                        style: TextStyle(
+                                          fontSize: 13.0,
+                                          color: theme.textTheme.bodyMedium?.color,
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    // FIXED: DYNAMIC ADS COUNT - Now using the same provider instance
-                                    _buildAdsCount(),
-                                  ],
+                                      const SizedBox(height: 4),
+                                      _buildAdsCount(),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                          ]),
+                              ],
+                            ),
                             const SizedBox(height: 16),
+                            
+                            // ENHANCED ACTION BUTTONS SECTION
                             Row(
                               children: [
-                                Expanded(
-                                  child: CustomTextButton(
-                                    buttonTextType: 'Chat', 
-                                    textTypeColor: ColorGlobalVariables.redColor, 
-                                    borderColor: theme.dividerColor,
-                                    isFullButtonWidthRequired: false, 
-                                    buttonBackgroundColor: Colors.transparent, 
-                                    onClickFunction: (){
-                                      Get.toNamed(
-                                        RouteClass.getChatPage()
-                                      );
-                                    }
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: CustomTextButton(
-                                    buttonTextType: 'Show contact', 
-                                    borderColor: theme.dividerColor,
-                                    textTypeColor: ColorGlobalVariables.redColor, 
-                                    isFullButtonWidthRequired: false, 
-                                    buttonBackgroundColor: Colors.transparent, 
-                                    onClickFunction: _showContactDialog
-                                  ),
-                                )
+                                _buildChatButton(),
+                                const SizedBox(width: 16),
+                                _buildShowContactButton(),
                               ],
                             ),
                           ],
                         ),
                       ),
                       
-                      _buildSimilarItemsSection(similarItemsProvider),
-                      
-                      const SizedBox(height: 40),
+                      // Similar Items Title
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
+                        child: Text(
+                          'Similar Items',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
+              ),
+              
+              // OPTIMIZED: Use SliverGrid for similar items instead of GridView.builder
+              _buildSimilarItemsSection(similarItemsProvider),
+              
+              // Loading more indicator
+              if (similarItemsProvider.isLoadingMore)
+                SliverToBoxAdapter(
+                  child: _buildLoadingMoreIndicator(),
+                ),
+              
+              // No more items indicator
+              if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(
+                        'No more similar items',
+                        style: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              
+              // Bottom padding
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 40),
               ),
             ],
           );
@@ -1448,6 +2049,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 }
 
+// Keep the existing _SimilarItemWidget class exactly as it is
 class _SimilarItemWidget extends StatefulWidget {
   final SimilarItem item;
   final Size screenSize;
@@ -1714,11 +2316,12 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                                   );
                                 },
                               ),
+                      ),
                     ),
                   ),
                 ),
               ),
-          )],
+            ],
           ),
     
           Padding(
@@ -1878,7 +2481,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
             Text(
               'No Image',
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 10, 
                 color: theme.textTheme.bodySmall?.color,
               ),
             ),

@@ -20,6 +20,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$UserModel {
+  String? get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String? get password => throw _privateConstructorUsedError;
@@ -30,11 +31,9 @@ mixin _$UserModel {
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'country_id')
-  int? get countryId =>
-      throw _privateConstructorUsedError; // Changed from String? to int?
+  int? get countryId => throw _privateConstructorUsedError;
   @JsonKey(name: 'state_id')
-  int? get stateId =>
-      throw _privateConstructorUsedError; // Also changed this to int? since it's likely the same type
+  int? get stateId => throw _privateConstructorUsedError;
   @JsonKey(name: 'profile_photo')
   String? get profileImage => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
@@ -53,8 +52,6 @@ mixin _$UserModel {
   int? get darkMode => throw _privateConstructorUsedError;
   @JsonKey(name: 'messenger_color')
   String? get messengerColor => throw _privateConstructorUsedError;
-  @JsonKey(includeFromJson: true, includeToJson: false)
-  String? get id => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -72,7 +69,8 @@ abstract class $UserModelCopyWith<$Res> {
       _$UserModelCopyWithImpl<$Res, UserModel>;
   @useResult
   $Res call(
-      {String name,
+      {String? id,
+      String name,
       String email,
       String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
@@ -88,8 +86,7 @@ abstract class $UserModelCopyWith<$Res> {
       @JsonKey(name: 'active_status') int? activeStatus,
       @JsonKey(name: 'avatar') String? avatar,
       @JsonKey(name: 'dark_mode') int? darkMode,
-      @JsonKey(name: 'messenger_color') String? messengerColor,
-      @JsonKey(includeFromJson: true, includeToJson: false) String? id});
+      @JsonKey(name: 'messenger_color') String? messengerColor});
 }
 
 /// @nodoc
@@ -107,6 +104,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? name = null,
     Object? email = null,
     Object? password = freezed,
@@ -124,9 +122,12 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? avatar = freezed,
     Object? darkMode = freezed,
     Object? messengerColor = freezed,
-    Object? id = freezed,
   }) {
     return _then(_value.copyWith(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -195,10 +196,6 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.messengerColor
           : messengerColor // ignore: cast_nullable_to_non_nullable
               as String?,
-      id: freezed == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String?,
     ) as $Val);
   }
 }
@@ -212,7 +209,8 @@ abstract class _$$UserModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String name,
+      {String? id,
+      String name,
       String email,
       String? password,
       @JsonKey(name: 'phone') String? phoneNumber,
@@ -228,8 +226,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       @JsonKey(name: 'active_status') int? activeStatus,
       @JsonKey(name: 'avatar') String? avatar,
       @JsonKey(name: 'dark_mode') int? darkMode,
-      @JsonKey(name: 'messenger_color') String? messengerColor,
-      @JsonKey(includeFromJson: true, includeToJson: false) String? id});
+      @JsonKey(name: 'messenger_color') String? messengerColor});
 }
 
 /// @nodoc
@@ -245,6 +242,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = freezed,
     Object? name = null,
     Object? email = null,
     Object? password = freezed,
@@ -262,9 +260,12 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? avatar = freezed,
     Object? darkMode = freezed,
     Object? messengerColor = freezed,
-    Object? id = freezed,
   }) {
     return _then(_$UserModelImpl(
+      id: freezed == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -333,10 +334,6 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.messengerColor
           : messengerColor // ignore: cast_nullable_to_non_nullable
               as String?,
-      id: freezed == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String?,
     ));
   }
 }
@@ -346,7 +343,8 @@ class __$$UserModelImplCopyWithImpl<$Res>
 @JsonSerializable(explicitToJson: true)
 class _$UserModelImpl extends _UserModel {
   const _$UserModelImpl(
-      {required this.name,
+      {this.id,
+      required this.name,
       required this.email,
       this.password,
       @JsonKey(name: 'phone') this.phoneNumber,
@@ -362,13 +360,14 @@ class _$UserModelImpl extends _UserModel {
       @JsonKey(name: 'active_status') this.activeStatus,
       @JsonKey(name: 'avatar') this.avatar,
       @JsonKey(name: 'dark_mode') this.darkMode,
-      @JsonKey(name: 'messenger_color') this.messengerColor,
-      @JsonKey(includeFromJson: true, includeToJson: false) this.id})
+      @JsonKey(name: 'messenger_color') this.messengerColor})
       : super._();
 
   factory _$UserModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserModelImplFromJson(json);
 
+  @override
+  final String? id;
   @override
   final String name;
   @override
@@ -387,11 +386,9 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey(name: 'country_id')
   final int? countryId;
-// Changed from String? to int?
   @override
   @JsonKey(name: 'state_id')
   final int? stateId;
-// Also changed this to int? since it's likely the same type
   @override
   @JsonKey(name: 'profile_photo')
   final String? profileImage;
@@ -419,13 +416,10 @@ class _$UserModelImpl extends _UserModel {
   @override
   @JsonKey(name: 'messenger_color')
   final String? messengerColor;
-  @override
-  @JsonKey(includeFromJson: true, includeToJson: false)
-  final String? id;
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, paidSeller: $paidSeller, emailVerifiedAt: $emailVerifiedAt, countryId: $countryId, stateId: $stateId, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, uploadsLeft: $uploadsLeft, activeStatus: $activeStatus, avatar: $avatar, darkMode: $darkMode, messengerColor: $messengerColor, id: $id)';
+    return 'UserModel(id: $id, name: $name, email: $email, password: $password, phoneNumber: $phoneNumber, paidSeller: $paidSeller, emailVerifiedAt: $emailVerifiedAt, countryId: $countryId, stateId: $stateId, profileImage: $profileImage, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt, uploadsLeft: $uploadsLeft, activeStatus: $activeStatus, avatar: $avatar, darkMode: $darkMode, messengerColor: $messengerColor)';
   }
 
   @override
@@ -433,6 +427,7 @@ class _$UserModelImpl extends _UserModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.password, password) ||
@@ -462,14 +457,14 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.darkMode, darkMode) ||
                 other.darkMode == darkMode) &&
             (identical(other.messengerColor, messengerColor) ||
-                other.messengerColor == messengerColor) &&
-            (identical(other.id, id) || other.id == id));
+                other.messengerColor == messengerColor));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
       runtimeType,
+      id,
       name,
       email,
       password,
@@ -486,8 +481,7 @@ class _$UserModelImpl extends _UserModel {
       activeStatus,
       avatar,
       darkMode,
-      messengerColor,
-      id);
+      messengerColor);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -507,30 +501,32 @@ class _$UserModelImpl extends _UserModel {
 
 abstract class _UserModel extends UserModel {
   const factory _UserModel(
-      {required final String name,
-      required final String email,
-      final String? password,
-      @JsonKey(name: 'phone') final String? phoneNumber,
-      @JsonKey(name: 'paid_seller') final int? paidSeller,
-      @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
-      @JsonKey(name: 'country_id') final int? countryId,
-      @JsonKey(name: 'state_id') final int? stateId,
-      @JsonKey(name: 'profile_photo') final String? profileImage,
-      @JsonKey(name: 'created_at') final DateTime? createdAt,
-      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
-      @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
-      @JsonKey(name: 'uploads_left') final int? uploadsLeft,
-      @JsonKey(name: 'active_status') final int? activeStatus,
-      @JsonKey(name: 'avatar') final String? avatar,
-      @JsonKey(name: 'dark_mode') final int? darkMode,
-      @JsonKey(name: 'messenger_color') final String? messengerColor,
-      @JsonKey(includeFromJson: true, includeToJson: false)
-      final String? id}) = _$UserModelImpl;
+          {final String? id,
+          required final String name,
+          required final String email,
+          final String? password,
+          @JsonKey(name: 'phone') final String? phoneNumber,
+          @JsonKey(name: 'paid_seller') final int? paidSeller,
+          @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
+          @JsonKey(name: 'country_id') final int? countryId,
+          @JsonKey(name: 'state_id') final int? stateId,
+          @JsonKey(name: 'profile_photo') final String? profileImage,
+          @JsonKey(name: 'created_at') final DateTime? createdAt,
+          @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+          @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
+          @JsonKey(name: 'uploads_left') final int? uploadsLeft,
+          @JsonKey(name: 'active_status') final int? activeStatus,
+          @JsonKey(name: 'avatar') final String? avatar,
+          @JsonKey(name: 'dark_mode') final int? darkMode,
+          @JsonKey(name: 'messenger_color') final String? messengerColor}) =
+      _$UserModelImpl;
   const _UserModel._() : super._();
 
   factory _UserModel.fromJson(Map<String, dynamic> json) =
       _$UserModelImpl.fromJson;
 
+  @override
+  String? get id;
   @override
   String get name;
   @override
@@ -548,10 +544,10 @@ abstract class _UserModel extends UserModel {
   DateTime? get emailVerifiedAt;
   @override
   @JsonKey(name: 'country_id')
-  int? get countryId; // Changed from String? to int?
+  int? get countryId;
   @override
   @JsonKey(name: 'state_id')
-  int? get stateId; // Also changed this to int? since it's likely the same type
+  int? get stateId;
   @override
   @JsonKey(name: 'profile_photo')
   String? get profileImage;
@@ -579,9 +575,6 @@ abstract class _UserModel extends UserModel {
   @override
   @JsonKey(name: 'messenger_color')
   String? get messengerColor;
-  @override
-  @JsonKey(includeFromJson: true, includeToJson: false)
-  String? get id;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.

@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:logger/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:get/get.dart'; // Add GetX for navigation
-
-// Add your chat page import here
-// import 'package:gag_cars_frontend/Pages/ChatPages/chat_page.dart';
+import 'package:get/get.dart';
 
 class ContactUsService {
   // Configuration - Replace these with your actual details
-  static const String _customerServicePhone = '+233552058759';
+  static const String _customerServicePhone = '+233530183887';
+  static const String _customerServiceName = 'Gag Cars Customer Service';
   static const String _whatsappNumber = '233530183887';
   static const String _websiteUrl = 'https://www.gagcars.com';
-  static const String _facebookPageId = 'gagcars'; // Or numeric ID
+  static const String _facebookPageId = 'gagcars';
   static const String _twitterHandle = 'gagcars';
   static const String _instagramUsername = 'gagcars';
 
@@ -24,7 +20,7 @@ class ContactUsService {
       title: 'Customer Service',
       icon: Icons.headset_mic_outlined,
       color: Colors.blue,
-      action: navigateToChatPage, // Changed to navigation function
+      action: makeCustomerServiceCall,
     ),
     ContactOption(
       title: 'WhatsApp',
@@ -58,49 +54,67 @@ class ContactUsService {
     ),
   ];
 
-  // Navigation function to chat page
-  static Future<void> navigateToChatPage(BuildContext context) async {
+  // Make a call to customer service - opens phone dialer with number pre-filled
+  static Future<void> makeCustomerServiceCall(BuildContext context) async {
+    final logger = Logger();
+    
+    logger.i('Make customer service call button pressed for phone: $_customerServicePhone');
+    
+    if (_customerServicePhone.isEmpty) {
+      _showError(context, 'Customer service phone number not available');
+      return;
+    }
+
+    // Clean the phone number - remove any non-digit characters except +
+    final cleanPhoneNumber = _customerServicePhone.replaceAll(RegExp(r'[^\d+]'), '');
+    
+    if (cleanPhoneNumber.isEmpty) {
+      _showError(context, 'Invalid customer service phone number format');
+      return;
+    }
+
+    final phoneUrl = 'tel:$cleanPhoneNumber';
+    
     try {
-      // Option 1: Using GetX navigation (if you're using GetX)
-      Get.offAllNamed(
-        RouteClass.getChatPage()
-      ); // Uncomment and replace with your actual chat page
+      logger.i('Launching phone dialer with URL: $phoneUrl');
       
-      // Option 2: Using Navigator (standard Flutter)
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => ChatPage()),
-      // );
-      
-      // Option 3: Using named routes (if you have routes set up)
-      // Get.toNamed('/chat-page');
-      // or
-      // Navigator.pushNamed(context, '/chat-page');
-      
-      // For now, showing a placeholder message
-      _showInfo(context, 'Opening customer service chat...');
-      
-      // TODO: Replace the above line with your actual navigation code
-      print('Navigate to chat page - Implement your navigation logic here');
-      
+      if (await canLaunchUrl(Uri.parse(phoneUrl))) {
+        await launchUrl(Uri.parse(phoneUrl));
+        logger.i('Phone dialer launched successfully for customer service');
+        
+        // Show success message
+        _showSuccess(
+          context, 
+          'Opening phone dialer for $_customerServiceName...'
+        );
+      } else {
+        throw 'Could not launch phone dialer';
+      }
     } catch (e) {
-      final logger = Logger();
-      logger.e('Error navigating to chat page', error: e);
-      _showError(context, 'Failed to open chat');
+      logger.e('Error launching phone dialer for customer service: $e');
+      _showError(
+        context, 
+        'Could not make a call. Please check if your device supports phone calls.'
+      );
     }
   }
 
   static Future<void> launchWhatsApp(BuildContext context) async {
     final logger = Logger();
     try {
+      // Clean the phone number for WhatsApp
+      final cleanWhatsapp = _whatsappNumber.replaceAll(RegExp(r'[^\d]'), '');
+      
       // Try both URL formats
-      final url1 = Uri.parse('https://wa.me/$_whatsappNumber');
-      final url2 = Uri.parse('whatsapp://send?phone=$_whatsappNumber');
+      final url1 = Uri.parse('https://wa.me/$cleanWhatsapp');
+      final url2 = Uri.parse('whatsapp://send?phone=$cleanWhatsapp');
       
       if (await canLaunchUrl(url1)) {
         await launchUrl(url1, mode: LaunchMode.externalApplication);
+        _showInfo(context, 'Opening WhatsApp...');
       } else if (await canLaunchUrl(url2)) {
         await launchUrl(url2, mode: LaunchMode.externalApplication);
+        _showInfo(context, 'Opening WhatsApp...');
       } else {
         _showError(context, 'WhatsApp not installed');
       }
@@ -115,12 +129,13 @@ class ContactUsService {
       final url = Uri.parse(_websiteUrl);
       await launchUrl(
         url,
-        mode: LaunchMode.inAppWebView, // Opens in-app browser
+        mode: LaunchMode.inAppWebView,
         webViewConfiguration: const WebViewConfiguration(
           enableJavaScript: true,
           enableDomStorage: true,
         ),
       );
+      _showInfo(context, 'Opening website...');
     } catch (e) {
       _showError(context, 'Could not open website');
     }
@@ -134,8 +149,10 @@ class ContactUsService {
       
       if (await canLaunchUrl(appUrl)) {
         await launchUrl(appUrl);
+        _showInfo(context, 'Opening Facebook...');
       } else {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        _showInfo(context, 'Opening Facebook...');
       }
     } catch (e) {
       _showError(context, 'Could not open Facebook');
@@ -150,8 +167,10 @@ class ContactUsService {
       
       if (await canLaunchUrl(appUrl)) {
         await launchUrl(appUrl);
+        _showInfo(context, 'Opening Twitter...');
       } else {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        _showInfo(context, 'Opening Twitter...');
       }
     } catch (e) {
       _showError(context, 'Could not open Twitter');
@@ -166,12 +185,93 @@ class ContactUsService {
       
       if (await canLaunchUrl(appUrl)) {
         await launchUrl(appUrl);
+        _showInfo(context, 'Opening Instagram...');
       } else {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        _showInfo(context, 'Opening Instagram...');
       }
     } catch (e) {
       _showError(context, 'Could not open Instagram');
     }
+  }
+
+  // Show contact details as fallback (optional - you can remove this if not needed)
+  static void showCustomerServiceDetails(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.headset_mic, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Customer Service'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Contact our customer service team for assistance:',
+              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+            ),
+            SizedBox(height: 16),
+            _buildContactInfoRow(Icons.person, _customerServiceName),
+            _buildContactInfoRow(Icons.phone, _customerServicePhone),
+            SizedBox(height: 12),
+            Text(
+              'Tap the call button below to contact us directly.',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.blue[700],
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              makeCustomerServiceCall(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.phone, size: 16),
+                SizedBox(width: 4),
+                Text('Call Now'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _buildContactInfoRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Colors.grey[600]),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   static void _showError(BuildContext context, String message) {
@@ -179,6 +279,16 @@ class ContactUsService {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  static void _showSuccess(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
         duration: const Duration(seconds: 3),
       ),
     );

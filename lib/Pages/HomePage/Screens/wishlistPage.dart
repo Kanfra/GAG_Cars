@@ -24,6 +24,7 @@ class WishlistPage extends StatefulWidget {
 class _WishlistPageState extends State<WishlistPage> {
   final ScrollController _scrollController = ScrollController();
   final _scrollThreshold = 100.0;
+  String _viewType = 'grid'; // 'grid' or 'list'
 
   @override
   void initState() {
@@ -51,6 +52,12 @@ class _WishlistPageState extends State<WishlistPage> {
         provider.hasMore) {
       provider.loadMoreWishlist();
     }
+  }
+
+  void _toggleView(String viewType) {
+    setState(() {
+      _viewType = viewType;
+    });
   }
 
   Future<void> _onRefresh() async {
@@ -200,33 +207,43 @@ class _WishlistPageState extends State<WishlistPage> {
   }
 
   Widget _buildViewToggleButtons(ThemeData theme) {
-    final isDarkMode = theme.brightness == Brightness.dark;
-    
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
+        color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          _buildViewButton(Icons.grid_view, true, theme),
-          _buildViewButton(Icons.list, false, theme),
+          // Grid View Button
+          CustomRoundIconButton(
+            iconData: Icons.grid_view,
+            isBorderSlightlyCurved: true,
+            onIconButtonClickFunction: () => _toggleView('grid'),
+            buttonSize: 36,
+            iconSize: 16,
+            backgroundColor: _viewType == 'grid' 
+                ? ColorGlobalVariables.brownColor 
+                : theme.cardColor,
+            iconDataColor: _viewType == 'grid' 
+                ? Colors.white 
+                : theme.iconTheme.color,
+          ),
+          SizedBox(width: 4),
+          // List View Button
+          CustomRoundIconButton(
+            iconData: Icons.list,
+            isBorderSlightlyCurved: true,
+            onIconButtonClickFunction: () => _toggleView('list'),
+            buttonSize: 36,
+            iconSize: 16,
+            backgroundColor: _viewType == 'list' 
+                ? ColorGlobalVariables.brownColor 
+                : theme.cardColor,
+            iconDataColor: _viewType == 'list' 
+                ? Colors.white 
+                : theme.iconTheme.color,
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildViewButton(IconData icon, bool isActive, ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: isActive ? ColorGlobalVariables.brownColor : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Icon(
-        icon,
-        size: 18,
-        color: isActive ? Colors.white : theme.iconTheme.color,
       ),
     );
   }
@@ -415,7 +432,15 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverPadding _buildContentSliver(WishlistFetchProvider provider, ThemeData theme) {
+  Widget _buildContentSliver(WishlistFetchProvider provider, ThemeData theme) {
+    if (_viewType == 'grid') {
+      return _buildGridSliver(provider, theme);
+    } else {
+      return _buildListSliver(provider, theme);
+    }
+  }
+
+  SliverPadding _buildGridSliver(WishlistFetchProvider provider, ThemeData theme) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       sliver: SliverGrid(
@@ -428,13 +453,28 @@ class _WishlistPageState extends State<WishlistPage> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final item = provider.wishlistItems[index];
-            return _WishlistItemCard(
+            return _WishlistGridItem(
               item: item,
               index: index,
             );
           },
           childCount: provider.wishlistItems.length,
         ),
+      ),
+    );
+  }
+
+  SliverList _buildListSliver(WishlistFetchProvider provider, ThemeData theme) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final item = provider.wishlistItems[index];
+          return _WishlistListItem(
+            item: item,
+            index: index,
+          );
+        },
+        childCount: provider.wishlistItems.length,
       ),
     );
   }
@@ -498,20 +538,21 @@ class _WishlistPageState extends State<WishlistPage> {
   }
 }
 
-class _WishlistItemCard extends StatefulWidget {
+// Grid View Item Widget
+class _WishlistGridItem extends StatefulWidget {
   final dynamic item;
   final int index;
 
-  const _WishlistItemCard({
+  const _WishlistGridItem({
     required this.item,
     required this.index,
   });
 
   @override
-  State<_WishlistItemCard> createState() => _WishlistItemCardState();
+  State<_WishlistGridItem> createState() => _WishlistGridItemState();
 }
 
-class _WishlistItemCardState extends State<_WishlistItemCard>
+class _WishlistGridItemState extends State<_WishlistGridItem>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -537,13 +578,10 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
     );
   }
 
-  // FIX: Handle both item structures (direct map or nested item)
   dynamic get _itemData {
-    // If item has an 'item' property, use that (nested structure)
     if (widget.item is Map && widget.item.containsKey('item')) {
       return widget.item['item'];
     }
-    // Otherwise use the item directly (flat structure)
     return widget.item;
   }
 
@@ -913,6 +951,533 @@ class _WishlistItemCardState extends State<_WishlistItemCard>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRemoveButton(ThemeData theme) {
+    return Material(
+      color: theme.cardColor,
+      shape: const CircleBorder(),
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        onTap: _isRemoving ? null : _removeItem,
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: _isRemoving
+              ? Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+                  ),
+                )
+              : Icon(
+                  Icons.favorite,
+                  size: 18,
+                  color: ColorGlobalVariables.redColor,
+                ),
+        ),
+      ),
+    );
+  }
+
+  // Helper methods to safely access item properties
+  String _getImageUrl() {
+    try {
+      if (_itemData is Map) {
+        final images = _itemData['images'] as List?;
+        final firstImage = images?.isNotEmpty == true ? images!.first : null;
+        return getImageUrl(firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+      }
+      final images = _itemData?.images;
+      final firstImage = images?.isNotEmpty == true ? images!.first : null;
+      return getImageUrl(firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+    } catch (e) {
+      return getImageUrl("${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+    }
+  }
+
+  String? _getBrandImage() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['brand']?['image'];
+      }
+      return _itemData?.brand?.image;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String _getCategory() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['category']?['name'] ?? _itemData['buildType'] ?? 'Car';
+      }
+      return _itemData?.category?.name ?? _itemData?.buildType ?? 'Car';
+    } catch (e) {
+      return 'Car';
+    }
+  }
+
+  String _getItemName() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['name'] ?? 'Unnamed Vehicle';
+      }
+      return _itemData?.name ?? 'Unnamed Vehicle';
+    } catch (e) {
+      return 'Unnamed Vehicle';
+    }
+  }
+
+  String _getCondition() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['condition'] ?? 'Used';
+      }
+      return _itemData?.condition ?? 'Used';
+    } catch (e) {
+      return 'Used';
+    }
+  }
+
+  String _getFormattedPrice() {
+    try {
+      if (_itemData is Map) {
+        final price = _itemData['price'] ?? '0';
+        return formatNumber(shortenerRequired: true, number: int.parse(price));
+      }
+      final price = _itemData?.price ?? '0';
+      return formatNumber(shortenerRequired: true, number: int.parse(price));
+    } catch (e) {
+      return '0';
+    }
+  }
+
+  String? _getMileage() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['mileage']?.toString();
+      }
+      return _itemData?.mileage?.toString();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String? _getTransmission() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['transmission'];
+      }
+      return _itemData?.transmission;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String? _getLocation() {
+    try {
+      if (_itemData is Map) {
+        return _itemData['location'];
+      }
+      return _itemData?.location;
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+// List View Item Widget
+class _WishlistListItem extends StatefulWidget {
+  final dynamic item;
+  final int index;
+
+  const _WishlistListItem({
+    required this.item,
+    required this.index,
+  });
+
+  @override
+  State<_WishlistListItem> createState() => _WishlistListItemState();
+}
+
+class _WishlistListItemState extends State<_WishlistListItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+  
+  bool _isRemoving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+    
+    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  dynamic get _itemData {
+    if (widget.item is Map && widget.item.containsKey('item')) {
+      return widget.item['item'];
+    }
+    return widget.item;
+  }
+
+  String get _itemId {
+    if (_itemData is Map) {
+      return _itemData['id']?.toString() ?? '';
+    }
+    return _itemData?.id?.toString() ?? '';
+  }
+
+  Future<void> _removeItem() async {
+    if (_isRemoving) return;
+    
+    setState(() => _isRemoving = true);
+    _animationController.forward();
+
+    try {
+      final toggleProvider = context.read<WishlistToggleProvider>();
+      final fetchProvider = context.read<WishlistFetchProvider>();
+      
+      final success = await toggleProvider.toggleWishlistItem(itemId: _itemId, context: context);
+
+      if (success) {
+        await Future.delayed(const Duration(milliseconds: 300));
+        fetchProvider.removeItem(_itemId);
+        
+        _showRemovalSnackbar();
+      } else {
+        _animationController.reverse();
+        _showErrorSnackbar();
+      }
+    } catch (e) {
+      _animationController.reverse();
+      _showErrorSnackbar(message: 'Error: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isRemoving = false);
+      }
+    }
+  }
+
+  void _showRemovalSnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text('Removed from wishlist'),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar({String message = 'Failed to remove item'}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 8),
+            Text(message),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  void _navigateToDetail() {
+    Get.toNamed(
+      RouteClass.getDetailPage(),
+      arguments: {
+        'product': _itemData is Map ? _itemData : _itemData.toJson(),
+        'item': _itemData is Map ? _itemData : _itemData.toJson(),
+        'type': 'wishlist',
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Opacity(
+            opacity: _opacityAnimation.value,
+            child: child,
+          ),
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        height: 160,
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Image Section
+            Container(
+              width: 160,
+              height: 160,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      color: theme.brightness == Brightness.dark 
+                          ? Colors.grey[800] 
+                          : Colors.grey[100],
+                      child: _buildImage(theme),
+                    ),
+                  ),
+                  
+                  // Remove Button
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: _buildRemoveButton(theme),
+                  ),
+                ],
+              ),
+            ),
+
+            // Content Section
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Header with Title
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _getItemName(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          _getCategory(),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: theme.textTheme.bodyMedium?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Price and Condition
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'GH₵ ${_getFormattedPrice()}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: ColorGlobalVariables.redColor,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: theme.brightness == Brightness.dark 
+                                ? Colors.grey[700] 
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _getCondition(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.textTheme.bodyMedium?.color,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Details Row
+                    Row(
+                      children: [
+                        if (_getMileage() != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
+                                SizedBox(width: 4),
+                                Text(
+                                  "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        if (_getTransmission() != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
+                                SizedBox(width: 4),
+                                Text(
+                                  _getTransmission()!,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    // Location and Brand
+                    Row(
+                      children: [
+                        if (_getLocation() != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
+                                SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    _getLocation()!,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        if (_getBrandImage() != null)
+                          Container(
+                            width: 24,
+                            height: 24,
+                            child: CachedNetworkImage(
+                              imageUrl: getImageUrl(_getBrandImage()!, null),
+                              fit: BoxFit.contain,
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.business,
+                                size: 16,
+                                color: theme.iconTheme.color,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImage(ThemeData theme) {
+    final imageUrl = _getImageUrl();
+    
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      progressIndicatorBuilder: (context, url, progress) {
+        return Shimmer.fromColors(
+          baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+          highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+          child: Container(color: theme.cardColor),
+        );
+      },
+      errorWidget: (context, url, error) {
+        return Container(
+          color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.image_not_supported, color: theme.iconTheme.color, size: 32),
+              const SizedBox(height: 4),
+              Text('No Image', style: TextStyle(color: theme.textTheme.bodySmall?.color, fontSize: 10)),
+            ],
+          ),
+        );
+      },
     );
   }
 

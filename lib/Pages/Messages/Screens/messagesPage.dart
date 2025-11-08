@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/messagetile.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Models/chatContactModel.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Providers/contactsProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:provider/provider.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({super.key});
@@ -14,127 +16,58 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage> {
   final TextEditingController _searchController = TextEditingController();
-  final List<Message> _messages = [
-    Message(
-      id: '1',
-      sender: 'Alice Johnson',
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-      content: 'Hello! I\'m interested in the Toyota Camry you listed. Is it still available?',
-      sentAt: DateTime.now().subtract(const Duration(minutes: 3)),
-      isOnline: true,
-      unreadCount: 2,
-      productImage: "https://images.unsplash.com/photo-1621135802920-133df287f89c?w=100&h=100&fit=crop",
-    ),
-    Message(
-      id: '2',
-      sender: 'Robert Chen',
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      content: 'Can we schedule a test drive for the Honda Civic? What times work for you?',
-      sentAt: DateTime.now().subtract(const Duration(hours: 1)),
-      isOnline: false,
-      unreadCount: 1,
-      productImage: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=100&h=100&fit=crop",
-    ),
-    Message(
-      id: '3',
-      sender: 'Sarah Miller',
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      content: 'Thanks for the detailed photos! The BMW looks amazing. What\'s your best price?',
-      sentAt: DateTime.now().subtract(const Duration(hours: 2)),
-      isOnline: true,
-      unreadCount: 0,
-      productImage: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=100&h=100&fit=crop",
-    ),
-    Message(
-      id: '4',
-      sender: 'David Kim',
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      content: 'I\'d like to make an offer on the Mercedes-Benz. Are you available to chat?',
-      sentAt: DateTime.now().subtract(const Duration(days: 1)),
-      isOnline: false,
-      unreadCount: 0,
-      productImage: "https://images.unsplash.com/photo-1563720223485-83c33bf5c8d9?w=100&h=100&fit=crop",
-    ),
-    Message(
-      id: '5',
-      sender: 'Mike Thompson',
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-      content: 'The Ford Mustang looks perfect! Can you share the service history?',
-      sentAt: DateTime.now().subtract(const Duration(days: 2)),
-      isOnline: true,
-      unreadCount: 3,
-      productImage: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=100&h=100&fit=crop",
-    ),
-  ];
-
-  List<Message> _filteredMessages = [];
-  String _selectedCategory = 'All';
+  String _selectedCategory = 'All Messages';
 
   @override
   void initState() {
     super.initState();
-    _filteredMessages = _messages;
-    _searchController.addListener(_filterMessages);
+    _searchController.addListener(_filterContacts);
+    // Load contacts when page initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadContacts();
+    });
   }
 
-  void _filterMessages() {
-    final query = _searchController.text.toLowerCase();
-    
-    setState(() {
-      if (query.isEmpty) {
-        _filteredMessages = _messages;
-      } else {
-        _filteredMessages = _messages.where((message) {
-          return message.sender.toLowerCase().contains(query) ||
-                 message.content.toLowerCase().contains(query);
-        }).toList();
-      }
-    });
+  void _loadContacts() {
+    final provider = context.read<ContactsProvider>();
+    if (provider.contacts.isEmpty && !provider.isLoading) {
+      provider.loadContacts();
+    }
+  }
+
+  void _filterContacts() {
+    setState(() {});
   }
 
   void _onCategorySelected(String category) {
     setState(() {
       _selectedCategory = category;
-      
-      switch (category) {
-        case 'All':
-          _filteredMessages = _messages;
-          break;
-        case 'Unread':
-          _filteredMessages = _messages.where((msg) => msg.unreadCount > 0).toList();
-          break;
-        case 'Important':
-          _filteredMessages = _messages.where((msg) => msg.sender == 'Sarah Miller' || msg.sender == 'David Kim').toList();
-          break;
-        case 'Groups':
-          _filteredMessages = []; // No groups in this example
-          break;
-      }
     });
   }
 
-  void _navigateToChat(Message message) {
+  void _navigateToChat(ChatContact contact) {
     Get.toNamed(
       RouteClass.getChatPage(),
       arguments: {
-        'chatId': message.id,
-        'recipientId': message.id,
-        'recipientName': message.sender,
-        'recipientImage': message.image,
-        'productId': message.id, // In real app, use actual product ID
-        'productImage': message.productImage,
+        'contactId': contact.id,
+        'contactName': contact.name,
+        'contactImage': contact.profilePhoto ?? contact.avatar,
+        'contactPhone': contact.phone,
       },
     );
   }
 
   void _startNewChat() {
-    // TODO: Implement new chat functionality
     Get.snackbar(
       'New Chat',
       'Start a new conversation feature coming soon!',
       backgroundColor: ColorGlobalVariables.brownColor,
       colorText: Colors.white,
     );
+  }
+
+  void _refreshContacts() {
+    context.read<ContactsProvider>().refreshContacts();
   }
 
   @override
@@ -158,13 +91,13 @@ class _MessagesPageState extends State<MessagesPage> {
           // Categories
           _buildCategoryTabs(theme),
           
-          // Messages List
-          _buildMessagesList(theme),
+          // Contacts List
+          _buildContactsList(theme),
         ],
       ),
       
       // Floating Action Button
-      floatingActionButton: _buildFloatingActionButton(),
+      // floatingActionButton: _buildFloatingActionButton(),
     );
   }
 
@@ -183,8 +116,8 @@ class _MessagesPageState extends State<MessagesPage> {
       centerTitle: true,
       actions: [
         IconButton(
-          icon: Icon(Icons.more_vert, color: theme.iconTheme.color ?? Colors.black54),
-          onPressed: () => _showOptionsMenu(theme),
+          icon: Icon(Icons.refresh_rounded, color: theme.iconTheme.color ?? Colors.black54),
+          onPressed: _refreshContacts,
         ),
       ],
     );
@@ -209,7 +142,7 @@ class _MessagesPageState extends State<MessagesPage> {
         child: TextFormField(
           controller: _searchController,
           decoration: InputDecoration(
-            hintText: "Search conversations...",
+            hintText: "Search contacts...",
             hintStyle: TextStyle(
               color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
               fontSize: 16
@@ -228,7 +161,7 @@ class _MessagesPageState extends State<MessagesPage> {
                     ),
                     onPressed: () {
                       _searchController.clear();
-                      _filterMessages();
+                      _filterContacts();
                     },
                   )
                 : null,
@@ -250,7 +183,7 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   Widget _buildCategoryTabs(ThemeData theme) {
-    final categories = ['All', 'Unread', 'Important', 'Groups'];
+    final categories = ['All Messages'];
     final isDarkMode = theme.brightness == Brightness.dark;
     
     return SizedBox(
@@ -309,90 +242,87 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  Widget _buildMessagesList(ThemeData theme) {
-    final isDarkMode = theme.brightness == Brightness.dark;
-    
+  Widget _buildContactsList(ThemeData theme) {
     return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 15,
-              offset: const Offset(0, -5),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: _filteredMessages.isEmpty
-              ? _buildEmptyState(theme)
-              : ListView.separated(
-                  padding: const EdgeInsets.only(top: 8, bottom: 16),
-                  itemCount: _filteredMessages.length,
-                  separatorBuilder: (context, index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
-                    ),
-                  ),
-                  itemBuilder: (context, index) {
-                    final message = _filteredMessages[index];
-                    return _buildMessageTile(message, theme);
-                  },
-                ),
-        ),
+      child: Consumer<ContactsProvider>(
+        builder: (context, contactsProvider, child) {
+          if (contactsProvider.isLoading && contactsProvider.contacts.isEmpty) {
+            return _buildLoadingState(theme);
+          }
+
+          if (contactsProvider.hasError) {
+            return _buildErrorState(contactsProvider.error!, theme);
+          }
+
+          final contacts = _searchController.text.isEmpty
+              ? contactsProvider.contacts
+              : contactsProvider.searchContacts(_searchController.text);
+
+          final filteredContacts = _applyCategoryFilter(contacts);
+
+          if (filteredContacts.isEmpty) {
+            return _buildEmptyState(theme);
+          }
+
+          return _buildContactsListView(filteredContacts, theme);
+        },
       ),
     );
   }
 
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.chat_bubble_outline_rounded,
-            size: 80,
-            color: theme.iconTheme.color,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            _selectedCategory == 'Groups' ? 'No group chats' : 'No messages found',
-            style: TextStyle(
-              color: theme.textTheme.bodyMedium?.color,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _selectedCategory == 'Groups' 
-                ? 'Start a group conversation with multiple people'
-                : 'Start a conversation by messaging a seller or buyer',
-            style: TextStyle(
-              color: theme.textTheme.bodySmall?.color,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
+  List<ChatContact> _applyCategoryFilter(List<ChatContact> contacts) {
+    switch (_selectedCategory) {
+      case 'All Messages':
+      default:
+        return contacts;
+    }
+  }
+
+  Widget _buildContactsListView(List<ChatContact> contacts, ThemeData theme) {
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, -5),
           ),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: ListView.separated(
+          padding: const EdgeInsets.only(top: 8, bottom: 16),
+          itemCount: contacts.length,
+          separatorBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Divider(
+              height: 1,
+              thickness: 1,
+              color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
+            ),
+          ),
+          itemBuilder: (context, index) {
+            final contact = contacts[index];
+            return _buildContactTile(contact, theme);
+          },
+        ),
+      ),
     );
   }
 
-  Widget _buildMessageTile(Message message, ThemeData theme) {
+  Widget _buildContactTile(ChatContact contact, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
     
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _navigateToChat(message),
+        onTap: () => _navigateToChat(contact),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -407,16 +337,16 @@ class _MessagesPageState extends State<MessagesPage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: message.isOnline ? Colors.green : isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+                        color: contact.activeStatus == 1 ? Colors.green : isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
                         width: 2,
                       ),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(28),
-                      child: _buildUserImage(message.image, theme),
+                      child: _buildUserImage(contact, theme),
                     ),
                   ),
-                  if (message.isOnline)
+                  if (contact.activeStatus == 1)
                     Positioned(
                       right: 0,
                       bottom: 0,
@@ -438,7 +368,7 @@ class _MessagesPageState extends State<MessagesPage> {
               
               const SizedBox(width: 12),
               
-              // Message Content
+              // Contact Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -446,28 +376,32 @@ class _MessagesPageState extends State<MessagesPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          message.sender,
-                          style: TextStyle(
-                            color: theme.textTheme.titleLarge?.color,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Text(
+                            contact.name.isNotEmpty ? contact.name : 'Unknown User',
+                            style: TextStyle(
+                              color: theme.textTheme.titleLarge?.color,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Text(
-                          _formatTime(message.sentAt),
-                          style: TextStyle(
-                            color: theme.textTheme.bodySmall?.color,
-                            fontSize: 12,
+                        if (contact.maxCreatedAt.isNotEmpty)
+                          Text(
+                            _formatTime(contact.maxCreatedAt),
+                            style: TextStyle(
+                              color: theme.textTheme.bodySmall?.color,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                     
                     const SizedBox(height: 4),
                     
                     Text(
-                      message.content,
+                      'Start a conversation',
                       style: TextStyle(
                         color: theme.textTheme.bodyMedium?.color,
                         fontSize: 14,
@@ -477,61 +411,20 @@ class _MessagesPageState extends State<MessagesPage> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     
-                    const SizedBox(height: 8),
+                    // const SizedBox(height: 4),
                     
-                    // Product Preview (if available)
-                    if (message.productImage != null)
-                      Row(
-                        children: [
-                          Container(
-                            width: 20,
-                            height: 20,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: _buildProductImage(message.productImage!, theme),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Vehicle Listing',
-                            style: TextStyle(
-                              color: ColorGlobalVariables.brownColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
+                    // // Phone number
+                    // Text(
+                    //   contact.phone.isNotEmpty ? contact.phone : 'No phone number',
+                    //   style: TextStyle(
+                    //     color: ColorGlobalVariables.brownColor,
+                    //     fontSize: 12,
+                    //     fontWeight: FontWeight.w500,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
-              
-              // Unread Badge
-              if (message.unreadCount > 0) ...[
-                const SizedBox(width: 12),
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: ColorGlobalVariables.brownColor,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      message.unreadCount > 9 ? '9+' : message.unreadCount.toString(),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -539,10 +432,11 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  Widget _buildUserImage(String imageUrl, ThemeData theme) {
+  Widget _buildUserImage(ChatContact contact, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
+    final imageUrl = contact.profilePhoto ?? contact.avatar;
     
-    if (imageUrl.startsWith('http')) {
+    if (imageUrl != null && imageUrl.isNotEmpty && imageUrl.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
@@ -563,28 +457,125 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
-  Widget _buildProductImage(String imageUrl, ThemeData theme) {
-    final isDarkMode = theme.brightness == Brightness.dark;
-    
-    if (imageUrl.startsWith('http')) {
-      return CachedNetworkImage(
-        imageUrl: imageUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => Container(
-          color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
-          child: Icon(Icons.car_rental, color: isDarkMode ? Colors.grey[500] : Colors.grey[400], size: 12),
-        ),
-        errorWidget: (context, url, error) => Container(
-          color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
-          child: Icon(Icons.car_rental, color: isDarkMode ? Colors.grey[500] : Colors.grey[400], size: 12),
-        ),
-      );
-    } else {
-      return Container(
-        color: isDarkMode ? Colors.grey[700] : Colors.grey[200],
-        child: Icon(Icons.car_rental, color: isDarkMode ? Colors.grey[500] : Colors.grey[400], size: 12),
-      );
-    }
+  Widget _buildLoadingState(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: ColorGlobalVariables.brownColor,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Loading contacts...',
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error, ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            size: 64,
+            color: theme.iconTheme.color,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Failed to load contacts',
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              error.length > 100 ? '${error.substring(0, 100)}...' : error,
+              style: TextStyle(
+                color: theme.textTheme.bodySmall?.color,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _refreshContacts,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorGlobalVariables.brownColor,
+            ),
+            child: const Text(
+              'Try Again',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.people_outline_rounded,
+            size: 80,
+            color: theme.iconTheme.color,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No contacts found',
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              _searchController.text.isNotEmpty
+                  ? 'No contacts match your search'
+                  : 'Start conversations by connecting with other users',
+              style: TextStyle(
+                color: theme.textTheme.bodySmall?.color,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (_searchController.text.isNotEmpty)
+            ElevatedButton(
+              onPressed: () {
+                _searchController.clear();
+                _filterContacts();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorGlobalVariables.brownColor,
+              ),
+              child: const Text(
+                'Clear Search',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildFloatingActionButton() {
@@ -599,208 +590,27 @@ class _MessagesPageState extends State<MessagesPage> {
     );
   }
 
-  void _showOptionsMenu(ThemeData theme) {
-    final isDarkMode = theme.brightness == Brightness.dark;
+  String _formatTime(String timestamp) {
+    if (timestamp.isEmpty) return '';
     
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          margin: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.cardColor,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 20,
-                offset: Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: theme.dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
-                      child: Icon(
-                        Icons.message_rounded,
-                        color: ColorGlobalVariables.brownColor,
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Message Options',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: theme.textTheme.titleLarge?.color,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Manage your conversations',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: theme.textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Options
-              ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.notifications,
-                    color: Colors.blue,
-                    size: 20,
-                  ),
-                ),
-                title: Text(
-                  'Notification Settings',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.textTheme.titleLarge?.color,
-                  ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: theme.iconTheme.color,
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Implement notification settings
-                },
-              ),
-              
-              ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.archive,
-                    color: Colors.green,
-                    size: 20,
-                  ),
-                ),
-                title: Text(
-                  'Archived Chats',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.textTheme.titleLarge?.color,
-                  ),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: theme.iconTheme.color,
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Implement archived chats
-                },
-              ),
-              
-              // Close Button
-              Padding(
-                padding: EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
-                      foregroundColor: isDarkMode ? Colors.grey[300] : Colors.grey[700],
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text('Close'),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  String _formatTime(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-    
-    if (difference.inMinutes < 1) {
-      return 'Now';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d';
-    } else {
-      return '${timestamp.day}/${timestamp.month}';
+    try {
+      final dateTime = DateTime.parse(timestamp);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+      
+      if (difference.inMinutes < 1) {
+        return 'Now';
+      } else if (difference.inMinutes < 60) {
+        return '${difference.inMinutes}m';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours}h';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays}d';
+      } else {
+        return '${dateTime.day}/${dateTime.month}';
+      }
+    } catch (e) {
+      return '';
     }
   }
-}
-
-// Extended Message Model
-class Message {
-  final String id;
-  final String sender;
-  final String image;
-  final String content;
-  final DateTime sentAt;
-  final bool isOnline;
-  final int unreadCount;
-  final String? productImage;
-
-  Message({
-    required this.id,
-    required this.sender,
-    required this.image,
-    required this.content,
-    required this.sentAt,
-    required this.isOnline,
-    this.unreadCount = 0,
-    this.productImage,
-  });
 }

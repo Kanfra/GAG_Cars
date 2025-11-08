@@ -153,24 +153,90 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
+  Color _getBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF303030) // grey[900]
+        : Colors.grey[50]!;
+  }
+
+  Color _getCardColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getSecondaryTextColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xB3FFFFFF) // white70
+        : Colors.grey[700]!;
+  }
+
+  Color _getIconColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFFFFFFF) // white
+        : Colors.black87;
+  }
+
+  Color _getBorderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF616161) // grey[700]
+        : Colors.grey[200]!;
+  }
+
+  Color _getSearchContainerColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.white;
+  }
+
+  Color _getBrandLogoBackgroundColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF303030) // grey[900]
+        : Colors.grey[50]!;
+  }
+
+  Color _getBrandLogoBorderColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF616161) // grey[700]
+        : Colors.grey[100]!;
+  }
+
+  Color _getShimmerBaseColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF424242) // grey[800]
+        : Colors.grey[200]!;
+  }
+
+  Color _getShimmerHighlightColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF303030) // grey[900]
+        : Colors.grey[100]!;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: _buildAppBar(),
+      backgroundColor: _getBackgroundColor(context),
+      appBar: _buildAppBar(context),
       body: SafeArea(
         child: Column(
           children: [
-            _buildSearchSection(),
-            _buildHeaderSection(),
+            _buildSearchSection(context),
+            _buildHeaderSection(context),
             Expanded(
               child: _showShimmer
-                  ? _buildShimmerLoader()
+                  ? _buildShimmerLoader(context)
                   : _filteredBrands.isEmpty
-                      ? _buildEmptyState()
+                      ? _buildEmptyState(context)
                       : _currentLayout == 'grid'
-                          ? _buildGridView()
-                          : _buildListView(),
+                          ? _buildGridView(context)
+                          : _buildListView(context),
             ),
           ],
         ),
@@ -178,12 +244,17 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF424242) // grey[800]
+          : Colors.white,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_rounded, color: Colors.black87),
+        icon: Icon(
+          Icons.arrow_back_ios_rounded, 
+          color: _getIconColor(context),
+        ),
         onPressed: () => Get.back(),
       ),
       title: Text(
@@ -191,41 +262,49 @@ class _AllMakesPageState extends State<AllMakesPage> {
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w700,
-          color: ColorGlobalVariables.brownColor,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : ColorGlobalVariables.brownColor,
           letterSpacing: -0.5,
         ),
       ),
       centerTitle: true,
       actions: [
         // IconButton(
-        //   icon: Icon(Icons.filter_list_rounded, color: Colors.black54),
+        //   icon: Icon(Icons.filter_list_rounded, color: _getIconColor(context)),
         //   onPressed: () {},
         // ),
       ],
     );
   }
 
-  Widget _buildSearchSection() {
+  Widget _buildSearchSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.white, Colors.grey[50]!],
-        ),
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!, width: 1)),
+        gradient: Theme.of(context).brightness == Brightness.dark
+            ? LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [const Color(0xFF424242), const Color(0xFF303030)],
+              )
+            : LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.white, Colors.grey[50]!],
+              ),
+        border: Border(bottom: BorderSide(color: _getBorderColor(context), width: 1)),
       ),
       child: Container(
         height: 56,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: Colors.white,
+          color: _getSearchContainerColor(context),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               blurRadius: 20,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -233,17 +312,36 @@ class _AllMakesPageState extends State<AllMakesPage> {
           controller: _searchEditingController,
           focusNode: _searchFocusNode,
           onChanged: _filterBrands,
+          style: TextStyle(
+            fontSize: 16, 
+            fontWeight: FontWeight.w500,
+            color: _getTextColor(context),
+          ),
           decoration: InputDecoration(
             hintText: 'Search luxury brands...',
-            hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
+            hintStyle: TextStyle(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xB3FFFFFF) // white70
+                  : Colors.grey[500],
+              fontSize: 16,
+            ),
             border: InputBorder.none,
             prefixIcon: Container(
-              padding: EdgeInsets.all(12),
-              child: Icon(Icons.search_rounded, color: ColorGlobalVariables.brownColor, size: 24),
+              padding: const EdgeInsets.all(12),
+              child: Icon(
+                Icons.search_rounded, 
+                color: ColorGlobalVariables.brownColor, 
+                size: 24,
+              ),
             ),
             suffixIcon: _isSearching
                 ? IconButton(
-                    icon: Icon(Icons.close_rounded, color: Colors.grey[500]),
+                    icon: Icon(
+                      Icons.close_rounded, 
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xB3FFFFFF) // white70
+                          : Colors.grey[500],
+                    ),
                     onPressed: () {
                       _searchEditingController.clear();
                       _filterBrands('');
@@ -251,18 +349,20 @@ class _AllMakesPageState extends State<AllMakesPage> {
                     },
                   )
                 : IconButton(
-                    icon: Icon(Icons.mic_rounded, color: ColorGlobalVariables.brownColor),
+                    icon: Icon(
+                      Icons.mic_rounded, 
+                      color: ColorGlobalVariables.brownColor,
+                    ),
                     onPressed: () {},
                   ),
-            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ),
     );
   }
 
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
@@ -273,7 +373,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
+              color: _getSecondaryTextColor(context),
             ),
           ),
           Row(
@@ -281,14 +381,22 @@ class _AllMakesPageState extends State<AllMakesPage> {
               IconButton(
                 icon: Icon(
                   Icons.grid_view_rounded,
-                  color: _currentLayout == 'grid' ? ColorGlobalVariables.brownColor : Colors.grey[400],
+                  color: _currentLayout == 'grid' 
+                      ? ColorGlobalVariables.brownColor 
+                      : Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xB3FFFFFF) // white70
+                          : Colors.grey[400],
                 ),
                 onPressed: _toggleLayout,
               ),
               IconButton(
                 icon: Icon(
                   Icons.list_rounded,
-                  color: _currentLayout == 'list' ? ColorGlobalVariables.brownColor : Colors.grey[400],
+                  color: _currentLayout == 'list' 
+                      ? ColorGlobalVariables.brownColor 
+                      : Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xB3FFFFFF) // white70
+                          : Colors.grey[400],
                 ),
                 onPressed: _toggleLayout,
               ),
@@ -299,10 +407,10 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildGridView() {
+  Widget _buildGridView(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
@@ -311,23 +419,23 @@ class _AllMakesPageState extends State<AllMakesPage> {
       itemCount: _filteredBrands.length,
       itemBuilder: (context, index) {
         final brand = _filteredBrands[index];
-        return _buildBrandGridCard(brand);
+        return _buildBrandGridCard(brand, context);
       },
     );
   }
 
-  Widget _buildListView() {
+  Widget _buildListView(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       itemCount: _filteredBrands.length,
       itemBuilder: (context, index) {
         final brand = _filteredBrands[index];
-        return _buildBrandListCard(brand);
+        return _buildBrandListCard(brand, context);
       },
     );
   }
 
-  Widget _buildBrandGridCard(TrendingMake brand) {
+  Widget _buildBrandGridCard(TrendingMake brand, BuildContext context) {
     // Get vehicle count for this brand from HomeProvider
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     final vehicleCount = homeProvider.recommendedItems.where((item) {
@@ -341,13 +449,13 @@ class _AllMakesPageState extends State<AllMakesPage> {
         onTap: () => _navigateToSelectedBrand(brand),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _getCardColor(context),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.08),
                 blurRadius: 25,
-                offset: Offset(0, 8),
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -366,33 +474,40 @@ class _AllMakesPageState extends State<AllMakesPage> {
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
-                          color: Colors.grey[50],
+                          color: _getBrandLogoBackgroundColor(context),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.grey[100]!, width: 3),
+                          border: Border.all(color: _getBrandLogoBorderColor(context), width: 3),
                         ),
                         child: ClipOval(
                           child: CachedNetworkImage(
                             imageUrl: getImageUrl(brand.image, null),
                             fit: BoxFit.cover,
                             errorWidget: (context, url, error) => Container(
-                              color: Colors.grey[200],
-                              child: Icon(Icons.business, color: Colors.grey[400]),
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xFF424242) // grey[800]
+                                  : Colors.grey[200],
+                              child: Icon(
+                                Icons.business, 
+                                color: Theme.of(context).brightness == Brightness.dark
+                                    ? const Color(0xB3FFFFFF) // white70
+                                    : Colors.grey[400],
+                              ),
                             ),
                           ),
                         ),
                       ),
 
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
                       // Brand Name - Centered
                       ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: 120),
+                        constraints: const BoxConstraints(maxWidth: 120),
                         child: Text(
                           brand.name ?? 'Unknown Brand',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black87,
+                            color: _getTextColor(context),
                             letterSpacing: -0.3,
                           ),
                           textAlign: TextAlign.center,
@@ -401,7 +516,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                         ),
                       ),
 
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
                       // Vehicle Count Badge - Centered
                       Container(
@@ -449,7 +564,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildBrandListCard(TrendingMake brand) {
+  Widget _buildBrandListCard(TrendingMake brand, BuildContext context) {
     // Get vehicle count for this brand from HomeProvider
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     final vehicleCount = homeProvider.recommendedItems.where((item) {
@@ -462,15 +577,15 @@ class _AllMakesPageState extends State<AllMakesPage> {
       child: GestureDetector(
         onTap: () => _navigateToSelectedBrand(brand),
         child: Container(
-          margin: EdgeInsets.only(bottom: 16),
+          margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _getCardColor(context),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.06),
                 blurRadius: 15,
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -490,23 +605,30 @@ class _AllMakesPageState extends State<AllMakesPage> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: Colors.grey[50],
+                        color: _getBrandLogoBackgroundColor(context),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey[100]!, width: 2),
+                        border: Border.all(color: _getBrandLogoBorderColor(context), width: 2),
                       ),
                       child: ClipOval(
                         child: CachedNetworkImage(
                           imageUrl: getImageUrl(brand.image, null),
                           fit: BoxFit.cover,
                           errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[200],
-                            child: Icon(Icons.business, color: Colors.grey[400]),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF424242) // grey[800]
+                                : Colors.grey[200],
+                            child: Icon(
+                              Icons.business, 
+                              color: Theme.of(context).brightness == Brightness.dark
+                                  ? const Color(0xB3FFFFFF) // white70
+                                  : Colors.grey[400],
+                            ),
                           ),
                         ),
                       ),
                     ),
                     
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     
                     // Brand Info
                     Expanded(
@@ -518,15 +640,15 @@ class _AllMakesPageState extends State<AllMakesPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: Colors.black87,
+                              color: _getTextColor(context),
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             '$vehicleCount ${vehicleCount == 1 ? 'vehicle' : 'vehicles'} available',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: _getSecondaryTextColor(context),
                             ),
                           ),
                         ],
@@ -537,7 +659,9 @@ class _AllMakesPageState extends State<AllMakesPage> {
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 16,
-                      color: Colors.grey[400],
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xB3FFFFFF) // white70
+                          : Colors.grey[400],
                     ),
                   ],
                 ),
@@ -549,7 +673,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -559,28 +683,34 @@ class _AllMakesPageState extends State<AllMakesPage> {
             Icon(
               Icons.search_off_rounded,
               size: 80,
-              color: Colors.grey[300],
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF616161) // grey[700]
+                  : Colors.grey[300],
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Text(
               'No Brands Found',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w700,
-                color: Colors.grey[500],
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xB3FFFFFF) // white70
+                    : Colors.grey[500],
                 letterSpacing: -0.5,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               'Try adjusting your search terms or browse all brands',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[400],
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xB3FFFFFF) // white70
+                    : Colors.grey[400],
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 _searchEditingController.clear();
@@ -588,7 +718,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: ColorGlobalVariables.brownColor,
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -608,10 +738,10 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildShimmerLoader() {
+  Widget _buildShimmerLoader(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
@@ -620,11 +750,11 @@ class _AllMakesPageState extends State<AllMakesPage> {
       itemCount: 6,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[200]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: _getShimmerBaseColor(context),
+          highlightColor: _getShimmerHighlightColor(context),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _getCardColor(context),
               borderRadius: BorderRadius.circular(20),
             ),
           ),

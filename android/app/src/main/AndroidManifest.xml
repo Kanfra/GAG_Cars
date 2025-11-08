@@ -1,19 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.gag_cars_frontend">
+
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- Add these for phone and contact features -->
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove"/> <!-- Optional: Remove if not needed -->
-    <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove"/> <!-- Optional: Remove if not needed -->
-    
-    <!-- For WhatsApp and other social media intents -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- Optional: Remove if not needed -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
+
+    <!-- Queries for external apps -->
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -31,7 +34,8 @@
             <action android:name="android.intent.action.SEND" />
             <data android:mimeType="text/plain" />
         </intent>
-        <!-- Package-specific queries for social apps -->
+
+        <!-- Social media packages -->
         <package android:name="com.whatsapp" />
         <package android:name="com.facebook.katana" />
         <package android:name="com.instagram.android" />
@@ -39,10 +43,11 @@
     </queries>
 
     <application
-        android:label="gag_cars_frontend"
+        android:label="GAGcars"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true"
-        android:networkSecurityConfig="@xml/network_security_config">
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:targetApi="31">
 
         <activity
             android:name=".MainActivity"
@@ -58,16 +63,18 @@
                 android:name="com.google.android.geo.API_KEY"
                 android:value="${GOOGLE_API_KEY}" />
 
+            <!-- Flutter normal theme -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
 
+            <!-- Main launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
-            <!-- Add these intent filters for better URL handling -->
+
+            <!-- Deep links for website -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -77,22 +84,24 @@
                 <data android:host="www.gagcars.com" />
             </intent-filter>
 
-            <!-- Add Paystack callback intent filter -->
+            <!-- Paystack callback (replace scheme with your app’s) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="yourapp" /> <!-- Replace with your app's custom scheme -->
+                <data android:scheme="gagcars" />
             </intent-filter>
         </activity>
 
-        <!-- WebView meta-data for better performance -->
+        <!-- WebView Safe Browsing -->
         <meta-data
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="true" />
-            
+
+        <!-- Required for Flutter v2 embedding -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
 </manifest>

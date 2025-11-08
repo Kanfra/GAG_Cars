@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   SfRangeValues _priceRange = const SfRangeValues(700, 2000);
   bool _showSearchBar = true;
   double _lastScrollOffset = 0.0;
+  String _recommendedViewType = 'grid'; // 'grid' or 'list'
 
   @override
   void initState() {
@@ -259,6 +260,12 @@ class _HomePageState extends State<HomePage> {
   );
 }
 
+  void _toggleRecommendedView(String viewType) {
+    setState(() {
+      _recommendedViewType = viewType;
+    });
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
@@ -447,20 +454,34 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Row(
                   children: [
+                    // List View Button
                     CustomRoundIconButton(
                       iconData: Icons.list,
                       isBorderSlightlyCurved: true,
-                      onIconButtonClickFunction: () {},
+                      onIconButtonClickFunction: () => _toggleRecommendedView('list'),
                       buttonSize: 36,
                       iconSize: 16,
+                      backgroundColor: _recommendedViewType == 'list' 
+                          ? ColorGlobalVariables.brownColor 
+                          : theme.cardColor,
+                      iconDataColor: _recommendedViewType == 'list' 
+                          ? Colors.white 
+                          : theme.iconTheme.color,
                     ),
                     SizedBox(width: 8),
+                    // Grid View Button
                     CustomRoundIconButton(
                       iconData: Icons.grid_view,
                       isBorderSlightlyCurved: true,
-                      onIconButtonClickFunction: () {},
+                      onIconButtonClickFunction: () => _toggleRecommendedView('grid'),
                       buttonSize: 36,
                       iconSize: 16,
+                      backgroundColor: _recommendedViewType == 'grid' 
+                          ? ColorGlobalVariables.brownColor 
+                          : theme.cardColor,
+                      iconDataColor: _recommendedViewType == 'grid' 
+                          ? Colors.white 
+                          : theme.iconTheme.color,
                     ),
                   ],
                 ),
@@ -469,28 +490,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        // Recommended Grid
-        SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          sliver: SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.72,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final recommended = homeProvider.recommendedItems[index];
-                return _RecommendedItemWidget(
-                  recommended: recommended,
-                  screenSize: screenSize,
-                );
-              },
-              childCount: homeProvider.recommendedItems.length,
-            ),
-          ),
-        ),
+        // Recommended Items based on selected view
+        if (_recommendedViewType == 'grid')
+          _buildRecommendedGrid(homeProvider, theme)
+        else
+          _buildRecommendedList(homeProvider, theme),
 
         // Loading More Indicator
         SliverToBoxAdapter(
@@ -538,6 +542,43 @@ class _HomePageState extends State<HomePage> {
               : SizedBox.shrink(),
         ),
       ],
+    );
+  }
+
+  Widget _buildRecommendedGrid(HomeProvider homeProvider, ThemeData theme) {
+    return SliverPadding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.72,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final recommended = homeProvider.recommendedItems[index];
+            return _RecommendedItemGridWidget(
+              recommended: recommended,
+            );
+          },
+          childCount: homeProvider.recommendedItems.length,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecommendedList(HomeProvider homeProvider, ThemeData theme) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          final recommended = homeProvider.recommendedItems[index];
+          return _RecommendedItemListWidget(
+            recommended: recommended,
+          );
+        },
+        childCount: homeProvider.recommendedItems.length,
+      ),
     );
   }
 
@@ -671,7 +712,7 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 12),
-            itemCount: homeProvider.trendingMakes.length,
+            itemCount: homeProvider.trendingMakes.length > 6 ? 6 : homeProvider.trendingMakes.length,
             itemBuilder: (context, index) {
               final make = homeProvider.trendingMakes[index];
               final logger = Logger();
@@ -742,7 +783,7 @@ Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           padding: EdgeInsets.symmetric(horizontal: 12),
-          itemCount: homeProvider.categories.length,
+          itemCount: homeProvider.categories.length > 6 ? 6 : homeProvider.categories.length,
           itemBuilder: (context, index) {
             final category = homeProvider.categories[index];
             return GestureDetector(
@@ -764,8 +805,8 @@ Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
                   ],
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // FIX: Center content
-                  mainAxisSize: MainAxisSize.min, // FIX: Prevent overflow
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     // Category Image
                     Container(
@@ -783,7 +824,7 @@ Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
                       ),
                     ),
                     SizedBox(height: 8),
-                    // Category Name - FIXED with proper constraints
+                    // Category Name
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Text(
@@ -810,7 +851,6 @@ Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
   );
 }
 
-  // NEW METHOD: Filter recommended items by category and navigate
 void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
   final logger = Logger();
   
@@ -830,7 +870,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
       RouteClass.getSelectedCategoryItemPage(),
       arguments: {
         'selectedCategory': category,
-        'categoryItems': categoryItems, // PASS OBJECTS DIRECTLY, NOT JSON
+        'categoryItems': categoryItems,
         'itemId': firstItemId,
       }
     );
@@ -841,7 +881,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
       RouteClass.getSelectedCategoryItemPage(),
       arguments: {
         'selectedCategory': category,
-        'categoryItems': [], // Empty list
+        'categoryItems': [],
         'itemId': category.id.toString(),
       }
     );
@@ -852,7 +892,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
     final imageUrl = category.image;
     final hasValidImage = imageUrl != null && 
                          imageUrl.isNotEmpty && 
-                         !imageUrl.contains('assets/'); // Changed to exclude any asset paths
+                         !imageUrl.contains('assets/');
     
     if (hasValidImage) {
       return CachedNetworkImage(
@@ -926,7 +966,7 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
               final brand = item?.brand;
               final firstImage = item!.images?.isNotEmpty == true
                   ? item.images?.first
-                  : null; // Changed to null to avoid asset issues
+                  : null;
               final brandImage = brand?.image;
               final discount = offer.discount;
 
@@ -957,7 +997,6 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
                   borderRadius: BorderRadius.circular(16),
                   child: Stack(
                     children: [
-                      // FIXED: Use network image only, no asset fallbacks
                       firstImage != null && !firstImage.contains('assets/')
                           ? CachedNetworkImage(
                               imageUrl: getImageUrl(firstImage, null),
@@ -1077,54 +1116,21 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
       ),
     );
   }
-
-  // Helper method to get colors for different categories
-  Color _getCategoryColor(String categoryName) {
-    switch (categoryName.toLowerCase()) {
-      case 'parts & accessories':
-        return Colors.blue;
-      case 'motocycle':
-        return Colors.orange;
-      case 'agricultural machinery':
-        return Colors.green;
-      case 'trucks':
-        return Colors.red;
-      default:
-        return ColorGlobalVariables.redColor;
-    }
-  }
-
-  IconData _getIconForCategory({required String categoryName}) {
-    switch (categoryName.toLowerCase()) {
-      case 'parts & accessories':
-        return Icons.construction;
-      case 'motocycle':
-        return FontAwesomeIcons.motorcycle;
-      case 'agricultural machinery':
-        return Icons.agriculture;
-      case 'trucks':
-        return FontAwesomeIcons.truck;
-      default:
-        return Icons.directions_car;
-    }
-  }
 }
 
-// _RecommendedItemWidget class with fixed asset issues
-class _RecommendedItemWidget extends StatefulWidget {
+// Grid View Widget (Original Design)
+class _RecommendedItemGridWidget extends StatefulWidget {
   final RecommendedItem recommended;
-  final Size screenSize;
 
-  const _RecommendedItemWidget({
+  const _RecommendedItemGridWidget({
     required this.recommended,
-    required this.screenSize,
   });
 
   @override
-  __RecommendedItemWidgetState createState() => __RecommendedItemWidgetState();
+  __RecommendedItemGridWidgetState createState() => __RecommendedItemGridWidgetState();
 }
 
-class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
+class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -1277,7 +1283,7 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
     final theme = Theme.of(context);
     final firstImage = widget.recommended.images?.isNotEmpty == true
         ? widget.recommended.images!.first
-        : null; // Changed to null to avoid asset issues
+        : null;
     final brandImage = widget.recommended.brand?.image;
     final isPromoted = widget.recommended.isPromoted == true;
 
@@ -1562,7 +1568,6 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
   }
 
   Widget _buildRecommendedImage(String? imageUrl, ThemeData theme) {
-    // FIXED: Only use network images, no asset fallbacks
     if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
       
@@ -1602,6 +1607,544 @@ class __RecommendedItemWidgetState extends State<_RecommendedItemWidget>
               'No Image',
               style: TextStyle(
                 fontSize: 10,
+                color: theme.textTheme.bodySmall?.color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// List View Widget (Updated Design with Full Height Image)
+// List View Widget (Fixed - No Overflow)
+class _RecommendedItemListWidget extends StatefulWidget {
+  final RecommendedItem recommended;
+
+  const _RecommendedItemListWidget({
+    required this.recommended,
+  });
+
+  @override
+  __RecommendedItemListWidgetState createState() => __RecommendedItemListWidgetState();
+}
+
+class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Color?> _colorAnimation;
+  
+  bool _isLiked = false;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _colorAnimation = ColorTween(
+      begin: Colors.grey[400],
+      end: Colors.red,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _initializeLikeStatus();
+  }
+
+  void _initializeLikeStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkWishlistStatus();
+    });
+  }
+
+  void _checkWishlistStatus() {
+    try {
+      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final isInWishlist = wishlistManager.isLiked(widget.recommended.id);
+      
+      setState(() {
+        _isLiked = isInWishlist;
+        if (_isLiked) {
+          _animationController.value = 1.0;
+        }
+      });
+    } catch (e) {
+      print('Error checking wishlist status: $e');
+    }
+  }
+
+  Future<void> _toggleLike() async {
+    if (_isLoading) return;
+    
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      if (_isLiked) {
+        _animationController.reverse();
+      } else {
+        _animationController.forward();
+      }
+
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      
+      final result = await wishlistProvider.toggleWishlistItem(
+        itemId: widget.recommended.id, context: context,
+      );
+
+      if (result) {
+        setState(() {
+          _isLiked = !_isLiked;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isLiked ? 'Added to wishlist!' : 'Removed from wishlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: _isLiked ? Colors.green : Colors.orange,
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      } else {
+        if (_isLiked) {
+          _animationController.forward();
+        } else {
+          _animationController.reverse();
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to update wishlist',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Wishlist error: $e');
+      if (_isLiked) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error: ${e.toString()}',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final firstImage = widget.recommended.images?.isNotEmpty == true
+        ? widget.recommended.images!.first
+        : null;
+    final brandImage = widget.recommended.brand?.image;
+    final isPromoted = widget.recommended.isPromoted == true;
+
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(
+          RouteClass.getDetailPage(),
+          arguments: {
+            'product': widget.recommended.toJson(),
+            'item': widget.recommended.toJson(),
+            'type': 'details',
+          },
+        );
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        height: 160, // Fixed height
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Image Section
+            Container(
+              width: 160,
+              height: 160,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      color: theme.brightness == Brightness.dark 
+                          ? Colors.grey[800] 
+                          : Colors.grey[100],
+                      child: _buildRecommendedImage(firstImage, theme),
+                    ),
+                  ),
+                  
+                  if (isPromoted)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.amber[700],
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.star, color: Colors.white, size: 12),
+                            SizedBox(width: 2),
+                            Text(
+                              'FEATURED',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Content Section - FIXED: No more overflow
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start, // CHANGED: from spaceBetween to start
+                  children: [
+                    // Header with Title and Wishlist - FIXED: Reduced spacing
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.recommended.name ?? 'Unnamed Vehicle',
+                                style: TextStyle(
+                                  fontSize: 15, // SLIGHTLY SMALLER
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.textTheme.titleLarge?.color,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 2), // REDUCED from 4
+                              Text(
+                                widget.recommended.category?.name ?? 'Car',
+                                style: TextStyle(
+                                  fontSize: 11, // SLIGHTLY SMALLER
+                                  color: theme.textTheme.bodyMedium?.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 4), // REDUCED from 8
+                        // Wishlist Button
+                        GestureDetector(
+                          onTap: () {
+                            if (_isLoading) return;
+                            _toggleLike();
+                          },
+                          child: MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: ScaleTransition(
+                              scale: _scaleAnimation,
+                              child: Container(
+                                padding: EdgeInsets.all(5), // REDUCED from 6
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: _isLoading
+                                    ? SizedBox(
+                                        width: 16, // REDUCED from 18
+                                        height: 16, // REDUCED from 18
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Colors.grey,
+                                          ),
+                                        ),
+                                      )
+                                    : AnimatedBuilder(
+                                        animation: _colorAnimation,
+                                        builder: (context, child) {
+                                          return Icon(
+                                            _isLiked ? Icons.favorite : Icons.favorite_border,
+                                            size: 16, // REDUCED from 18
+                                            color: _isLiked 
+                                                ? _colorAnimation.value 
+                                                : theme.iconTheme.color,
+                                          );
+                                        },
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 8), // KEPT SAME
+
+                    // Price and Condition
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
+                            style: TextStyle(
+                              fontSize: 16, // REDUCED from 18
+                              fontWeight: FontWeight.bold,
+                              color: ColorGlobalVariables.redColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3), // REDUCED
+                          decoration: BoxDecoration(
+                            color: theme.brightness == Brightness.dark 
+                                ? Colors.grey[700] 
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            widget.recommended.condition ?? 'Used',
+                            style: TextStyle(
+                              fontSize: 10, // REDUCED from 12
+                              color: theme.textTheme.bodyMedium?.color,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 6), // REDUCED from 12
+
+                    // Details Row - FIXED: Reduced spacing and font sizes
+                    Row(
+                      children: [
+                        if (widget.recommended.mileage != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.speed, size: 12, color: theme.iconTheme.color), // REDUCED
+                                SizedBox(width: 2), // REDUCED from 4
+                                Expanded(
+                                  child: Text(
+                                    "${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.mileage!))} km",
+                                    style: TextStyle(
+                                      fontSize: 10, // REDUCED from 12
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        if (widget.recommended.transmission != null)
+                          SizedBox(width: 8), // ADDED spacing between details
+                        
+                        if (widget.recommended.transmission != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.settings, size: 12, color: theme.iconTheme.color), // REDUCED
+                                SizedBox(width: 2), // REDUCED from 4
+                                Expanded(
+                                  child: Text(
+                                    widget.recommended.transmission!,
+                                    style: TextStyle(
+                                      fontSize: 10, // REDUCED from 12
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    SizedBox(height: 4), // REDUCED from 8
+
+                    // Location and Brand - FIXED: Reduced spacing
+                    Row(
+                      children: [
+                        if (widget.recommended.location != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.location_on, size: 12, color: theme.iconTheme.color), // REDUCED
+                                SizedBox(width: 2), // REDUCED from 4
+                                Expanded(
+                                  child: Text(
+                                    widget.recommended.location!,
+                                    style: TextStyle(
+                                      fontSize: 10, // REDUCED from 12
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        if (brandImage != null && !brandImage.contains('assets/'))
+                          Container(
+                            width: 20, // REDUCED from 24
+                            height: 20, // REDUCED from 24
+                            child: CachedNetworkImage(
+                              imageUrl: getImageUrl(brandImage, null),
+                              fit: BoxFit.contain,
+                              errorWidget: (context, url, error) => Icon(
+                                Icons.business,
+                                size: 14, // REDUCED from 16
+                                color: theme.iconTheme.color,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecommendedImage(String? imageUrl, ThemeData theme) {
+    if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
+      final String fullImageUrl = getImageUrl(imageUrl, null);
+      
+      return CachedNetworkImage(
+        imageUrl: fullImageUrl,
+        fit: BoxFit.cover,
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Container(
+            color: theme.brightness == Brightness.dark 
+                ? Colors.grey[800] 
+                : Colors.grey[200],
+            child: Center(
+              child: CircularProgressIndicator(
+                value: downloadProgress.progress,
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              ),
+            ),
+          );
+        },
+        errorWidget: (context, url, error) {
+          return _buildImageErrorPlaceholder(theme);
+        },
+      );
+    } else {
+      return _buildImageErrorPlaceholder(theme);
+    }
+  }
+
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
+    return Container(
+      color: theme.brightness == Brightness.dark 
+          ? Colors.grey[800] 
+          : Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color), // REDUCED
+            SizedBox(height: 2), // REDUCED
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 9, // REDUCED from 10
                 color: theme.textTheme.bodySmall?.color,
               ),
             ),

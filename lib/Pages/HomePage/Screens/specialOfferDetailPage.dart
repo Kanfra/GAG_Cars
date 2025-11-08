@@ -12,48 +12,76 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.d
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SpecialOfferDetailPage extends StatefulWidget {
-  final SpecialOffer specialOffer; // CHANGED: Now takes SpecialOffer object
+  final SpecialOffer specialOffer;
   const SpecialOfferDetailPage({
     super.key, 
-    required this.specialOffer, // CHANGED: parameter name
+    required this.specialOffer,
   });
 
   @override
   State<SpecialOfferDetailPage> createState() => _SpecialOfferDetailPageState();
 }
 
-class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
+class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   double _appBarHeight = 300;
   double _imageOpacity = 1.0;
   int selectedIndex = 0;
 
+  final logger = Logger();
+
   late SpecialOffer _specialOffer;
   late Item _item;
   late Brand? _brand;
+  late User? _user;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
     
-    // SIMPLE INITIALIZATION - No JSON parsing needed
     _specialOffer = widget.specialOffer;
     _item = _specialOffer.item ?? _createFallbackItem();
     _brand = _item.brand;
+    _user = _item.user;
     
-    print('✅ Special Offer Detail Initialized Successfully');
-    print('Special Offer ID: ${_specialOffer.id}');
-    print('Item Name: ${_item.name}');
-    print('Item Images: ${_item.images}');
-    print('Brand: ${_brand?.name}');
+    // Animation setup
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+    
+    _animationController.forward();
+    
+    logger.i('✅ Special Offer Detail Initialized Successfully');
     
     _scrollController.addListener(() {
       if (mounted) {
@@ -91,7 +119,294 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  // ========== ENHANCED BUTTON UI METHODS ==========
+
+  Widget _buildDefaultProfileAvatar({double size = 60}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade400,
+            Colors.purple.shade400,
+          ],
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person,
+          size: size * 0.5,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserProfileImage() {
+    final profilePhoto = _getUserProfilePhoto();
+    
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: profilePhoto.isNotEmpty 
+            ? _buildSafeImage(
+                getImageUrl(profilePhoto, null),
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+              )
+            : _buildDefaultProfileAvatar(size: 60),
+      ),
+    );
+  }
+
+  // Enhanced Chat Button
+  Widget _buildChatButton() {
+    final theme = Theme.of(context);
+    
+    return Expanded(
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              ColorGlobalVariables.redColor.withOpacity(0.9),
+              ColorGlobalVariables.redColor.withOpacity(0.7),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: ColorGlobalVariables.redColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              final userId = _getUserId();
+              final userName = _getUserName();
+              final userProfilePhoto = _getUserProfilePhoto();
+              final userPhone = _getUserPhoneNumber();
+              
+               if (userId != null && userId != 'unknown_user') {
+                // final logger = Logger();
+                logger.e('User id in Special offers is: $userId');
+                Get.toNamed(
+                  RouteClass.getChatPage(),
+                  arguments: {
+                    'contactId': userId,
+                    'contactName': userName,
+                    'contactImage': userProfilePhoto,
+                    'contactPhone': userPhone,
+                  }
+                );
+              } else {
+                Get.snackbar(
+                  'Error',
+                  'Unable to start chat. Seller information not available.',
+                  backgroundColor: Colors.red,
+                  colorText: Colors.white,
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.chat_bubble_outline,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Chat',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Enhanced Show Contact Button
+  Widget _buildShowContactButton() {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final hasContact = _getUserPhoneNumber() != null && _getUserPhoneNumber()!.isNotEmpty;
+    
+    return Expanded(
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _showContactDialog,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withOpacity(0.8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.contact_phone_outlined,
+                      color: hasContact ? ColorGlobalVariables.greenColor : Colors.grey,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Contact',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      Text(
+                        hasContact ? 'Show details' : 'No contact',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: hasContact ? 
+                            (isDarkMode ? Colors.green[300] : ColorGlobalVariables.greenColor) : 
+                            (isDarkMode ? Colors.grey[400] : Colors.grey[500]),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ========== EXISTING METHODS (KEEPING ALL FUNCTIONALITY) ==========
+
+  // Phone Call Functionality
+  Future<void> _makePhoneCall(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    
+    try {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        Get.snackbar(
+          'Error',
+          'Could not launch phone app',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to make phone call: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  // Get user information for chat
+  String _getUserId() {
+    return _user?.id ?? 'Unknown User';
+  }
+
+  String _getUserName() {
+    if (_user != null && _user!.name.isNotEmpty) {
+      return _user!.name;
+    }
+    return 'Seller';
+  }
+
+  String _getUserProfilePhoto() {
+    if (_user != null) {
+      return _user!.profilePhoto ?? _user!.avatar ?? '';
+    }
+    return '';
+  }
+
+  String _getUserPhoneNumber() {
+    if (_user != null) {
+      return _user!.phone ?? '';
+    }
+    return '';
   }
 
   // Price formatting and calculations
@@ -205,7 +520,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     );
   }
 
-  Widget buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
     try {
       if (imagePath.isEmpty) {
         return _buildCustomErrorWidget(width, height);
@@ -255,94 +570,76 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     }
   }
 
-  // Contact methods
-  String? _getUserPhoneNumber() {
-    try {
-      final user = _item.user;
-      if (user is Map<String, dynamic>) {
-        return user['phoneNumber']?.toString() ?? 
-               user['phone_number']?.toString() ??
-               user['contact']?.toString() ??
-               user['mobile']?.toString();
-      }
-      return _item.userId?.toString();
-    } catch (e) {
-      return null;
-    }
-  }
-
-  String _getUserName() {
-    try {
-      final user = _item.user;
-      if (user is Map<String, dynamic>) {
-        return user['name']?.toString() ?? 
-               user['username']?.toString() ??
-               'Seller';
-      }
-      return 'Seller';
-    } catch (e) {
-      return 'Seller';
-    }
-  }
-
   void _showContactDialog() {
     final phoneNumber = _getUserPhoneNumber();
     final userName = _getUserName();
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors.white,
-          surfaceTintColor: Colors.white,
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Padding(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.contact_phone,
-                        color: Colors.blue[700],
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    const Expanded(
-                      child: Text(
-                        "Contact Information",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                // Header with animation
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.contact_phone,
+                          color: Colors.blue[700],
+                          size: 24,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Text(
+                          "Contact Information",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 
                 const SizedBox(height: 20),
                 
                 // Seller name
-                Text(
-                  "Seller: $userName",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                AnimatedOpacity(
+                  opacity: 1.0,
+                  duration: const Duration(milliseconds: 500),
+                  child: Text(
+                    "Seller: $userName",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
                 ),
                 
@@ -350,130 +647,148 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
                 
                 // Phone number
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
-                  const Text(
-                    "Phone Number:",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
+                  AnimatedOpacity(
+                    opacity: 1.0,
+                    duration: const Duration(milliseconds: 600),
+                    child: Column(
+                      children: [
+                        Text(
+                          "Phone Number:",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+                          ),
+                          child: Text(
+                            phoneNumber,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: isDarkMode ? Colors.white : Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "You can call or message this number to contact the seller.",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: Text(
-                      phoneNumber,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "You can call or message this number to contact the seller.",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                    textAlign: TextAlign.center,
                   ),
                 ] else ...[
-                  Column(
-                    children: [
-                      const Icon(
-                        Icons.contact_phone_outlined,
-                        size: 48,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        "No contact information available",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                  AnimatedOpacity(
+                    opacity: 1.0,
+                    duration: const Duration(milliseconds: 600),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.contact_phone_outlined,
+                          size: 48,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "The seller hasn't provided contact details",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
+                        const SizedBox(height: 12),
+                        Text(
+                          "No contact information available",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          "The seller hasn't provided contact details",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
                 
                 const SizedBox(height: 24),
                 
-                // Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          side: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        child: const Text(
-                          "Close",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
-                      const SizedBox(width: 12),
+                // Buttons with animation
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 700),
+                  curve: Curves.easeInOut,
+                  child: Row(
+                    children: [
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            Get.snackbar(
-                              'Call',
-                              'Calling $phoneNumber',
-                              backgroundColor: Colors.green,
-                              colorText: Colors.white,
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            elevation: 0,
+                            side: BorderSide(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
                           ),
-                          child: const Text(
-                            "Call",
+                          child: Text(
+                            "Close",
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
+                              color: isDarkMode ? Colors.white70 : Colors.black54,
                             ),
                           ),
                         ),
                       ),
+                      if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _makePhoneCall(phoneNumber);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.phone, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Call",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -483,55 +798,126 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     );
   }
 
-  // Helper widgets
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 20.0,
-        fontWeight: FontWeight.w600,
+  // Image Zoom Dialog with smooth animation
+  void _showFullScreenImage(String imageUrl, int imageIndex) {
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: Stack(
+            children: [
+              // Full screen image with zoom capability
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: _buildSafeImage(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              
+              // Close button with animation
+              Positioned(
+                top: 50,
+                right: 20,
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              
+              // Image counter with fade animation
+              Positioned(
+                top: 50,
+                left: 20,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${imageIndex + 1}/${getItemImages().length}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          ),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper widgets with animations
+  Widget _buildSectionTitle(String title, bool isDarkMode) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.w600,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.grey[600], size: 20),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: Colors.grey[700],
-              fontSize: 15.0,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoItem(String title, String value, {bool isSpecification = false}) {
-    return IntrinsicWidth(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildInfoRow(IconData icon, String text, bool isDarkMode) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      child: Row(
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14.0,
-              color: isSpecification ? Colors.black54 : Colors.black87,
-              fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
-              color: Colors.black87,
+          Icon(icon, color: isDarkMode ? Colors.white70 : Colors.grey[600], size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                fontSize: 15.0,
+              ),
             ),
           ),
         ],
@@ -539,8 +925,39 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     );
   }
 
+  Widget _buildInfoItem(String title, String value, bool isDarkMode, {bool isSpecification = false}) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      child: IntrinsicWidth(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14.0,
+                color: isDarkMode ? Colors.white60 : (isSpecification ? Colors.black54 : Colors.black87),
+                fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTag(String text, Color color) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
         color: color,
@@ -551,7 +968,130 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
         style: const TextStyle(
           fontSize: 13.0,
           fontWeight: FontWeight.w500,
+          color: Colors.white,
         ),
+      ),
+    );
+  }
+
+  // Build gallery item with view button
+  Widget _buildGalleryItem(String image, int index, bool isDarkMode) {
+    return Container(
+      width: 120,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Image container
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                border: Border.all(
+                  color: index == selectedIndex 
+                      ? ColorGlobalVariables.brownColor 
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                ),
+                child: Stack(
+                  children: [
+                    _buildSafeImage(
+                      image,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    if (index == selectedIndex)
+                      Container(
+                        color: Colors.black.withOpacity(0.3),
+                        child: const Center(
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // View button section
+          Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Image ${index + 1}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                // View button
+                Container(
+                  height: 28,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showFullScreenImage(image, index);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.visibility, size: 12),
+                        SizedBox(width: 4),
+                        Text(
+                          'View',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -563,7 +1103,8 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     // Special offer highlights
     highlights.add({
       'title': 'Discount', 
-      'value': '${_specialOffer.discount}% ${_specialOffer.discountType}'
+      'value': '${_specialOffer.discount}%'
+      // ${_specialOffer.discountType}
     });
     
     if (_item.year != null) {
@@ -613,11 +1154,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     return specifications;
   }
 
-  // Build special offer badge
+  // Build special offer badge with animation
   Widget _buildSpecialOfferBadge() {
     final isActive = _isOfferActive();
     
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -658,6 +1200,9 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+    
     final images = getItemImages();
     final currentImage = images.isNotEmpty && selectedIndex < images.length 
         ? images[selectedIndex] 
@@ -668,719 +1213,693 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> {
     final isActive = _isOfferActive();
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 350,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.black,
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                    color: Colors.white, size: 18),
-              ),
-              onPressed: () => Get.back(),
-            ),
-            title: AnimatedOpacity(
-              opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 200),
-              child: Text(
-                _item.name ?? 'Special Offer',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16.0,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                children: [
-                  Opacity(
-                    opacity: _imageOpacity,
-                    child: buildSafeImage(
-                      currentImage,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.8),
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.3),
-                        ],
-                      ),
-                    ),
-                  ),
-                  
-                  Positioned(
-                    left: 20,
-                    bottom: 80,
-                    child: AnimatedOpacity(
-                      opacity: _imageOpacity,
-                      duration: const Duration(milliseconds: 200),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _item.name ?? 'Special Offer Vehicle',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 26.0,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6),
-                          // Special Offer Price Display
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _calculateDiscountedPrice(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Text(
-                                    _formatPrice(_item.price ?? '0'),
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 16.0,
-                                      decoration: TextDecoration.lineThrough,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      'Save GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12.0,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Special Offer Badge
-                  Positioned(
-                    top: 80,
-                    left: 20,
-                    child: AnimatedOpacity(
-                      opacity: _imageOpacity,
-                      duration: const Duration(milliseconds: 200),
-                      child: _buildSpecialOfferBadge(),
-                    ),
-                  ),
-
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: AnimatedOpacity(
-                      opacity: _imageOpacity,
-                      duration: const Duration(milliseconds: 200),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+      body: AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, child) {
+          return FadeTransition(
+            opacity: _fadeAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverAppBar(
+                    expandedHeight: 350,
+                    floating: false,
+                    pinned: true,
+                    backgroundColor: isDarkMode ? Colors.black : Colors.black,
+                    leading: IconButton(
+                      icon: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.black54,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Text(
-                          '${selectedIndex + 1}/${images.length}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12.0,
-                          ),
+                        child: const Icon(Icons.arrow_back_ios_new_outlined, 
+                            color: Colors.white, size: 18),
+                      ),
+                      onPressed: () => Get.back(),
+                    ),
+                    title: AnimatedOpacity(
+                      opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        _item.name ?? 'Special Offer',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16.0,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              // IconButton(
-              //   onPressed: () {
-              //     // Share functionality
-              //     Get.snackbar(
-              //       'Share',
-              //       'Special offer shared!',
-              //       backgroundColor: Colors.blue,
-              //       colorText: Colors.white,
-              //     );
-              //   },
-              //   icon: Container(
-              //     padding: const EdgeInsets.all(6),
-              //     decoration: BoxDecoration(
-              //       color: Colors.black54,
-              //       borderRadius: BorderRadius.circular(20),
-              //     ),
-              //     child: const Icon(Icons.share, color: Colors.white, size: 18),
-              //   ),
-              // ),
-            ],
-          ),
-          
-          // Gallery Section
-          SliverToBoxAdapter(
-            child: Container(
-              color: Colors.grey[50],
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(left: 16, bottom: 8),
-                    child: Text(
-                      "Gallery",
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 80,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: images.length,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemBuilder: (context, index) {
-                        final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
-                        return GestureDetector(
-                          onTap: () {
-                            if (mounted) {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            }
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: index == selectedIndex 
-                                    ? ColorGlobalVariables.redColor 
-                                    : Colors.transparent,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Stack(
+                        children: [
+                          // Main image - NOT clickable anymore
+                          Opacity(
+                            opacity: _imageOpacity,
+                            child: _buildSafeImage(
+                              currentImage,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Stack(
-                                children: [
-                                  buildSafeImage(
-                                    image,
-                                    width: 100,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  if (index == selectedIndex)
-                                    Container(
-                                      color: Colors.black.withOpacity(0.3),
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.check_circle,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ),
+                          ),
+                          
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.8),
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
                                 ],
                               ),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Main Content Section
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Vehicle name and brand
-                        Row(
-                          children: [
-                            if (_brand?.image != null)
-                              Container(
-                                width: 40,
-                                height: 40,
-                                margin: const EdgeInsets.only(right: 12),
-                                child: CustomImage(
-                                  imagePath: getImageUrl(_brand!.image!, null),
-                                  isAssetImage: false,
-                                  isImageBorderRadiusRequired: false,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            Expanded(
+                          
+                          Positioned(
+                            left: 20,
+                            bottom: 80,
+                            child: AnimatedOpacity(
+                              opacity: _imageOpacity,
+                              duration: const Duration(milliseconds: 200),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     _item.name ?? 'Special Offer Vehicle',
                                     style: const TextStyle(
-                                      fontSize: 22.0,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
+                                      fontSize: 26.0,
                                     ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${_brand?.name ?? ''} • ${_item.year ?? ''} • ${_item.condition?.toUpperCase() ?? ''}',
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Special Offer Time Info
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: isActive ? Colors.green[50] : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isActive ? Colors.green[100]! : Colors.grey[300]!,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                isActive ? Icons.timer : Icons.timer_off,
-                                color: isActive ? Colors.green : Colors.grey,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      isActive ? 'Special Offer Active' : 'Offer Ended',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: isActive ? Colors.green[700] : Colors.grey[700],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      _getTimeRemaining(),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isActive ? Colors.green[600] : Colors.grey[600],
-                                      ),
-                                    ),
-                                    if (isActive) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Valid: ${_formatDate(_specialOffer.startAt)} - ${_formatDate(_specialOffer.endAt)}',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Price Comparison
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: ColorGlobalVariables.redColor.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: ColorGlobalVariables.redColor.withOpacity(0.2)),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
+                                  const SizedBox(height: 6),
+                                  // Special Offer Price Display
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Discounted Price',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
                                       Text(
                                         _calculateDiscountedPrice(),
-                                        style: TextStyle(
-                                          fontSize: 24,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 24.0,
                                           fontWeight: FontWeight.bold,
-                                          color: ColorGlobalVariables.redColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      const Text(
-                                        'Original Price',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        _formatPrice(_item.price ?? '0'),
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.grey[500],
-                                          decoration: TextDecoration.lineThrough,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            _formatPrice(_item.price ?? '0'),
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 16.0,
+                                              decoration: TextDecoration.lineThrough,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          AnimatedContainer(
+                                            duration: const Duration(milliseconds: 300),
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              'Save GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12.0,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: ColorGlobalVariables.redColor.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.savings, color: ColorGlobalVariables.redColor, size: 16),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'You save GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
-                                      style: TextStyle(
-                                        color: ColorGlobalVariables.redColor,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
 
-                        // Description
-                        if (_item.description != null && _item.description!.isNotEmpty) ...[
-                          Text(
-                            _item.description!,
-                            style: const TextStyle(
-                              fontSize: 15.0,
-                              height: 1.5,
-                              color: Colors.black87,
+                          // Special Offer Badge
+                          Positioned(
+                            top: 80,
+                            left: 20,
+                            child: AnimatedOpacity(
+                              opacity: _imageOpacity,
+                              duration: const Duration(milliseconds: 200),
+                              child: _buildSpecialOfferBadge(),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                        ],
 
-                        // Location and date info
-                        if (_item.location != null) ...[
-                          _buildInfoRow(Icons.location_on_outlined, _item.location!),
-                          const SizedBox(height: 8),
-                        ],
-                        _buildInfoRow(Icons.refresh_outlined, safeFormatTimeAgo(_item.createdAt)),
-                        const SizedBox(height: 16),
-                        
-                        // Special Offer Description
-                        if (_specialOffer.description != null && _specialOffer.description!.isNotEmpty) ...[
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.blue[50],
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.blue[100]!),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Special Offer Details',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue[800],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _specialOffer.description!,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black87,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                        
-                        // Tags section
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            _buildTag(
-                              "${_specialOffer.discount}% OFF", 
-                              ColorGlobalVariables.redColor.withOpacity(0.9)
-                            ),
-                            if(_item.warranty != null && _item.warranty! > 0)
-                              _buildTag(
-                                "Warranty", 
-                                Colors.green
-                              ),
-                            if(_item.condition != null)
-                              _buildTag(
-                                _item.condition!.toUpperCase(), 
-                                Colors.orange
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        
-                        // Highlights section
-                        _buildSectionTitle("Highlights"),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 20.0,
-                          runSpacing: 12.0,
-                          children: highlights.map((highlight) {
-                            return _buildInfoItem(
-                              highlight['title'] ?? 'N/A',
-                              highlight['value'] ?? 'N/A',
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        
-                        // Specifications section
-                        _buildSectionTitle("Specifications"),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 20.0,
-                          runSpacing: 12.0,
-                          children: specifications.map((spec) {
-                            return _buildInfoItem(
-                              spec['title'] ?? 'N/A',
-                              spec['value'] ?? 'N/A',
-                              isSpecification: true,
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 16),
-                        
-                        const Divider(
-                          color: ColorGlobalVariables.fadedBlackColor,
-                          height: 12,
-                          thickness: 0.5,
-                        ),
-                        const SizedBox(height: 16),
-                        
-                        // Features section
-                        if (_item.features != null && _item.features!.isNotEmpty) ...[
-                          _buildSectionTitle("Features"),
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _item.features!.map((feature) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: AnimatedOpacity(
+                              opacity: _imageOpacity,
+                              duration: const Duration(milliseconds: 200),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.blue[50],
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.blue[100]!),
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
-                                  feature,
-                                  style: TextStyle(
-                                    color: Colors.blue[700],
-                                    fontSize: 12,
+                                  '${selectedIndex + 1}/${images.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
                                     fontWeight: FontWeight.w500,
+                                    fontSize: 12.0,
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                        
-                        // Seller information section
-                        Row(
-                          children: [
-                            // User image
-                            CustomImage(
-                              imagePath: '${ImageStringGlobalVariables.imagePath}user_profile_temporary.png', 
-                              isAssetImage: true,
-                              imageBackgroundColor: Colors.transparent,
-                              useShimmerEffect: true,
-                              imageWidth: 60,
-                              imageHeight: 60,
-                              imageBorderRadius: 30,
-                              fit: BoxFit.contain, 
-                              isImageBorderRadiusRequired: true
+                              ),
                             ),
-                            const SizedBox(width: 12),
-                            // User details
-                            Expanded(
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
+                  // Enhanced Gallery Section with View Buttons
+                  SliverToBoxAdapter(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 400),
+                      color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Gallery with view buttons
+                          SizedBox(
+                            height: 140,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: images.length,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              itemBuilder: (context, index) {
+                                final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (mounted) {
+                                      setState(() {
+                                        selectedIndex = index;
+                                      });
+                                    }
+                                  },
+                                  child: _buildGalleryItem(image, index, isDarkMode),
+                                );
+                              },
+                            ),
+                          ),
+                          
+                          // Instructions
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Text(
+                              "Tap image to set as main display • Tap 'View' to see full size",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
+                  // Main Content Section
+                  SliverToBoxAdapter(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 500),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    _getUserName(),
-                                    style: const TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
+                                  // Vehicle name and brand
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 400),
+                                    child: Row(
+                                      children: [
+                                        if (_brand?.image != null)
+                                          Container(
+                                            width: 40,
+                                            height: 40,
+                                            margin: const EdgeInsets.only(right: 12),
+                                            child: CustomImage(
+                                              imagePath: getImageUrl(_brand!.image!, null),
+                                              isAssetImage: false,
+                                              isImageBorderRadiusRequired: false,
+                                              fit: BoxFit.contain,
+                                            ),
+                                          ),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                _item.name ?? 'Special Offer Vehicle',
+                                                style: TextStyle(
+                                                  fontSize: 22.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '${_brand?.name ?? ''} • ${_item.year ?? ''} • ${_item.condition?.toUpperCase() ?? ''}',
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    "Joined: ${safeFormatTimeAgo(_item.createdAt)}",
-                                    style: TextStyle(
-                                      fontSize: 13.0,
-                                      color: Colors.grey[600],
+                                  const SizedBox(height: 16),
+
+                                  // Special Offer Time Info with animation
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: isActive 
+                                          ? (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]) 
+                                          : (isDarkMode ? Colors.grey[800]! : Colors.grey[100]),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isActive 
+                                            ? (isDarkMode ? Colors.green[700]! : Colors.green[100]!)
+                                            : (isDarkMode ? Colors.grey[600]! : Colors.grey[300]!),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          isActive ? Icons.timer : Icons.timer_off,
+                                          color: isActive ? Colors.green : (isDarkMode ? Colors.grey[400] : Colors.grey),
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                isActive ? 'Special Offer Active' : 'Offer Ended',
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isActive 
+                                                      ? (isDarkMode ? Colors.green[300] : Colors.green[700])
+                                                      : (isDarkMode ? Colors.grey[400] : Colors.grey[700]),
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                _getTimeRemaining(),
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: isActive 
+                                                      ? (isDarkMode ? Colors.green[300] : Colors.green[600])
+                                                      : (isDarkMode ? Colors.grey[500] : Colors.grey[600]),
+                                                ),
+                                              ),
+                                              if (isActive) ...[
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  'Valid: ${_formatDate(_specialOffer.startAt)} - ${_formatDate(_specialOffer.endAt)}',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: isDarkMode ? Colors.white60 : Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    '34 Ads',
-                                    style: TextStyle(
-                                      fontSize: 13.0,
-                                      fontWeight: FontWeight.w600,
-                                      color: ColorGlobalVariables.greenColor,
-                                      decoration: TextDecoration.underline,
+                                  const SizedBox(height: 16),
+
+                                  // Price Comparison with animation
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 600),
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: isDarkMode 
+                                          ? ColorGlobalVariables.redColor.withOpacity(0.1)
+                                          : ColorGlobalVariables.redColor.withOpacity(0.05),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isDarkMode
+                                            ? ColorGlobalVariables.redColor.withOpacity(0.3)
+                                            : ColorGlobalVariables.redColor.withOpacity(0.2)
+                                      ),
                                     ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Discounted Price',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: isDarkMode ? Colors.white70 : Colors.grey,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  _calculateDiscountedPrice(),
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: ColorGlobalVariables.redColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  'Original Price',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: isDarkMode ? Colors.white70 : Colors.grey,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  _formatPrice(_item.price ?? '0'),
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                                                    decoration: TextDecoration.lineThrough,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 12),
+                                        AnimatedContainer(
+                                          duration: const Duration(milliseconds: 400),
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: isDarkMode
+                                                ? ColorGlobalVariables.redColor.withOpacity(0.2)
+                                                : ColorGlobalVariables.redColor.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.savings, color: ColorGlobalVariables.redColor, size: 16),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                'You save GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
+                                                style: TextStyle(
+                                                  color: ColorGlobalVariables.redColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Description with fade animation
+                                  if (_item.description != null && _item.description!.isNotEmpty) ...[
+                                    AnimatedOpacity(
+                                      opacity: 1.0,
+                                      duration: const Duration(milliseconds: 500),
+                                      child: Text(
+                                        _item.description!,
+                                        style: TextStyle(
+                                          fontSize: 15.0,
+                                          height: 1.5,
+                                          color: isDarkMode ? Colors.white : Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+
+                                  // Location and date info with animations
+                                  if (_item.location != null) ...[
+                                    _buildInfoRow(Icons.location_on_outlined, _item.location!, isDarkMode),
+                                    const SizedBox(height: 8),
+                                  ],
+                                  _buildInfoRow(Icons.refresh_outlined, safeFormatTimeAgo(_item.createdAt), isDarkMode),
+                                  const SizedBox(height: 16),
+                                  
+                                  // Special Offer Description with animation
+                                  if (_specialOffer.description != null && _specialOffer.description!.isNotEmpty) ...[
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 500),
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Special Offer Details',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: isDarkMode ? Colors.blue[200] : Colors.blue[800],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            _specialOffer.description!,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: isDarkMode ? Colors.white : Colors.black87,
+                                              height: 1.4,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                  
+                                  // Tags section with staggered animation
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      _buildTag(
+                                        "${_specialOffer.discount}% OFF", 
+                                        ColorGlobalVariables.redColor.withOpacity(0.9)
+                                      ),
+                                      if(_item.warranty != null && _item.warranty! > 0)
+                                        _buildTag(
+                                          "Warranty", 
+                                          Colors.green
+                                        ),
+                                      if(_item.condition != null)
+                                        _buildTag(
+                                          _item.condition!.toUpperCase(), 
+                                          Colors.orange
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  
+                                  // Highlights section
+                                  _buildSectionTitle("Highlights", isDarkMode),
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 20.0,
+                                    runSpacing: 12.0,
+                                    children: highlights.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final highlight = entry.value;
+                                      return AnimatedContainer(
+                                        duration: Duration(milliseconds: 400 + (index * 100)),
+                                        child: _buildInfoItem(
+                                          highlight['title'] ?? 'N/A',
+                                          highlight['value'] ?? 'N/A',
+                                          isDarkMode,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  
+                                  // Specifications section
+                                  _buildSectionTitle("Specifications", isDarkMode),
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 20.0,
+                                    runSpacing: 12.0,
+                                    children: specifications.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final spec = entry.value;
+                                      return AnimatedContainer(
+                                        duration: Duration(milliseconds: 400 + (index * 100)),
+                                        child: _buildInfoItem(
+                                          spec['title'] ?? 'N/A',
+                                          spec['value'] ?? 'N/A',
+                                          isDarkMode,
+                                          isSpecification: true,
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  
+                                  Divider(
+                                    color: isDarkMode ? const Color(0xFF616161) : ColorGlobalVariables.fadedBlackColor,
+                                    height: 12,
+                                    thickness: 0.5,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  
+                                  // Features section with animation
+                                  if (_item.features != null && _item.features!.isNotEmpty) ...[
+                                    _buildSectionTitle("Features", isDarkMode),
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: _item.features!.asMap().entries.map((entry) {
+                                        final index = entry.key;
+                                        final feature = entry.value;
+                                        return AnimatedContainer(
+                                          duration: Duration(milliseconds: 300 + (index * 50)),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
+                                            ),
+                                          ),
+                                          child: Text(
+                                            feature,
+                                            style: TextStyle(
+                                              color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                  
+                                  // Seller information section with animation
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 500),
+                                    child: Row(
+                                      children: [
+                                        // Professional User Profile Icon
+                                        _buildUserProfileImage(),
+                                        const SizedBox(width: 12),
+                                        // User details
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                _getUserName(),
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 6),
+                                              Text(
+                                                "Joined: ${safeFormatTimeAgo(_item.createdAt)}",
+                                                style: TextStyle(
+                                                  fontSize: 13.0,
+                                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                '34 Ads',
+                                                style: TextStyle(
+                                                  fontSize: 13.0,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: ColorGlobalVariables.greenColor,
+                                                  decoration: TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  
+                                  // ENHANCED ACTION BUTTONS SECTION
+                                  Row(
+                                    children: [
+                                      _buildChatButton(),
+                                      const SizedBox(width: 16),
+                                      _buildShowContactButton(),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
+                            const SizedBox(height: 24),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        
-                        // Action buttons
-                        Row(
-                          children: [
-                            // Chat button
-                            Expanded(
-                              child: CustomTextButton(
-                                buttonTextType: 'Chat', 
-                                textTypeColor: ColorGlobalVariables.redColor, 
-                                borderColor: ColorGlobalVariables.fadedBlackColor,
-                                isFullButtonWidthRequired: false, 
-                                buttonBackgroundColor: Colors.transparent, 
-                                onClickFunction: (){
-                                  Get.toNamed(
-                                    RouteClass.getChatPage(),
-                                  );
-                                }
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            // Show contact button
-                            Expanded(
-                              child: CustomTextButton(
-                                buttonTextType: 'Show contact', 
-                                borderColor: ColorGlobalVariables.fadedBlackColor,
-                                textTypeColor: ColorGlobalVariables.redColor, 
-                                isFullButtonWidthRequired: false, 
-                                buttonBackgroundColor: Colors.transparent, 
-                                onClickFunction: _showContactDialog
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
                 ],
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

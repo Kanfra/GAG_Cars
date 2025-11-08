@@ -9,6 +9,7 @@ part of 'auth_response_model.dart';
 _$AuthResponseModelImpl _$$AuthResponseModelImplFromJson(
         Map<String, dynamic> json) =>
     _$AuthResponseModelImpl(
+      message: json['message'] as String?,
       token: json['token'] as String?,
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
       verified: json['verified'] as bool?,
@@ -18,6 +19,7 @@ _$AuthResponseModelImpl _$$AuthResponseModelImplFromJson(
 Map<String, dynamic> _$$AuthResponseModelImplToJson(
         _$AuthResponseModelImpl instance) =>
     <String, dynamic>{
+      'message': instance.message,
       'token': instance.token,
       'user': instance.user,
       'verified': instance.verified,

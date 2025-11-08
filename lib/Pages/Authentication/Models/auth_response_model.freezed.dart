@@ -20,10 +20,10 @@ AuthResponseModel _$AuthResponseModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AuthResponseModel {
+  String? get message => throw _privateConstructorUsedError;
   String? get token => throw _privateConstructorUsedError;
   UserModel get user => throw _privateConstructorUsedError;
-  bool? get verified =>
-      throw _privateConstructorUsedError; // ← Changed to nullable
+  bool? get verified => throw _privateConstructorUsedError;
   @JsonKey(name: 'verified_dealer')
   bool? get verifiedDealer => throw _privateConstructorUsedError;
 
@@ -44,7 +44,8 @@ abstract class $AuthResponseModelCopyWith<$Res> {
       _$AuthResponseModelCopyWithImpl<$Res, AuthResponseModel>;
   @useResult
   $Res call(
-      {String? token,
+      {String? message,
+      String? token,
       UserModel user,
       bool? verified,
       @JsonKey(name: 'verified_dealer') bool? verifiedDealer});
@@ -67,12 +68,17 @@ class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? message = freezed,
     Object? token = freezed,
     Object? user = null,
     Object? verified = freezed,
     Object? verifiedDealer = freezed,
   }) {
     return _then(_value.copyWith(
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
       token: freezed == token
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
@@ -112,7 +118,8 @@ abstract class _$$AuthResponseModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? token,
+      {String? message,
+      String? token,
       UserModel user,
       bool? verified,
       @JsonKey(name: 'verified_dealer') bool? verifiedDealer});
@@ -134,12 +141,17 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? message = freezed,
     Object? token = freezed,
     Object? user = null,
     Object? verified = freezed,
     Object? verifiedDealer = freezed,
   }) {
     return _then(_$AuthResponseModelImpl(
+      message: freezed == message
+          ? _value.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
       token: freezed == token
           ? _value.token
           : token // ignore: cast_nullable_to_non_nullable
@@ -164,7 +176,8 @@ class __$$AuthResponseModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AuthResponseModelImpl implements _AuthResponseModel {
   const _$AuthResponseModelImpl(
-      {this.token,
+      {this.message,
+      this.token,
       required this.user,
       this.verified,
       @JsonKey(name: 'verified_dealer') this.verifiedDealer});
@@ -173,19 +186,20 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
       _$$AuthResponseModelImplFromJson(json);
 
   @override
+  final String? message;
+  @override
   final String? token;
   @override
   final UserModel user;
   @override
   final bool? verified;
-// ← Changed to nullable
   @override
   @JsonKey(name: 'verified_dealer')
   final bool? verifiedDealer;
 
   @override
   String toString() {
-    return 'AuthResponseModel(token: $token, user: $user, verified: $verified, verifiedDealer: $verifiedDealer)';
+    return 'AuthResponseModel(message: $message, token: $token, user: $user, verified: $verified, verifiedDealer: $verifiedDealer)';
   }
 
   @override
@@ -193,6 +207,7 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AuthResponseModelImpl &&
+            (identical(other.message, message) || other.message == message) &&
             (identical(other.token, token) || other.token == token) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.verified, verified) ||
@@ -204,7 +219,7 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, token, user, verified, verifiedDealer);
+      Object.hash(runtimeType, message, token, user, verified, verifiedDealer);
 
   /// Create a copy of AuthResponseModel
   /// with the given fields replaced by the non-null parameter values.
@@ -225,7 +240,8 @@ class _$AuthResponseModelImpl implements _AuthResponseModel {
 
 abstract class _AuthResponseModel implements AuthResponseModel {
   const factory _AuthResponseModel(
-          {final String? token,
+          {final String? message,
+          final String? token,
           required final UserModel user,
           final bool? verified,
           @JsonKey(name: 'verified_dealer') final bool? verifiedDealer}) =
@@ -235,11 +251,13 @@ abstract class _AuthResponseModel implements AuthResponseModel {
       _$AuthResponseModelImpl.fromJson;
 
   @override
+  String? get message;
+  @override
   String? get token;
   @override
   UserModel get user;
   @override
-  bool? get verified; // ← Changed to nullable
+  bool? get verified;
   @override
   @JsonKey(name: 'verified_dealer')
   bool? get verifiedDealer;

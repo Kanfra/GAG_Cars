@@ -8,6 +8,7 @@ part of 'user_model.dart';
 
 _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
     _$UserModelImpl(
+      id: json['id'] as String?,
       name: json['name'] as String,
       email: json['email'] as String,
       password: json['password'] as String?,
@@ -33,11 +34,11 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       avatar: json['avatar'] as String?,
       darkMode: (json['dark_mode'] as num?)?.toInt(),
       messengerColor: json['messenger_color'] as String?,
-      id: json['id'] as String?,
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'email': instance.email,
       'password': instance.password,

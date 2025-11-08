@@ -96,6 +96,8 @@ _$ItemImpl _$$ItemImplFromJson(Map<String, dynamic> json) => _$ItemImpl(
       deletedAt: json['deleted_at'] as String?,
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
+      Height: json['Height'] as String?,
+      VIN: json['VIN'] as String?,
       brand: json['brand'] == null
           ? null
           : Brand.fromJson(json['brand'] as Map<String, dynamic>),
@@ -105,7 +107,9 @@ _$ItemImpl _$$ItemImplFromJson(Map<String, dynamic> json) => _$ItemImpl(
       brandModel: json['brand_model'] == null
           ? null
           : BrandModel.fromJson(json['brand_model'] as Map<String, dynamic>),
-      user: json['user'] as Map<String, dynamic>? ?? null,
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$ItemImplToJson(_$ItemImpl instance) =>
@@ -139,10 +143,53 @@ Map<String, dynamic> _$$ItemImplToJson(_$ItemImpl instance) =>
       'deleted_at': instance.deletedAt,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
+      'Height': instance.Height,
+      'VIN': instance.VIN,
       'brand': instance.brand,
       'category': instance.category,
       'brand_model': instance.brandModel,
       'user': instance.user,
+    };
+
+_$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
+      id: _parseString(json['id']),
+      name: _parseString(json['name']),
+      email: _parseString(json['email']),
+      phone: json['phone'] as String?,
+      emailVerifiedAt: json['email_verified_at'] as String?,
+      paidSeller: _parseInt(json['paid_seller']),
+      deletedAt: json['deleted_at'] as String?,
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
+      countryId: _parseInt(json['country_id']),
+      stateId: _parseInt(json['state_id']),
+      profilePhoto: json['profile_photo'] as String?,
+      uploadsLeft: _parseInt(json['uploads_left']),
+      activeStatus: _parseInt(json['active_status']),
+      avatar: json['avatar'] as String?,
+      darkMode: _parseInt(json['dark_mode']),
+      messengerColor: json['messenger_color'] as String?,
+    );
+
+Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'email': instance.email,
+      'phone': instance.phone,
+      'email_verified_at': instance.emailVerifiedAt,
+      'paid_seller': instance.paidSeller,
+      'deleted_at': instance.deletedAt,
+      'created_at': instance.createdAt,
+      'updated_at': instance.updatedAt,
+      'country_id': instance.countryId,
+      'state_id': instance.stateId,
+      'profile_photo': instance.profilePhoto,
+      'uploads_left': instance.uploadsLeft,
+      'active_status': instance.activeStatus,
+      'avatar': instance.avatar,
+      'dark_mode': instance.darkMode,
+      'messenger_color': instance.messengerColor,
     };
 
 _$BrandImpl _$$BrandImplFromJson(Map<String, dynamic> json) => _$BrandImpl(
@@ -170,7 +217,7 @@ _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
       id: _parseInt(json['id']),
       userId: json['user_id'] as String?,
-      parentId: json['parent_id'] as String?,
+      parentId: _parseString(json['parent_id']),
       name: _parseString(json['name']),
       slug: json['slug'] as String?,
       description: json['description'] as String?,

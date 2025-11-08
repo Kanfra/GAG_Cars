@@ -37,28 +37,6 @@ class SpecialOffer with _$SpecialOffer {
       _$SpecialOfferFromJson(json);
 }
 
-// Add these helper functions at the bottom of your file:
-int _parseInt(dynamic value) {
-  if (value == null) return 0;
-  if (value is int) return value;
-  if (value is String) return int.tryParse(value) ?? 0;
-  return 0;
-}
-
-String _parseString(dynamic value) {
-  if (value == null) return '';
-  if (value is String) return value;
-  return value.toString();
-}
-
-double _parseDouble(dynamic value) {
-  if (value == null) return 0.0;
-  if (value is double) return value;
-  if (value is int) return value.toDouble();
-  if (value is String) return double.tryParse(value) ?? 0.0;
-  return 0.0;
-}
-
 @freezed
 class Item with _$Item {
   const factory Item({
@@ -91,13 +69,41 @@ class Item with _$Item {
     @JsonKey(name: 'deleted_at') String? deletedAt,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
+    // New fields from response
+    String? Height,
+    String? VIN,
     Brand? brand,
     Category? category,
     @JsonKey(name: 'brand_model') BrandModel? brandModel,
-    @Default(null) Map<String, dynamic>? user,
+    User? user,
   }) = _Item;
 
   factory Item.fromJson(Map<String, dynamic> json) => _$ItemFromJson(json);
+}
+
+@freezed
+class User with _$User {
+  const factory User({
+    @JsonKey(fromJson: _parseString) required String id,
+    @JsonKey(fromJson: _parseString) required String name,
+    @JsonKey(fromJson: _parseString) required String email,
+    String? phone,
+    @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+    @JsonKey(name: 'paid_seller', fromJson: _parseInt) int? paidSeller,
+    @JsonKey(name: 'deleted_at') String? deletedAt,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+    @JsonKey(name: 'state_id', fromJson: _parseInt) int? stateId,
+    @JsonKey(name: 'profile_photo') String? profilePhoto,
+    @JsonKey(name: 'uploads_left', fromJson: _parseInt) int? uploadsLeft,
+    @JsonKey(name: 'active_status', fromJson: _parseInt) int? activeStatus,
+    String? avatar,
+    @JsonKey(name: 'dark_mode', fromJson: _parseInt) int? darkMode,
+    @JsonKey(name: 'messenger_color') String? messengerColor,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
 
 @freezed
@@ -120,7 +126,7 @@ class Category with _$Category {
   const factory Category({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id') String? userId,
-    @JsonKey(name: 'parent_id') String? parentId,
+    @JsonKey(name: 'parent_id', fromJson: _parseString) String? parentId,
     @JsonKey(fromJson: _parseString) required String name,
     String? slug,
     String? description,
@@ -189,4 +195,26 @@ class PaginationMetaLink with _$PaginationMetaLink {
 
   factory PaginationMetaLink.fromJson(Map<String, dynamic> json) =>
       _$PaginationMetaLinkFromJson(json);
+}
+
+// Helper functions
+int _parseInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
+String _parseString(dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value;
+  return value.toString();
+}
+
+double _parseDouble(dynamic value) {
+  if (value == null) return 0.0;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0.0;
+  return 0.0;
 }

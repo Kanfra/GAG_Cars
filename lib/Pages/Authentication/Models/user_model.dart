@@ -9,14 +9,15 @@ class UserModel with _$UserModel {
 
   @JsonSerializable(explicitToJson: true)
   const factory UserModel({
+    String? id,
     required String name,
     required String email,
     String? password,
     @JsonKey(name: 'phone') String? phoneNumber,
     @JsonKey(name: 'paid_seller') int? paidSeller,
     @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
-    @JsonKey(name: 'country_id') int? countryId, // Changed from String? to int?
-    @JsonKey(name: 'state_id') int? stateId, // Also changed this to int? since it's likely the same type
+    @JsonKey(name: 'country_id') int? countryId,
+    @JsonKey(name: 'state_id') int? stateId,
     @JsonKey(name: 'profile_photo') String? profileImage,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
@@ -26,7 +27,6 @@ class UserModel with _$UserModel {
     @JsonKey(name: 'avatar') String? avatar,
     @JsonKey(name: 'dark_mode') int? darkMode,
     @JsonKey(name: 'messenger_color') String? messengerColor,
-    @JsonKey(includeFromJson: true, includeToJson: false) String? id,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>

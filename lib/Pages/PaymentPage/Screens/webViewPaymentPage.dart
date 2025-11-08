@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/PromotionService/promotionService.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:get/get.dart';
@@ -12,6 +13,7 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:logger/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class WebViewPaymentPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -937,7 +939,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
 
   // ========== UI BUILDING METHODS ==========
 
-  Widget _buildManualNavigationButton() {
+  Widget _buildManualNavigationButton(bool isDarkMode) {
     return Positioned(
       bottom: 20,
       left: 20,
@@ -945,11 +947,11 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -958,26 +960,26 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         ),
         child: Column(
           children: [
-            const Icon(
+            Icon(
               Icons.touch_app_rounded,
               color: ColorGlobalVariables.brownColor,
               size: 32,
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Payment Completed?',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'If you have completed payment but are still on this page, tap below to proceed',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey,
+                color: isDarkMode ? Colors.white60 : Colors.grey,
               ),
               textAlign: TextAlign.center,
             ),
@@ -1009,7 +1011,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     );
   }
 
-  Widget _buildLoadingIndicator() {
+  Widget _buildLoadingIndicator(bool isDarkMode) {
     String statusText = _currentStatus;
     String subText = '';
     
@@ -1026,7 +1028,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     }
 
     return Container(
-      color: Colors.white,
+      color: isDarkMode ? const Color(0xFF303030) : Colors.white,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1077,7 +1079,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                   Text(
                     subText,
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: isDarkMode ? Colors.white70 : Colors.grey[600],
                       fontSize: 14,
                     ),
                     textAlign: TextAlign.center,
@@ -1088,7 +1090,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             
             if (_isUploading || _isPromoting) ...[
               const SizedBox(height: 24),
-              _buildProgressSteps(),
+              _buildProgressSteps(isDarkMode),
             ],
             
             if (!_paymentVerified && !_isProcessing && !_isUploading && !_isPromoting) ...[
@@ -1108,29 +1110,29 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     );
   }
 
-  Widget _buildProgressSteps() {
+  Widget _buildProgressSteps(bool isDarkMode) {
     final steps = _type == 'upload' 
         ? [
-            _buildProgressStep('Payment Verified', true),
-            _buildProgressStep('Loading Vehicle Data', _isUploading),
-            _buildProgressStep('Validating Data', _isUploading),
-            _buildProgressStep('Uploading to Server', _isUploading),
-            _buildProgressStep('Complete', _uploadComplete),
+            _buildProgressStep('Payment Verified', true, isDarkMode),
+            _buildProgressStep('Loading Vehicle Data', _isUploading, isDarkMode),
+            _buildProgressStep('Validating Data', _isUploading, isDarkMode),
+            _buildProgressStep('Uploading to Server', _isUploading, isDarkMode),
+            _buildProgressStep('Complete', _uploadComplete, isDarkMode),
           ]
         : [
-            _buildProgressStep('Payment Verified', true),
-            _buildProgressStep('Loading Promotion Data', _isPromoting),
-            _buildProgressStep('Validating Data', _isPromoting),
-            _buildProgressStep('Activating Promotion', _isPromoting),
-            _buildProgressStep('Complete', _promotionComplete),
+            _buildProgressStep('Payment Verified', true, isDarkMode),
+            _buildProgressStep('Loading Promotion Data', _isPromoting, isDarkMode),
+            _buildProgressStep('Validating Data', _isPromoting, isDarkMode),
+            _buildProgressStep('Activating Promotion', _isPromoting, isDarkMode),
+            _buildProgressStep('Complete', _promotionComplete, isDarkMode),
           ];
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
       ),
       child: Column(
         children: steps,
@@ -1138,7 +1140,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     );
   }
 
-  Widget _buildProgressStep(String text, bool isActive) {
+  Widget _buildProgressStep(String text, bool isActive, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1147,7 +1149,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             width: 20,
             height: 20,
             decoration: BoxDecoration(
-              color: isActive ? ColorGlobalVariables.greenColor : Colors.grey[300],
+              color: isActive ? ColorGlobalVariables.greenColor : (isDarkMode ? Colors.grey[600] : Colors.grey[300]),
               shape: BoxShape.circle,
             ),
             child: isActive 
@@ -1158,7 +1160,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
           Text(
             text,
             style: TextStyle(
-              color: isActive ? Colors.black87 : Colors.grey[600],
+              color: isActive ? (isDarkMode ? Colors.white : Colors.black87) : (isDarkMode ? Colors.white60 : Colors.grey[600]),
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -1175,75 +1177,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     return Icons.payment_rounded;
   }
 
-  Widget _buildPaymentSuccess() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: ColorGlobalVariables.greenColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.check_circle_rounded,
-              size: 60,
-              color: ColorGlobalVariables.greenColor,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Payment Successful!',
-            style: TextStyle(
-              color: ColorGlobalVariables.greenColor,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _type == 'upload' 
-                ? 'Your vehicle has been uploaded successfully!'
-                : 'Your promotion has been activated successfully!',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Reference: $_reference',
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 32),
-          if (_isUploading || _isPromoting) ...[
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.greenColor),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _isUploading ? 'Finalizing vehicle upload...' : 'Finalizing promotion...',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPaymentFailed() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
+  Widget _buildPaymentSuccess(bool isDarkMode) {
+    return Container(
+      color: isDarkMode ? const Color(0xFF303030) : Colors.white,
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -1251,172 +1188,247 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                color: ColorGlobalVariables.greenColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.error_outline_rounded,
+                Icons.check_circle_rounded,
                 size: 60,
-                color: ColorGlobalVariables.redColor,
+                color: ColorGlobalVariables.greenColor,
               ),
             ),
             const SizedBox(height: 24),
             Text(
-              'Payment Failed',
+              'Payment Successful!',
               style: TextStyle(
-                color: ColorGlobalVariables.redColor,
+                color: ColorGlobalVariables.greenColor,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
-              _errorMessage,
+              _type == 'upload' 
+                  ? 'Your vehicle has been uploaded successfully!'
+                  : 'Your promotion has been activated successfully!',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 fontSize: 16,
               ),
               textAlign: TextAlign.center,
             ),
-            if (_detailedError.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'Detailed Error:',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _detailedError.length > 200 
-                          ? '${_detailedError.substring(0, 200)}...' 
-                          : _detailedError,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 10,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ],
             const SizedBox(height: 8),
             Text(
               'Reference: $_reference',
               style: TextStyle(
-                color: Colors.grey[500],
+                color: isDarkMode ? Colors.white60 : Colors.grey[500],
                 fontSize: 14,
               ),
             ),
             const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: _handleCancelPayment,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[300],
-                    foregroundColor: Colors.grey[700],
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: _handlePaymentRetry,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ColorGlobalVariables.brownColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text('Try Again'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _manualVerifyPayment,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue[50],
-                foregroundColor: Colors.blue[700],
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            if (_isUploading || _isPromoting) ...[
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.greenColor),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _isUploading ? 'Finalizing vehicle upload...' : 'Finalizing promotion...',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                  fontSize: 14,
                 ),
               ),
-              child: const Text('Check Payment Status'),
-            ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildWebView() {
+  Widget _buildPaymentFailed(bool isDarkMode) {
+    return Container(
+      color: isDarkMode ? const Color(0xFF303030) : Colors.white,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.error_outline_rounded,
+                  size: 60,
+                  color: ColorGlobalVariables.redColor,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Payment Failed',
+                style: TextStyle(
+                  color: ColorGlobalVariables.redColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (_detailedError.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? const Color(0xFF424242) : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Detailed Error:',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _detailedError.length > 200 
+                            ? '${_detailedError.substring(0, 200)}...' 
+                            : _detailedError,
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 8),
+              Text(
+                'Reference: $_reference',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _handleCancelPayment,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode ? const Color(0xFF616161) : Colors.grey[300],
+                      foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[700],
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: _handlePaymentRetry,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text('Try Again'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _manualVerifyPayment,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                  foregroundColor: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Check Payment Status'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebView(bool isDarkMode) {
     return Stack(
       children: [
         WebViewWidget(controller: _webViewController),
         if (_isLoading && !_paymentVerified && !_paymentFailed)
           Container(
-            color: Colors.white,
-            child: _buildLoadingIndicator(),
+            color: isDarkMode ? const Color(0xFF303030) : Colors.white,
+            child: _buildLoadingIndicator(isDarkMode),
           ),
         if (_showManualNavigationButton && !_paymentVerified && !_paymentFailed && !_isProcessing)
-          _buildManualNavigationButton(),
+          _buildManualNavigationButton(isDarkMode),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black),
+          icon: Icon(Icons.arrow_back_rounded, color: isDarkMode ? Colors.white : Colors.black87),
           onPressed: _handleCancelPayment,
         ),
         title: Text(
           _type == 'upload' ? 'Purchase Upload Package' : 'Promote Listing',
-          style: const TextStyle(
-            color: Colors.black,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
             fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
         ),
         centerTitle: true,
         actions: [
           if (!_paymentVerified && !_paymentFailed)
             IconButton(
-              icon: const Icon(Icons.refresh, color: Colors.black),
+              icon: Icon(Icons.refresh, color: isDarkMode ? Colors.white : Colors.black),
               onPressed: _manualVerifyPayment,
               tooltip: 'Check Payment Status',
             ),
         ],
       ),
       body: _paymentVerified
-          ? _buildPaymentSuccess()
+          ? _buildPaymentSuccess(isDarkMode)
           : _paymentFailed
-              ? _buildPaymentFailed()
-              : _buildWebView(),
+              ? _buildPaymentFailed(isDarkMode)
+              : _buildWebView(isDarkMode),
     );
   }
-} 
+}

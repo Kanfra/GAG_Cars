@@ -587,7 +587,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
       onTap: () {
         logger.w('item is clicked on');
         Get.toNamed(
-          RouteClass.listingsDetailPage,
+          RouteClass.getListingsDetailPage(),
           arguments: {
             'listing': listing.toJson(),
             'type': 'listing'

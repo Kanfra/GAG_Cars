@@ -53,10 +53,87 @@ class SimilarItem with _$SimilarItem {
     @JsonKey(name: 'updated_at') String? updatedAt,
     @JsonKey(name: 'Height') String? height,
     @JsonKey(name: 'VIN') String? vin,
+    // Added nested objects
+    @JsonKey(name: 'brand') Brand? brand,
+    @JsonKey(name: 'category') Category? category,
+    @JsonKey(name: 'brand_model') BrandModel? brandModel,
+    @JsonKey(name: 'user') User? user,
   }) = _SimilarItem;
 
   factory SimilarItem.fromJson(Map<String, dynamic> json) =>
       _$SimilarItemFromJson(json);
+}
+
+@freezed
+class Brand with _$Brand {
+  const factory Brand({
+    @JsonKey(name: 'id') required int id,
+    @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
+    @JsonKey(name: 'name') String? name,
+    @JsonKey(name: 'slug') String? slug,
+    @JsonKey(name: 'image') String? image,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+  }) = _Brand;
+
+  factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
+}
+
+@freezed
+class Category with _$Category {
+  const factory Category({
+    @JsonKey(name: 'id') required int id,
+    @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
+    @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
+    @JsonKey(name: 'name') String? name,
+    @JsonKey(name: 'slug') String? slug,
+    @JsonKey(name: 'description') String? description,
+    @JsonKey(name: 'features', fromJson: _parseStringList) List<String>? features,
+    @JsonKey(name: 'image') String? image,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+  }) = _Category;
+
+  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
+}
+
+@freezed
+class BrandModel with _$BrandModel {
+  const factory BrandModel({
+    @JsonKey(name: 'id') required int id,
+    @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
+    @JsonKey(name: 'name') String? name,
+    @JsonKey(name: 'slug') String? slug,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+  }) = _BrandModel;
+
+  factory BrandModel.fromJson(Map<String, dynamic> json) => _$BrandModelFromJson(json);
+}
+
+@freezed
+class User with _$User {
+  const factory User({
+    @JsonKey(name: 'id') required String id,
+    @JsonKey(name: 'name') String? name,
+    @JsonKey(name: 'email') String? email,
+    @JsonKey(name: 'phone') String? phone,
+    @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+    @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt) int? paidSeller,
+    @JsonKey(name: 'deleted_at') String? deletedAt,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
+    @JsonKey(name: 'state_id', fromJson: _parseNullableInt) int? stateId,
+    @JsonKey(name: 'profile_photo') String? profilePhoto,
+    @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt) int? uploadsLeft,
+    @JsonKey(name: 'active_status', fromJson: _parseNullableInt) int? activeStatus,
+    @JsonKey(name: 'avatar') String? avatar,
+    @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt) int? darkMode,
+    @JsonKey(name: 'messenger_color') String? messengerColor,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
 
 @freezed

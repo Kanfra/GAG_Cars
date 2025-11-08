@@ -34,7 +34,7 @@ class CloudinaryService {
   }
 
 
-  static Future<String> uploadImage(File imageFile, {String? oldImageUrl}) async {
+  static Future<String> uploadImage(File imageFile, {String? oldImageUrl, String? folderName}) async {
   final logger = Logger();
   try{
     // validate that cloudinary is initialized
@@ -57,7 +57,7 @@ class CloudinaryService {
     // upload the image
     final response = await _cloudinary.upload(
       file: imageFile.path,
-      folder: "profile_images", // specific folder for profile pictures
+      folder: folderName ?? "profile_images", // specific folder for profile pictures
       publicId: publicId, // this will replace the existing image if provided
       resourceType: CloudinaryResourceType.image,
       optParams: optParams, // pass transformation parameters here
@@ -73,7 +73,7 @@ class CloudinaryService {
 
   } catch(e){
     logger.e('Cloudinary upload error: $e');
-    throw Exception('Failed to upload profile image: $e');
+    throw Exception('Failed to upload ${folderName ?? 'profile image'}: $e');
   }
 }
 

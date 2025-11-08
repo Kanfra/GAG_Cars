@@ -782,12 +782,15 @@ mixin _$Item {
   @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
-  String? get updatedAt => throw _privateConstructorUsedError;
+  String? get updatedAt =>
+      throw _privateConstructorUsedError; // New fields from response
+  String? get Height => throw _privateConstructorUsedError;
+  String? get VIN => throw _privateConstructorUsedError;
   Brand? get brand => throw _privateConstructorUsedError;
   Category? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'brand_model')
   BrandModel? get brandModel => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get user => throw _privateConstructorUsedError;
+  User? get user => throw _privateConstructorUsedError;
 
   /// Serializes this Item to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -834,14 +837,17 @@ abstract class $ItemCopyWith<$Res> {
       @JsonKey(name: 'deleted_at') String? deletedAt,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
+      String? Height,
+      String? VIN,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
-      Map<String, dynamic>? user});
+      User? user});
 
   $BrandCopyWith<$Res>? get brand;
   $CategoryCopyWith<$Res>? get category;
   $BrandModelCopyWith<$Res>? get brandModel;
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -888,6 +894,8 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
     Object? deletedAt = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? Height = freezed,
+    Object? VIN = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
@@ -1010,6 +1018,14 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      Height: freezed == Height
+          ? _value.Height
+          : Height // ignore: cast_nullable_to_non_nullable
+              as String?,
+      VIN: freezed == VIN
+          ? _value.VIN
+          : VIN // ignore: cast_nullable_to_non_nullable
+              as String?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1025,7 +1041,7 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
       user: freezed == user
           ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
+              as User?,
     ) as $Val);
   }
 
@@ -1070,6 +1086,20 @@ class _$ItemCopyWithImpl<$Res, $Val extends Item>
       return _then(_value.copyWith(brandModel: value) as $Val);
     });
   }
+
+  /// Create a copy of Item
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -1110,10 +1140,12 @@ abstract class _$$ItemImplCopyWith<$Res> implements $ItemCopyWith<$Res> {
       @JsonKey(name: 'deleted_at') String? deletedAt,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
+      String? Height,
+      String? VIN,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
-      Map<String, dynamic>? user});
+      User? user});
 
   @override
   $BrandCopyWith<$Res>? get brand;
@@ -1121,6 +1153,8 @@ abstract class _$$ItemImplCopyWith<$Res> implements $ItemCopyWith<$Res> {
   $CategoryCopyWith<$Res>? get category;
   @override
   $BrandModelCopyWith<$Res>? get brandModel;
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -1164,6 +1198,8 @@ class __$$ItemImplCopyWithImpl<$Res>
     Object? deletedAt = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? Height = freezed,
+    Object? VIN = freezed,
     Object? brand = freezed,
     Object? category = freezed,
     Object? brandModel = freezed,
@@ -1286,6 +1322,14 @@ class __$$ItemImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      Height: freezed == Height
+          ? _value.Height
+          : Height // ignore: cast_nullable_to_non_nullable
+              as String?,
+      VIN: freezed == VIN
+          ? _value.VIN
+          : VIN // ignore: cast_nullable_to_non_nullable
+              as String?,
       brand: freezed == brand
           ? _value.brand
           : brand // ignore: cast_nullable_to_non_nullable
@@ -1299,9 +1343,9 @@ class __$$ItemImplCopyWithImpl<$Res>
           : brandModel // ignore: cast_nullable_to_non_nullable
               as BrandModel?,
       user: freezed == user
-          ? _value._user
+          ? _value.user
           : user // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
+              as User?,
     ));
   }
 }
@@ -1340,13 +1384,14 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
+      this.Height,
+      this.VIN,
       this.brand,
       this.category,
       @JsonKey(name: 'brand_model') this.brandModel,
-      final Map<String, dynamic>? user = null})
+      this.user})
       : _images = images,
-        _features = features,
-        _user = user;
+        _features = features;
 
   factory _$ItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$ItemImplFromJson(json);
@@ -1442,6 +1487,11 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   @override
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
+// New fields from response
+  @override
+  final String? Height;
+  @override
+  final String? VIN;
   @override
   final Brand? brand;
   @override
@@ -1449,20 +1499,12 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
   @override
   @JsonKey(name: 'brand_model')
   final BrandModel? brandModel;
-  final Map<String, dynamic>? _user;
   @override
-  @JsonKey()
-  Map<String, dynamic>? get user {
-    final value = _user;
-    if (value == null) return null;
-    if (_user is EqualUnmodifiableMapView) return _user;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
+  final User? user;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Item(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, brand: $brand, category: $category, brandModel: $brandModel, user: $user)';
+    return 'Item(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, Height: $Height, VIN: $VIN, brand: $brand, category: $category, brandModel: $brandModel, user: $user)';
   }
 
   @override
@@ -1499,6 +1541,8 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
       ..add(DiagnosticsProperty('deletedAt', deletedAt))
       ..add(DiagnosticsProperty('createdAt', createdAt))
       ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('Height', Height))
+      ..add(DiagnosticsProperty('VIN', VIN))
       ..add(DiagnosticsProperty('brand', brand))
       ..add(DiagnosticsProperty('category', category))
       ..add(DiagnosticsProperty('brandModel', brandModel))
@@ -1556,12 +1600,14 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
+            (identical(other.Height, Height) || other.Height == Height) &&
+            (identical(other.VIN, VIN) || other.VIN == VIN) &&
             (identical(other.brand, brand) || other.brand == brand) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.brandModel, brandModel) ||
                 other.brandModel == brandModel) &&
-            const DeepCollectionEquality().equals(other._user, _user));
+            (identical(other.user, user) || other.user == user));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1597,10 +1643,12 @@ class _$ItemImpl with DiagnosticableTreeMixin implements _Item {
         deletedAt,
         createdAt,
         updatedAt,
+        Height,
+        VIN,
         brand,
         category,
         brandModel,
-        const DeepCollectionEquality().hash(_user)
+        user
       ]);
 
   /// Create a copy of Item
@@ -1652,10 +1700,12 @@ abstract class _Item implements Item {
       @JsonKey(name: 'deleted_at') final String? deletedAt,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
+      final String? Height,
+      final String? VIN,
       final Brand? brand,
       final Category? category,
       @JsonKey(name: 'brand_model') final BrandModel? brandModel,
-      final Map<String, dynamic>? user}) = _$ItemImpl;
+      final User? user}) = _$ItemImpl;
 
   factory _Item.fromJson(Map<String, dynamic> json) = _$ItemImpl.fromJson;
 
@@ -1733,7 +1783,11 @@ abstract class _Item implements Item {
   String? get createdAt;
   @override
   @JsonKey(name: 'updated_at')
-  String? get updatedAt;
+  String? get updatedAt; // New fields from response
+  @override
+  String? get Height;
+  @override
+  String? get VIN;
   @override
   Brand? get brand;
   @override
@@ -1742,13 +1796,582 @@ abstract class _Item implements Item {
   @JsonKey(name: 'brand_model')
   BrandModel? get brandModel;
   @override
-  Map<String, dynamic>? get user;
+  User? get user;
 
   /// Create a copy of Item
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$ItemImplCopyWith<_$ItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+User _$UserFromJson(Map<String, dynamic> json) {
+  return _User.fromJson(json);
+}
+
+/// @nodoc
+mixin _$User {
+  @JsonKey(fromJson: _parseString)
+  String get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String get email => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
+  @JsonKey(name: 'email_verified_at')
+  String? get emailVerifiedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'paid_seller', fromJson: _parseInt)
+  int? get paidSeller => throw _privateConstructorUsedError;
+  @JsonKey(name: 'deleted_at')
+  String? get deletedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  int? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'state_id', fromJson: _parseInt)
+  int? get stateId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto => throw _privateConstructorUsedError;
+  @JsonKey(name: 'uploads_left', fromJson: _parseInt)
+  int? get uploadsLeft => throw _privateConstructorUsedError;
+  @JsonKey(name: 'active_status', fromJson: _parseInt)
+  int? get activeStatus => throw _privateConstructorUsedError;
+  String? get avatar => throw _privateConstructorUsedError;
+  @JsonKey(name: 'dark_mode', fromJson: _parseInt)
+  int? get darkMode => throw _privateConstructorUsedError;
+  @JsonKey(name: 'messenger_color')
+  String? get messengerColor => throw _privateConstructorUsedError;
+
+  /// Serializes this User to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UserCopyWith<User> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserCopyWith<$Res> {
+  factory $UserCopyWith(User value, $Res Function(User) then) =
+      _$UserCopyWithImpl<$Res, User>;
+  @useResult
+  $Res call(
+      {@JsonKey(fromJson: _parseString) String id,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String email,
+      String? phone,
+      @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseInt) int? paidSeller,
+      @JsonKey(name: 'deleted_at') String? deletedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseInt) int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseInt) int? uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseInt) int? activeStatus,
+      String? avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseInt) int? darkMode,
+      @JsonKey(name: 'messenger_color') String? messengerColor});
+}
+
+/// @nodoc
+class _$UserCopyWithImpl<$Res, $Val extends User>
+    implements $UserCopyWith<$Res> {
+  _$UserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = null,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+    Object? uploadsLeft = freezed,
+    Object? activeStatus = freezed,
+    Object? avatar = freezed,
+    Object? darkMode = freezed,
+    Object? messengerColor = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+      uploadsLeft: freezed == uploadsLeft
+          ? _value.uploadsLeft
+          : uploadsLeft // ignore: cast_nullable_to_non_nullable
+              as int?,
+      activeStatus: freezed == activeStatus
+          ? _value.activeStatus
+          : activeStatus // ignore: cast_nullable_to_non_nullable
+              as int?,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      darkMode: freezed == darkMode
+          ? _value.darkMode
+          : darkMode // ignore: cast_nullable_to_non_nullable
+              as int?,
+      messengerColor: freezed == messengerColor
+          ? _value.messengerColor
+          : messengerColor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
+  factory _$$UserImplCopyWith(
+          _$UserImpl value, $Res Function(_$UserImpl) then) =
+      __$$UserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(fromJson: _parseString) String id,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String email,
+      String? phone,
+      @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseInt) int? paidSeller,
+      @JsonKey(name: 'deleted_at') String? deletedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseInt) int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseInt) int? uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseInt) int? activeStatus,
+      String? avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseInt) int? darkMode,
+      @JsonKey(name: 'messenger_color') String? messengerColor});
+}
+
+/// @nodoc
+class __$$UserImplCopyWithImpl<$Res>
+    extends _$UserCopyWithImpl<$Res, _$UserImpl>
+    implements _$$UserImplCopyWith<$Res> {
+  __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = null,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+    Object? uploadsLeft = freezed,
+    Object? activeStatus = freezed,
+    Object? avatar = freezed,
+    Object? darkMode = freezed,
+    Object? messengerColor = freezed,
+  }) {
+    return _then(_$UserImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+      uploadsLeft: freezed == uploadsLeft
+          ? _value.uploadsLeft
+          : uploadsLeft // ignore: cast_nullable_to_non_nullable
+              as int?,
+      activeStatus: freezed == activeStatus
+          ? _value.activeStatus
+          : activeStatus // ignore: cast_nullable_to_non_nullable
+              as int?,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      darkMode: freezed == darkMode
+          ? _value.darkMode
+          : darkMode // ignore: cast_nullable_to_non_nullable
+              as int?,
+      messengerColor: freezed == messengerColor
+          ? _value.messengerColor
+          : messengerColor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UserImpl with DiagnosticableTreeMixin implements _User {
+  const _$UserImpl(
+      {@JsonKey(fromJson: _parseString) required this.id,
+      @JsonKey(fromJson: _parseString) required this.name,
+      @JsonKey(fromJson: _parseString) required this.email,
+      this.phone,
+      @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseInt) this.paidSeller,
+      @JsonKey(name: 'deleted_at') this.deletedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) this.countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseInt) this.stateId,
+      @JsonKey(name: 'profile_photo') this.profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseInt) this.uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseInt) this.activeStatus,
+      this.avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseInt) this.darkMode,
+      @JsonKey(name: 'messenger_color') this.messengerColor});
+
+  factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserImplFromJson(json);
+
+  @override
+  @JsonKey(fromJson: _parseString)
+  final String id;
+  @override
+  @JsonKey(fromJson: _parseString)
+  final String name;
+  @override
+  @JsonKey(fromJson: _parseString)
+  final String email;
+  @override
+  final String? phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  final String? emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller', fromJson: _parseInt)
+  final int? paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  final String? deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+  @override
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  final int? countryId;
+  @override
+  @JsonKey(name: 'state_id', fromJson: _parseInt)
+  final int? stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  final String? profilePhoto;
+  @override
+  @JsonKey(name: 'uploads_left', fromJson: _parseInt)
+  final int? uploadsLeft;
+  @override
+  @JsonKey(name: 'active_status', fromJson: _parseInt)
+  final int? activeStatus;
+  @override
+  final String? avatar;
+  @override
+  @JsonKey(name: 'dark_mode', fromJson: _parseInt)
+  final int? darkMode;
+  @override
+  @JsonKey(name: 'messenger_color')
+  final String? messengerColor;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'User(id: $id, name: $name, email: $email, phone: $phone, emailVerifiedAt: $emailVerifiedAt, paidSeller: $paidSeller, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, countryId: $countryId, stateId: $stateId, profilePhoto: $profilePhoto, uploadsLeft: $uploadsLeft, activeStatus: $activeStatus, avatar: $avatar, darkMode: $darkMode, messengerColor: $messengerColor)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'User'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('email', email))
+      ..add(DiagnosticsProperty('phone', phone))
+      ..add(DiagnosticsProperty('emailVerifiedAt', emailVerifiedAt))
+      ..add(DiagnosticsProperty('paidSeller', paidSeller))
+      ..add(DiagnosticsProperty('deletedAt', deletedAt))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('countryId', countryId))
+      ..add(DiagnosticsProperty('stateId', stateId))
+      ..add(DiagnosticsProperty('profilePhoto', profilePhoto))
+      ..add(DiagnosticsProperty('uploadsLeft', uploadsLeft))
+      ..add(DiagnosticsProperty('activeStatus', activeStatus))
+      ..add(DiagnosticsProperty('avatar', avatar))
+      ..add(DiagnosticsProperty('darkMode', darkMode))
+      ..add(DiagnosticsProperty('messengerColor', messengerColor));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.emailVerifiedAt, emailVerifiedAt) ||
+                other.emailVerifiedAt == emailVerifiedAt) &&
+            (identical(other.paidSeller, paidSeller) ||
+                other.paidSeller == paidSeller) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
+            (identical(other.stateId, stateId) || other.stateId == stateId) &&
+            (identical(other.profilePhoto, profilePhoto) ||
+                other.profilePhoto == profilePhoto) &&
+            (identical(other.uploadsLeft, uploadsLeft) ||
+                other.uploadsLeft == uploadsLeft) &&
+            (identical(other.activeStatus, activeStatus) ||
+                other.activeStatus == activeStatus) &&
+            (identical(other.avatar, avatar) || other.avatar == avatar) &&
+            (identical(other.darkMode, darkMode) ||
+                other.darkMode == darkMode) &&
+            (identical(other.messengerColor, messengerColor) ||
+                other.messengerColor == messengerColor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      email,
+      phone,
+      emailVerifiedAt,
+      paidSeller,
+      deletedAt,
+      createdAt,
+      updatedAt,
+      countryId,
+      stateId,
+      profilePhoto,
+      uploadsLeft,
+      activeStatus,
+      avatar,
+      darkMode,
+      messengerColor);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      __$$UserImplCopyWithImpl<_$UserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _User implements User {
+  const factory _User(
+      {@JsonKey(fromJson: _parseString) required final String id,
+      @JsonKey(fromJson: _parseString) required final String name,
+      @JsonKey(fromJson: _parseString) required final String email,
+      final String? phone,
+      @JsonKey(name: 'email_verified_at') final String? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseInt) final int? paidSeller,
+      @JsonKey(name: 'deleted_at') final String? deletedAt,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) final int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseInt) final int? stateId,
+      @JsonKey(name: 'profile_photo') final String? profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseInt)
+      final int? uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseInt)
+      final int? activeStatus,
+      final String? avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseInt) final int? darkMode,
+      @JsonKey(name: 'messenger_color')
+      final String? messengerColor}) = _$UserImpl;
+
+  factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
+
+  @override
+  @JsonKey(fromJson: _parseString)
+  String get id;
+  @override
+  @JsonKey(fromJson: _parseString)
+  String get name;
+  @override
+  @JsonKey(fromJson: _parseString)
+  String get email;
+  @override
+  String? get phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  String? get emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller', fromJson: _parseInt)
+  int? get paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  String? get deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt;
+  @override
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  int? get countryId;
+  @override
+  @JsonKey(name: 'state_id', fromJson: _parseInt)
+  int? get stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto;
+  @override
+  @JsonKey(name: 'uploads_left', fromJson: _parseInt)
+  int? get uploadsLeft;
+  @override
+  @JsonKey(name: 'active_status', fromJson: _parseInt)
+  int? get activeStatus;
+  @override
+  String? get avatar;
+  @override
+  @JsonKey(name: 'dark_mode', fromJson: _parseInt)
+  int? get darkMode;
+  @override
+  @JsonKey(name: 'messenger_color')
+  String? get messengerColor;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -2063,7 +2686,7 @@ mixin _$Category {
   int get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'user_id')
   String? get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'parent_id')
+  @JsonKey(name: 'parent_id', fromJson: _parseString)
   String? get parentId => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
@@ -2094,7 +2717,7 @@ abstract class $CategoryCopyWith<$Res> {
   $Res call(
       {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'parent_id') String? parentId,
+      @JsonKey(name: 'parent_id', fromJson: _parseString) String? parentId,
       @JsonKey(fromJson: _parseString) String name,
       String? slug,
       String? description,
@@ -2186,7 +2809,7 @@ abstract class _$$CategoryImplCopyWith<$Res>
   $Res call(
       {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'parent_id') String? parentId,
+      @JsonKey(name: 'parent_id', fromJson: _parseString) String? parentId,
       @JsonKey(fromJson: _parseString) String name,
       String? slug,
       String? description,
@@ -2271,7 +2894,7 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   const _$CategoryImpl(
       {@JsonKey(fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'parent_id') this.parentId,
+      @JsonKey(name: 'parent_id', fromJson: _parseString) this.parentId,
       @JsonKey(fromJson: _parseString) required this.name,
       this.slug,
       this.description,
@@ -2291,7 +2914,7 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   @JsonKey(name: 'user_id')
   final String? userId;
   @override
-  @JsonKey(name: 'parent_id')
+  @JsonKey(name: 'parent_id', fromJson: _parseString)
   final String? parentId;
   @override
   @JsonKey(fromJson: _parseString)
@@ -2397,7 +3020,8 @@ abstract class _Category implements Category {
   const factory _Category(
       {@JsonKey(fromJson: _parseInt) required final int id,
       @JsonKey(name: 'user_id') final String? userId,
-      @JsonKey(name: 'parent_id') final String? parentId,
+      @JsonKey(name: 'parent_id', fromJson: _parseString)
+      final String? parentId,
       @JsonKey(fromJson: _parseString) required final String name,
       final String? slug,
       final String? description,
@@ -2416,7 +3040,7 @@ abstract class _Category implements Category {
   @JsonKey(name: 'user_id')
   String? get userId;
   @override
-  @JsonKey(name: 'parent_id')
+  @JsonKey(name: 'parent_id', fromJson: _parseString)
   String? get parentId;
   @override
   @JsonKey(fromJson: _parseString)

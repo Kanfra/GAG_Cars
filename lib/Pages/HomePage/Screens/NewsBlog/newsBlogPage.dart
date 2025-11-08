@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/postResponse.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:get/get.dart';
@@ -294,10 +295,13 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
   }
 
   Widget _buildPostList(List<Post> posts, String tabTitle, BlogPostProvider blogPostProvider) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
+    
     final isLoadingMore = blogPostProvider.isLoadingMore && _searchQuery.isEmpty;
 
     if (posts.isEmpty) {
-      return _searchQuery.isNotEmpty ? _buildSearchEmptyState() : _buildEmptyState();
+      return _searchQuery.isNotEmpty ? _buildSearchEmptyState(isDarkMode) : _buildEmptyState(isDarkMode);
     }
 
     return ListView.builder(
@@ -308,15 +312,15 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
       itemBuilder: (context, index) {
         if (index < posts.length) {
           final post = posts[index];
-          return _buildPostCard(post, tabTitle != 'All News', index);
+          return _buildPostCard(post, tabTitle != 'All News', index, isDarkMode);
         } else {
-          return _buildLoadMoreIndicator();
+          return _buildLoadMoreIndicator(isDarkMode);
         }
       },
     );
   }
 
-  Widget _buildPostCard(Post post, bool showCategoryBadge, int index) {
+  Widget _buildPostCard(Post post, bool showCategoryBadge, int index, bool isDarkMode) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300 + (index * 100)),
       curve: Curves.easeOut,
@@ -332,11 +336,11 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             borderRadius: BorderRadius.circular(20),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -357,7 +361,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           height: 200,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => _buildImageShimmer(),
+                          placeholder: (context, url) => _buildImageShimmer(isDarkMode),
                           errorWidget: (context, url, error) {
                             return Container(
                               height: 200,
@@ -430,31 +434,31 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           ),
                         ),
                       
-                      Positioned(
-                        top: 12,
-                        right: 12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.schedule, color: Colors.white, size: 12),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${_calculateReadingTime(post.content)} min',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      // Positioned(
+                      //   top: 12,
+                      //   right: 12,
+                      //   child: Container(
+                      //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      //     decoration: BoxDecoration(
+                      //       color: Colors.black.withOpacity(0.7),
+                      //       borderRadius: BorderRadius.circular(10),
+                      //     ),
+                      //     child: Row(
+                      //       children: [
+                      //         Icon(Icons.schedule, color: Colors.white, size: 12),
+                      //         const SizedBox(width: 4),
+                      //         Text(
+                      //           '${_calculateReadingTime(post.content)} min',
+                      //           style: const TextStyle(
+                      //             color: Colors.white,
+                      //             fontSize: 10,
+                      //             fontWeight: FontWeight.w600,
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   
@@ -468,7 +472,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: ColorGlobalVariables.blackColor,
+                            color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                             height: 1.3,
                           ),
                           maxLines: 2,
@@ -482,7 +486,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade700,
+                            color: isDarkMode ? Colors.white70 : Colors.grey.shade700,
                             height: 1.5,
                           ),
                           maxLines: 3,
@@ -518,7 +522,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                                       style: TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
-                                        color: ColorGlobalVariables.blackColor,
+                                        color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                                       ),
                                     ),
                                     Text(
@@ -526,7 +530,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.grey.shade500,
+                                        color: isDarkMode ? Colors.white60 : Colors.grey.shade500,
                                       ),
                                     ),
                                   ],
@@ -534,27 +538,30 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                               ],
                             ),
                             
-                            Row(
-                              children: [
-                                _buildEngagementStat(
-                                  icon: Icons.favorite_outline,
-                                  count: _calculateLikes(post),
-                                  color: Colors.red.shade400,
-                                ),
-                                const SizedBox(width: 16),
-                                _buildEngagementStat(
-                                  icon: Icons.comment_outlined,
-                                  count: post.tags.length.toString(),
-                                  color: Colors.blue.shade400,
-                                ),
-                                const SizedBox(width: 16),
-                                _buildEngagementStat(
-                                  icon: Icons.share_outlined,
-                                  count: '0',
-                                  color: Colors.green.shade400,
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     _buildEngagementStat(
+                            //       icon: Icons.favorite_outline,
+                            //       count: _calculateLikes(post),
+                            //       color: Colors.red.shade400,
+                            //       isDarkMode: isDarkMode,
+                            //     ),
+                            //     const SizedBox(width: 16),
+                            //     _buildEngagementStat(
+                            //       icon: Icons.comment_outlined,
+                            //       count: post.tags.length.toString(),
+                            //       color: Colors.blue.shade400,
+                            //       isDarkMode: isDarkMode,
+                            //     ),
+                            //     const SizedBox(width: 16),
+                            //     _buildEngagementStat(
+                            //       icon: Icons.share_outlined,
+                            //       count: '0',
+                            //       color: Colors.green.shade400,
+                            //       isDarkMode: isDarkMode,
+                            //     ),
+                            //   ],
+                            // ),
                           ],
                         ),
                       ],
@@ -569,7 +576,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildEngagementStat({required IconData icon, required String count, required Color color}) {
+  Widget _buildEngagementStat({required IconData icon, required String count, required Color color, required bool isDarkMode}) {
     return Row(
       children: [
         Icon(icon, size: 16, color: color),
@@ -579,14 +586,14 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade600,
+            color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -595,13 +602,13 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: isDarkMode ? const Color(0xFF424242) : Colors.grey.shade100,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.article_outlined,
               size: 50,
-              color: Colors.grey.shade400,
+              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade400,
             ),
           ),
           const SizedBox(height: 24),
@@ -610,7 +617,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Colors.grey.shade600,
+              color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 8),
@@ -618,7 +625,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             'Check back later for new content',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade500,
+              color: isDarkMode ? Colors.white60 : Colors.grey.shade500,
             ),
           ),
         ],
@@ -626,7 +633,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildSearchEmptyState() {
+  Widget _buildSearchEmptyState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -635,13 +642,13 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: isDarkMode ? const Color(0xFF424242) : Colors.grey.shade100,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.search_off,
               size: 50,
-              color: Colors.grey.shade400,
+              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade400,
             ),
           ),
           const SizedBox(height: 24),
@@ -650,7 +657,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: Colors.grey.shade600,
+              color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 8),
@@ -658,7 +665,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             'Try searching with different keywords',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade500,
+              color: isDarkMode ? Colors.white60 : Colors.grey.shade500,
             ),
           ),
           const SizedBox(height: 16),
@@ -667,7 +674,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
               'Searching for: "$_searchQuery"',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: isDarkMode ? Colors.white60 : Colors.grey.shade600,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -676,7 +683,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildLoadMoreIndicator() {
+  Widget _buildLoadMoreIndicator(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Center(
@@ -695,7 +702,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
               'Loading more articles...',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
               ),
             ),
           ],
@@ -704,15 +711,15 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     );
   }
 
-  Widget _buildImageShimmer() {
+  Widget _buildImageShimmer(bool isDarkMode) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+      highlightColor: isDarkMode ? Colors.grey.shade600 : Colors.grey.shade100,
       child: Container(
         height: 200,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
@@ -767,17 +774,20 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     if (_isInitialLoad) {
       _fetchPostsAfterBuild();
     }
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey.shade50,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
             SliverAppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
               elevation: innerBoxIsScrolled ? 4 : 0,
               pinned: true,
               floating: true,
@@ -790,10 +800,15 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.white,
-                        Colors.grey.shade50,
-                      ],
+                      colors: isDarkMode
+                          ? [
+                              const Color(0xFF424242),
+                              const Color(0xFF303030),
+                            ]
+                          : [
+                              Colors.white,
+                              Colors.grey.shade50,
+                            ],
                     ),
                   ),
                   child: Padding(
@@ -821,7 +836,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Colors.grey.shade600,
+                              color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
                             ),
                           ),
                         ),
@@ -836,14 +851,14 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey.shade100,
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
                     icon: Icon(
                       Icons.arrow_back_ios,
                       size: 18,
-                      color: ColorGlobalVariables.fadedBlackColor,
+                      color: isDarkMode ? Colors.white70 : ColorGlobalVariables.fadedBlackColor,
                     ),
                     onPressed: () => Get.back(),
                     padding: EdgeInsets.zero,
@@ -857,7 +872,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: isDarkMode ? const Color(0xFF616161) : Colors.grey.shade100,
                       shape: BoxShape.circle,
                     ),
                     child: Stack(
@@ -866,7 +881,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           icon: Icon(
                             Icons.notifications_outlined,
                             size: 18,
-                            color: Colors.grey.shade700,
+                            color: isDarkMode ? Colors.white70 : Colors.grey.shade700,
                           ),
                           onPressed: () {
                             Get.toNamed(RouteClass.getNotificationsPage());
@@ -882,7 +897,10 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                             decoration: BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1.5),
+                              border: Border.all(
+                                color: isDarkMode ? const Color(0xFF424242) : Colors.white, 
+                                width: 1.5
+                              ),
                             ),
                           ),
                         ),
@@ -900,11 +918,11 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withOpacity(isDarkMode ? 0.1 : 0.05),
                         blurRadius: 15,
                         offset: const Offset(0, 4),
                       ),
@@ -916,14 +934,14 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                     decoration: InputDecoration(
                       hintText: 'Search articles, brands, topics...',
                       hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
+                        color: isDarkMode ? Colors.white60 : Colors.grey.shade500,
                         fontSize: 14,
                       ),
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 16, right: 8),
                         child: Icon(
                           Icons.search_rounded, 
-                          color: Colors.grey.shade500, 
+                          color: isDarkMode ? Colors.white60 : Colors.grey.shade500, 
                           size: 20
                         ),
                       ),
@@ -932,7 +950,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                         child: IconButton(
                           icon: Icon(
                             Icons.clear,
-                            color: Colors.grey.shade500,
+                            color: isDarkMode ? Colors.white60 : Colors.grey.shade500,
                             size: 20,
                           ),
                           onPressed: _clearSearch,
@@ -942,7 +960,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                       contentPadding: const EdgeInsets.symmetric(vertical: 15),
                     ),
                     style: TextStyle(
-                      color: ColorGlobalVariables.blackColor,
+                      color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                       fontSize: 14,
                     ),
                   ),
@@ -954,10 +972,10 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
               child: Container(
                 height: 60,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
+                      color: Colors.black.withOpacity(isDarkMode ? 0.1 : 0.03),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -989,7 +1007,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                         ),
                         indicatorSize: TabBarIndicatorSize.tab,
                         labelColor: Colors.white,
-                        unselectedLabelColor: Colors.grey.shade600,
+                        unselectedLabelColor: isDarkMode ? Colors.white60 : Colors.grey.shade600,
                         labelStyle: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -998,7 +1016,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                         unselectedLabelStyle: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color: Colors.grey.shade600,
+                          color: isDarkMode ? Colors.white60 : Colors.grey.shade600,
                         ),
                         tabs: _tabTitles.map((title) => Tab(
                           child: Container(
@@ -1026,12 +1044,12 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             ),
           ];
         },
-        body: _isInitialLoad ? _buildLoadingState() : _buildContent(),
+        body: _isInitialLoad ? _buildLoadingState(isDarkMode) : _buildContent(),
       ),
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -1042,7 +1060,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
               valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: isDarkMode ? Colors.grey.shade600 : Colors.grey.shade200,
             ),
           ),
           const SizedBox(height: 16),
@@ -1051,7 +1069,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade600,
+              color: isDarkMode ? Colors.white70 : Colors.grey.shade600,
             ),
           ),
           const SizedBox(height: 4),
@@ -1059,7 +1077,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
             'Discovering the latest automotive news',
             style: TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade500,
+              color: isDarkMode ? Colors.white60 : Colors.grey.shade500,
             ),
           ),
         ],

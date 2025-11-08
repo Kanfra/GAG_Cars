@@ -83,6 +83,8 @@ dependencies:
   pdf: ^3.10.4             # For PDF generation
   printing: ^5.11.1        # For PDF printing and sharing
   open_file: ^3.3.1        # For opening downloaded files
+  emoji_picker_flutter: ^4.3.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -92,6 +94,12 @@ dev_dependencies:
   build_runner: ^2.4.7
   freezed: ^2.4.6
   json_serializable: ^6.7.1
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
 
 flutter:
   uses-material-design: true

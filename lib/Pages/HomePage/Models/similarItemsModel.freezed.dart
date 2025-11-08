@@ -331,7 +331,15 @@ mixin _$SimilarItem {
   @JsonKey(name: 'Height')
   String? get height => throw _privateConstructorUsedError;
   @JsonKey(name: 'VIN')
-  String? get vin => throw _privateConstructorUsedError;
+  String? get vin => throw _privateConstructorUsedError; // Added nested objects
+  @JsonKey(name: 'brand')
+  Brand? get brand => throw _privateConstructorUsedError;
+  @JsonKey(name: 'category')
+  Category? get category => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_model')
+  BrandModel? get brandModel => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user')
+  User? get user => throw _privateConstructorUsedError;
 
   /// Serializes this SimilarItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -384,7 +392,16 @@ abstract class $SimilarItemCopyWith<$Res> {
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       @JsonKey(name: 'Height') String? height,
-      @JsonKey(name: 'VIN') String? vin});
+      @JsonKey(name: 'VIN') String? vin,
+      @JsonKey(name: 'brand') Brand? brand,
+      @JsonKey(name: 'category') Category? category,
+      @JsonKey(name: 'brand_model') BrandModel? brandModel,
+      @JsonKey(name: 'user') User? user});
+
+  $BrandCopyWith<$Res>? get brand;
+  $CategoryCopyWith<$Res>? get category;
+  $BrandModelCopyWith<$Res>? get brandModel;
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -433,6 +450,10 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
     Object? updatedAt = freezed,
     Object? height = freezed,
     Object? vin = freezed,
+    Object? brand = freezed,
+    Object? category = freezed,
+    Object? brandModel = freezed,
+    Object? user = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -559,7 +580,79 @@ class _$SimilarItemCopyWithImpl<$Res, $Val extends SimilarItem>
           ? _value.vin
           : vin // ignore: cast_nullable_to_non_nullable
               as String?,
+      brand: freezed == brand
+          ? _value.brand
+          : brand // ignore: cast_nullable_to_non_nullable
+              as Brand?,
+      category: freezed == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as Category?,
+      brandModel: freezed == brandModel
+          ? _value.brandModel
+          : brandModel // ignore: cast_nullable_to_non_nullable
+              as BrandModel?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
     ) as $Val);
+  }
+
+  /// Create a copy of SimilarItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BrandCopyWith<$Res>? get brand {
+    if (_value.brand == null) {
+      return null;
+    }
+
+    return $BrandCopyWith<$Res>(_value.brand!, (value) {
+      return _then(_value.copyWith(brand: value) as $Val);
+    });
+  }
+
+  /// Create a copy of SimilarItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CategoryCopyWith<$Res>? get category {
+    if (_value.category == null) {
+      return null;
+    }
+
+    return $CategoryCopyWith<$Res>(_value.category!, (value) {
+      return _then(_value.copyWith(category: value) as $Val);
+    });
+  }
+
+  /// Create a copy of SimilarItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BrandModelCopyWith<$Res>? get brandModel {
+    if (_value.brandModel == null) {
+      return null;
+    }
+
+    return $BrandModelCopyWith<$Res>(_value.brandModel!, (value) {
+      return _then(_value.copyWith(brandModel: value) as $Val);
+    });
+  }
+
+  /// Create a copy of SimilarItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -606,7 +699,20 @@ abstract class _$$SimilarItemImplCopyWith<$Res>
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
       @JsonKey(name: 'Height') String? height,
-      @JsonKey(name: 'VIN') String? vin});
+      @JsonKey(name: 'VIN') String? vin,
+      @JsonKey(name: 'brand') Brand? brand,
+      @JsonKey(name: 'category') Category? category,
+      @JsonKey(name: 'brand_model') BrandModel? brandModel,
+      @JsonKey(name: 'user') User? user});
+
+  @override
+  $BrandCopyWith<$Res>? get brand;
+  @override
+  $CategoryCopyWith<$Res>? get category;
+  @override
+  $BrandModelCopyWith<$Res>? get brandModel;
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -653,6 +759,10 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? height = freezed,
     Object? vin = freezed,
+    Object? brand = freezed,
+    Object? category = freezed,
+    Object? brandModel = freezed,
+    Object? user = freezed,
   }) {
     return _then(_$SimilarItemImpl(
       id: null == id
@@ -779,6 +889,22 @@ class __$$SimilarItemImplCopyWithImpl<$Res>
           ? _value.vin
           : vin // ignore: cast_nullable_to_non_nullable
               as String?,
+      brand: freezed == brand
+          ? _value.brand
+          : brand // ignore: cast_nullable_to_non_nullable
+              as Brand?,
+      category: freezed == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as Category?,
+      brandModel: freezed == brandModel
+          ? _value.brandModel
+          : brandModel // ignore: cast_nullable_to_non_nullable
+              as BrandModel?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
     ));
   }
 }
@@ -823,7 +949,11 @@ class _$SimilarItemImpl extends _SimilarItem {
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
       @JsonKey(name: 'Height') this.height,
-      @JsonKey(name: 'VIN') this.vin})
+      @JsonKey(name: 'VIN') this.vin,
+      @JsonKey(name: 'brand') this.brand,
+      @JsonKey(name: 'category') this.category,
+      @JsonKey(name: 'brand_model') this.brandModel,
+      @JsonKey(name: 'user') this.user})
       : _images = images,
         _features = features,
         super._();
@@ -940,10 +1070,23 @@ class _$SimilarItemImpl extends _SimilarItem {
   @override
   @JsonKey(name: 'VIN')
   final String? vin;
+// Added nested objects
+  @override
+  @JsonKey(name: 'brand')
+  final Brand? brand;
+  @override
+  @JsonKey(name: 'category')
+  final Category? category;
+  @override
+  @JsonKey(name: 'brand_model')
+  final BrandModel? brandModel;
+  @override
+  @JsonKey(name: 'user')
+  final User? user;
 
   @override
   String toString() {
-    return 'SimilarItem(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, height: $height, vin: $vin)';
+    return 'SimilarItem(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, height: $height, vin: $vin, brand: $brand, category: $category, brandModel: $brandModel, user: $user)';
   }
 
   @override
@@ -998,7 +1141,13 @@ class _$SimilarItemImpl extends _SimilarItem {
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.height, height) || other.height == height) &&
-            (identical(other.vin, vin) || other.vin == vin));
+            (identical(other.vin, vin) || other.vin == vin) &&
+            (identical(other.brand, brand) || other.brand == brand) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.brandModel, brandModel) ||
+                other.brandModel == brandModel) &&
+            (identical(other.user, user) || other.user == user));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1035,7 +1184,11 @@ class _$SimilarItemImpl extends _SimilarItem {
         createdAt,
         updatedAt,
         height,
-        vin
+        vin,
+        brand,
+        category,
+        brandModel,
+        user
       ]);
 
   /// Create a copy of SimilarItem
@@ -1094,7 +1247,11 @@ abstract class _SimilarItem extends SimilarItem {
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
       @JsonKey(name: 'Height') final String? height,
-      @JsonKey(name: 'VIN') final String? vin}) = _$SimilarItemImpl;
+      @JsonKey(name: 'VIN') final String? vin,
+      @JsonKey(name: 'brand') final Brand? brand,
+      @JsonKey(name: 'category') final Category? category,
+      @JsonKey(name: 'brand_model') final BrandModel? brandModel,
+      @JsonKey(name: 'user') final User? user}) = _$SimilarItemImpl;
   const _SimilarItem._() : super._();
 
   factory _SimilarItem.fromJson(Map<String, dynamic> json) =
@@ -1192,13 +1349,1548 @@ abstract class _SimilarItem extends SimilarItem {
   String? get height;
   @override
   @JsonKey(name: 'VIN')
-  String? get vin;
+  String? get vin; // Added nested objects
+  @override
+  @JsonKey(name: 'brand')
+  Brand? get brand;
+  @override
+  @JsonKey(name: 'category')
+  Category? get category;
+  @override
+  @JsonKey(name: 'brand_model')
+  BrandModel? get brandModel;
+  @override
+  @JsonKey(name: 'user')
+  User? get user;
 
   /// Create a copy of SimilarItem
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SimilarItemImplCopyWith<_$SimilarItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+Brand _$BrandFromJson(Map<String, dynamic> json) {
+  return _Brand.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Brand {
+  @JsonKey(name: 'id')
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
+  int? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'name')
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'slug')
+  String? get slug => throw _privateConstructorUsedError;
+  @JsonKey(name: 'image')
+  String? get image => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this Brand to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Brand
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BrandCopyWith<Brand> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BrandCopyWith<$Res> {
+  factory $BrandCopyWith(Brand value, $Res Function(Brand) then) =
+      _$BrandCopyWithImpl<$Res, Brand>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') int id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'slug') String? slug,
+      @JsonKey(name: 'image') String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
+}
+
+/// @nodoc
+class _$BrandCopyWithImpl<$Res, $Val extends Brand>
+    implements $BrandCopyWith<$Res> {
+  _$BrandCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of Brand
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BrandImplCopyWith<$Res> implements $BrandCopyWith<$Res> {
+  factory _$$BrandImplCopyWith(
+          _$BrandImpl value, $Res Function(_$BrandImpl) then) =
+      __$$BrandImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') int id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'slug') String? slug,
+      @JsonKey(name: 'image') String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
+}
+
+/// @nodoc
+class __$$BrandImplCopyWithImpl<$Res>
+    extends _$BrandCopyWithImpl<$Res, _$BrandImpl>
+    implements _$$BrandImplCopyWith<$Res> {
+  __$$BrandImplCopyWithImpl(
+      _$BrandImpl _value, $Res Function(_$BrandImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of Brand
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_$BrandImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BrandImpl implements _Brand {
+  const _$BrandImpl(
+      {@JsonKey(name: 'id') required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) this.userId,
+      @JsonKey(name: 'name') this.name,
+      @JsonKey(name: 'slug') this.slug,
+      @JsonKey(name: 'image') this.image,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
+
+  factory _$BrandImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BrandImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'id')
+  final int id;
+  @override
+  @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
+  final int? userId;
+  @override
+  @JsonKey(name: 'name')
+  final String? name;
+  @override
+  @JsonKey(name: 'slug')
+  final String? slug;
+  @override
+  @JsonKey(name: 'image')
+  final String? image;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+
+  @override
+  String toString() {
+    return 'Brand(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BrandImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, userId, name, slug, image, createdAt, updatedAt);
+
+  /// Create a copy of Brand
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BrandImplCopyWith<_$BrandImpl> get copyWith =>
+      __$$BrandImplCopyWithImpl<_$BrandImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BrandImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Brand implements Brand {
+  const factory _Brand(
+      {@JsonKey(name: 'id') required final int id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) final int? userId,
+      @JsonKey(name: 'name') final String? name,
+      @JsonKey(name: 'slug') final String? slug,
+      @JsonKey(name: 'image') final String? image,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$BrandImpl;
+
+  factory _Brand.fromJson(Map<String, dynamic> json) = _$BrandImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'id')
+  int get id;
+  @override
+  @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
+  int? get userId;
+  @override
+  @JsonKey(name: 'name')
+  String? get name;
+  @override
+  @JsonKey(name: 'slug')
+  String? get slug;
+  @override
+  @JsonKey(name: 'image')
+  String? get image;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt;
+
+  /// Create a copy of Brand
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BrandImplCopyWith<_$BrandImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+Category _$CategoryFromJson(Map<String, dynamic> json) {
+  return _Category.fromJson(json);
+}
+
+/// @nodoc
+mixin _$Category {
+  @JsonKey(name: 'id')
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
+  int? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
+  int? get parentId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'name')
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'slug')
+  String? get slug => throw _privateConstructorUsedError;
+  @JsonKey(name: 'description')
+  String? get description => throw _privateConstructorUsedError;
+  @JsonKey(name: 'features', fromJson: _parseStringList)
+  List<String>? get features => throw _privateConstructorUsedError;
+  @JsonKey(name: 'image')
+  String? get image => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this Category to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $CategoryCopyWith<Category> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $CategoryCopyWith<$Res> {
+  factory $CategoryCopyWith(Category value, $Res Function(Category) then) =
+      _$CategoryCopyWithImpl<$Res, Category>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') int id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'slug') String? slug,
+      @JsonKey(name: 'description') String? description,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      List<String>? features,
+      @JsonKey(name: 'image') String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
+}
+
+/// @nodoc
+class _$CategoryCopyWithImpl<$Res, $Val extends Category>
+    implements $CategoryCopyWith<$Res> {
+  _$CategoryCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? description = freezed,
+    Object? features = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      features: freezed == features
+          ? _value.features
+          : features // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$CategoryImplCopyWith<$Res>
+    implements $CategoryCopyWith<$Res> {
+  factory _$$CategoryImplCopyWith(
+          _$CategoryImpl value, $Res Function(_$CategoryImpl) then) =
+      __$$CategoryImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') int id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'slug') String? slug,
+      @JsonKey(name: 'description') String? description,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      List<String>? features,
+      @JsonKey(name: 'image') String? image,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
+}
+
+/// @nodoc
+class __$$CategoryImplCopyWithImpl<$Res>
+    extends _$CategoryCopyWithImpl<$Res, _$CategoryImpl>
+    implements _$$CategoryImplCopyWith<$Res> {
+  __$$CategoryImplCopyWithImpl(
+      _$CategoryImpl _value, $Res Function(_$CategoryImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? userId = freezed,
+    Object? parentId = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? description = freezed,
+    Object? features = freezed,
+    Object? image = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_$CategoryImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      userId: freezed == userId
+          ? _value.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      parentId: freezed == parentId
+          ? _value.parentId
+          : parentId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      description: freezed == description
+          ? _value.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      features: freezed == features
+          ? _value._features
+          : features // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+      image: freezed == image
+          ? _value.image
+          : image // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$CategoryImpl implements _Category {
+  const _$CategoryImpl(
+      {@JsonKey(name: 'id') required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) this.userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) this.parentId,
+      @JsonKey(name: 'name') this.name,
+      @JsonKey(name: 'slug') this.slug,
+      @JsonKey(name: 'description') this.description,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      final List<String>? features,
+      @JsonKey(name: 'image') this.image,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt})
+      : _features = features;
+
+  factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
+      _$$CategoryImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'id')
+  final int id;
+  @override
+  @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
+  final int? userId;
+  @override
+  @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
+  final int? parentId;
+  @override
+  @JsonKey(name: 'name')
+  final String? name;
+  @override
+  @JsonKey(name: 'slug')
+  final String? slug;
+  @override
+  @JsonKey(name: 'description')
+  final String? description;
+  final List<String>? _features;
+  @override
+  @JsonKey(name: 'features', fromJson: _parseStringList)
+  List<String>? get features {
+    final value = _features;
+    if (value == null) return null;
+    if (_features is EqualUnmodifiableListView) return _features;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(value);
+  }
+
+  @override
+  @JsonKey(name: 'image')
+  final String? image;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+
+  @override
+  String toString() {
+    return 'Category(id: $id, userId: $userId, parentId: $parentId, name: $name, slug: $slug, description: $description, features: $features, image: $image, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CategoryImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            const DeepCollectionEquality().equals(other._features, _features) &&
+            (identical(other.image, image) || other.image == image) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      parentId,
+      name,
+      slug,
+      description,
+      const DeepCollectionEquality().hash(_features),
+      image,
+      createdAt,
+      updatedAt);
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CategoryImplCopyWith<_$CategoryImpl> get copyWith =>
+      __$$CategoryImplCopyWithImpl<_$CategoryImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$CategoryImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _Category implements Category {
+  const factory _Category(
+      {@JsonKey(name: 'id') required final int id,
+      @JsonKey(name: 'user_id', fromJson: _parseNullableInt) final int? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
+      final int? parentId,
+      @JsonKey(name: 'name') final String? name,
+      @JsonKey(name: 'slug') final String? slug,
+      @JsonKey(name: 'description') final String? description,
+      @JsonKey(name: 'features', fromJson: _parseStringList)
+      final List<String>? features,
+      @JsonKey(name: 'image') final String? image,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$CategoryImpl;
+
+  factory _Category.fromJson(Map<String, dynamic> json) =
+      _$CategoryImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'id')
+  int get id;
+  @override
+  @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
+  int? get userId;
+  @override
+  @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
+  int? get parentId;
+  @override
+  @JsonKey(name: 'name')
+  String? get name;
+  @override
+  @JsonKey(name: 'slug')
+  String? get slug;
+  @override
+  @JsonKey(name: 'description')
+  String? get description;
+  @override
+  @JsonKey(name: 'features', fromJson: _parseStringList)
+  List<String>? get features;
+  @override
+  @JsonKey(name: 'image')
+  String? get image;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt;
+
+  /// Create a copy of Category
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$CategoryImplCopyWith<_$CategoryImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
+  return _BrandModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BrandModel {
+  @JsonKey(name: 'id')
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
+  int? get brandId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'name')
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'slug')
+  String? get slug => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this BrandModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BrandModelCopyWith<BrandModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BrandModelCopyWith<$Res> {
+  factory $BrandModelCopyWith(
+          BrandModel value, $Res Function(BrandModel) then) =
+      _$BrandModelCopyWithImpl<$Res, BrandModel>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'slug') String? slug,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
+}
+
+/// @nodoc
+class _$BrandModelCopyWithImpl<$Res, $Val extends BrandModel>
+    implements $BrandModelCopyWith<$Res> {
+  _$BrandModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? brandId = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandId: freezed == brandId
+          ? _value.brandId
+          : brandId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BrandModelImplCopyWith<$Res>
+    implements $BrandModelCopyWith<$Res> {
+  factory _$$BrandModelImplCopyWith(
+          _$BrandModelImpl value, $Res Function(_$BrandModelImpl) then) =
+      __$$BrandModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'slug') String? slug,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
+}
+
+/// @nodoc
+class __$$BrandModelImplCopyWithImpl<$Res>
+    extends _$BrandModelCopyWithImpl<$Res, _$BrandModelImpl>
+    implements _$$BrandModelImplCopyWith<$Res> {
+  __$$BrandModelImplCopyWithImpl(
+      _$BrandModelImpl _value, $Res Function(_$BrandModelImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? brandId = freezed,
+    Object? name = freezed,
+    Object? slug = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_$BrandModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandId: freezed == brandId
+          ? _value.brandId
+          : brandId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      slug: freezed == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BrandModelImpl implements _BrandModel {
+  const _$BrandModelImpl(
+      {@JsonKey(name: 'id') required this.id,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) this.brandId,
+      @JsonKey(name: 'name') this.name,
+      @JsonKey(name: 'slug') this.slug,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
+
+  factory _$BrandModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BrandModelImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'id')
+  final int id;
+  @override
+  @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
+  final int? brandId;
+  @override
+  @JsonKey(name: 'name')
+  final String? name;
+  @override
+  @JsonKey(name: 'slug')
+  final String? slug;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+
+  @override
+  String toString() {
+    return 'BrandModel(id: $id, brandId: $brandId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BrandModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.brandId, brandId) || other.brandId == brandId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, brandId, name, slug, createdAt, updatedAt);
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BrandModelImplCopyWith<_$BrandModelImpl> get copyWith =>
+      __$$BrandModelImplCopyWithImpl<_$BrandModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BrandModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _BrandModel implements BrandModel {
+  const factory _BrandModel(
+      {@JsonKey(name: 'id') required final int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
+      final int? brandId,
+      @JsonKey(name: 'name') final String? name,
+      @JsonKey(name: 'slug') final String? slug,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$BrandModelImpl;
+
+  factory _BrandModel.fromJson(Map<String, dynamic> json) =
+      _$BrandModelImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'id')
+  int get id;
+  @override
+  @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
+  int? get brandId;
+  @override
+  @JsonKey(name: 'name')
+  String? get name;
+  @override
+  @JsonKey(name: 'slug')
+  String? get slug;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$BrandModelImplCopyWith<_$BrandModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+User _$UserFromJson(Map<String, dynamic> json) {
+  return _User.fromJson(json);
+}
+
+/// @nodoc
+mixin _$User {
+  @JsonKey(name: 'id')
+  String get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'name')
+  String? get name => throw _privateConstructorUsedError;
+  @JsonKey(name: 'email')
+  String? get email => throw _privateConstructorUsedError;
+  @JsonKey(name: 'phone')
+  String? get phone => throw _privateConstructorUsedError;
+  @JsonKey(name: 'email_verified_at')
+  String? get emailVerifiedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+  int? get paidSeller => throw _privateConstructorUsedError;
+  @JsonKey(name: 'deleted_at')
+  String? get deletedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
+  int? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'state_id', fromJson: _parseNullableInt)
+  int? get stateId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto => throw _privateConstructorUsedError;
+  @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+  int? get uploadsLeft => throw _privateConstructorUsedError;
+  @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+  int? get activeStatus => throw _privateConstructorUsedError;
+  @JsonKey(name: 'avatar')
+  String? get avatar => throw _privateConstructorUsedError;
+  @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt)
+  int? get darkMode => throw _privateConstructorUsedError;
+  @JsonKey(name: 'messenger_color')
+  String? get messengerColor => throw _privateConstructorUsedError;
+
+  /// Serializes this User to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UserCopyWith<User> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserCopyWith<$Res> {
+  factory $UserCopyWith(User value, $Res Function(User) then) =
+      _$UserCopyWithImpl<$Res, User>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') String id,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'email') String? email,
+      @JsonKey(name: 'phone') String? phone,
+      @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+      int? paidSeller,
+      @JsonKey(name: 'deleted_at') String? deletedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseNullableInt) int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+      int? uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+      int? activeStatus,
+      @JsonKey(name: 'avatar') String? avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt) int? darkMode,
+      @JsonKey(name: 'messenger_color') String? messengerColor});
+}
+
+/// @nodoc
+class _$UserCopyWithImpl<$Res, $Val extends User>
+    implements $UserCopyWith<$Res> {
+  _$UserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = freezed,
+    Object? email = freezed,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+    Object? uploadsLeft = freezed,
+    Object? activeStatus = freezed,
+    Object? avatar = freezed,
+    Object? darkMode = freezed,
+    Object? messengerColor = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+      uploadsLeft: freezed == uploadsLeft
+          ? _value.uploadsLeft
+          : uploadsLeft // ignore: cast_nullable_to_non_nullable
+              as int?,
+      activeStatus: freezed == activeStatus
+          ? _value.activeStatus
+          : activeStatus // ignore: cast_nullable_to_non_nullable
+              as int?,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      darkMode: freezed == darkMode
+          ? _value.darkMode
+          : darkMode // ignore: cast_nullable_to_non_nullable
+              as int?,
+      messengerColor: freezed == messengerColor
+          ? _value.messengerColor
+          : messengerColor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
+  factory _$$UserImplCopyWith(
+          _$UserImpl value, $Res Function(_$UserImpl) then) =
+      __$$UserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: 'id') String id,
+      @JsonKey(name: 'name') String? name,
+      @JsonKey(name: 'email') String? email,
+      @JsonKey(name: 'phone') String? phone,
+      @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+      int? paidSeller,
+      @JsonKey(name: 'deleted_at') String? deletedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseNullableInt) int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+      int? uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+      int? activeStatus,
+      @JsonKey(name: 'avatar') String? avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt) int? darkMode,
+      @JsonKey(name: 'messenger_color') String? messengerColor});
+}
+
+/// @nodoc
+class __$$UserImplCopyWithImpl<$Res>
+    extends _$UserCopyWithImpl<$Res, _$UserImpl>
+    implements _$$UserImplCopyWith<$Res> {
+  __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = freezed,
+    Object? email = freezed,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+    Object? uploadsLeft = freezed,
+    Object? activeStatus = freezed,
+    Object? avatar = freezed,
+    Object? darkMode = freezed,
+    Object? messengerColor = freezed,
+  }) {
+    return _then(_$UserImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: freezed == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String?,
+      email: freezed == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String?,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+      uploadsLeft: freezed == uploadsLeft
+          ? _value.uploadsLeft
+          : uploadsLeft // ignore: cast_nullable_to_non_nullable
+              as int?,
+      activeStatus: freezed == activeStatus
+          ? _value.activeStatus
+          : activeStatus // ignore: cast_nullable_to_non_nullable
+              as int?,
+      avatar: freezed == avatar
+          ? _value.avatar
+          : avatar // ignore: cast_nullable_to_non_nullable
+              as String?,
+      darkMode: freezed == darkMode
+          ? _value.darkMode
+          : darkMode // ignore: cast_nullable_to_non_nullable
+              as int?,
+      messengerColor: freezed == messengerColor
+          ? _value.messengerColor
+          : messengerColor // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UserImpl implements _User {
+  const _$UserImpl(
+      {@JsonKey(name: 'id') required this.id,
+      @JsonKey(name: 'name') this.name,
+      @JsonKey(name: 'email') this.email,
+      @JsonKey(name: 'phone') this.phone,
+      @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
+      @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+      this.paidSeller,
+      @JsonKey(name: 'deleted_at') this.deletedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'country_id', fromJson: _parseNullableInt) this.countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseNullableInt) this.stateId,
+      @JsonKey(name: 'profile_photo') this.profilePhoto,
+      @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+      this.uploadsLeft,
+      @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+      this.activeStatus,
+      @JsonKey(name: 'avatar') this.avatar,
+      @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt) this.darkMode,
+      @JsonKey(name: 'messenger_color') this.messengerColor});
+
+  factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'id')
+  final String id;
+  @override
+  @JsonKey(name: 'name')
+  final String? name;
+  @override
+  @JsonKey(name: 'email')
+  final String? email;
+  @override
+  @JsonKey(name: 'phone')
+  final String? phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  final String? emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+  final int? paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  final String? deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+  @override
+  @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
+  final int? countryId;
+  @override
+  @JsonKey(name: 'state_id', fromJson: _parseNullableInt)
+  final int? stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  final String? profilePhoto;
+  @override
+  @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+  final int? uploadsLeft;
+  @override
+  @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+  final int? activeStatus;
+  @override
+  @JsonKey(name: 'avatar')
+  final String? avatar;
+  @override
+  @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt)
+  final int? darkMode;
+  @override
+  @JsonKey(name: 'messenger_color')
+  final String? messengerColor;
+
+  @override
+  String toString() {
+    return 'User(id: $id, name: $name, email: $email, phone: $phone, emailVerifiedAt: $emailVerifiedAt, paidSeller: $paidSeller, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, countryId: $countryId, stateId: $stateId, profilePhoto: $profilePhoto, uploadsLeft: $uploadsLeft, activeStatus: $activeStatus, avatar: $avatar, darkMode: $darkMode, messengerColor: $messengerColor)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.emailVerifiedAt, emailVerifiedAt) ||
+                other.emailVerifiedAt == emailVerifiedAt) &&
+            (identical(other.paidSeller, paidSeller) ||
+                other.paidSeller == paidSeller) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
+            (identical(other.stateId, stateId) || other.stateId == stateId) &&
+            (identical(other.profilePhoto, profilePhoto) ||
+                other.profilePhoto == profilePhoto) &&
+            (identical(other.uploadsLeft, uploadsLeft) ||
+                other.uploadsLeft == uploadsLeft) &&
+            (identical(other.activeStatus, activeStatus) ||
+                other.activeStatus == activeStatus) &&
+            (identical(other.avatar, avatar) || other.avatar == avatar) &&
+            (identical(other.darkMode, darkMode) ||
+                other.darkMode == darkMode) &&
+            (identical(other.messengerColor, messengerColor) ||
+                other.messengerColor == messengerColor));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      email,
+      phone,
+      emailVerifiedAt,
+      paidSeller,
+      deletedAt,
+      createdAt,
+      updatedAt,
+      countryId,
+      stateId,
+      profilePhoto,
+      uploadsLeft,
+      activeStatus,
+      avatar,
+      darkMode,
+      messengerColor);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      __$$UserImplCopyWithImpl<_$UserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _User implements User {
+  const factory _User(
+          {@JsonKey(name: 'id') required final String id,
+          @JsonKey(name: 'name') final String? name,
+          @JsonKey(name: 'email') final String? email,
+          @JsonKey(name: 'phone') final String? phone,
+          @JsonKey(name: 'email_verified_at') final String? emailVerifiedAt,
+          @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+          final int? paidSeller,
+          @JsonKey(name: 'deleted_at') final String? deletedAt,
+          @JsonKey(name: 'created_at') final String? createdAt,
+          @JsonKey(name: 'updated_at') final String? updatedAt,
+          @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
+          final int? countryId,
+          @JsonKey(name: 'state_id', fromJson: _parseNullableInt)
+          final int? stateId,
+          @JsonKey(name: 'profile_photo') final String? profilePhoto,
+          @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+          final int? uploadsLeft,
+          @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+          final int? activeStatus,
+          @JsonKey(name: 'avatar') final String? avatar,
+          @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt)
+          final int? darkMode,
+          @JsonKey(name: 'messenger_color') final String? messengerColor}) =
+      _$UserImpl;
+
+  factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'id')
+  String get id;
+  @override
+  @JsonKey(name: 'name')
+  String? get name;
+  @override
+  @JsonKey(name: 'email')
+  String? get email;
+  @override
+  @JsonKey(name: 'phone')
+  String? get phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  String? get emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller', fromJson: _parseNullableInt)
+  int? get paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  String? get deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  String? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  String? get updatedAt;
+  @override
+  @JsonKey(name: 'country_id', fromJson: _parseNullableInt)
+  int? get countryId;
+  @override
+  @JsonKey(name: 'state_id', fromJson: _parseNullableInt)
+  int? get stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto;
+  @override
+  @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+  int? get uploadsLeft;
+  @override
+  @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+  int? get activeStatus;
+  @override
+  @JsonKey(name: 'avatar')
+  String? get avatar;
+  @override
+  @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt)
+  int? get darkMode;
+  @override
+  @JsonKey(name: 'messenger_color')
+  String? get messengerColor;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

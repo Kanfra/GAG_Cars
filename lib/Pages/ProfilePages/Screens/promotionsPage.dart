@@ -7,6 +7,7 @@ import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.da
 import 'package:gag_cars_frontend/Pages/PaymentPage/Models/packageModel.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Services/PaystackService/paystackService.dart';
+import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:provider/provider.dart';
 import 'package:get/get.dart';
@@ -369,11 +370,13 @@ class _PromotionsPageState extends State<PromotionsPage> {
   }
 
   Widget _buildPromotionDetailsSheet(Map<String, dynamic> promotion, int index, List<Map<String, dynamic>> uiPackages) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
     final listingFeature = promotion['features'].isNotEmpty ? promotion['features'][0] : 'Premium features';
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
@@ -394,7 +397,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                 width: 60,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
                   borderRadius: BorderRadius.circular(3),
                 ),
               ),
@@ -423,16 +426,16 @@ class _PromotionsPageState extends State<PromotionsPage> {
                     children: [
                       Text(
                         promotion['name'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                       Text(
                         promotion['description'],
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600],
                           fontSize: 14,
                         ),
                       ),
@@ -440,7 +443,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: _packageType == 'upload' ? Colors.blue[50] : Colors.green[50],
+                          color: _packageType == 'upload' 
+                              ? (isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50]) 
+                              : (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -448,7 +453,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: _packageType == 'upload' ? Colors.blue[700] : Colors.green[700],
+                            color: _packageType == 'upload' 
+                                ? (isDarkMode ? Colors.blue[200] : Colors.blue[700]) 
+                                : (isDarkMode ? Colors.green[200] : Colors.green[700]),
                           ),
                         ),
                       ),
@@ -462,27 +469,27 @@ class _PromotionsPageState extends State<PromotionsPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: (promotion['gradient'] as List<Color>)[0].withOpacity(0.1),
+                color: (promotion['gradient'] as List<Color>)[0].withOpacity(isDarkMode ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: (promotion['gradient'] as List<Color>)[0].withOpacity(0.3)),
+                border: Border.all(color: (promotion['gradient'] as List<Color>)[0].withOpacity(isDarkMode ? 0.4 : 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildDetailItem(Icons.calendar_today, promotion['startText']),
-                  _buildDetailItem(Icons.attach_money, promotion['endText']),
-                  _buildDetailItem(Icons.list_alt, listingFeature.toString()),
+                  _buildDetailItem(Icons.calendar_today, promotion['startText'], isDarkMode),
+                  _buildDetailItem(Icons.attach_money, promotion['endText'], isDarkMode),
+                  _buildDetailItem(Icons.list_alt, listingFeature.toString(), isDarkMode),
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'What\'s Included:',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
             const SizedBox(height: 12),
@@ -491,14 +498,14 @@ class _PromotionsPageState extends State<PromotionsPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle, size: 20, color: Colors.green),
+                  Icon(Icons.check_circle, size: 20, color: isDarkMode ? Colors.green[300] : Colors.green),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       feature.toString(),
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey[700],
+                        color: isDarkMode ? Colors.white70 : Colors.grey[700],
                         height: 1.4,
                       ),
                     ),
@@ -539,16 +546,17 @@ class _PromotionsPageState extends State<PromotionsPage> {
     );
   }
 
-  Widget _buildDetailItem(IconData icon, String text) {
+  Widget _buildDetailItem(IconData icon, String text, bool isDarkMode) {
     return Column(
       children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
+        Icon(icon, size: 20, color: isDarkMode ? Colors.white70 : Colors.grey[600]),
         const SizedBox(height: 4),
         Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 12,
+            color: isDarkMode ? Colors.white70 : Colors.black87,
           ),
           textAlign: TextAlign.center,
         ),
@@ -557,6 +565,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
   }
 
   Widget _buildPromotionCard(Map<String, dynamic> promotion, int index, List<Map<String, dynamic>> uiPackages) {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
+    
     final isSelected = _selectedIndex == index;
     final gradientColors = promotion['gradient'] as List<Color>;
     final currencySymbol = promotion['currencySymbol'] ?? 'GH₵';
@@ -587,7 +598,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
               child: Container(
                 margin: const EdgeInsets.all(1.5),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 padding: const EdgeInsets.all(24),
@@ -627,10 +638,10 @@ class _PromotionsPageState extends State<PromotionsPage> {
 
                     Text(
                       promotion['name'],
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -638,7 +649,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                     Text(
                       promotion['description'],
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: isDarkMode ? Colors.white60 : Colors.grey[600],
                         fontSize: 12,
                       ),
                       maxLines: 2,
@@ -649,7 +660,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: _packageType == 'upload' ? Colors.blue[50] : Colors.green[50],
+                        color: _packageType == 'upload' 
+                            ? (isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50]) 
+                            : (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -657,7 +670,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          color: _packageType == 'upload' ? Colors.blue[700] : Colors.green[700],
+                          color: _packageType == 'upload' 
+                              ? (isDarkMode ? Colors.blue[200] : Colors.blue[700]) 
+                              : (isDarkMode ? Colors.green[200] : Colors.green[700]),
                         ),
                       ),
                     ),
@@ -672,16 +687,16 @@ class _PromotionsPageState extends State<PromotionsPage> {
                             Text(
                               _packageType == 'upload' ? 'Listings' : 'Duration',
                               style: TextStyle(
-                                color: Colors.grey[500],
+                                color: isDarkMode ? Colors.white60 : Colors.grey[500],
                                 fontSize: 12,
                               ),
                             ),
                             Text(
                               promotion['startText'],
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                             // Show number of listings for upload packages if available
@@ -692,7 +707,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                   '${numberOfListings} items',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.green[700],
+                                    color: isDarkMode ? Colors.green[300] : Colors.green[700],
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -705,7 +720,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                             Text(
                               'Total',
                               style: TextStyle(
-                                color: Colors.grey[500],
+                                color: isDarkMode ? Colors.white60 : Colors.grey[500],
                                 fontSize: 12,
                               ),
                             ),
@@ -730,7 +745,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         ...(promotion['features'] as List<dynamic>).take(2).map((feature) => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: gradientColors[0].withOpacity(0.1),
+                            color: gradientColors[0].withOpacity(isDarkMode ? 0.2 : 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -746,14 +761,14 @@ class _PromotionsPageState extends State<PromotionsPage> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
+                              color: isDarkMode ? Colors.grey[800] : Colors.grey[100],
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               '+${(promotion['features'] as List<dynamic>).length - 2} more',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.grey[600],
+                                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                               ),
                             ),
                           ),
@@ -807,8 +822,11 @@ class _PromotionsPageState extends State<PromotionsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFD),
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : const Color(0xFFF8FAFD),
       body: Consumer<PackageProvider>(
         builder: (context, packageProvider, child) {
           // Get filtered packages based on package_type
@@ -818,10 +836,10 @@ class _PromotionsPageState extends State<PromotionsPage> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.12),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -838,10 +856,10 @@ class _PromotionsPageState extends State<PromotionsPage> {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.grey[100],
+                              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[100],
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.arrow_back, size: 20, color: Colors.grey),
+                            child: Icon(Icons.arrow_back, size: 20, color: isDarkMode ? Colors.white70 : Colors.grey),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -851,16 +869,16 @@ class _PromotionsPageState extends State<PromotionsPage> {
                             children: [
                               Text(
                                 _packageType == 'upload' ? "Upload Packages" : "Promotion Packages",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: isDarkMode ? Colors.white : Colors.black87,
                                 ),
                               ),
                               Text(
                                 "$_vehicleName - ${_packageType == 'upload' ? 'Upload' : 'Promotion'}",
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
                                   fontSize: 12,
                                 ),
                                 maxLines: 1,
@@ -872,10 +890,10 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.help_outline, size: 20, color: Colors.blue),
+                          child: Icon(Icons.help_outline, size: 20, color: isDarkMode ? Colors.blue[200] : Colors.blue),
                         ),
                       ],
                     ),
@@ -896,7 +914,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                 Text(
                                   'Loading packages...',
                                   style: TextStyle(
-                                    color: Colors.grey[600],
+                                    color: isDarkMode ? Colors.white70 : Colors.grey[600],
                                     fontSize: 16,
                                   ),
                                 ),
@@ -908,13 +926,13 @@ class _PromotionsPageState extends State<PromotionsPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+                                Icon(Icons.error_outline, size: 64, color: isDarkMode ? Colors.red[400] : Colors.red[300]),
                                 const SizedBox(height: 16),
                                 Text(
                                   'Failed to load packages',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.grey[600],
+                                    color: isDarkMode ? Colors.white70 : Colors.grey[600],
                                   ),
                                 ),
                                 const SizedBox(height: 8),
@@ -923,7 +941,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey[500],
+                                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
                                   ),
                                 ),
                               ],
@@ -934,13 +952,13 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey),
+                                    Icon(Icons.inventory_2_outlined, size: 64, color: isDarkMode ? Colors.grey[400] : Colors.grey),
                                     const SizedBox(height: 16),
                                     Text(
                                       'No ${_packageType == 'upload' ? 'upload' : 'promotion'} packages available',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
-                                        color: Colors.grey,
+                                        color: isDarkMode ? Colors.white70 : Colors.grey,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
@@ -948,7 +966,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                       'Please check back later for ${_packageType == 'upload' ? 'upload' : 'promotion'} packages',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.grey[500],
+                                        color: isDarkMode ? Colors.white60 : Colors.grey[500],
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -969,10 +987,10 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                             _packageType == 'upload' 
                                                 ? "Choose Your Upload Package" 
                                                 : "Boost Your Listing",
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
+                                              color: isDarkMode ? Colors.white : Colors.black87,
                                               height: 1.2,
                                             ),
                                           ),
@@ -981,8 +999,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                             _packageType == 'upload'
                                                 ? "Select an upload package to list your vehicle and reach potential buyers"
                                                 : "Select a promotion package to increase visibility and get more buyers for your listing",
-                                            style: const TextStyle(
-                                              color: Colors.grey,
+                                            style: TextStyle(
+                                              color: isDarkMode ? Colors.white60 : Colors.grey,
                                               fontSize: 14,
                                               height: 1.4,
                                             ),
@@ -1019,7 +1037,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                                                     (_pageController.page?.round() == index || 
                                                      _pageController.page == index)
                                                   ? Colors.blue
-                                                  : Colors.grey[300],
+                                                  : isDarkMode ? Colors.grey[600] : Colors.grey[300],
                                             ),
                                           );
                                         }),
