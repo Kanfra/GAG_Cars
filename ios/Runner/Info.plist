@@ -14,7 +14,12 @@
     <!-- Phone Call Permission -->
     <key>NSMicrophoneUsageDescription</key>
     <string>Required for making phone calls to customer service</string>
-    
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app uses the microphone to convert speech to text for searching brands</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>This app uses speech recognition to convert speech to text for searching brands</string>
+        
     <!-- Photo Library Permissions for Image Sharing -->
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>This app needs permission to save photos to your gallery for sharing</string>

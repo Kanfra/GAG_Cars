@@ -34,6 +34,9 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       avatar: json['avatar'] as String?,
       darkMode: (json['dark_mode'] as num?)?.toInt(),
       messengerColor: json['messenger_color'] as String?,
+      country: json['country'] == null
+          ? null
+          : CountryModel.fromJson(json['country'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
@@ -56,4 +59,47 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'avatar': instance.avatar,
       'dark_mode': instance.darkMode,
       'messenger_color': instance.messengerColor,
+      'country': instance.country?.toJson(),
+    };
+
+_$CountryModelImpl _$$CountryModelImplFromJson(Map<String, dynamic> json) =>
+    _$CountryModelImpl(
+      id: (json['id'] as num?)?.toInt(),
+      name: json['name'] as String?,
+      iso3: json['iso3'] as String?,
+      iso2: json['iso2'] as String?,
+      numericCode: json['numeric_code'] as String?,
+      phoneCode: json['phone_code'] as String?,
+      capital: json['capital'] as String?,
+      currency: json['currency'] as String?,
+      currencyName: json['currency_name'] as String?,
+      currencySymbol: json['currency_symbol'] as String?,
+      tld: json['tld'] as String?,
+      native: json['native'] as String?,
+      region: json['region'] as String?,
+      subregion: json['subregion'] as String?,
+      latitude: json['latitude'] as String?,
+      longitude: json['longitude'] as String?,
+      emoji: json['emoji'] as String?,
+    );
+
+Map<String, dynamic> _$$CountryModelImplToJson(_$CountryModelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'iso3': instance.iso3,
+      'iso2': instance.iso2,
+      'numeric_code': instance.numericCode,
+      'phone_code': instance.phoneCode,
+      'capital': instance.capital,
+      'currency': instance.currency,
+      'currency_name': instance.currencyName,
+      'currency_symbol': instance.currencySymbol,
+      'tld': instance.tld,
+      'native': instance.native,
+      'region': instance.region,
+      'subregion': instance.subregion,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
+      'emoji': instance.emoji,
     };

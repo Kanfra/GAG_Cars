@@ -5,7 +5,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/brandItemsModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 
 class BrandItemsService {
   
@@ -101,7 +101,7 @@ class BrandItemsService {
         // If no items found in common keys, check if it's a single item
         print('🔍 [SERVICE] No items list found in response. Checking if single item...');
         try {
-          final singleItem = BrandItem.fromJson(jsonData);
+          final singleItem = BrandItemConverter.fromJson(jsonData);
           print('✅ [SERVICE] Successfully parsed single item');
           return [singleItem];
         } catch (e) {
@@ -161,7 +161,8 @@ class BrandItemsService {
         final itemData = itemsList[i];
         
         if (itemData is Map<String, dynamic>) {
-          final brandItem = BrandItem.fromJson(itemData);
+          // Use the converter for proper type handling
+          final brandItem = BrandItemConverter.fromJson(itemData);
           items.add(brandItem);
         } else {
           print('⚠️ [SERVICE] Item at index $i is not a Map: ${itemData.runtimeType}');

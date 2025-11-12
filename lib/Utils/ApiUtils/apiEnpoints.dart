@@ -32,7 +32,7 @@ class ApiEndpoint{
 
   // profiles
   static const String verifications = "/verifications";
-  static const String countries = "/countries";
+  static const String countries = "/app/countries";
   static const String changePassword = "/change-password";
   static const String faqs = "/faqs";
   static const String faqCategories = "/faq-categories";

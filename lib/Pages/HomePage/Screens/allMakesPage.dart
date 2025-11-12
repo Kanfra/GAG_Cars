@@ -37,13 +37,27 @@ class _AllMakesPageState extends State<AllMakesPage> {
   bool _isSearching = false;
   bool _showShimmer = true;
   String _currentLayout = 'grid';
-  final logger = Logger();
+  final Logger logger = Logger();
+
+  // Speech variables - Commented out since flutter_speech is problematic
+  // bool _isListening = false;
+  // String _lastWords = '';
+  // bool _speechAvailable = false;
+
+  // Keyboard visibility tracking
+  bool _keyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
     _initializeFromArguments();
+    // _initializeSpeech(); // Commented out - speech functionality disabled
     _simulateLoading();
+    
+    // Listen for keyboard visibility changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setupKeyboardListeners();
+    });
   }
 
   void _initializeFromArguments() {
@@ -102,6 +116,31 @@ class _AllMakesPageState extends State<AllMakesPage> {
     _filteredBrands = List.from(_brands);
   }
 
+  // void _initializeSpeech() {
+  //   // Commented out - speech functionality disabled
+  //   _speechAvailable = false;
+  //   logger.i('ℹ️ Speech recognition disabled due to compatibility issues');
+  // }
+
+  void _setupKeyboardListeners() {
+    // Check initial keyboard state
+    _updateKeyboardVisibility();
+    
+    // Listen for keyboard changes
+    _searchFocusNode.addListener(() {
+      _updateKeyboardVisibility();
+    });
+  }
+
+  void _updateKeyboardVisibility() {
+    final newKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    if (newKeyboardVisible != _keyboardVisible) {
+      setState(() {
+        _keyboardVisible = newKeyboardVisible;
+      });
+    }
+  }
+
   void _simulateLoading() {
     Future.delayed(Duration(milliseconds: 800), () {
       if (mounted) {
@@ -132,6 +171,67 @@ class _AllMakesPageState extends State<AllMakesPage> {
     });
   }
 
+  // Voice search methods commented out since functionality is disabled
+  /*
+  void _startListening() {
+    // Show a message that voice search is coming soon
+    _showSpeechMessage('Voice search functionality coming soon!');
+    
+    // For demo purposes, simulate speech recognition after 2 seconds
+    Future.delayed(Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isListening = false;
+          // Simulate a search term
+          _searchEditingController.text = 'Toyota';
+          _filterBrands('Toyota');
+        });
+      }
+    });
+  }
+
+  void _stopListening() {
+    setState(() {
+      _isListening = false;
+    });
+  }
+
+  void _toggleListening() {
+    if (_isListening) {
+      _stopListening();
+    } else {
+      setState(() {
+        _isListening = true;
+      });
+      _startListening();
+    }
+  }
+
+  void _showSpeechError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _showSpeechMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: ColorGlobalVariables.brownColor,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+  */
+
   void _navigateToSelectedBrand(TrendingMake brand) {
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     
@@ -147,7 +247,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
       RouteClass.getSelectedBrandPage(),
       arguments: {
         'selectedBrand': brand.toJson(),
-        'brandItems': brandItems, // Pass the actual filtered items
+        'brandItems': brandItems,
         'type': 'selectedBrand'
       }
     );
@@ -155,67 +255,67 @@ class _AllMakesPageState extends State<AllMakesPage> {
 
   Color _getBackgroundColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF303030) // grey[900]
+        ? const Color(0xFF303030)
         : Colors.grey[50]!;
   }
 
   Color _getCardColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
+        ? const Color(0xFF424242)
         : Colors.white;
   }
 
   Color _getTextColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFFFFFFF) // white
+        ? const Color(0xFFFFFFFF)
         : Colors.black87;
   }
 
   Color _getSecondaryTextColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xB3FFFFFF) // white70
+        ? const Color(0xB3FFFFFF)
         : Colors.grey[700]!;
   }
 
   Color _getIconColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFFFFFFF) // white
+        ? const Color(0xFFFFFFFF)
         : Colors.black87;
   }
 
   Color _getBorderColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF616161) // grey[700]
+        ? const Color(0xFF616161)
         : Colors.grey[200]!;
   }
 
   Color _getSearchContainerColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
+        ? const Color(0xFF424242)
         : Colors.white;
   }
 
   Color _getBrandLogoBackgroundColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF303030) // grey[900]
+        ? const Color(0xFF303030)
         : Colors.grey[50]!;
   }
 
   Color _getBrandLogoBorderColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF616161) // grey[700]
+        ? const Color(0xFF616161)
         : Colors.grey[100]!;
   }
 
   Color _getShimmerBaseColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
+        ? const Color(0xFF424242)
         : Colors.grey[200]!;
   }
 
   Color _getShimmerHighlightColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF303030) // grey[900]
+        ? const Color(0xFF303030)
         : Colors.grey[100]!;
   }
 
@@ -225,29 +325,71 @@ class _AllMakesPageState extends State<AllMakesPage> {
       backgroundColor: _getBackgroundColor(context),
       appBar: _buildAppBar(context),
       body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                _buildSearchSection(context),
+                _buildHeaderSection(context),
+                Expanded(
+                  child: _buildContentSection(constraints),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+      // Commented out - floating action button for voice search disabled
+      // floatingActionButton: _isListening ? _buildListeningFab() : null,
+    );
+  }
+
+  Widget _buildContentSection(BoxConstraints constraints) {
+    if (_showShimmer) {
+      return _buildShimmerLoader();
+    }
+    
+    if (_filteredBrands.isEmpty) {
+      return _buildEmptyState(constraints);
+    }
+    
+    return _currentLayout == 'grid' 
+        ? _buildGridView() 
+        : _buildListView();
+  }
+
+  // Commented out - listening FAB disabled
+  /*
+  Widget _buildListeningFab() {
+    return Container(
+      margin: EdgeInsets.only(bottom: _keyboardVisible ? MediaQuery.of(context).viewInsets.bottom + 20 : 20),
+      child: FloatingActionButton.large(
+        onPressed: _stopListening,
+        backgroundColor: Colors.red,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildSearchSection(context),
-            _buildHeaderSection(context),
-            Expanded(
-              child: _showShimmer
-                  ? _buildShimmerLoader(context)
-                  : _filteredBrands.isEmpty
-                      ? _buildEmptyState(context)
-                      : _currentLayout == 'grid'
-                          ? _buildGridView(context)
-                          : _buildListView(context),
+            Icon(Icons.mic, color: Colors.white, size: 30),
+            SizedBox(height: 4),
+            Text(
+              'Demo Mode',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+  */
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Theme.of(context).brightness == Brightness.dark
-          ? const Color(0xFF424242) // grey[800]
+          ? const Color(0xFF424242)
           : Colors.white,
       elevation: 0,
       leading: IconButton(
@@ -269,12 +411,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
         ),
       ),
       centerTitle: true,
-      actions: [
-        // IconButton(
-        //   icon: Icon(Icons.filter_list_rounded, color: _getIconColor(context)),
-        //   onPressed: () {},
-        // ),
-      ],
     );
   }
 
@@ -321,7 +457,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
             hintText: 'Search luxury brands...',
             hintStyle: TextStyle(
               color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xB3FFFFFF) // white70
+                  ? const Color(0xB3FFFFFF)
                   : Colors.grey[500],
               fontSize: 16,
             ),
@@ -334,32 +470,51 @@ class _AllMakesPageState extends State<AllMakesPage> {
                 size: 24,
               ),
             ),
-            suffixIcon: _isSearching
-                ? IconButton(
-                    icon: Icon(
-                      Icons.close_rounded, 
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xB3FFFFFF) // white70
-                          : Colors.grey[500],
-                    ),
-                    onPressed: () {
-                      _searchEditingController.clear();
-                      _filterBrands('');
-                      _searchFocusNode.unfocus();
-                    },
-                  )
-                : IconButton(
-                    icon: Icon(
-                      Icons.mic_rounded, 
-                      color: ColorGlobalVariables.brownColor,
-                    ),
-                    onPressed: () {},
-                  ),
+            suffixIcon: _buildSuffixIcon(),
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildSuffixIcon() {
+    if (_isSearching) {
+      return IconButton(
+        icon: Icon(
+          Icons.close_rounded, 
+          color: Theme.of(context).brightness == Brightness.dark
+              ? const Color(0xB3FFFFFF)
+              : Colors.grey[500],
+        ),
+        onPressed: () {
+          _searchEditingController.clear();
+          _filterBrands('');
+          _searchFocusNode.unfocus();
+        },
+      );
+    } else {
+      // Commented out - mic icon button disabled
+      /*
+      return IconButton(
+        icon: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          decoration: BoxDecoration(
+            color: _isListening ? Colors.red.withOpacity(0.1) : Colors.transparent,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            _isListening ? Icons.mic_rounded : Icons.mic_rounded,
+            color: _isListening ? Colors.red : ColorGlobalVariables.brownColor.withOpacity(0.7),
+            size: _isListening ? 26 : 24,
+          ),
+        ),
+        onPressed: _toggleListening,
+        tooltip: 'Tap for voice search demo',
+      );
+      */
+      return SizedBox.shrink(); // Return empty widget when not searching
+    }
   }
 
   Widget _buildHeaderSection(BuildContext context) {
@@ -369,7 +524,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            '${_filteredBrands.length} ${_filteredBrands.length == 1 ? 'Make' : 'All Makes'}',
+            '${_filteredBrands.length} ${_filteredBrands.length == 1 ? 'Make' : 'Makes'}',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -384,7 +539,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                   color: _currentLayout == 'grid' 
                       ? ColorGlobalVariables.brownColor 
                       : Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xB3FFFFFF) // white70
+                          ? const Color(0xB3FFFFFF)
                           : Colors.grey[400],
                 ),
                 onPressed: _toggleLayout,
@@ -395,7 +550,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                   color: _currentLayout == 'list' 
                       ? ColorGlobalVariables.brownColor 
                       : Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xB3FFFFFF) // white70
+                          ? const Color(0xB3FFFFFF)
                           : Colors.grey[400],
                 ),
                 onPressed: _toggleLayout,
@@ -407,7 +562,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildGridView(BuildContext context) {
+  Widget _buildGridView() {
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -424,7 +579,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildListView(BuildContext context) {
+  Widget _buildListView() {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       itemCount: _filteredBrands.length,
@@ -436,7 +591,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
   }
 
   Widget _buildBrandGridCard(TrendingMake brand, BuildContext context) {
-    // Get vehicle count for this brand from HomeProvider
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     final vehicleCount = homeProvider.recommendedItems.where((item) {
       final itemBrandId = item.brand?.id ?? item.brandId;
@@ -461,7 +615,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
           ),
           child: Stack(
             children: [
-              // Main Content - Perfectly Centered
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -469,7 +622,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Brand Logo Container
                       Container(
                         width: 70,
                         height: 70,
@@ -484,22 +636,19 @@ class _AllMakesPageState extends State<AllMakesPage> {
                             fit: BoxFit.cover,
                             errorWidget: (context, url, error) => Container(
                               color: Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xFF424242) // grey[800]
+                                  ? const Color(0xFF424242)
                                   : Colors.grey[200],
                               child: Icon(
                                 Icons.business, 
                                 color: Theme.of(context).brightness == Brightness.dark
-                                    ? const Color(0xB3FFFFFF) // white70
+                                    ? const Color(0xB3FFFFFF)
                                     : Colors.grey[400],
                               ),
                             ),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
-                      // Brand Name - Centered
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 120),
                         child: Text(
@@ -515,10 +664,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
-                      // Vehicle Count Badge - Centered
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
@@ -543,8 +689,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
                   ),
                 ),
               ),
-              
-              // Hover Effect Layer
               Positioned.fill(
                 child: Material(
                   color: Colors.transparent,
@@ -565,7 +709,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
   }
 
   Widget _buildBrandListCard(TrendingMake brand, BuildContext context) {
-    // Get vehicle count for this brand from HomeProvider
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     final vehicleCount = homeProvider.recommendedItems.where((item) {
       final itemBrandId = item.brand?.id ?? item.brandId;
@@ -600,7 +743,6 @@ class _AllMakesPageState extends State<AllMakesPage> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // Brand Logo
                     Container(
                       width: 60,
                       height: 60,
@@ -615,22 +757,19 @@ class _AllMakesPageState extends State<AllMakesPage> {
                           fit: BoxFit.cover,
                           errorWidget: (context, url, error) => Container(
                             color: Theme.of(context).brightness == Brightness.dark
-                                ? const Color(0xFF424242) // grey[800]
+                                ? const Color(0xFF424242)
                                 : Colors.grey[200],
                             child: Icon(
                               Icons.business, 
                               color: Theme.of(context).brightness == Brightness.dark
-                                  ? const Color(0xB3FFFFFF) // white70
+                                  ? const Color(0xB3FFFFFF)
                                   : Colors.grey[400],
                             ),
                           ),
                         ),
                       ),
                     ),
-                    
                     const SizedBox(width: 16),
-                    
-                    // Brand Info
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,13 +793,11 @@ class _AllMakesPageState extends State<AllMakesPage> {
                         ],
                       ),
                     ),
-                    
-                    // Arrow Icon
                     Icon(
                       Icons.arrow_forward_ios_rounded,
                       size: 16,
                       color: Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xB3FFFFFF) // white70
+                          ? const Color(0xB3FFFFFF)
                           : Colors.grey[400],
                     ),
                   ],
@@ -673,72 +810,88 @@ class _AllMakesPageState extends State<AllMakesPage> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 80,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF616161) // grey[700]
-                  : Colors.grey[300],
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No Brands Found',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xB3FFFFFF) // white70
-                    : Colors.grey[500],
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Try adjusting your search terms or browse all brands',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? const Color(0xB3FFFFFF) // white70
-                    : Colors.grey[400],
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                _searchEditingController.clear();
-                _filterBrands('');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorGlobalVariables.brownColor,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+  Widget _buildEmptyState(BoxConstraints constraints) {
+    // Calculate available height considering keyboard
+    final availableHeight = constraints.maxHeight - 
+        (MediaQuery.of(context).padding.top + kToolbarHeight + 200);
+    
+    return SingleChildScrollView(
+      physics: AlwaysScrollableScrollPhysics(),
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: availableHeight,
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.search_off_rounded,
+                  size: 80,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF616161)
+                      : Colors.grey[300],
                 ),
-              ),
-              child: Text(
-                'View All Brands',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                const SizedBox(height: 24),
+                Text(
+                  'No Brands Found',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xB3FFFFFF)
+                        : Colors.grey[500],
+                    letterSpacing: -0.5,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                Text(
+                  'Try adjusting your search terms or browse all brands',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xB3FFFFFF)
+                        : Colors.grey[400],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    _searchEditingController.clear();
+                    _filterBrands('');
+                    _searchFocusNode.unfocus();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorGlobalVariables.brownColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'View All Brands',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildShimmerLoader(BuildContext context) {
+  Widget _buildShimmerLoader() {
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

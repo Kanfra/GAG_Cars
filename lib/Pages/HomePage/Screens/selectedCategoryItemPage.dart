@@ -8,7 +8,6 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/similarItemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
@@ -677,11 +676,12 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
 
     return GestureDetector(
       onTap: () {
+        // DIRECTLY PASS SimilarItem TO DetailPage WITHOUT CONVERSION
         Get.toNamed(
           RouteClass.getDetailPage(),
           arguments: {
-            'product': _convertToRecommendedItem(widget.item).toJson(),
-            'item': _convertToRecommendedItem(widget.item).toJson(),
+            'product': widget.item.toJson(),
+            'item': widget.item.toJson(),
             'type': 'category-item',
           },
         );
@@ -978,50 +978,6 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
           ],
         ),
       ),
-    );
-  }
-
-  // Helper method to convert SimilarItem to RecommendedItem for compatibility
-  RecommendedItem _convertToRecommendedItem(SimilarItem similarItem) {
-    return RecommendedItem(
-      id: similarItem.id,
-      name: similarItem.name ?? 'Unnamed Item',
-      price: similarItem.price ?? '0',
-      year: similarItem.year ?? '',
-      images: similarItem.images ?? [],
-      mileage: similarItem.mileage,
-      transmission: similarItem.transmission,
-      location: similarItem.location,
-      condition: similarItem.condition,
-      description: similarItem.description,
-      userId: similarItem.userId,
-      countryId: similarItem.countryId,
-      brandModelId: similarItem.brandModelId,
-      brandId: similarItem.brandId,
-      categoryId: similarItem.categoryId,
-      slug: similarItem.slug,
-      serialNumber: similarItem.serialNumber,
-      steerPosition: similarItem.steerPosition,
-      engineCapacity: similarItem.engineCapacity,
-      color: similarItem.color,
-      buildType: similarItem.buildType,
-      numberOfPassengers: similarItem.numberOfPassengers,
-      features: similarItem.features,
-      status: similarItem.status,
-      warranty: similarItem.warranty,
-      // Convert String dates to DateTime
-      warrantyExpiration: similarItem.warrantyExpiration != null 
-          ? DateTime.tryParse(similarItem.warrantyExpiration!) 
-          : null,
-      deletedAt: similarItem.deletedAt != null 
-          ? DateTime.tryParse(similarItem.deletedAt!) 
-          : null,
-      createdAt: DateTime.tryParse(similarItem.createdAt ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(similarItem.updatedAt ?? '') ?? DateTime.now(),
-      height: similarItem.height,
-      vin: similarItem.vin,
-      isPromoted: false,
-      brand: null,
     );
   }
 }

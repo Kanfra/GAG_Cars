@@ -4,18 +4,6 @@ part 'countryModel.freezed.dart';
 part 'countryModel.g.dart';
 
 @freezed
-class CountriesResponse with _$CountriesResponse {
-  const factory CountriesResponse({
-    required List<Country> data,
-    required PaginationLinks links,
-    required Meta meta,
-  }) = _CountriesResponse;
-
-  factory CountriesResponse.fromJson(Map<String, dynamic> json) =>
-      _$CountriesResponseFromJson(json);
-}
-
-@freezed
 class Country with _$Country {
   const factory Country({
     required int id,
@@ -29,7 +17,13 @@ class Country with _$Country {
     @JsonKey(name: 'currency_name') required String currencyName,
     @JsonKey(name: 'currency_symbol') required String currencySymbol,
     required String tld,
-    String? slug,
+    String? native,
+    String? region,
+    String? subregion,
+    String? latitude,
+    String? longitude,
+    String? emoji,
+    String? emojiU,
     @JsonKey(name: 'created_at') required String createdAt,
     @JsonKey(name: 'updated_at') required String updatedAt,
   }) = _Country;
@@ -38,44 +32,6 @@ class Country with _$Country {
       _$CountryFromJson(json);
 }
 
-@freezed
-class PaginationLinks with _$PaginationLinks {
-  const factory PaginationLinks({
-    required String first,
-    required String last,
-    required String? prev,
-    required String? next,
-  }) = _PaginationLinks;
-
-  factory PaginationLinks.fromJson(Map<String, dynamic> json) =>
-      _$PaginationLinksFromJson(json);
-}
-
-@freezed
-class Meta with _$Meta {
-  const factory Meta({
-    @JsonKey(name: 'current_page') required int currentPage,
-    required int from,
-    @JsonKey(name: 'last_page') required int lastPage,
-    required List<MetaLink> links,
-    required String path,
-    @JsonKey(name: 'per_page') required int perPage,
-    required int to,
-    required int total,
-  }) = _Meta;
-
-  factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
-}
-
-@freezed
-class MetaLink with _$MetaLink {
-  const factory MetaLink({
-    required String? url,
-    required String label,
-    required int? page,
-    required bool active,
-  }) = _MetaLink;
-
-  factory MetaLink.fromJson(Map<String, dynamic> json) =>
-      _$MetaLinkFromJson(json);
-}
+// If you want to keep the original structure for other endpoints that use pagination,
+// you can create a simple list wrapper:
+typedef CountriesList = List<Country>;

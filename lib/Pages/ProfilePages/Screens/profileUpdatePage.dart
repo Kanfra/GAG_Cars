@@ -4,8 +4,6 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.d
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
-import 'package:gag_cars_frontend/Pages/ProfilePages/Models/countryModel.dart';
-import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
@@ -22,30 +20,7 @@ class ProfileUpdatePage extends StatefulWidget {
 class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   final ImagePicker _picker = ImagePicker();
   File? _pendingProfileImage;
-  Country? _selectedCountry;
-  bool _initializedCountries = false;
   bool _hasNewImageSelected = false;
-  final TextEditingController _searchController = TextEditingController();
-  List<Country> _filteredCountries = [];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeCountries();
-    });
-  }
-
-  void _initializeCountries() {
-    if (_initializedCountries) return;
-    
-    final countryProvider = Provider.of<CountryProvider>(context, listen: false);
-    
-    if (!countryProvider.isInitialized && !countryProvider.isLoading) {
-      countryProvider.loadCountries();
-    }
-    _initializedCountries = true;
-  }
 
   Future<void> _updateProfileImage() async {
     showImageSourceDialog(
@@ -100,7 +75,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         userName: currentName,
         phoneNumber: currentPhone,
         email: currentEmail,
-        countryId: _selectedCountry?.id,
+        // countryId is no longer sent since country selection is disabled
       );
 
       // Only clear the pending image if it was actually uploaded
@@ -200,298 +175,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  void _showCountrySelectionDialog() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final countryProvider = Provider.of<CountryProvider>(context, listen: false);
-    final countries = countryProvider.countriesSortedByName;
-    _filteredCountries = countries;
-    _searchController.clear();
-
-    Get.dialog(
-      Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
-        child: Container(
-          decoration: BoxDecoration(
-            color: isDarkMode ? const Color(0xFF424242) : Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 30,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: ColorGlobalVariables.brownColor,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_rounded,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "Select Your Country",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: Colors.white.withOpacity(0.8),
-                        size: 24,
-                      ),
-                      onPressed: () => Get.back(),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-                    ),
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isDarkMode ? Colors.white : Colors.grey[800],
-                    ),
-                    decoration: InputDecoration(
-                      hintText: "Search countries...",
-                      hintStyle: TextStyle(
-                        color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                        fontSize: 16,
-                      ),
-                      border: InputBorder.none,
-                      prefixIcon: Icon(
-                        Icons.search_rounded,
-                        color: ColorGlobalVariables.brownColor,
-                        size: 22,
-                      ),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.clear_rounded,
-                                color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                                size: 20,
-                              ),
-                              onPressed: () {
-                                _searchController.clear();
-                                _filteredCountries = countries;
-                                setState(() {});
-                              },
-                            )
-                          : null,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _filteredCountries = countries.where((country) {
-                          return country.name.toLowerCase().contains(value.toLowerCase()) ||
-                              country.iso2.toLowerCase().contains(value.toLowerCase()) ||
-                              country.phoneCode.contains(value);
-                        }).toList();
-                      });
-                    },
-                  ),
-                ),
-              ),
-
-              // Countries List
-              Expanded(
-                child: countryProvider.isLoading && !countryProvider.isInitialized
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-                        ),
-                      )
-                    : countryProvider.hasError
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.error_outline_rounded,
-                                color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
-                                size: 48,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'Failed to load countries',
-                                style: TextStyle(
-                                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () {
-                                  countryProvider.loadCountries();
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: ColorGlobalVariables.brownColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Try Again',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          )
-                        : _filteredCountries.isEmpty
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.search_off_rounded,
-                                    color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
-                                    size: 48,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'No countries found',
-                                    style: TextStyle(
-                                      color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Try a different search term',
-                                    style: TextStyle(
-                                      color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : ListView.builder(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                itemCount: _filteredCountries.length,
-                                itemBuilder: (context, index) {
-                                  final country = _filteredCountries[index];
-                                  final isSelected = _selectedCountry?.id == country.id;
-                                  
-                                  return Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedCountry = country;
-                                        });
-                                        Get.back();
-                                      },
-                                      child: Container(
-                                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? ColorGlobalVariables.brownColor.withOpacity(0.1)
-                                              : Colors.transparent,
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: isSelected
-                                                ? ColorGlobalVariables.brownColor.withOpacity(0.3)
-                                                : Colors.transparent,
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            // Flag
-                                            Container(
-                                              width: 32,
-                                              height: 32,
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(6),
-                                                color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                _getFlagEmoji(country.iso2),
-                                                style: const TextStyle(fontSize: 18),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 16),
-                                            
-                                            // Country Info
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    country.name,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: isDarkMode ? Colors.white : Colors.grey[800],
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    '+${country.phoneCode} • ${country.iso2}',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: isDarkMode ? Colors.white60 : Colors.grey[600],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            
-                                            // Selection Indicator
-                                            if (isSelected)
-                                              Icon(
-                                                Icons.check_circle_rounded,
-                                                color: ColorGlobalVariables.brownColor,
-                                                size: 24,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   String _getFlagEmoji(String countryCode) {
     final codePoints = countryCode.toUpperCase().codeUnits.map((codeUnit) => codeUnit + 127397).toList();
     return String.fromCharCodes(codePoints);
@@ -526,33 +209,19 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
-    return Consumer2<UserProvider, CountryProvider>(
-      builder: (context, userProvider, countryProvider, child){
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child){
         final user = userProvider.user;
-        final hasExistingCountry = user?.countryId != null;
-        
-        if (_selectedCountry == null && hasExistingCountry) {
-          final countryId = user!.countryId;
-          final int? parsedCountryId = countryId;
-          
-          if (parsedCountryId != null) {
-            final userCountry = countryProvider.getCountryById(parsedCountryId);
-            if (userCountry != null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                setState(() {
-                  _selectedCountry = userCountry;
-                });
-              });
-            }
-          }
-        }
+        final hasCountry = user?.countryId != null && user?.countryName != null && user?.countryName!.isNotEmpty == true;
+        final countryName = user?.countryName;
+        final countryCode = user?.countryCode;
 
         return Scaffold(
           backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[100],
           appBar: _buildAppBar(isDarkMode),
           body: Stack(
             children: [
-              _buildProfileForm(userProvider, countryProvider, user, hasExistingCountry, isDarkMode),
+              _buildProfileForm(userProvider, user, hasCountry, countryName, countryCode, isDarkMode),
               if(userProvider.isLoading)
               Container(
                 color: ColorGlobalVariables.blackColor.withOpacity(0.3),
@@ -591,12 +260,12 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildProfileForm(UserProvider userProvider, CountryProvider countryProvider, UserModel? user, bool hasExistingCountry, bool isDarkMode) {
+  Widget _buildProfileForm(UserProvider userProvider, UserModel? user, bool hasCountry, String? countryName, String? countryCode, bool isDarkMode) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
         children: [
-          _buildProfileHeader(user, countryProvider, hasExistingCountry, isDarkMode),
+          _buildProfileHeader(user, hasCountry, countryName, countryCode, isDarkMode),
           const SizedBox(height: 32),
           _buildEditableField(
             label: "Full Name",
@@ -628,7 +297,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 20),
-          _buildCountrySelectionField(hasExistingCountry, isDarkMode),
+          _buildCountryDisplayField(hasCountry, countryName, countryCode, isDarkMode),
           const SizedBox(height: 40),
           _buildUpdateButton(userProvider),
         ],
@@ -636,21 +305,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildProfileHeader(UserModel? user, CountryProvider countryProvider, bool hasExistingCountry, bool isDarkMode) {
-    String? countryName;
-    String? countryFlag;
-    
-    if (hasExistingCountry) {
-      final countryId = user!.countryId;
-      final int? parsedCountryId = countryId;
-      
-      if (parsedCountryId != null) {
-        final userCountry = countryProvider.getCountryById(parsedCountryId);
-        countryName = userCountry?.name;
-        countryFlag = userCountry != null ? _getFlagEmoji(userCountry.iso2) : null;
-      }
-    }
-
+  Widget _buildProfileHeader(UserModel? user, bool hasCountry, String? countryName, String? countryCode, bool isDarkMode) {
     return Column(
       children: [
         Stack(
@@ -701,15 +356,15 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           ),
         ),
         const SizedBox(height: 4),
-        if (hasExistingCountry && countryName != null) 
+        if (hasCountry && countryName != null) 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (countryFlag != null) 
+              if (countryCode != null) 
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: Text(
-                    countryFlag,
+                    _getFlagEmoji(countryCode),
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),
@@ -792,65 +447,61 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildCountrySelectionField(bool hasExistingCountry, bool isDarkMode) {
-    final displayCountry = _selectedCountry;
-    final hasSelectedCountry = displayCountry != null;
-
-    return GestureDetector(
-      onTap: _showCountrySelectionDialog,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        "Country",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
-                        ),
+  Widget _buildCountryDisplayField(bool hasCountry, String? countryName, String? countryCode, bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "Country",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
                       ),
-                      if (hasExistingCountry)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: ColorGlobalVariables.greenColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              "Current",
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: ColorGlobalVariables.greenColor,
-                                fontWeight: FontWeight.w500,
-                              ),
+                    ),
+                    if (hasCountry)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: ColorGlobalVariables.greenColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            "Current",
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: ColorGlobalVariables.greenColor,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  hasSelectedCountry
-                    ? Row(
-                        children: [
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                hasCountry && countryName != null
+                  ? Row(
+                      children: [
+                        if (countryCode != null)
                           Container(
                             width: 24,
                             height: 24,
@@ -860,73 +511,52 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                             ),
                             alignment: Alignment.center,
                             child: Text(
-                              _getFlagEmoji(displayCountry!.iso2),
+                              _getFlagEmoji(countryCode),
                               style: const TextStyle(fontSize: 12),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  displayCountry.name,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
-                                  ),
-                                ),
-                                if (hasExistingCountry)
-                                  Text(
-                                    "Tap to change country",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.5),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          Text(
-                            '+${displayCountry.phoneCode}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Select your country",
+                        if (countryCode != null) const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            countryName,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.4),
+                              color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor,
                             ),
                           ),
-                          Text(
-                            "Required for full profile setup",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: ColorGlobalVariables.redColor.withOpacity(0.7),
-                            ),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "No country information",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.4),
                           ),
-                        ],
-                      ),
-                ],
-              ),
+                        ),
+                        Text(
+                          "Country data not available",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: ColorGlobalVariables.redColor.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+              ],
             ),
-            Icon(
-              Icons.arrow_drop_down_rounded,
-              size: 24,
-              color: ColorGlobalVariables.brownColor,
-            ),
-          ],
-        ),
+          ),
+          Icon(
+            Icons.location_on_rounded,
+            size: 20,
+            color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+          ),
+        ],
       ),
     );
   }

@@ -697,7 +697,7 @@ class _HomePageState extends State<HomePage> {
                   Get.toNamed(
                     RouteClass.getAllMakesPage(),
                     arguments: {
-                       'selectedBrand':  homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
+                       'selectedBrand': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
                       'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
                       'type': 'brands',
                     },

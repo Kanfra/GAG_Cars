@@ -28,12 +28,16 @@ mixin _$TrendingMake {
   String get name => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _safeParseStringWithDefault)
   String get slug => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _safeParseStringWithDefault)
-  String get image => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseString)
+  String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
   String get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
   String get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+  int get itemsCount => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+  List<BrandModel> get brandModels => throw _privateConstructorUsedError;
 
   /// Serializes this TrendingMake to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,11 +60,15 @@ abstract class $TrendingMakeCopyWith<$Res> {
       @JsonKey(name: 'user_id', fromJson: _safeParseString) String? userId,
       @JsonKey(fromJson: _safeParseStringWithDefault) String name,
       @JsonKey(fromJson: _safeParseStringWithDefault) String slug,
-      @JsonKey(fromJson: _safeParseStringWithDefault) String image,
+      @JsonKey(fromJson: _safeParseString) String? image,
       @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
       String createdAt,
       @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
-      String updatedAt});
+      String updatedAt,
+      @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+      int itemsCount,
+      @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+      List<BrandModel> brandModels});
 }
 
 /// @nodoc
@@ -82,9 +90,11 @@ class _$TrendingMakeCopyWithImpl<$Res, $Val extends TrendingMake>
     Object? userId = freezed,
     Object? name = null,
     Object? slug = null,
-    Object? image = null,
+    Object? image = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? itemsCount = null,
+    Object? brandModels = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -103,10 +113,10 @@ class _$TrendingMakeCopyWithImpl<$Res, $Val extends TrendingMake>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      image: null == image
+      image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -115,6 +125,14 @@ class _$TrendingMakeCopyWithImpl<$Res, $Val extends TrendingMake>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as String,
+      itemsCount: null == itemsCount
+          ? _value.itemsCount
+          : itemsCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandModels: null == brandModels
+          ? _value.brandModels
+          : brandModels // ignore: cast_nullable_to_non_nullable
+              as List<BrandModel>,
     ) as $Val);
   }
 }
@@ -132,11 +150,15 @@ abstract class _$$TrendingMakeImplCopyWith<$Res>
       @JsonKey(name: 'user_id', fromJson: _safeParseString) String? userId,
       @JsonKey(fromJson: _safeParseStringWithDefault) String name,
       @JsonKey(fromJson: _safeParseStringWithDefault) String slug,
-      @JsonKey(fromJson: _safeParseStringWithDefault) String image,
+      @JsonKey(fromJson: _safeParseString) String? image,
       @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
       String createdAt,
       @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
-      String updatedAt});
+      String updatedAt,
+      @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+      int itemsCount,
+      @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+      List<BrandModel> brandModels});
 }
 
 /// @nodoc
@@ -156,9 +178,11 @@ class __$$TrendingMakeImplCopyWithImpl<$Res>
     Object? userId = freezed,
     Object? name = null,
     Object? slug = null,
-    Object? image = null,
+    Object? image = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? itemsCount = null,
+    Object? brandModels = null,
   }) {
     return _then(_$TrendingMakeImpl(
       id: null == id
@@ -177,10 +201,10 @@ class __$$TrendingMakeImplCopyWithImpl<$Res>
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
               as String,
-      image: null == image
+      image: freezed == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -189,6 +213,14 @@ class __$$TrendingMakeImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as String,
+      itemsCount: null == itemsCount
+          ? _value.itemsCount
+          : itemsCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandModels: null == brandModels
+          ? _value._brandModels
+          : brandModels // ignore: cast_nullable_to_non_nullable
+              as List<BrandModel>,
     ));
   }
 }
@@ -201,11 +233,16 @@ class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
       @JsonKey(name: 'user_id', fromJson: _safeParseString) this.userId,
       @JsonKey(fromJson: _safeParseStringWithDefault) required this.name,
       @JsonKey(fromJson: _safeParseStringWithDefault) required this.slug,
-      @JsonKey(fromJson: _safeParseStringWithDefault) required this.image,
+      @JsonKey(fromJson: _safeParseString) this.image,
       @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
       required this.createdAt,
       @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
-      required this.updatedAt});
+      required this.updatedAt,
+      @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+      required this.itemsCount,
+      @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+      required final List<BrandModel> brandModels})
+      : _brandModels = brandModels;
 
   factory _$TrendingMakeImpl.fromJson(Map<String, dynamic> json) =>
       _$$TrendingMakeImplFromJson(json);
@@ -223,18 +260,29 @@ class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
   @JsonKey(fromJson: _safeParseStringWithDefault)
   final String slug;
   @override
-  @JsonKey(fromJson: _safeParseStringWithDefault)
-  final String image;
+  @JsonKey(fromJson: _safeParseString)
+  final String? image;
   @override
   @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
   final String createdAt;
   @override
   @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
   final String updatedAt;
+  @override
+  @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+  final int itemsCount;
+  final List<BrandModel> _brandModels;
+  @override
+  @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+  List<BrandModel> get brandModels {
+    if (_brandModels is EqualUnmodifiableListView) return _brandModels;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_brandModels);
+  }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'TrendingMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'TrendingMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt, itemsCount: $itemsCount, brandModels: $brandModels)';
   }
 
   @override
@@ -248,7 +296,9 @@ class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
       ..add(DiagnosticsProperty('slug', slug))
       ..add(DiagnosticsProperty('image', image))
       ..add(DiagnosticsProperty('createdAt', createdAt))
-      ..add(DiagnosticsProperty('updatedAt', updatedAt));
+      ..add(DiagnosticsProperty('updatedAt', updatedAt))
+      ..add(DiagnosticsProperty('itemsCount', itemsCount))
+      ..add(DiagnosticsProperty('brandModels', brandModels));
   }
 
   @override
@@ -264,13 +314,26 @@ class _$TrendingMakeImpl with DiagnosticableTreeMixin implements _TrendingMake {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.itemsCount, itemsCount) ||
+                other.itemsCount == itemsCount) &&
+            const DeepCollectionEquality()
+                .equals(other._brandModels, _brandModels));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
-      runtimeType, id, userId, name, slug, image, createdAt, updatedAt);
+      runtimeType,
+      id,
+      userId,
+      name,
+      slug,
+      image,
+      createdAt,
+      updatedAt,
+      itemsCount,
+      const DeepCollectionEquality().hash(_brandModels));
 
   /// Create a copy of TrendingMake
   /// with the given fields replaced by the non-null parameter values.
@@ -297,12 +360,15 @@ abstract class _TrendingMake implements TrendingMake {
       required final String name,
       @JsonKey(fromJson: _safeParseStringWithDefault)
       required final String slug,
-      @JsonKey(fromJson: _safeParseStringWithDefault)
-      required final String image,
+      @JsonKey(fromJson: _safeParseString) final String? image,
       @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
       required final String createdAt,
       @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
-      required final String updatedAt}) = _$TrendingMakeImpl;
+      required final String updatedAt,
+      @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+      required final int itemsCount,
+      @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+      required final List<BrandModel> brandModels}) = _$TrendingMakeImpl;
 
   factory _TrendingMake.fromJson(Map<String, dynamic> json) =
       _$TrendingMakeImpl.fromJson;
@@ -320,8 +386,312 @@ abstract class _TrendingMake implements TrendingMake {
   @JsonKey(fromJson: _safeParseStringWithDefault)
   String get slug;
   @override
+  @JsonKey(fromJson: _safeParseString)
+  String? get image;
+  @override
+  @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+  String get createdAt;
+  @override
+  @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+  String get updatedAt;
+  @override
+  @JsonKey(name: 'items_count', fromJson: _safeParseIntWithDefault)
+  int get itemsCount;
+  @override
+  @JsonKey(name: 'brand_models', fromJson: _safeParseBrandModelList)
+  List<BrandModel> get brandModels;
+
+  /// Create a copy of TrendingMake
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$TrendingMakeImplCopyWith<_$TrendingMakeImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
+  return _BrandModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$BrandModel {
+  @JsonKey(fromJson: _safeParseInt)
+  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_id', fromJson: _safeParseInt)
+  int get brandId => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _safeParseStringWithDefault)
-  String get image;
+  String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _safeParseStringWithDefault)
+  String get slug => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+  String get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+  String get updatedAt => throw _privateConstructorUsedError;
+
+  /// Serializes this BrandModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $BrandModelCopyWith<BrandModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BrandModelCopyWith<$Res> {
+  factory $BrandModelCopyWith(
+          BrandModel value, $Res Function(BrandModel) then) =
+      _$BrandModelCopyWithImpl<$Res, BrandModel>;
+  @useResult
+  $Res call(
+      {@JsonKey(fromJson: _safeParseInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _safeParseInt) int brandId,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String name,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String slug,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      String updatedAt});
+}
+
+/// @nodoc
+class _$BrandModelCopyWithImpl<$Res, $Val extends BrandModel>
+    implements $BrandModelCopyWith<$Res> {
+  _$BrandModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? brandId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandId: null == brandId
+          ? _value.brandId
+          : brandId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$BrandModelImplCopyWith<$Res>
+    implements $BrandModelCopyWith<$Res> {
+  factory _$$BrandModelImplCopyWith(
+          _$BrandModelImpl value, $Res Function(_$BrandModelImpl) then) =
+      __$$BrandModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(fromJson: _safeParseInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _safeParseInt) int brandId,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String name,
+      @JsonKey(fromJson: _safeParseStringWithDefault) String slug,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      String updatedAt});
+}
+
+/// @nodoc
+class __$$BrandModelImplCopyWithImpl<$Res>
+    extends _$BrandModelCopyWithImpl<$Res, _$BrandModelImpl>
+    implements _$$BrandModelImplCopyWith<$Res> {
+  __$$BrandModelImplCopyWithImpl(
+      _$BrandModelImpl _value, $Res Function(_$BrandModelImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? brandId = null,
+    Object? name = null,
+    Object? slug = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_$BrandModelImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as int,
+      brandId: null == brandId
+          ? _value.brandId
+          : brandId // ignore: cast_nullable_to_non_nullable
+              as int,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      slug: null == slug
+          ? _value.slug
+          : slug // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as String,
+      updatedAt: null == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
+  const _$BrandModelImpl(
+      {@JsonKey(fromJson: _safeParseInt) required this.id,
+      @JsonKey(name: 'brand_id', fromJson: _safeParseInt) required this.brandId,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.name,
+      @JsonKey(fromJson: _safeParseStringWithDefault) required this.slug,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      required this.createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      required this.updatedAt});
+
+  factory _$BrandModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$BrandModelImplFromJson(json);
+
+  @override
+  @JsonKey(fromJson: _safeParseInt)
+  final int id;
+  @override
+  @JsonKey(name: 'brand_id', fromJson: _safeParseInt)
+  final int brandId;
+  @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
+  final String name;
+  @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
+  final String slug;
+  @override
+  @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+  final String createdAt;
+  @override
+  @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+  final String updatedAt;
+
+  @override
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
+    return 'BrandModel(id: $id, brandId: $brandId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'BrandModel'))
+      ..add(DiagnosticsProperty('id', id))
+      ..add(DiagnosticsProperty('brandId', brandId))
+      ..add(DiagnosticsProperty('name', name))
+      ..add(DiagnosticsProperty('slug', slug))
+      ..add(DiagnosticsProperty('createdAt', createdAt))
+      ..add(DiagnosticsProperty('updatedAt', updatedAt));
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$BrandModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.brandId, brandId) || other.brandId == brandId) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, brandId, name, slug, createdAt, updatedAt);
+
+  /// Create a copy of BrandModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$BrandModelImplCopyWith<_$BrandModelImpl> get copyWith =>
+      __$$BrandModelImplCopyWithImpl<_$BrandModelImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$BrandModelImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _BrandModel implements BrandModel {
+  const factory _BrandModel(
+      {@JsonKey(fromJson: _safeParseInt) required final int id,
+      @JsonKey(name: 'brand_id', fromJson: _safeParseInt)
+      required final int brandId,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
+      required final String name,
+      @JsonKey(fromJson: _safeParseStringWithDefault)
+      required final String slug,
+      @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
+      required final String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
+      required final String updatedAt}) = _$BrandModelImpl;
+
+  factory _BrandModel.fromJson(Map<String, dynamic> json) =
+      _$BrandModelImpl.fromJson;
+
+  @override
+  @JsonKey(fromJson: _safeParseInt)
+  int get id;
+  @override
+  @JsonKey(name: 'brand_id', fromJson: _safeParseInt)
+  int get brandId;
+  @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
+  String get name;
+  @override
+  @JsonKey(fromJson: _safeParseStringWithDefault)
+  String get slug;
   @override
   @JsonKey(name: 'created_at', fromJson: _safeParseStringWithDefault)
   String get createdAt;
@@ -329,11 +699,11 @@ abstract class _TrendingMake implements TrendingMake {
   @JsonKey(name: 'updated_at', fromJson: _safeParseStringWithDefault)
   String get updatedAt;
 
-  /// Create a copy of TrendingMake
+  /// Create a copy of BrandModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TrendingMakeImplCopyWith<_$TrendingMakeImpl> get copyWith =>
+  _$$BrandModelImplCopyWith<_$BrandModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 

@@ -12,9 +12,11 @@ _$TrendingMakeImpl _$$TrendingMakeImplFromJson(Map<String, dynamic> json) =>
       userId: _safeParseString(json['user_id']),
       name: _safeParseStringWithDefault(json['name']),
       slug: _safeParseStringWithDefault(json['slug']),
-      image: _safeParseStringWithDefault(json['image']),
+      image: _safeParseString(json['image']),
       createdAt: _safeParseStringWithDefault(json['created_at']),
       updatedAt: _safeParseStringWithDefault(json['updated_at']),
+      itemsCount: _safeParseIntWithDefault(json['items_count']),
+      brandModels: _safeParseBrandModelList(json['brand_models']),
     );
 
 Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
@@ -24,6 +26,28 @@ Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
       'name': instance.name,
       'slug': instance.slug,
       'image': instance.image,
+      'created_at': instance.createdAt,
+      'updated_at': instance.updatedAt,
+      'items_count': instance.itemsCount,
+      'brand_models': instance.brandModels,
+    };
+
+_$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
+    _$BrandModelImpl(
+      id: _safeParseInt(json['id']),
+      brandId: _safeParseInt(json['brand_id']),
+      name: _safeParseStringWithDefault(json['name']),
+      slug: _safeParseStringWithDefault(json['slug']),
+      createdAt: _safeParseStringWithDefault(json['created_at']),
+      updatedAt: _safeParseStringWithDefault(json['updated_at']),
+    );
+
+Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'brand_id': instance.brandId,
+      'name': instance.name,
+      'slug': instance.slug,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
     };

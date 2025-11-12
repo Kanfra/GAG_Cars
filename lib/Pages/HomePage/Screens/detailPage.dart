@@ -92,7 +92,6 @@ class _DetailPageState extends State<DetailPage> {
     _scrollController.addListener(_onScroll);
   }
 
-  // Enhanced Helper method to safely convert user object to Map
   Map<String, dynamic> _convertUserToMap(dynamic userObj) {
     if (userObj == null) return {};
     
@@ -100,7 +99,6 @@ class _DetailPageState extends State<DetailPage> {
       return userObj;
     }
     
-    // Handle Freezed object case - use toJson() method first
     try {
       if (userObj is dynamic && userObj.toJson != null) {
         final jsonResult = userObj.toJson();
@@ -113,48 +111,42 @@ class _DetailPageState extends State<DetailPage> {
       logger.e('Error using toJson() on user object: $e');
     }
     
-    // Fallback to reflection-based approach
     try {
       final Map<String, dynamic> result = {};
       
-      // Try common user properties with both camelCase and snake_case
       if (_hasProperty(userObj, 'id')) result['id'] = userObj.id;
       if (_hasProperty(userObj, 'name')) result['name'] = userObj.name;
       if (_hasProperty(userObj, 'username')) result['username'] = userObj.username;
       if (_hasProperty(userObj, 'email')) result['email'] = userObj.email;
       
-      // Handle profile photo with both camelCase and snake_case
       if (_hasProperty(userObj, 'profilePhoto')) {
         result['profilePhoto'] = userObj.profilePhoto;
-        result['profile_photo'] = userObj.profilePhoto; // Set both keys
+        result['profile_photo'] = userObj.profilePhoto;
       }
       if (_hasProperty(userObj, 'profile_photo')) {
         result['profile_photo'] = userObj.profile_photo;
-        result['profilePhoto'] = userObj.profile_photo; // Set both keys
+        result['profilePhoto'] = userObj.profile_photo;
       }
       
-      // Handle created date with both camelCase and snake_case
       if (_hasProperty(userObj, 'createdAt')) {
         result['createdAt'] = userObj.createdAt;
-        result['created_at'] = userObj.createdAt; // Set both keys
+        result['created_at'] = userObj.createdAt;
       }
       if (_hasProperty(userObj, 'created_at')) {
         result['created_at'] = userObj.created_at;
-        result['createdAt'] = userObj.created_at; // Set both keys
+        result['createdAt'] = userObj.created_at;
       }
       
-      // Handle phone with both camelCase and snake_case
       if (_hasProperty(userObj, 'phone')) {
         result['phone'] = userObj.phone;
-        result['phone_number'] = userObj.phone; // Set both keys
+        result['phone_number'] = userObj.phone;
       }
       if (_hasProperty(userObj, 'phone_number')) {
         result['phone_number'] = userObj.phone_number;
-        result['phone'] = userObj.phone_number; // Set both keys
+        result['phone'] = userObj.phone_number;
       }
       
       logger.w('🔍 [USER CONVERSION] Converted user object: $result');
-      
       return result;
     } catch (e) {
       logger.e('Error converting user object to map: $e');
@@ -162,9 +154,7 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  // Enhanced method to get user created date
   String? _getUserCreatedAt() {
-    // First try the converted user map which has both keys
     if (user.containsKey('createdAt') && user['createdAt'] != null) {
       return user['createdAt']?.toString();
     }
@@ -172,7 +162,6 @@ class _DetailPageState extends State<DetailPage> {
       return user['created_at']?.toString();
     }
     
-    // Fallback to direct object access
     final dynamic userObj = item['user'];
     if (userObj is Map<String, dynamic>) {
       return userObj['createdAt']?.toString() ?? userObj['created_at']?.toString();
@@ -192,7 +181,6 @@ class _DetailPageState extends State<DetailPage> {
       return userObj['id']?.toString();
     }
     
-    // Try to access id property on object
     try {
       return userObj.id?.toString();
     } catch (e) {
@@ -211,7 +199,6 @@ class _DetailPageState extends State<DetailPage> {
 
   dynamic _getProperty(dynamic obj, String propertyName) {
     try {
-      // Try direct property access for both camelCase and snake_case
       switch (propertyName) {
         case 'id': return obj.id;
         case 'name': return obj.name;
@@ -244,7 +231,6 @@ class _DetailPageState extends State<DetailPage> {
       });
     }
 
-    // Check for lazy loading
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     
@@ -320,7 +306,134 @@ class _DetailPageState extends State<DetailPage> {
     super.dispose();
   }
 
-  // ========== ENHANCED BUTTON UI METHODS ==========
+  // ========== FIXED IMAGE HANDLING METHODS ==========
+
+  String _getCorrectImageUrl(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
+      return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    }
+
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+
+    try {
+      String baseUrl = "https://dashboard.gagcars.com";
+      
+      String cleanImagePath;
+      if (imagePath.startsWith('/storage/')) {
+        cleanImagePath = imagePath;
+      } else if (imagePath.startsWith('storage/')) {
+        cleanImagePath = '/$imagePath';
+      } else {
+        cleanImagePath = '/storage/$imagePath';
+      }
+      
+      final fullUrl = '$baseUrl$cleanImagePath';
+      return fullUrl;
+    } catch (e) {
+      print('❌ Error constructing image URL: $e');
+      return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    }
+  }
+
+  Widget _buildImageErrorPlaceholder(double? width, double? height, ThemeData theme) {
+    return Container(
+      width: width,
+      height: height,
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image_not_supported,
+              size: (width ?? 45) * 0.4,
+              color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10,
+                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
+    return Shimmer.fromColors(
+      baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+      highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+      child: Container(
+        width: width,
+        height: height,
+        color: theme.cardColor,
+      ),
+    );
+  }
+
+  Widget _buildSafeNetworkImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+    final theme = Theme.of(context);
+    final String imageUrl = _getCorrectImageUrl(imagePath);
+    
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      width: width,
+      height: height,
+      fit: fit,
+      progressIndicatorBuilder: (context, url, downloadProgress) {
+        return Center(
+          child: CircularProgressIndicator(
+            value: downloadProgress.progress,
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+          ),
+        );
+      },
+      errorWidget: (context, url, error) {
+        return _buildImageErrorPlaceholder(width, height, theme);
+      },
+    );
+  }
+
+  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+    final theme = Theme.of(context);
+    final String imageUrl = _getCorrectImageUrl(imagePath);
+    
+    final bool isAssetImage = imageUrl.contains('assets/') || 
+                             imageUrl.endsWith('car_placeholder.png');
+    
+    if (isAssetImage) {
+      return Image.asset(
+        imageUrl,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorPlaceholder(width, height, theme);
+        },
+      );
+    } else {
+      return _buildSafeNetworkImage(imagePath, width: width, height: height, fit: fit);
+    }
+  }
+
+  List<dynamic> getItemImages() {
+    try {
+      final images = item['images'];
+      if (images is List && images.isNotEmpty) {
+        return images.whereType<String>().toList();
+      }
+    } catch (e) {
+      // Fall through to default
+    }
+    return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
+  }
 
   Widget _buildDefaultProfileAvatar({double size = 60}) {
     return Container(
@@ -354,18 +467,15 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Enhanced User Profile Image with better error handling
   Widget _buildUserProfileImage() {
     final dynamic userObj = item['user'];
     String? profilePhoto;
     
-    // Try to get profile photo from converted user map first
     if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
       profilePhoto = user['profilePhoto'];
     } else if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
       profilePhoto = user['profile_photo'];
     } else {
-      // Fallback to direct access
       if (userObj is Map<String, dynamic>) {
         profilePhoto = userObj['profilePhoto'] ?? userObj['profile_photo'];
       } else {
@@ -391,8 +501,8 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
         child: ClipOval(
-          child: _buildSafeImage(
-            getImageUrl(profilePhoto, null),
+          child: _buildSafeNetworkImage(
+            profilePhoto,
             width: 60,
             height: 60,
             fit: BoxFit.cover,
@@ -404,7 +514,88 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  // Enhanced Chat Button
+  String? _getUserPhoneNumber() {
+    try {
+      if (user.containsKey('phone') && user['phone'] != null) {
+        return user['phone']?.toString();
+      }
+      if (user.containsKey('phone_number') && user['phone_number'] != null) {
+        return user['phone_number']?.toString();
+      }
+      
+      final dynamic userObj = item['user'];
+      
+      if (userObj is Map<String, dynamic>) {
+        return userObj['phone']?.toString() ?? 
+               userObj['phone_number']?.toString() ??
+               userObj['contact']?.toString() ??
+               userObj['mobile']?.toString();
+      } else {
+        try {
+          return userObj.phone?.toString() ?? 
+                 userObj.phone_number?.toString() ??
+                 userObj.contact?.toString() ??
+                 userObj.mobile?.toString();
+        } catch (e) {
+          return item['phone']?.toString() ?? 
+                 item['phone_number']?.toString() ??
+                 item['contact']?.toString() ??
+                 item['mobile']?.toString();
+        }
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  String? _getUserProfilePhoto() {
+    if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
+      return user['profilePhoto'];
+    }
+    if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
+      return user['profile_photo'];
+    }
+    
+    final dynamic userObj = item['user'];
+    if (userObj is Map<String, dynamic>) {
+      return userObj['profilePhoto'] ?? userObj['profile_photo'];
+    } else {
+      try {
+        return userObj.profilePhoto ?? userObj.profile_photo;
+      } catch (e) {
+        return null;
+      }
+    }
+  }
+
+  String _getUserName() {
+    if (user.containsKey('name') && user['name'] != null) {
+      return user['name']!.toString();
+    }
+    if (user.containsKey('username') && user['username'] != null) {
+      return user['username']!.toString();
+    }
+    
+    try {
+      final dynamic userObj = item['user'];
+      if (userObj is Map<String, dynamic>) {
+        return userObj['name']?.toString() ?? 
+               userObj['username']?.toString() ??
+               'Seller';
+      }
+      
+      try {
+        return userObj.name?.toString() ?? 
+               userObj.username?.toString() ??
+               'Seller';
+      } catch (e) {
+        return 'Seller';
+      }
+    } catch (e) {
+      return 'Seller';
+    }
+  }
+
   Widget _buildChatButton() {
     final theme = Theme.of(context);
     
@@ -494,7 +685,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Enhanced Show Contact Button
   Widget _buildShowContactButton() {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -574,9 +764,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // ========== EXISTING METHODS (KEEPING ALL FUNCTIONALITY) ==========
-
-  // Phone Call Functionality
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
     
@@ -601,184 +788,6 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
-    return Shimmer.fromColors(
-      baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-      highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
-      child: Container(
-        width: width,
-        height: height,
-        color: theme.cardColor,
-      ),
-    );
-  }
-
-  Widget _buildCustomErrorWidget(double? width, double? height, ThemeData theme) {
-    return Container(
-      width: width,
-      height: height,
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[300],
-      child: Center(
-        child: Icon(
-          Icons.broken_image,
-          size: (width ?? 45) * 0.4,
-          color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
-    final theme = Theme.of(context);
-    try {
-      if (imagePath.isNotEmpty) {
-        return Image.network(
-          getImageUrl(imagePath, null),
-          width: width,
-          height: height,
-          fit: fit,
-          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height, theme),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return _buildShimmerPlaceholder(width, height, theme);
-          },
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (wasSynchronouslyLoaded) return child;
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: frame != null ? child : _buildShimmerPlaceholder(width, height, theme),
-            );
-          },
-        );
-      }
-      else if (imagePath.startsWith('assets/')) {
-        return Image.asset(
-          imagePath,
-          width: width,
-          height: height,
-          fit: fit,
-          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height, theme),
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (wasSynchronouslyLoaded) return child;
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: frame != null ? child : _buildShimmerPlaceholder(width, height, theme),
-            );
-          },
-        );
-      } else {
-        return _buildCustomErrorWidget(width, height, theme);
-      }
-    } catch (e) {
-      return _buildCustomErrorWidget(width, height, theme);
-    }
-  }
-
-  List<dynamic> getItemImages() {
-    try {
-      final images = item['images'];
-      if (images is List && images.isNotEmpty) {
-        return images.whereType<String>().toList();
-      }
-    } catch (e) {
-      // Fall through to default
-    }
-    return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
-  }
-
-  // Enhanced User Phone Number getter
-  String? _getUserPhoneNumber() {
-    try {
-      // First try the converted user map
-      if (user.containsKey('phone') && user['phone'] != null) {
-        return user['phone']?.toString();
-      }
-      if (user.containsKey('phone_number') && user['phone_number'] != null) {
-        return user['phone_number']?.toString();
-      }
-      
-      final dynamic userObj = item['user'];
-      
-      // Handle both Map and Object cases
-      if (userObj is Map<String, dynamic>) {
-        return userObj['phone']?.toString() ?? 
-               userObj['phone_number']?.toString() ??
-               userObj['contact']?.toString() ??
-               userObj['mobile']?.toString();
-      } else {
-        // Handle object case
-        try {
-          return userObj.phone?.toString() ?? 
-                 userObj.phone_number?.toString() ??
-                 userObj.contact?.toString() ??
-                 userObj.mobile?.toString();
-        } catch (e) {
-          // Fall back to item properties
-          return item['phone']?.toString() ?? 
-                 item['phone_number']?.toString() ??
-                 item['contact']?.toString() ??
-                 item['mobile']?.toString();
-        }
-      }
-    } catch (e) {
-      return null;
-    }
-  }
-
-  // Enhanced User Profile Photo getter
-  String? _getUserProfilePhoto() {
-    // First try the converted user map
-    if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
-      return user['profilePhoto'];
-    }
-    if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
-      return user['profile_photo'];
-    }
-    
-    final dynamic userObj = item['user'];
-    if (userObj is Map<String, dynamic>) {
-      return userObj['profilePhoto'] ?? userObj['profile_photo'];
-    } else {
-      try {
-        return userObj.profilePhoto ?? userObj.profile_photo;
-      } catch (e) {
-        return null;
-      }
-    }
-  }
-
-  // Enhanced User Name getter
-  String _getUserName() {
-    // First try the converted user map
-    if (user.containsKey('name') && user['name'] != null) {
-      return user['name']!.toString();
-    }
-    if (user.containsKey('username') && user['username'] != null) {
-      return user['username']!.toString();
-    }
-    
-    try {
-      final dynamic userObj = item['user'];
-      if (userObj is Map<String, dynamic>) {
-        return userObj['name']?.toString() ?? 
-               userObj['username']?.toString() ??
-               'Seller';
-      }
-      
-      // Handle object case
-      try {
-        return userObj.name?.toString() ?? 
-               userObj.username?.toString() ??
-               'Seller';
-      } catch (e) {
-        return 'Seller';
-      }
-    } catch (e) {
-      return 'Seller';
-    }
-  }
-
-  // Enhanced Contact Dialog with Call Functionality
   void _showContactDialog() {
     final phoneNumber = _getUserPhoneNumber();
     final userName = _getUserName();
@@ -800,7 +809,6 @@ class _DetailPageState extends State<DetailPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
                 Row(
                   children: [
                     Container(
@@ -832,7 +840,6 @@ class _DetailPageState extends State<DetailPage> {
                 
                 const SizedBox(height: 20),
                 
-                // Seller name
                 Text(
                   "Seller: $userName",
                   style: TextStyle(
@@ -844,7 +851,6 @@ class _DetailPageState extends State<DetailPage> {
                 
                 const SizedBox(height: 16),
                 
-                // Phone number
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
                   Column(
                     children: [
@@ -918,7 +924,6 @@ class _DetailPageState extends State<DetailPage> {
                 
                 const SizedBox(height: 24),
                 
-                // Buttons
                 Row(
                   children: [
                     Expanded(
@@ -985,7 +990,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Image Zoom Dialog
   void _showFullScreenImage(String imageUrl, int imageIndex) {
     showGeneralDialog(
       context: context,
@@ -999,7 +1003,6 @@ class _DetailPageState extends State<DetailPage> {
           insetPadding: EdgeInsets.zero,
           child: Stack(
             children: [
-              // Full screen image with zoom capability
               Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
@@ -1014,7 +1017,6 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
               
-              // Close button
               Positioned(
                 top: 50,
                 right: 20,
@@ -1035,7 +1037,6 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
               
-              // Image counter
               Positioned(
                 top: 50,
                 left: 20,
@@ -1074,7 +1075,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Enhanced Gallery Item with View Button
   Widget _buildGalleryItem(String image, int index, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
     
@@ -1094,7 +1094,6 @@ class _DetailPageState extends State<DetailPage> {
       ),
       child: Column(
         children: [
-          // Image container
           Expanded(
             child: Container(
               width: double.infinity,
@@ -1140,7 +1139,6 @@ class _DetailPageState extends State<DetailPage> {
             ),
           ),
           
-          // View button section
           Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -1158,7 +1156,6 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
                 const SizedBox(width: 4),
-                // View button
                 Container(
                   height: 28,
                   child: ElevatedButton(
@@ -1195,17 +1192,6 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ],
       ),
-    );
-  }
-
-  void _showComingSoonMessage() {
-    Get.snackbar(
-      'Coming Soon',
-      'Price drop notifications feature will be available soon!',
-      backgroundColor: Colors.blue,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 3),
     );
   }
 
@@ -1308,7 +1294,6 @@ class _DetailPageState extends State<DetailPage> {
       return value?.toString();
     }
     
-    // Handle object case
     try {
       switch (key) {
         case 'id': return obj.id?.toString();
@@ -1476,7 +1461,6 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // OPTIMIZED: Use SliverGrid instead of GridView.builder for smooth scrolling
   Widget _buildSimilarItemsSection(SimilarItemsProvider similarItemsProvider) {
     final theme = Theme.of(context);
     
@@ -1703,7 +1687,7 @@ class _DetailPageState extends State<DetailPage> {
                       Opacity(
                         opacity: _imageOpacity,
                         child: _buildSafeImage(
-                          getImageUrl(currentImage, null),
+                          currentImage,
                           width: double.infinity,
                           height: double.infinity,
                           fit: BoxFit.cover,
@@ -1785,7 +1769,6 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
               
-              // Enhanced Gallery Section with View Buttons
               SliverToBoxAdapter(
                 child: Container(
                   color: theme.scaffoldBackgroundColor,
@@ -1793,7 +1776,6 @@ class _DetailPageState extends State<DetailPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Gallery with view buttons
                       SizedBox(
                         height: 140,
                         child: ListView.builder(
@@ -1816,7 +1798,6 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       
-                      // Instructions
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
@@ -1982,7 +1963,6 @@ class _DetailPageState extends State<DetailPage> {
                             ),
                             const SizedBox(height: 16),
                             
-                            // ENHANCED ACTION BUTTONS SECTION
                             Row(
                               children: [
                                 _buildChatButton(),
@@ -1994,7 +1974,6 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       
-                      // Similar Items Title
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
                         child: Text(
@@ -2011,16 +1990,13 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
               
-              // OPTIMIZED: Use SliverGrid for similar items instead of GridView.builder
               _buildSimilarItemsSection(similarItemsProvider),
               
-              // Loading more indicator
               if (similarItemsProvider.isLoadingMore)
                 SliverToBoxAdapter(
                   child: _buildLoadingMoreIndicator(),
                 ),
               
-              // No more items indicator
               if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -2037,7 +2013,6 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                 ),
               
-              // Bottom padding
               const SliverToBoxAdapter(
                 child: SizedBox(height: 40),
               ),
@@ -2049,7 +2024,6 @@ class _DetailPageState extends State<DetailPage> {
   }
 }
 
-// Keep the existing _SimilarItemWidget class exactly as it is
 class _SimilarItemWidget extends StatefulWidget {
   final SimilarItem item;
   final Size screenSize;
@@ -2210,6 +2184,95 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  String _getCorrectImageUrl(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
+      return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    }
+
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+
+    try {
+      String baseUrl = "https://dashboard.gagcars.com";
+      
+      String cleanImagePath;
+      if (imagePath.startsWith('/storage/')) {
+        cleanImagePath = imagePath;
+      } else if (imagePath.startsWith('storage/')) {
+        cleanImagePath = '/$imagePath';
+      } else {
+        cleanImagePath = '/storage/$imagePath';
+      }
+      
+      final fullUrl = '$baseUrl$cleanImagePath';
+      return fullUrl;
+    } catch (e) {
+      print('❌ Error constructing similar item image URL: $e');
+      return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    }
+  }
+
+  Widget _buildItemImage(String imageUrl, ThemeData theme) {
+    final String fullImageUrl = _getCorrectImageUrl(imageUrl);
+    
+    final bool isAssetImage = fullImageUrl.contains('assets/') || 
+                             fullImageUrl.endsWith('car_placeholder.png');
+    
+    if (isAssetImage) {
+      return Image.asset(
+        fullImageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorPlaceholder(theme);
+        },
+      );
+    } else {
+      return CachedNetworkImage(
+        imageUrl: fullImageUrl,
+        fit: BoxFit.cover,
+        progressIndicatorBuilder: (context, url, downloadProgress) {
+          return Center(
+            child: CircularProgressIndicator(
+              value: downloadProgress.progress,
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            ),
+          );
+        },
+        errorWidget: (context, url, error) {
+          return _buildImageErrorPlaceholder(theme);
+        },
+      );
+    }
+  }
+
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
+    return Container(
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image_not_supported, 
+              size: 32, 
+              color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10, 
+                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -2432,61 +2495,6 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildItemImage(String imageUrl, ThemeData theme) {
-    final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
-    
-    if (isAssetImage) {
-      return Image.asset(
-        imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildImageErrorPlaceholder(theme);
-        },
-      );
-    } else {
-      final String fullImageUrl = getImageUrl(imageUrl, null);
-      
-      return CachedNetworkImage(
-        imageUrl: fullImageUrl,
-        fit: BoxFit.cover,
-        progressIndicatorBuilder: (context, url, downloadProgress) {
-          return Center(
-            child: CircularProgressIndicator(
-              value: downloadProgress.progress,
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
-            ),
-          );
-        },
-        errorWidget: (context, url, error) {
-          return _buildImageErrorPlaceholder(theme);
-        },
-      );
-    }
-  }
-
-  Widget _buildImageErrorPlaceholder(ThemeData theme) {
-    return Container(
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
-            const SizedBox(height: 4),
-            Text(
-              'No Image',
-              style: TextStyle(
-                fontSize: 10, 
-                color: theme.textTheme.bodySmall?.color,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

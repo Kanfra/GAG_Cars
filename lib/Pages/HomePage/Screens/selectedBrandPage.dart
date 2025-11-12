@@ -25,18 +25,29 @@ class SelectedBrandPage extends StatefulWidget {
 
 class _SelectedBrandPageState extends State<SelectedBrandPage> {
   late Map<String, dynamic> _selectedBrand;
-  late String _type;
+  late int _brandId;
   final ScrollController _scrollController = ScrollController();
   final double _scrollThreshold = 100.0;
   bool _showSearchBar = true;
   double _lastScrollOffset = 0.0;
+  bool _initialLoadCompleted = false;
 
   @override
   void initState() {
     super.initState();
     _initializeFromArguments();
     _setupScrollController();
-    _loadInitialItems();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Use WidgetsBinding to schedule the initial load after the build phase
+    if (!_initialLoadCompleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadInitialItems();
+      });
+    }
   }
 
   @override
@@ -56,12 +67,12 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
 
     if (args.containsKey('selectedBrand')) {
       _selectedBrand = args['selectedBrand'] as Map<String, dynamic>;
+      _brandId = _selectedBrand['id'] as int;
       print('Selected Brand Data: $_selectedBrand');
+      print('Brand ID: $_brandId');
     } else {
       throw Exception('selectedBrand is required in arguments');
     }
-
-    _type = args['type'] as String? ?? 'selectedBrand';
   }
 
   void _setupScrollController() {
@@ -69,38 +80,28 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   }
 
   void _scrollListener() {
-    if (_scrollController.hasClients) {
-      final currentOffset = _scrollController.offset;
-      
-      // Show search bar when at the top
-      if (currentOffset <= 0) {
-        if (!_showSearchBar) {
-          setState(() {
-            _showSearchBar = true;
-          });
-        }
-      } 
-      // Hide when scrolling down, show when scrolling up
-      else if (currentOffset > _lastScrollOffset + 50) {
-        // Scrolling down - hide search bar
-        if (_showSearchBar) {
-          setState(() {
-            _showSearchBar = false;
-          });
-        }
-      } else if (currentOffset < _lastScrollOffset - 25) {
-        // Scrolling up - show search bar
-        if (!_showSearchBar) {
-          setState(() {
-            _showSearchBar = true;
-          });
-        }
+    if (!_scrollController.hasClients) return;
+
+    final currentOffset = _scrollController.offset;
+    
+    // Handle search bar visibility
+    if (currentOffset <= 0) {
+      if (!_showSearchBar) {
+        setState(() => _showSearchBar = true);
       }
-      
-      _lastScrollOffset = currentOffset;
+    } else if (currentOffset > _lastScrollOffset + 50) {
+      if (_showSearchBar) {
+        setState(() => _showSearchBar = false);
+      }
+    } else if (currentOffset < _lastScrollOffset - 25) {
+      if (!_showSearchBar) {
+        setState(() => _showSearchBar = true);
+      }
     }
     
-    // Load more functionality
+    _lastScrollOffset = currentOffset;
+    
+    // Handle load more
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - _scrollThreshold &&
@@ -110,17 +111,13 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   }
 
   void _loadInitialItems() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<BrandItemsProvider>(context, listen: false);
-      
-      final brandId = _selectedBrand['id'];
-      if (brandId != null) {
-        print('🔄 Loading vehicles for brand: $brandId');
-        provider.loadInitialItems(brandId);
-      } else {
-        print('❌ No brand ID found in selectedBrand');
-      }
-    });
+    final provider = Provider.of<BrandItemsProvider>(context, listen: false);
+    
+    if (_brandId != null && !provider.isLoading && !_initialLoadCompleted) {
+      print('🔄 Loading vehicles for brand: $_brandId');
+      provider.loadInitialItems(_brandId);
+      _initialLoadCompleted = true;
+    }
   }
 
   void _loadMoreItems() {
@@ -131,91 +128,33 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     }
   }
 
-  void _onRefresh() async {
+  Future<void> _onRefresh() async {
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
     await provider.refresh();
   }
 
-  Color _getBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF303030) // grey[900]
-        : Colors.grey[50]!;
-  }
-
-  Color _getCardColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
-        : Colors.white;
-  }
-
-  Color _getTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFFFFFFF) // white
-        : Colors.black87;
-  }
-
-  Color _getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xB3FFFFFF) // white70
-        : Colors.grey[600]!;
-  }
-
-  Color _getIconColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFFFFFFF) // white
-        : Colors.black87;
-  }
-
-  Color _getSearchContainerColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
-        : Colors.white;
-  }
-
-  Color _getImagePlaceholderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
-        : Colors.grey[200]!;
-  }
-
-  Color _getStatsBackgroundColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF1E3A5F) // dark blue
-        : Colors.blue[50]!;
-  }
-
-  Color _getStatsTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF90CAF9) // light blue
-        : Colors.blue[700]!;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final isSmallScreen = screenSize.width < 360;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: _getBackgroundColor(context),
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF424242) // grey[800]
-            : Colors.white,
+        backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios, 
             size: 20, 
-            color: _getIconColor(context)
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
           onPressed: () => Get.back(),
         ),
         title: Text(
           _selectedBrand['name'] ?? 'Brand',
           style: TextStyle(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white
-                : ColorGlobalVariables.brownColor,
+            color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -226,29 +165,13 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         child: Consumer<BrandItemsProvider>(
           builder: (context, provider, child) {
             return RefreshIndicator(
-              onRefresh: () async => _onRefresh(),
-              backgroundColor: _getCardColor(context),
+              onRefresh: _onRefresh,
+              backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
               color: ColorGlobalVariables.brownColor,
               child: Stack(
                 children: [
-                  _buildContent(provider, isSmallScreen),
-                  
-                  // Floating Search Bar
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      transform: Matrix4.translationValues(
-                        0, 
-                        _showSearchBar ? 0 : -100, 
-                        0
-                      ),
-                      child: _buildSearchWidget(context),
-                    ),
-                  ),
+                  _buildContent(provider, isDarkMode),
+                  _buildFloatingSearchBar(isDarkMode),
                 ],
               ),
             );
@@ -258,135 +181,127 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildContent(BrandItemsProvider provider, bool isSmallScreen) {
+  Widget _buildContent(BrandItemsProvider provider, bool isDarkMode) {
     return CustomScrollView(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
-        // Add padding at the top for the floating search bar
         SliverToBoxAdapter(
           child: SizedBox(height: _showSearchBar ? 80 : 0),
         ),
 
-        // Header Section
         SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildHeaderSection(provider, context),
-          ),
+          child: _buildHeaderSection(provider, isDarkMode),
         ),
 
-        // Content based on state
-        if (provider.isLoading && provider.items.isEmpty)
-          SliverToBoxAdapter(
-            child: _LoadingState(context: context),
-          )
-        else if (provider.hasError && provider.items.isEmpty)
-          SliverToBoxAdapter(
-            child: _buildErrorState(provider.error!, context),
-          )
-        else if (provider.isEmpty)
-          SliverToBoxAdapter(
-            child: _buildEmptyState(context),
-          )
-        else
-          _buildItemsGrid(provider, isSmallScreen, context),
-
-        // Load More Indicator
-        if (provider.hasMore)
-          SliverToBoxAdapter(
-            child: _buildLoadMoreIndicator(provider, context),
-          )
-        else if (provider.hasItems)
-          SliverToBoxAdapter(
-            child: _NoMoreItemsIndicator(context: context),
-          ),
+        // State-based content
+        ..._buildStateContent(provider, isDarkMode),
       ],
     );
   }
 
-  Widget _buildSearchWidget(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _getSearchContainerColor(context),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: GestureDetector(
-        onTap: () {
-          // Navigate to search page or implement search functionality
-          Get.toNamed(RouteClass.getHomePageSearchPage());
-        },
+  List<Widget> _buildStateContent(BrandItemsProvider provider, bool isDarkMode) {
+    if (provider.isLoading && provider.items.isEmpty) {
+      return [_buildLoadingState(isDarkMode)];
+    } else if (provider.hasError && provider.items.isEmpty) {
+      return [_buildErrorState(provider.error!, isDarkMode)];
+    } else if (provider.isEmpty) {
+      return [_buildEmptyState(isDarkMode)];
+    } else {
+      return [
+        _buildItemsGrid(provider, isDarkMode),
+        _buildLoadMoreSection(provider, isDarkMode),
+      ];
+    }
+  }
+
+  Widget _buildFloatingSearchBar(bool isDarkMode) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        transform: Matrix4.translationValues(0, _showSearchBar ? 0 : -100, 0),
         child: Container(
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: _getSearchContainerColor(context),
-            borderRadius: BorderRadius.circular(16),
+            color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
-            border: Border.all(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF616161) // grey[700]
-                  : Colors.grey.withOpacity(0.2),
-              width: 1,
-            ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.search_rounded,
-                  color: ColorGlobalVariables.blueColor,
-                  size: 24,
+          child: GestureDetector(
+            onTap: () => Get.toNamed(RouteClass.getHomePageSearchPage()),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+                border: Border.all(
+                  color: isDarkMode ? const Color(0xFF616161) : Colors.grey.withOpacity(0.2),
+                  width: 1,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Search ${_selectedBrand['name'] ?? 'brand'} vehicles...',
-                    style: TextStyle(
-                      color: _getSecondaryTextColor(context),
-                      fontSize: 16,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.search_rounded,
+                      color: ColorGlobalVariables.blueColor,
+                      size: 24,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: ColorGlobalVariables.blueColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.tune_rounded,
-                        color: ColorGlobalVariables.blueColor,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Filter',
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Search ${_selectedBrand['name'] ?? 'brand'} vehicles...',
                         style: TextStyle(
-                          color: ColorGlobalVariables.blueColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                          color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                          fontSize: 16,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: ColorGlobalVariables.blueColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.tune_rounded,
+                            color: ColorGlobalVariables.blueColor,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Filter',
+                            style: TextStyle(
+                              color: ColorGlobalVariables.blueColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -394,31 +309,34 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildHeaderSection(BrandItemsProvider provider, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          _selectedBrand['name'] ?? 'Brand',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: _getTextColor(context),
+  Widget _buildHeaderSection(BrandItemsProvider provider, bool isDarkMode) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _selectedBrand['name'] ?? 'Brand',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          _buildResultsText(provider),
-          style: TextStyle(
-            color: _getSecondaryTextColor(context),
-            fontSize: 14,
+          const SizedBox(height: 4),
+          Text(
+            _buildResultsText(provider),
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              fontSize: 14,
+            ),
           ),
-        ),
-        if (provider.hasItems) ...[
-          const SizedBox(height: 8),
-          _buildStatsSection(provider, context),
+          if (provider.hasItems) ...[
+            const SizedBox(height: 8),
+            _buildStatsSection(provider, isDarkMode),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -428,16 +346,17 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     } else if (provider.isEmpty) {
       return "No vehicles found";
     } else {
-      return "${provider.totalItems} ${provider.totalItems == 1 ? 'vehicle' : 'vehicles'} available${provider.hasMore ? ' • More loading...' : ''}";
+      final count = provider.totalItems;
+      return "$count ${count == 1 ? 'vehicle' : 'vehicles'} available${provider.hasMore ? ' • More loading...' : ''}";
     }
   }
 
-  Widget _buildStatsSection(BrandItemsProvider provider, BuildContext context) {
+  Widget _buildStatsSection(BrandItemsProvider provider, bool isDarkMode) {
     final priceRange = _calculatePriceRange(provider.items);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: _getStatsBackgroundColor(context),
+        color: isDarkMode ? const Color(0xFF1E3A5F) : Colors.blue[50],
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -446,7 +365,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           Text(
             'Price range: GH₵${formatNumber(shortenerRequired: true, number: priceRange['min']!.toInt())} - GH₵${formatNumber(shortenerRequired: true, number: priceRange['max']!.toInt())}',
             style: TextStyle(
-              color: _getStatsTextColor(context),
+              color: isDarkMode ? const Color(0xFF90CAF9) : Colors.blue[700],
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -455,9 +374,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             Text(
               '• More available',
               style: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.green[300]
-                    : Colors.green[600],
+                color: isDarkMode ? Colors.green[300] : Colors.green[600],
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -479,7 +396,153 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     };
   }
 
-  Widget _buildItemsGrid(BrandItemsProvider provider, bool isSmallScreen, BuildContext context) {
+  Widget _buildLoadingState(bool isDarkMode) {
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: ColorGlobalVariables.brownColor,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Loading vehicles...',
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error, bool isDarkMode) {
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 400,
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 80,
+              color: Colors.red[400],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Unable to Load Vehicles',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _extractErrorMessage(error),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _loadInitialItems,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ColorGlobalVariables.brownColor,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Try Again'),
+                ),
+                const SizedBox(width: 12),
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text(
+                    'Go Back',
+                    style: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(bool isDarkMode) {
+    return SliverToBoxAdapter(
+      child: Container(
+        height: 400,
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.directions_car_outlined,
+              size: 80,
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No Vehicles Found',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'We couldn\'t find any ${_selectedBrand['name'] ?? 'brand'} vehicles at the moment.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Check back later or try another brand.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _loadInitialItems,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorGlobalVariables.brownColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: const Text('Try Again'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItemsGrid(BrandItemsProvider provider, bool isDarkMode) {
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       sliver: SliverGrid(
@@ -492,9 +555,9 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         delegate: SliverChildBuilderDelegate(
           (context, index) {
             final item = provider.items[index];
-            return _BrandItemWidget(
+            return BrandItemCard(
               item: item,
-              screenSize: MediaQuery.of(context).size,
+              isDarkMode: isDarkMode,
             );
           },
           childCount: provider.items.length,
@@ -503,168 +566,84 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  Widget _buildLoadMoreIndicator(BrandItemsProvider provider, BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Center(
-        child: provider.isLoadingMore
-            ? Column(
-                children: [
-                  CircularProgressIndicator(
-                    color: ColorGlobalVariables.brownColor,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Loading more vehicles...',
-                    style: TextStyle(
-                      color: _getSecondaryTextColor(context),
-                      fontSize: 14,
+  Widget _buildLoadMoreSection(BrandItemsProvider provider, bool isDarkMode) {
+    if (!provider.hasMore && provider.hasItems) {
+      return _buildNoMoreItemsIndicator(isDarkMode);
+    } else if (provider.hasMore) {
+      return _buildLoadMoreIndicator(provider, isDarkMode);
+    } else {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+  }
+
+  Widget _buildLoadMoreIndicator(BrandItemsProvider provider, bool isDarkMode) {
+    return SliverToBoxAdapter(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Center(
+          child: provider.isLoadingMore
+              ? Column(
+                  children: [
+                    CircularProgressIndicator(
+                      color: ColorGlobalVariables.brownColor,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Loading more vehicles...',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                )
+              : GestureDetector(
+                  onTap: _loadMoreItems,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? const Color(0xFF1E3A5F) : Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.refresh, 
+                          color: isDarkMode ? const Color(0xFF90CAF9) : Colors.blue[700], 
+                          size: 20
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Load More Vehicles',
+                          style: TextStyle(
+                            color: isDarkMode ? const Color(0xFF90CAF9) : Colors.blue[700],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              )
-            : GestureDetector(
-                onTap: _loadMoreItems,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: _getStatsBackgroundColor(context),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.refresh, 
-                        color: _getStatsTextColor(context), 
-                        size: 20
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Load More Vehicles',
-                        style: TextStyle(
-                          color: _getStatsTextColor(context),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    return Container(
-      height: 400,
-      padding: const EdgeInsets.all(32.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.directions_car_outlined,
-            size: 80,
-            color: _getSecondaryTextColor(context),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'No Vehicles Found',
+  Widget _buildNoMoreItemsIndicator(bool isDarkMode) {
+    return SliverToBoxAdapter(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        child: Center(
+          child: Text(
+            'All vehicles loaded',
             style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: _getTextColor(context),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'We couldn\'t find any ${_selectedBrand['name'] ?? 'brand'} vehicles at the moment.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _getSecondaryTextColor(context),
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later or try another brand.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _getSecondaryTextColor(context),
+              color: isDarkMode ? Colors.white70 : Colors.grey[500],
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: () => _loadInitialItems(),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: ColorGlobalVariables.brownColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: const Text('Try Again'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(String error, BuildContext context) {
-    return Container(
-      height: 400,
-      padding: const EdgeInsets.all(32.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.error_outline,
-            size: 80,
-            color: Colors.red[400],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Unable to Load Vehicles',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: _getTextColor(context),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            _extractErrorMessage(error),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: _getSecondaryTextColor(context),
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => _loadInitialItems(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorGlobalVariables.brownColor,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Try Again'),
-              ),
-              const SizedBox(width: 12),
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text(
-                  'Go Back',
-                  style: TextStyle(
-                    color: _getSecondaryTextColor(context),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -683,85 +662,21 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   }
 }
 
-// Loading State Widget
-class _LoadingState extends StatelessWidget {
-  final BuildContext context;
-  const _LoadingState({required this.context});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              color: ColorGlobalVariables.brownColor,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Loading vehicles...',
-              style: TextStyle(
-                color: _getSecondaryTextColor(context),
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  static Color _getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xB3FFFFFF) // white70
-        : Colors.grey[600]!;
-  }
-}
-
-// No More Items Indicator
-class _NoMoreItemsIndicator extends StatelessWidget {
-  final BuildContext context;
-  const _NoMoreItemsIndicator({required this.context});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Center(
-        child: Text(
-          'All vehicles loaded',
-          style: TextStyle(
-            color: _getSecondaryTextColor(context),
-            fontSize: 14,
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Color _getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xB3FFFFFF) // white70
-        : Colors.grey[500]!;
-  }
-}
-
-class _BrandItemWidget extends StatefulWidget {
+class BrandItemCard extends StatefulWidget {
   final BrandItem item;
-  final Size screenSize;
+  final bool isDarkMode;
 
-  const _BrandItemWidget({
+  const BrandItemCard({
+    super.key,
     required this.item,
-    required this.screenSize,
+    required this.isDarkMode,
   });
 
   @override
-  _BrandItemWidgetState createState() => _BrandItemWidgetState();
+  State<BrandItemCard> createState() => _BrandItemCardState();
 }
 
-class _BrandItemWidgetState extends State<_BrandItemWidget>
+class _BrandItemCardState extends State<BrandItemCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -828,38 +743,22 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
             content: Text(_isLiked ? 'Added to wishlist!' : 'Removed from wishlist'),
             backgroundColor: _isLiked ? Colors.green : Colors.orange,
             duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
       print('Wishlist error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update wishlist: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     } finally {
       setState(() => _isLoading = false);
     }
-  }
-
-  Color _getCardColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
-        : Colors.white;
-  }
-
-  Color _getTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFFFFFFF) // white
-        : Colors.black87;
-  }
-
-  Color _getSecondaryTextColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xB3FFFFFF) // white70
-        : Colors.grey[600]!;
-  }
-
-  Color _getImagePlaceholderColor(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF424242) // grey[800]
-        : Colors.grey[200]!;
   }
 
   @override
@@ -870,9 +769,10 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
 
   @override
   Widget build(BuildContext context) {
-    final firstImage = widget.item.images.isNotEmpty
-        ? widget.item.images.first
-        : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    // Use the extension methods from your model
+    final firstImage = widget.item.firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final formattedPrice = widget.item.formattedPrice;
+    final displayCondition = widget.item.displayCondition;
 
     return GestureDetector(
       onTap: () {
@@ -887,7 +787,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: _getCardColor(context),
+          color: widget.isDarkMode ? const Color(0xFF424242) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -908,8 +808,8 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: _getImagePlaceholderColor(context),
-                    child: _buildItemImage(firstImage, context),
+                    color: widget.isDarkMode ? const Color(0xFF424242) : Colors.grey[200],
+                    child: _buildItemImage(firstImage),
                   ),
                 ),
                 // Condition badge
@@ -924,7 +824,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        widget.item.condition!,
+                        displayCondition,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 10,
@@ -946,7 +846,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: _getCardColor(context),
+                            color: widget.isDarkMode ? const Color(0xFF424242) : Colors.white,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -962,13 +862,15 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                                   height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(_getSecondaryTextColor(context)),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      widget.isDarkMode ? Colors.white70 : Colors.grey[600]!,
+                                    ),
                                   ),
                                 )
                               : Icon(
                                   _isLiked ? Icons.favorite : Icons.favorite_border,
                                   size: 18,
-                                  color: _isLiked ? Colors.red : _getSecondaryTextColor(context),
+                                  color: _isLiked ? Colors.red : (widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
                                 ),
                         ),
                       ),
@@ -992,17 +894,17 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: _getTextColor(context),
+                            color: widget.isDarkMode ? Colors.white : Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Text(
-                        widget.item.year,
+                        widget.item.displayYear,
                         style: TextStyle(
                           fontSize: 12,
-                          color: _getSecondaryTextColor(context),
+                          color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
                         ),
                       ),
                     ],
@@ -1012,7 +914,7 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.item.price))}',
+                        formattedPrice,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -1022,13 +924,13 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                       if (widget.item.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: _getSecondaryTextColor(context)),
+                            Icon(Icons.speed, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
                             const SizedBox(width: 4),
                             Text(
                               "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
                               style: TextStyle(
                                 fontSize: 12,
-                                color: _getSecondaryTextColor(context),
+                                color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -1043,37 +945,36 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
                       if (widget.item.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: _getSecondaryTextColor(context)),
+                            Icon(Icons.settings, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
                             const SizedBox(width: 4),
                             Text(
                               widget.item.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: _getSecondaryTextColor(context),
+                                color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
                               ),
                             ),
                           ],
                         ),
-                      if (widget.item.location != null)
-                        Flexible(
-                          child: Row(
-                            children: [
-                              Icon(Icons.location_on, size: 14, color: _getSecondaryTextColor(context)),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  widget.item.location,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: _getSecondaryTextColor(context),
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                      Flexible(
+                        child: Row(
+                          children: [
+                            Icon(Icons.location_on, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                widget.item.displayLocation,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                      ),
                     ],
                   ),
                 ],
@@ -1085,14 +986,14 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
     );
   }
 
-  Widget _buildItemImage(String imageUrl, BuildContext context) {
+  Widget _buildItemImage(String imageUrl) {
     final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
 
     if (isAssetImage) {
       return Image.asset(
         imageUrl,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildImageErrorPlaceholder(context),
+        errorBuilder: (context, error, stackTrace) => _buildImageErrorPlaceholder(),
       );
     } else {
       return CachedNetworkImage(
@@ -1105,14 +1006,14 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
             valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
           ),
         ),
-        errorWidget: (context, url, error) => _buildImageErrorPlaceholder(context),
+        errorWidget: (context, url, error) => _buildImageErrorPlaceholder(),
       );
     }
   }
 
-  Widget _buildImageErrorPlaceholder(BuildContext context) {
+  Widget _buildImageErrorPlaceholder() {
     return Container(
-      color: _getImagePlaceholderColor(context),
+      color: widget.isDarkMode ? const Color(0xFF424242) : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1120,14 +1021,14 @@ class _BrandItemWidgetState extends State<_BrandItemWidget>
             Icon(
               Icons.image_not_supported, 
               size: 32, 
-              color: _getSecondaryTextColor(context)
+              color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
             ),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: _getSecondaryTextColor(context),
+                color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
             ),
           ],

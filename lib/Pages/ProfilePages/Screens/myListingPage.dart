@@ -361,7 +361,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  isLiveTab ? 'My Vehicles' : 'Sold Vehicles',
+                  isLiveTab ? 'My Items' : 'Sold Items',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

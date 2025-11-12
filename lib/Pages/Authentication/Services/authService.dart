@@ -200,6 +200,7 @@ class AuthService {
     required String email,
     required String password,
     required String phone,
+    required int countryId,
   }) async {
     final logger = Logger();
     const endpoint = '/sanctum/register'; 
@@ -213,6 +214,7 @@ class AuthService {
         "email": email,
         "password": password,
         "phone": phone,
+        "country_id": countryId,
         "device_name": deviceName, // Added device name
       });
 
@@ -264,11 +266,11 @@ static Future<AuthResponseModel> logInWithEmail({
   required String password,
 }) async {
   final logger = Logger();
+  // final UserProvider userProvider = UserProvider();
   final deviceName = await _getDeviceName();
   const endpoint = '/sanctum/token'; 
   final url = Uri.parse('$baseApiUrl$endpoint');
   
-  logger.i('🚀 STARTING LOGIN PROCESS');
   logger.i('📧 Email: $email');
   logger.i('📱 Device name: $deviceName');
   logger.i('🔗 API URL: $url');
@@ -281,7 +283,6 @@ static Future<AuthResponseModel> logInWithEmail({
     });
     
     logger.i('📦 Request body: $body');
-    logger.i('📤 Sending login request...');
 
     final response = await http.post(
       url,
@@ -292,9 +293,7 @@ static Future<AuthResponseModel> logInWithEmail({
       body: body,
     );
 
-    logger.i('📥 Response received');
     logger.i('📊 Status Code: ${response.statusCode}');
-    logger.i('📄 Response Headers: ${response.headers}');
     logger.i('📝 Response Body: ${response.body}');
 
     // Log detailed response information
@@ -303,11 +302,13 @@ static Future<AuthResponseModel> logInWithEmail({
       
       try {
         final responseData = jsonDecode(response.body);
+        
         logger.i('🔍 Parsed response data: $responseData');
         
         final authResponse = AuthResponseModel.fromJson(
           responseData as Map<String, dynamic>,
         );
+        // await userProvider.setUser(authResponse.user);
         
         logger.i('🔑 Token received: ${authResponse.token != null ? "YES" : "NO"}');
         logger.i('👤 User data received: ${authResponse.user != null ? "YES" : "NO"}');
@@ -499,6 +500,7 @@ static Future<AuthResponseModel> verifyOtp({
       if (response.statusCode == 200) {
         final token = responseBody['token'];
         final message = responseBody['message'];
+        logger.w("Response body for successful verification of otp: $responseBody");
         logger.i('test success response: $message and token: $token');
 
         final authResponse = AuthResponseModel.fromJson(responseBody);

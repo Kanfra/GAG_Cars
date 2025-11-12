@@ -45,7 +45,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
   late SpecialOffer _specialOffer;
   late Item _item;
   late Brand? _brand;
-  late User? _user;
+  late User?  _user;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -220,7 +220,6 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
               final userPhone = _getUserPhoneNumber();
               
                if (userId != null && userId != 'unknown_user') {
-                // final logger = Logger();
                 logger.e('User id in Special offers is: $userId');
                 Get.toNamed(
                   RouteClass.getChatPage(),
@@ -1104,7 +1103,6 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
     highlights.add({
       'title': 'Discount', 
       'value': '${_specialOffer.discount}%'
-      // ${_specialOffer.discountType}
     });
     
     if (_item.year != null) {
@@ -1259,7 +1257,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                     flexibleSpace: FlexibleSpaceBar(
                       background: Stack(
                         children: [
-                          // Main image - NOT clickable anymore
+                          // Main image
                           Opacity(
                             opacity: _imageOpacity,
                             child: _buildSafeImage(
@@ -1861,15 +1859,40 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                                 ),
                                               ),
                                               const SizedBox(height: 4),
-                                              Text(
-                                                '34 Ads',
-                                                style: TextStyle(
-                                                  fontSize: 13.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: ColorGlobalVariables.greenColor,
-                                                  decoration: TextDecoration.underline,
+                                              // COMMENTED OUT: Ads section removed as requested
+                                              /*
+                                              GestureDetector(
+                                                onTap: (){
+                                                  logger.e('User data: $_user');
+                                                  if (_user != null) {
+                                                    Get.toNamed(
+                                                      RouteClass.getAdsPage(),
+                                                      arguments: {
+                                                        'user': _user!.toJson(),
+                                                        'phoneNumber': _getUserPhoneNumber(),
+                                                        'type': 'adsPage'
+                                                      }
+                                                    );
+                                                  } else {
+                                                    Get.snackbar(
+                                                      'Error',
+                                                      'Seller information not available',
+                                                      backgroundColor: Colors.red,
+                                                      colorText: Colors.white,
+                                                    );
+                                                  }
+                                                },
+                                                child: Text(
+                                                  '34 Ads',
+                                                  style: TextStyle(
+                                                    fontSize: 13.0,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: ColorGlobalVariables.greenColor,
+                                                    decoration: TextDecoration.underline,
+                                                  ),
                                                 ),
                                               ),
+                                              */
                                             ],
                                           ),
                                         ),

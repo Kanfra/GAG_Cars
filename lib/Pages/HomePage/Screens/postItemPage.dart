@@ -1457,8 +1457,8 @@ class _PostItemPageState extends State<PostItemPage> {
     
     return [
       _buildTextField(
-        title: "Vehicle Name",
-        hintText: "Enter vehicle name",
+        title: "${selectedCategory?.name ?? 'Item'} Name",
+        hintText: "Enter ${selectedCategory?.name.toLowerCase() ?? 'item'} name",
         controller: _itemNameController,
         icon: Icons.directions_car_rounded,
       ),
@@ -1809,7 +1809,7 @@ class _PostItemPageState extends State<PostItemPage> {
               ),
               const SizedBox(width: 12),
               Text(
-                "Vehicle Details",
+                "${selectedCategory?.name ?? 'Item'} Details",
                 style: TextStyle(
                   color: _getTextColor(),
                   fontSize: 16,
@@ -2266,7 +2266,7 @@ class _PostItemPageState extends State<PostItemPage> {
               ),
               const SizedBox(width: 12),
               Text(
-                "Vehicle Images",
+                "${selectedCategory?.name ?? 'Item'} Images",
                 style: TextStyle(
                   color: _getTextColor(),
                   fontSize: 16,
@@ -2559,7 +2559,7 @@ class _PostItemPageState extends State<PostItemPage> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Upload Vehicle',
+                              'Upload ${selectedCategory?.name ?? 'Item'}',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 17,

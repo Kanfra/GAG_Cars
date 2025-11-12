@@ -1,23 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Models/countryModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
+import 'package:logger/Logger.dart';
 
 class CountryService {
   final logger = Logger();
 
-  Future<CountriesResponse> fetchCountries() async {
+  Future<List<Country>> fetchCountries() async {
     final uri = Uri.parse('$baseApiUrl${ApiEndpoint.countries}');
     try {
-      final token = await AuthService.getToken();
       final response = await http.get(
         uri,
         headers: {
-          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
@@ -25,19 +22,15 @@ class CountryService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        logger.i("Success: $jsonData");
-        return CountriesResponse.fromJson(jsonData);
-      } else if (response.statusCode == 401) {
-        throw ApiException(
-          message: 'Unauthorized - Invalid or expired token',
-          statusCode: 401,
-          code: 'UNAUTHORIZED',
-        );
+        logger.i("Countries fetched successfully: ${jsonData.length} countries");
+        
+        final List<dynamic> countriesJson = jsonData;
+        return countriesJson.map((countryJson) => Country.fromJson(countryJson)).toList();
       } else {
         throw ApiException(
-          message: 'Unexpected error occurred',
+          message: 'Failed to load countries: ${response.statusCode}',
           statusCode: response.statusCode,
-          code: 'UNEXPECTED_ERROR',
+          code: 'HTTP_ERROR',
         );
       }
     } on http.ClientException catch (e) {
@@ -61,7 +54,7 @@ class CountryService {
     } on ApiException {
       rethrow;
     } catch (e) {
-      logger.e("Unexpected error: $e");
+      logger.e("Unexpected error fetching countries: $e");
       throw ApiException(
         message: 'Unexpected error: $e',
         statusCode: 0,
