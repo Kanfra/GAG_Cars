@@ -25,11 +25,13 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvide
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Utils/simple_deep_link_handler.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -49,30 +51,66 @@ class _DetailPageState extends State<DetailPage> {
   double _imageOpacity = 1.0;
   int selectedIndex = 0;
 
-  late final Map<String, dynamic> item;
-  late final Map<String, dynamic>? product;
-  late final String? type;
+  // State variables - SIMPLIFIED: No deep link loading states
+  Map<String, dynamic>? item;
+  Map<String, dynamic>? product;
+  String? type;
   
   late int _currentItemCategoryId;
   late String _currentItemId;
   String? _currentUserId;
-  late Map<String, dynamic> user;
+  Map<String, dynamic> user = {};
   final logger = Logger();
 
   @override
   void initState() {
     super.initState();
-    item = widget.allJson['item'] as Map<String, dynamic>;
-    product = widget.allJson['product'] as Map<String, dynamic>;
-    logger.e('This is the user: ${product?['user']}');
+    _initializeData();
+  }
 
-    type = widget.allJson['type'] as String?;
+  void _initializeData() {
+    final allJson = widget.allJson;
     
-    _currentItemCategoryId = item['category_id'] ?? _extractCategoryId(item['category']) ?? 0;
-    _currentItemId = item['id']?.toString() ?? '';
+    // SIMPLIFIED: Just check if we have valid data, no deep link handling
+    if (_hasValidData(allJson)) {
+      _setupWithCompleteData(allJson);
+    } else {
+      _handleInvalidData();
+    }
+  }
+
+  bool _hasValidData(Map<String, dynamic> allJson) {
+    return allJson['item'] is Map<String, dynamic> && 
+           (allJson['item']?['id'] != null || allJson['item']?['name'] != null);
+  }
+
+  void _setupWithCompleteData(Map<String, dynamic> allJson) {
+    item = allJson['item'] as Map<String, dynamic>;
+    product = allJson['product'] as Map<String, dynamic>?;
+    type = allJson['type'] as String?;
+    
+    _initializeItemData();
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _preloadCategoryDetails();
+      _loadSimilarItems();
+      _fetchUserDetails();
+    });
+  }
+
+  void _handleInvalidData() {
+    // SIMPLIFIED: Just show error, no fetching
+    logger.e('❌ Invalid data provided to DetailPage: ${widget.allJson}');
+  }
+
+  void _initializeItemData() {
+    if (item == null) return;
+    
+    _currentItemCategoryId = item!['category_id'] ?? _extractCategoryId(item!['category']) ?? 0;
+    _currentItemId = item!['id']?.toString() ?? '';
     
     // Handle user object properly
-    final dynamic userObj = item['user'];
+    final dynamic userObj = item!['user'];
     user = _convertUserToMap(userObj);
     
     logger.e('Posted User is: $user');
@@ -83,14 +121,75 @@ class _DetailPageState extends State<DetailPage> {
     logger.w('🔍 [DETAIL PAGE] Extracted user ID: $_currentUserId');
     logger.w('🔍 [DETAIL PAGE] Item user data: $user');
     
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _preloadCategoryDetails();
-      _loadSimilarItems();
-      _fetchUserDetails();
-    });
-    
     _scrollController.addListener(_onScroll);
   }
+
+  void _onScroll() {
+    if (mounted && item != null) {
+      setState(() {
+        final scrollOffset = _scrollController.offset;
+        _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
+        
+        if (scrollOffset > 0) {
+          _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
+        } else {
+          _appBarHeight = 300.0;
+        }
+      });
+    }
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    
+    if (maxScroll - currentScroll <= _similarItemsScrollThreshold) {
+      _loadMoreSimilarItems();
+    }
+  }
+
+  void _preloadCategoryDetails() {
+    if (!mounted || item == null) return;
+    
+    final categoryId = item!['category_id'] ?? _extractCategoryId(item!['category']);
+    if (categoryId != null) {
+      final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: false);
+      if (!categoryDetailProvider.categoryDetails.containsKey(categoryId)) {
+        categoryDetailProvider.fetchCategoryDetail(categoryId);
+      }
+    }
+  }
+
+  void _loadSimilarItems() {
+    if (!mounted || _currentItemCategoryId == 0 || _currentItemId.isEmpty) return;
+    
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+    similarItemsProvider.loadInitialItems(_currentItemCategoryId, _currentItemId);
+  }
+
+  Future<void> _loadMoreSimilarItems() async {
+    if (!mounted) return;
+    
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+    if (similarItemsProvider.hasMore && !similarItemsProvider.isLoadingMore) {
+      await similarItemsProvider.loadMoreItems();
+    }
+  }
+
+  void _fetchUserDetails() {
+    if (!mounted || _currentUserId == null || _currentUserId!.isEmpty) return;
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userDetailsProvider = Provider.of<UserDetailsProvider>(context, listen: false);
+      
+      final logger = Logger();
+      logger.w('🔍 [DETAIL PAGE FETCH] Fetching details for user ID: $_currentUserId');
+      
+      if (!userDetailsProvider.hasUserDetails(_currentUserId!)) {
+        userDetailsProvider.fetchUserDetails(_currentUserId!);
+      }
+    });
+  }
+
+  // ========== DATA HANDLING METHODS ==========
 
   Map<String, dynamic> _convertUserToMap(dynamic userObj) {
     if (userObj == null) return {};
@@ -162,12 +261,12 @@ class _DetailPageState extends State<DetailPage> {
       return user['created_at']?.toString();
     }
     
-    final dynamic userObj = item['user'];
+    final dynamic userObj = item?['user'];
     if (userObj is Map<String, dynamic>) {
       return userObj['createdAt']?.toString() ?? userObj['created_at']?.toString();
     } else {
       try {
-        return userObj.createdAt?.toString() ?? userObj.created_at?.toString();
+        return userObj?.createdAt?.toString() ?? userObj?.created_at?.toString();
       } catch (e) {
         return null;
       }
@@ -217,71 +316,6 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  void _onScroll() {
-    if (mounted) {
-      setState(() {
-        final scrollOffset = _scrollController.offset;
-        _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
-        
-        if (scrollOffset > 0) {
-          _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
-        } else {
-          _appBarHeight = 300.0;
-        }
-      });
-    }
-
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final currentScroll = _scrollController.position.pixels;
-    
-    if (maxScroll - currentScroll <= _similarItemsScrollThreshold) {
-      _loadMoreSimilarItems();
-    }
-  }
-
-  void _preloadCategoryDetails() {
-    if (!mounted) return;
-    
-    final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
-    if (categoryId != null) {
-      final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: false);
-      if (!categoryDetailProvider.categoryDetails.containsKey(categoryId)) {
-        categoryDetailProvider.fetchCategoryDetail(categoryId);
-      }
-    }
-  }
-
-  void _loadSimilarItems() {
-    if (!mounted || _currentItemCategoryId == 0 || _currentItemId.isEmpty) return;
-    
-    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
-    similarItemsProvider.loadInitialItems(_currentItemCategoryId, _currentItemId);
-  }
-
-  Future<void> _loadMoreSimilarItems() async {
-    if (!mounted) return;
-    
-    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
-    if (similarItemsProvider.hasMore && !similarItemsProvider.isLoadingMore) {
-      await similarItemsProvider.loadMoreItems();
-    }
-  }
-
-  void _fetchUserDetails() {
-    if (!mounted || _currentUserId == null || _currentUserId!.isEmpty) return;
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userDetailsProvider = Provider.of<UserDetailsProvider>(context, listen: false);
-      
-      final logger = Logger();
-      logger.w('🔍 [DETAIL PAGE FETCH] Fetching details for user ID: $_currentUserId');
-      
-      if (!userDetailsProvider.hasUserDetails(_currentUserId!)) {
-        userDetailsProvider.fetchUserDetails(_currentUserId!);
-      }
-    });
-  }
-
   int? _extractCategoryId(dynamic category) {
     if (category == null) return null;
     
@@ -300,13 +334,573 @@ class _DetailPageState extends State<DetailPage> {
     return null;
   }
 
+  // ========== UI BUILDING METHODS ==========
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    // SIMPLIFIED: Only show main content or error state
+    if (item != null) {
+      return _buildMainContent(theme);
+    }
+    
+    // Error state when data is invalid
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: theme.iconTheme.color),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          'Item Details',
+          style: TextStyle(color: theme.textTheme.titleLarge?.color),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: theme.iconTheme.color),
+            SizedBox(height: 16),
+            Text(
+              'Unable to load item details',
+              style: TextStyle(
+                color: theme.textTheme.bodyMedium?.color,
+                fontSize: 16,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'The item data provided is invalid or incomplete',
+              style: TextStyle(
+                color: theme.textTheme.bodySmall?.color,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => Get.back(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorGlobalVariables.brownColor,
+              ),
+              child: Text('Go Back', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMainContent(ThemeData theme) {
+    final images = getItemImages();
+    final currentImage = images.isNotEmpty && selectedIndex < images.length 
+        ? images[selectedIndex] 
+        : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+
+    final highlights = getHighlights();
+    final specifications = getSpecifications();
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Consumer2<SimilarItemsProvider, UserDetailsProvider>(
+        builder: (context, similarItemsProvider, userDetailsProvider, child) {
+          return CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              // ========== SLIVER APP BAR ==========
+              SliverAppBar(
+                expandedHeight: 350,
+                floating: false,
+                pinned: true,
+                backgroundColor: Colors.black,
+                leading: Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(Icons.arrow_back_ios_new_outlined, 
+                          color: Colors.white, size: 18),
+                    ),
+                    onPressed: () => Get.back(),
+                  ),
+                ),
+                title: AnimatedOpacity(
+                  opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    item!['name'] ?? 'Item Details',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16.0,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                      onPressed: _shareListing,
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(Icons.share, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ),
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    children: [
+                      Opacity(
+                        opacity: _imageOpacity,
+                        child: _buildSafeImage(
+                          currentImage,
+                          width: double.infinity,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.8),
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.3),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      Positioned(
+                        left: 20,
+                        bottom: 80,
+                        child: AnimatedOpacity(
+                          opacity: _imageOpacity,
+                          duration: const Duration(milliseconds: 200),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item!['name'] ?? 'Unnamed Item',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 26.0,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 6),
+                              Consumer<UserProvider>(
+                                builder: (context, userProvider, child) {
+                                  return Text(
+                                    '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: AnimatedOpacity(
+                          opacity: _imageOpacity,
+                          duration: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${selectedIndex + 1}/${images.length}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // ========== IMAGE GALLERY ==========
+              SliverToBoxAdapter(
+                child: Container(
+                  color: theme.scaffoldBackgroundColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 140,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: images.length,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemBuilder: (context, index) {
+                            final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                            return GestureDetector(
+                              onTap: () {
+                                if (mounted) {
+                                  setState(() {
+                                    selectedIndex = index;
+                                  });
+                                }
+                              },
+                              child: _buildGalleryItem(image, index, theme),
+                            );
+                          },
+                        ),
+                      ),
+                      
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Text(
+                          "Tap image to set as main display • Tap 'View' to see full size",
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            color: theme.textTheme.bodyMedium?.color,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // ========== ITEM DETAILS ==========
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item!['name'] ?? 'Unnamed Item',
+                              style: TextStyle(
+                                fontSize: 22.0,
+                                fontWeight: FontWeight.bold,
+                                color: theme.textTheme.titleLarge?.color,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Consumer<UserProvider>(
+                              builder: (context, userProvider, child) {
+                                return Text(
+                                  '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.textTheme.titleLarge?.color,
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            if (item!['description'] != null) ...[
+                              Text(
+                                item!['description'],
+                                style: TextStyle(
+                                  fontSize: 15.0,
+                                  height: 1.5,
+                                  color: theme.textTheme.bodyLarge?.color,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            if (item!['location'] != null) ...[
+                              _buildInfoRow(Icons.location_on_outlined, item!['location']),
+                              const SizedBox(height: 8),
+                            ],
+                            _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item!['created_at'] ?? '')),
+                            const SizedBox(height: 16),
+                            
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _buildVerificationBadges(),
+                            ),
+                            
+                            const SizedBox(height: 16),
+                            
+                            const SizedBox(height: 20),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                if(item!["warranty"] != null)
+                                _buildTag(
+                                  "Warranty", 
+                                  theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            _buildSectionTitle("Highlights"),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 20.0,
+                              runSpacing: 12.0,
+                              children: highlights.map((highlight) {
+                                return _buildInfoItem(
+                                  highlight['title'] ?? 'N/A',
+                                  highlight['value'] ?? 'N/A',
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildSectionTitle("Specifications"),
+                            const SizedBox(height: 12),
+                            Wrap(
+                              spacing: 20.0,
+                              runSpacing: 12.0,
+                              children: specifications.map((spec) {
+                                return _buildInfoItem(
+                                  spec['title'] ?? 'N/A',
+                                  spec['value'] ?? 'N/A',
+                                  isSpecification: true,
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            Divider(
+                              color: theme.dividerColor,
+                              height: 12,
+                              thickness: 0.5,
+                            ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                _buildUserProfileImage(),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            _getUserName(),
+                                            style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: theme.textTheme.titleLarge?.color,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
+                                            CustomImage(
+                                              imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
+                                              imageWidth: 16,
+                                              imageHeight: 16,
+                                              fit: BoxFit.cover, 
+                                              isAssetImage: true, 
+                                              isImageBorderRadiusRequired: false,
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        "Joined: ${formatTimeAgo(_getUserCreatedAt() ?? '')}",
+                                        style: TextStyle(
+                                          fontSize: 13.0,
+                                          color: theme.textTheme.bodyMedium?.color,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      _buildAdsCount(),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            
+                            Row(
+                              children: [
+                                _buildChatButton(),
+                                const SizedBox(width: 16),
+                                _buildShowContactButton(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
+                        child: Text(
+                          'Similar Items',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // ========== SIMILAR ITEMS ==========
+              _buildSimilarItemsSection(similarItemsProvider),
+              
+              if (similarItemsProvider.isLoadingMore)
+                SliverToBoxAdapter(
+                  child: _buildLoadingMoreIndicator(),
+                ),
+              
+              if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: Text(
+                        'No more similar items',
+                        style: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 40),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // ========== SHARE FUNCTIONALITY ==========
+
+  Future<void> _shareListing() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    try {
+      final String itemId = item!['id']?.toString() ?? '';
+      final String itemName = item!['name'] ?? 'Amazing Vehicle';
+      final String itemPrice = '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}';
+      final String itemLocation = item!['location'] ?? 'Location not specified';
+      
+      if (itemId.isEmpty) {
+        _showErrorSnackbar('Cannot share: Item ID missing');
+        return;
+      }
+      
+      // Use the fixed shareable link method
+      final String shareableLink = SimpleDeepLinkHandler.generateShareableLink(itemId, itemName);
+      
+      // Create the share text
+      final String shareText = '''
+🚗 Check out this vehicle on Gag Cars!
+
+$itemName
+💰 Price: $itemPrice
+📍 Location: $itemLocation
+
+🔗 View details: $shareableLink
+
+Download Gag Cars app for more amazing vehicles!''';
+
+      logger.i("📝 Generated share link: $shareableLink");
+      
+      final box = context.findRenderObject() as RenderBox?;
+      
+      final result = await Share.share(
+        shareText,
+        subject: 'Check out this vehicle on Gag Cars!',
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+      
+      if (result.status == ShareResultStatus.success) {
+        logger.i("✅ Share completed successfully");
+        _showSuccessSnackbar('Listing shared successfully!');
+      } else {
+        logger.w("⚠️ Share dialog was dismissed");
+      }
+      
+    } catch (e, stackTrace) {
+      logger.e("❌ Error sharing listing: $e");
+      logger.e("❌ Stack trace: $stackTrace");
+      _showErrorSnackbar('Failed to share listing');
+    }
+  }
+
+  /// Show success snackbar
+  void _showSuccessSnackbar(String message) {
+    Get.snackbar(
+      'Success!',
+      message,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  /// Show error snackbar
+  void _showErrorSnackbar(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
   }
 
-  // ========== FIXED IMAGE HANDLING METHODS ==========
+  // ========== IMAGE HANDLING METHODS ==========
 
   String _getCorrectImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
@@ -425,7 +1019,7 @@ class _DetailPageState extends State<DetailPage> {
 
   List<dynamic> getItemImages() {
     try {
-      final images = item['images'];
+      final images = item!['images'];
       if (images is List && images.isNotEmpty) {
         return images.whereType<String>().toList();
       }
@@ -434,6 +1028,8 @@ class _DetailPageState extends State<DetailPage> {
     }
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
   }
+
+  // ========== USER PROFILE METHODS ==========
 
   Widget _buildDefaultProfileAvatar({double size = 60}) {
     return Container(
@@ -468,7 +1064,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildUserProfileImage() {
-    final dynamic userObj = item['user'];
+    final dynamic userObj = item!['user'];
     String? profilePhoto;
     
     if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
@@ -523,7 +1119,7 @@ class _DetailPageState extends State<DetailPage> {
         return user['phone_number']?.toString();
       }
       
-      final dynamic userObj = item['user'];
+      final dynamic userObj = item!['user'];
       
       if (userObj is Map<String, dynamic>) {
         return userObj['phone']?.toString() ?? 
@@ -537,10 +1133,10 @@ class _DetailPageState extends State<DetailPage> {
                  userObj.contact?.toString() ??
                  userObj.mobile?.toString();
         } catch (e) {
-          return item['phone']?.toString() ?? 
-                 item['phone_number']?.toString() ??
-                 item['contact']?.toString() ??
-                 item['mobile']?.toString();
+          return item!['phone']?.toString() ?? 
+                 item!['phone_number']?.toString() ??
+                 item!['contact']?.toString() ??
+                 item!['mobile']?.toString();
         }
       }
     } catch (e) {
@@ -556,7 +1152,7 @@ class _DetailPageState extends State<DetailPage> {
       return user['profile_photo'];
     }
     
-    final dynamic userObj = item['user'];
+    final dynamic userObj = item!['user'];
     if (userObj is Map<String, dynamic>) {
       return userObj['profilePhoto'] ?? userObj['profile_photo'];
     } else {
@@ -577,7 +1173,7 @@ class _DetailPageState extends State<DetailPage> {
     }
     
     try {
-      final dynamic userObj = item['user'];
+      final dynamic userObj = item!['user'];
       if (userObj is Map<String, dynamic>) {
         return userObj['name']?.toString() ?? 
                userObj['username']?.toString() ??
@@ -595,6 +1191,8 @@ class _DetailPageState extends State<DetailPage> {
       return 'Seller';
     }
   }
+
+  // ========== ACTION BUTTONS ==========
 
   Widget _buildChatButton() {
     final theme = Theme.of(context);
@@ -624,7 +1222,7 @@ class _DetailPageState extends State<DetailPage> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              final userId = _extractUserId(item['user']);
+              final userId = _extractUserId(item!['user']);
               final userName = _getUserName();
               final userProfilePhoto = _getUserProfilePhoto();
               final userPhone = _getUserPhoneNumber();
@@ -990,6 +1588,8 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  // ========== GALLERY AND IMAGE METHODS ==========
+
   void _showFullScreenImage(String imageUrl, int imageIndex) {
     showGeneralDialog(
       context: context,
@@ -1195,6 +1795,8 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
+  // ========== VERIFICATION AND BADGES ==========
+
   List<Widget> _buildVerificationBadges() {
     final List<Widget> badges = [];
     final theme = Theme.of(context);
@@ -1266,24 +1868,26 @@ class _DetailPageState extends State<DetailPage> {
     return badges;
   }
 
+  // ========== HIGHLIGHTS AND SPECIFICATIONS ==========
+
   List<Map<String, String>> getHighlights() {
-    final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    final categoryId = item!['category_id'] ?? _extractCategoryId(item!['category']);
     if (categoryId == null) {
       return _getDefaultHighlights();
     }
     
     final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: true);
-    return categoryDetailProvider.buildHighlights(categoryId, item);
+    return categoryDetailProvider.buildHighlights(categoryId, item!);
   }
 
   List<Map<String, String>> getSpecifications() {
-    final categoryId = item['category_id'] ?? _extractCategoryId(item['category']);
+    final categoryId = item!['category_id'] ?? _extractCategoryId(item!['category']);
     if (categoryId == null) {
       return _getDefaultSpecifications();
     }
     
     final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: true);
-    return categoryDetailProvider.buildSpecifications(categoryId, item);
+    return categoryDetailProvider.buildSpecifications(categoryId, item!);
   }
 
   String? _safeGetString(dynamic obj, String key) {
@@ -1323,17 +1927,17 @@ class _DetailPageState extends State<DetailPage> {
   List<Map<String, String>> _getDefaultHighlights() {
     final List<Map<String, String>> highlights = [];
     
-    if (item['year'] != null) {
-      highlights.add({'title': 'Model Year', 'value': item['year'].toString()});
+    if (item!['year'] != null) {
+      highlights.add({'title': 'Model Year', 'value': item!['year'].toString()});
     }
-    if (item['mileage'] != null) {
-      highlights.add({'title': 'Mileage', 'value': '${item['mileage']} km'});
+    if (item!['mileage'] != null) {
+      highlights.add({'title': 'Mileage', 'value': '${item!['mileage']} km'});
     }
-    if (item['engine_capacity'] != null) {
-      highlights.add({'title': 'Engine', 'value': '${item['engine_capacity']} L'});
+    if (item!['engine_capacity'] != null) {
+      highlights.add({'title': 'Engine', 'value': '${item!['engine_capacity']} L'});
     }
-    if (item['condition'] != null) {
-      highlights.add({'title': 'Condition', 'value': item['condition'].toString()});
+    if (item!['condition'] != null) {
+      highlights.add({'title': 'Condition', 'value': item!['condition'].toString()});
     }
     
     return highlights.isNotEmpty ? highlights : [
@@ -1346,27 +1950,27 @@ class _DetailPageState extends State<DetailPage> {
   List<Map<String, String>> _getDefaultSpecifications() {
     final List<Map<String, String>> specifications = [];
     
-    final categoryName = _safeGetString(item['category'], 'name') ?? 
-                        _safeGetString(item['brand'], 'name');
+    final categoryName = _safeGetString(item!['category'], 'name') ?? 
+                        _safeGetString(item!['brand'], 'name');
     if (categoryName != null) {
       specifications.add({'title': 'Make', 'value': categoryName});
     }
     
-    final modelName = _safeGetString(item['brand_model'], 'name');
+    final modelName = _safeGetString(item!['brand_model'], 'name');
     if (modelName != null) {
       specifications.add({'title': 'Model', 'value': modelName});
     }
     
-    if (item['color'] != null) {
-      specifications.add({'title': 'Color', 'value': item['color'].toString()});
+    if (item!['color'] != null) {
+      specifications.add({'title': 'Color', 'value': item!['color'].toString()});
     }
     
-    if (item['number_of_passengers'] != null) {
-      specifications.add({'title': 'Seats', 'value': '${item['number_of_passengers']} seats'});
+    if (item!['number_of_passengers'] != null) {
+      specifications.add({'title': 'Seats', 'value': '${item!['number_of_passengers']} seats'});
     }
     
-    if (item['transmission'] != null) {
-      specifications.add({'title': 'Transmission', 'value': item['transmission'].toString()});
+    if (item!['transmission'] != null) {
+      specifications.add({'title': 'Transmission', 'value': item!['transmission'].toString()});
     }
     
     return specifications.isNotEmpty ? specifications : [
@@ -1375,6 +1979,8 @@ class _DetailPageState extends State<DetailPage> {
       {'title': 'Color', 'value': 'N/A'},
     ];
   }
+
+  // ========== UI COMPONENTS ==========
 
   Widget _buildInfoItem(String title, String value, {bool isSpecification = false}) {
     final theme = Theme.of(context);
@@ -1460,6 +2066,8 @@ class _DetailPageState extends State<DetailPage> {
       screenSize: screenSize,
     );
   }
+
+  // ========== SIMILAR ITEMS SECTION ==========
 
   Widget _buildSimilarItemsSection(SimilarItemsProvider similarItemsProvider) {
     final theme = Theme.of(context);
@@ -1630,399 +2238,9 @@ class _DetailPageState extends State<DetailPage> {
       },
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final images = getItemImages();
-    final currentImage = images.isNotEmpty && selectedIndex < images.length 
-        ? images[selectedIndex] 
-        : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
-
-    final highlights = getHighlights();
-    final specifications = getSpecifications();
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Consumer2<SimilarItemsProvider, UserDetailsProvider>(
-        builder: (context, similarItemsProvider, userDetailsProvider, child) {
-          return CustomScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 350,
-                floating: false,
-                pinned: true,
-                backgroundColor: Colors.black,
-                leading: IconButton(
-                  icon: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                        color: Colors.white, size: 18),
-                  ),
-                  onPressed: () => Get.back(),
-                ),
-                title: AnimatedOpacity(
-                  opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Text(
-                    item['name'] ?? 'Item Details',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16.0,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    children: [
-                      Opacity(
-                        opacity: _imageOpacity,
-                        child: _buildSafeImage(
-                          currentImage,
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.8),
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.3),
-                            ],
-                          ),
-                        ),
-                      ),
-                      
-                      Positioned(
-                        left: 20,
-                        bottom: 80,
-                        child: AnimatedOpacity(
-                          opacity: _imageOpacity,
-                          duration: const Duration(milliseconds: 200),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item['name'] ?? 'Unnamed Item',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 26.0,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: AnimatedOpacity(
-                          opacity: _imageOpacity,
-                          duration: const Duration(milliseconds: 200),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              '${selectedIndex + 1}/${images.length}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              SliverToBoxAdapter(
-                child: Container(
-                  color: theme.scaffoldBackgroundColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 140,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: images.length,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemBuilder: (context, index) {
-                            final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
-                            return GestureDetector(
-                              onTap: () {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedIndex = index;
-                                  });
-                                }
-                              },
-                              child: _buildGalleryItem(image, index, theme),
-                            );
-                          },
-                        ),
-                      ),
-                      
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Text(
-                          "Tap image to set as main display • Tap 'View' to see full size",
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            color: theme.textTheme.bodyMedium?.color,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item['name'] ?? 'Unnamed Item',
-                              style: TextStyle(
-                                fontSize: 22.0,
-                                fontWeight: FontWeight.bold,
-                                color: theme.textTheme.titleLarge?.color,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(item['price']?.toString() ?? '0'))}',
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500,
-                                color: theme.textTheme.titleLarge?.color,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            if (item['description'] != null) ...[
-                              Text(
-                                item['description'],
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  height: 1.5,
-                                  color: theme.textTheme.bodyLarge?.color,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                            if (item['location'] != null) ...[
-                              _buildInfoRow(Icons.location_on_outlined, item['location']),
-                              const SizedBox(height: 8),
-                            ],
-                            _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item['created_at'] ?? '')),
-                            const SizedBox(height: 16),
-                            
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: _buildVerificationBadges(),
-                            ),
-                            
-                            const SizedBox(height: 16),
-                            
-                            const SizedBox(height: 20),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                if(item["warranty"] != null)
-                                _buildTag(
-                                  "Warranty", 
-                                  theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            _buildSectionTitle("Highlights"),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 20.0,
-                              runSpacing: 12.0,
-                              children: highlights.map((highlight) {
-                                return _buildInfoItem(
-                                  highlight['title'] ?? 'N/A',
-                                  highlight['value'] ?? 'N/A',
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 20),
-                            _buildSectionTitle("Specifications"),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 20.0,
-                              runSpacing: 12.0,
-                              children: specifications.map((spec) {
-                                return _buildInfoItem(
-                                  spec['title'] ?? 'N/A',
-                                  spec['value'] ?? 'N/A',
-                                  isSpecification: true,
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            Divider(
-                              color: theme.dividerColor,
-                              height: 12,
-                              thickness: 0.5,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                _buildUserProfileImage(),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            _getUserName(),
-                                            style: TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: theme.textTheme.titleLarge?.color,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
-                                            CustomImage(
-                                              imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
-                                              imageWidth: 16,
-                                              imageHeight: 16,
-                                              fit: BoxFit.cover, 
-                                              isAssetImage: true, 
-                                              isImageBorderRadiusRequired: false,
-                                            ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        "Joined: ${formatTimeAgo(_getUserCreatedAt() ?? '')}",
-                                        style: TextStyle(
-                                          fontSize: 13.0,
-                                          color: theme.textTheme.bodyMedium?.color,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      _buildAdsCount(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            Row(
-                              children: [
-                                _buildChatButton(),
-                                const SizedBox(width: 16),
-                                _buildShowContactButton(),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
-                        child: Text(
-                          'Similar Items',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: theme.textTheme.titleLarge?.color,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              _buildSimilarItemsSection(similarItemsProvider),
-              
-              if (similarItemsProvider.isLoadingMore)
-                SliverToBoxAdapter(
-                  child: _buildLoadingMoreIndicator(),
-                ),
-              
-              if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Center(
-                      child: Text(
-                        'No more similar items',
-                        style: TextStyle(
-                          color: theme.textTheme.bodyMedium?.color,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 40),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
 }
+
+// ========== SIMILAR ITEM WIDGET ==========
 
 class _SimilarItemWidget extends StatefulWidget {
   final SimilarItem item;
@@ -2127,7 +2345,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
           SnackBar(
             content: Text(
               _isLiked ? 'Added to wishlist!' : 'Removed from wishlist',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white),
             ),
             backgroundColor: _isLiked ? Colors.green : Colors.orange,
             duration: const Duration(seconds: 2),
@@ -2151,7 +2369,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: 2),
           ),
         );
       }
@@ -2167,7 +2385,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         SnackBar(
           content: Text(
             'Error: ${e.toString()}',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 2),
@@ -2277,6 +2495,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
     final firstImage = widget.item.images?.isNotEmpty == true
         ? widget.item.images!.first
@@ -2423,7 +2642,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
+                      '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

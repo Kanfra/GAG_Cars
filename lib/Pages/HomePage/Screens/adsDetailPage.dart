@@ -8,6 +8,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserListingsProvid
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
@@ -86,12 +87,13 @@ class _AdsDetailPageState extends State<AdsDetailPage> {
     return listing.name ?? 'Vehicle Listing';
   }
 
-  String getListingPrice() {
+  String getListingPrice({required BuildContext context}) {
+    final userProvider = Provider.of<UserProvider>(context);
     final price = listing.price;
     if (price != null && price.isNotEmpty) {
-      return 'GH₵ ${formatNumber(shortenerRequired: false, number: int.tryParse(price) ?? 0)}';
+      return '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.tryParse(price) ?? 0)}';
     }
-    return 'GH₵ 0';
+    return '${userProvider.user?.countryCurrencySymbol ?? ''} 0';
   }
 
   String getListingDescription() {
@@ -1245,7 +1247,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            getListingPrice(),
+                            getListingPrice(context: context),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20.0,

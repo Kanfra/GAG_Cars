@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
-import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,6 +8,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/searchProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 
@@ -22,22 +22,24 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   final FocusNode _searchFocusNode = FocusNode();
   bool _showInitialState = true;
 
-  final List<String> _recentSearches = [
-    'Toyota Camry 2020',
-    'BMW X5',
-    'Mercedes Benz',
-    'Honda Civic',
-    'Range Rover Sport'
-  ];
+  // Commented out Recent Searches data
+  // final List<String> _recentSearches = [
+  //   'Toyota Camry 2020',
+  //   'BMW X5',
+  //   'Mercedes Benz',
+  //   'Honda Civic',
+  //   'Range Rover Sport'
+  // ];
 
-  final List<String> _popularSearches = [
-    'Tesla Model 3',
-    'Ford Mustang',
-    'Porsche 911',
-    'Audi Q7',
-    'Jeep Wrangler',
-    'Nissan Altima'
-  ];
+  // Commented out Popular Searches data
+  // final List<String> _popularSearches = [
+  //   'Tesla Model 3',
+  //   'Ford Mustang',
+  //   'Porsche 911',
+  //   'Audi Q7',
+  //   'Jeep Wrangler',
+  //   'Nissan Altima'
+  // ];
 
   // Helper method to get colors for different categories
   Color _getCategoryColor(String categoryName) {
@@ -111,15 +113,15 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     _searchController.text = query;
     _searchFocusNode.unfocus();
     
-    // Add to recent searches if not already present
-    if (!_recentSearches.contains(query)) {
-      setState(() {
-        _recentSearches.insert(0, query);
-        if (_recentSearches.length > 5) {
-          _recentSearches.removeLast();
-        }
-      });
-    }
+    // Commented out recent searches functionality
+    // if (!_recentSearches.contains(query)) {
+    //   setState(() {
+    //     _recentSearches.insert(0, query);
+    //     if (_recentSearches.length > 5) {
+    //       _recentSearches.removeLast();
+    //     }
+    //   });
+    // }
 
     setState(() {
       _showInitialState = false;
@@ -242,19 +244,19 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Recent Searches - THESE WILL TRIGGER SEARCH
-          if (_recentSearches.isNotEmpty) ...[
-            _buildSectionHeader('Recent Searches', isDarkMode),
-            SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: _recentSearches.map((search) {
-                return _buildChip(search, Icons.history_rounded, isDarkMode);
-              }).toList(),
-            ),
-            SizedBox(height: 24),
-          ],
+          // Commented out Recent Searches section
+          // if (_recentSearches.isNotEmpty) ...[
+          //   _buildSectionHeader('Recent Searches', isDarkMode),
+          //   SizedBox(height: 12),
+          //   Wrap(
+          //     spacing: 8,
+          //     runSpacing: 8,
+          //     children: _recentSearches.map((search) {
+          //       return _buildChip(search, Icons.history_rounded, isDarkMode);
+          //     }).toList(),
+          //   ),
+          //   SizedBox(height: 24),
+          // ],
 
           // Browse Categories - THESE WILL TRIGGER SEARCH BY CATEGORY NAME
           _buildSectionHeader('Browse Categories', isDarkMode),
@@ -262,14 +264,14 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           _buildCategoriesGrid(homeProvider.categories, isDarkMode),
           SizedBox(height: 24),
 
-          // Popular Searches - THESE WILL TRIGGER SEARCH
-          _buildSectionHeader('Popular Searches', isDarkMode),
-          SizedBox(height: 12),
-          Column(
-            children: _popularSearches.map((search) {
-              return _buildSearchSuggestionItem(search, isDarkMode);
-            }).toList(),
-          ),
+          // Commented out Popular Searches section
+          // _buildSectionHeader('Popular Searches', isDarkMode),
+          // SizedBox(height: 12),
+          // Column(
+          //   children: _popularSearches.map((search) {
+          //     return _buildSearchSuggestionItem(search, isDarkMode);
+          //   }).toList(),
+          // ),
         ],
       ),
     );
@@ -660,64 +662,64 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     );
   }
 
-  // Chip for Recent Searches - WILL TRIGGER SEARCH
-  Widget _buildChip(String text, IconData icon, bool isDarkMode) {
-    return GestureDetector(
-      onTap: () => _performSearch(text),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon, 
-              size: 16, 
-              color: isDarkMode ? Colors.white60 : Colors.grey[600]
-            ),
-            SizedBox(width: 6),
-            Text(
-              text,
-              style: TextStyle(
-                color: isDarkMode ? Colors.white70 : Colors.grey[700],
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // Commented out Chip for Recent Searches
+  // Widget _buildChip(String text, IconData icon, bool isDarkMode) {
+  //   return GestureDetector(
+  //     onTap: () => _performSearch(text),
+  //     child: Container(
+  //       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  //       decoration: BoxDecoration(
+  //         color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
+  //         borderRadius: BorderRadius.circular(20),
+  //         border: Border.all(
+  //           color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!
+  //         ),
+  //       ),
+  //       child: Row(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Icon(
+  //             icon, 
+  //             size: 16, 
+  //             color: isDarkMode ? Colors.white60 : Colors.grey[600]
+  //           ),
+  //           SizedBox(width: 6),
+  //           Text(
+  //             text,
+  //             style: TextStyle(
+  //               color: isDarkMode ? Colors.white70 : Colors.grey[700],
+  //               fontSize: 14,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  // Search Suggestion Item for Popular Searches - WILL TRIGGER SEARCH
-  Widget _buildSearchSuggestionItem(String search, bool isDarkMode) {
-    return ListTile(
-      leading: Icon(
-        Icons.trending_up_rounded, 
-        color: isDarkMode ? Colors.white60 : Colors.grey[500], 
-        size: 20
-      ),
-      title: Text(
-        search,
-        style: TextStyle(
-          color: isDarkMode ? Colors.white70 : Colors.grey[700]
-        ),
-      ),
-      trailing: Icon(
-        Icons.arrow_forward_ios_rounded, 
-        size: 16, 
-        color: isDarkMode ? Colors.white60 : Colors.grey[400]
-      ),
-      onTap: () => _performSearch(search),
-      contentPadding: EdgeInsets.symmetric(horizontal: 4),
-    );
-  }
+  // Commented out Search Suggestion Item for Popular Searches
+  // Widget _buildSearchSuggestionItem(String search, bool isDarkMode) {
+  //   return ListTile(
+  //     leading: Icon(
+  //       Icons.trending_up_rounded, 
+  //       color: isDarkMode ? Colors.white60 : Colors.grey[500], 
+  //       size: 20
+  //     ),
+  //     title: Text(
+  //       search,
+  //       style: TextStyle(
+  //         color: isDarkMode ? Colors.white70 : Colors.grey[700]
+  //       ),
+  //     ),
+  //     trailing: Icon(
+  //       Icons.arrow_forward_ios_rounded, 
+  //       size: 16, 
+  //       color: isDarkMode ? Colors.white60 : Colors.grey[400]
+  //     ),
+  //     onTap: () => _performSearch(search),
+  //     contentPadding: EdgeInsets.symmetric(horizontal: 4),
+  //   );
+  // }
 }
 
 class _SearchResultItemWidget extends StatelessWidget {
@@ -731,6 +733,7 @@ class _SearchResultItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final firstImage = searchItem.images?.isNotEmpty == true
         ? searchItem.images!.first
         : null;
@@ -813,7 +816,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${_formatPrice(searchItem.price)}',
+                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPrice(searchItem.price)}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

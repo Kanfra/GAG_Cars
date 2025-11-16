@@ -3,6 +3,27 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'searchItemModel.freezed.dart';
 part 'searchItemModel.g.dart';
 
+
+@freezed
+class User with _$User {
+  const factory User({
+    required String id,
+    required String name,
+    required String email,
+    String? phone,
+    @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+    @JsonKey(name: 'paid_seller') int? paidSeller,
+    @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
+    @JsonKey(name: 'country_id') int? countryId,
+    @JsonKey(name: 'state_id') int? stateId,
+    @JsonKey(name: 'profile_photo') String? profilePhoto,
+  }) = _User;
+
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+}
+
 @freezed
 class SearchItem with _$SearchItem {
   const factory SearchItem({
@@ -30,6 +51,7 @@ class SearchItem with _$SearchItem {
     String? status,
     String? price,
     String? mileage,
+    User? user,
     int? warranty,
     @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
     @JsonKey(name: 'deleted_at') String? deletedAt,

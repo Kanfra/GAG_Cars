@@ -42,6 +42,8 @@ class UserModel with _$UserModel {
   String? get countryName => country?.name;
   String? get countryCode => country?.iso2;
   String? get countryFlag => country?.emoji;
+  String? get countryCurrency => country?.currency;
+  String? get countryCurrencySymbol => country?.currencySymbol;
 }
 
 // Add this new model in the same file or separate

@@ -11,6 +11,7 @@ import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -714,7 +715,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                 _buildImageSection(imageUrl, theme),
                 
                 // Content Section
-                _buildContentSection(brandImage, theme),
+                _buildContentSection(brandImage, theme, context),
               ],
             ),
             
@@ -818,7 +819,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     );
   }
 
-  Widget _buildContentSection(dynamic brandImage, ThemeData theme) {
+  Widget _buildContentSection(dynamic brandImage, ThemeData theme, BuildContext context) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -827,7 +828,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildTitleSection(theme),
-            _buildPriceSection(),
+            _buildPriceSection(context),
             _buildDetailsSection(brandImage, theme),
           ],
         ),
@@ -863,12 +864,13 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     );
   }
 
-  Widget _buildPriceSection() {
+  Widget _buildPriceSection(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'GH₵ ${_getFormattedPrice()}',
+          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -1238,6 +1240,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
     
     return AnimatedBuilder(
@@ -1336,7 +1339,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'GH₵ ${_getFormattedPrice()}',
+                          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

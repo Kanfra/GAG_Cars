@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithTextFormFieldComponent.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/VerifyDealerService/verifyDealerService.dart';
@@ -11,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/Logger.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DealerLoginPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -112,12 +115,55 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     }
   }
 
-  // ================== NATIONAL ID CAPTURE - SIMPLE CAMERA ==================
-  Future<void> _captureNationalId(bool isFront) async {
+  // ================== NATIONAL ID CAPTURE WITH FRAME DETECTION ==================
+  Future<void> _captureNationalIdWithFrame(bool isFront) async {
+    try {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => IDCardCameraFrame(
+            isFront: isFront,
+          ),
+        ),
+      );
+
+      if (result != null && result is File) {
+        setState(() {
+          if (isFront) {
+            _nationalIdFront = result;
+            _isFrontCaptured = true;
+          } else {
+            _nationalIdBack = result;
+            _isBackCaptured = true;
+          }
+        });
+        
+        showCustomSnackBar(
+          title: "Success",
+          message: "ID ${isFront ? 'front' : 'back'} captured successfully!",
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      showCustomSnackBar(
+        title: "Error",
+        message: "Failed to capture ID: ${e.toString()}",
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  // ================== QUICK NATIONAL ID CAPTURE ==================
+  Future<void> _quickCaptureNationalId(bool isFront) async {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
         preferredCameraDevice: CameraDevice.rear,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 90,
       );
       
       if (image == null) return;
@@ -175,18 +221,16 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     }
   }
 
-  // ================== DOCUMENT WIDGET ==================
+  // ================== ENHANCED DOCUMENT WIDGET ==================
   Widget _buildDocumentSection({
     required String title,
     required String description,
     required IconData icon,
     required bool isCaptured,
     required File? file,
-    required VoidCallback onTap,
+    required bool isFront,
     Color? accentColor,
     required bool isDarkMode,
-    required String captureButtonText,
-    required String retakeButtonText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,66 +253,47 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           ),
         ),
         const SizedBox(height: 16),
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isCaptured 
-                  ? Colors.green 
-                  : (accentColor ?? ColorGlobalVariables.brownColor),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        
+        // Capture Options
+        Column(
+          children: [
+            _buildCaptureOptionCard(
+              title: "Scan with Frame Guide",
+              subtitle: "Perfect alignment assistance",
+              icon: Icons.crop_free,
+              isCaptured: isCaptured,
+              accentColor: accentColor,
+              onTap: () => _captureNationalIdWithFrame(isFront),
             ),
-            child: Column(
+            const SizedBox(height: 12),
+            Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
-                        .withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    icon,
-                    color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
-                    size: 28,
+                Expanded(
+                  child: _buildCaptureOptionCard(
+                    title: "Quick Camera",
+                    subtitle: "Basic camera",
+                    icon: Icons.photo_camera,
+                    isCaptured: isCaptured,
+                    accentColor: accentColor,
+                    onTap: () => _quickCaptureNationalId(isFront),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  isCaptured ? "Successfully Captured!" : captureButtonText,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildCaptureOptionCard(
+                    title: "From Gallery",
+                    subtitle: "Choose existing",
+                    icon: Icons.photo_library,
+                    isCaptured: isCaptured,
+                    accentColor: accentColor,
+                    onTap: () => _quickCaptureNationalId(isFront), // Uses same function but from gallery
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  isCaptured ? "Ready for verification" : "Take a clear photo",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
-                  ),
-                  textAlign: TextAlign.center,
                 ),
               ],
             ),
-          ),
+          ],
         ),
+        
         if (isCaptured && file != null) ...[
           const SizedBox(height: 16),
           Container(
@@ -308,14 +333,339 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: onTap,
+              onPressed: () => _captureNationalIdWithFrame(isFront),
               icon: Icon(
                 Icons.camera_alt, 
                 size: 18,
                 color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
               label: Text(
-                retakeButtonText,
+                "Rescan",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildCaptureOptionCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required bool isCaptured,
+    required Color? accentColor,
+    required VoidCallback onTap,
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isCaptured 
+              ? Colors.green 
+              : (accentColor ?? ColorGlobalVariables.brownColor).withOpacity(0.5),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
+                    .withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ================== COMPANY DOCUMENT WIDGET ==================
+  Widget _buildCompanyDocumentSection({
+    required bool isDarkMode,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "4. Company Registration Document",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Upload your business registration certificate or company documents.",
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        InkWell(
+          onTap: _pickCompanyDocument,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isCompanyDocCaptured 
+                  ? Colors.green 
+                  : Colors.teal,
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (_isCompanyDocCaptured ? Colors.green : Colors.teal)
+                        .withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.description_outlined,
+                    color: _isCompanyDocCaptured ? Colors.green : Colors.teal,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _isCompanyDocCaptured ? "Successfully Uploaded!" : "Tap to Upload",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: _isCompanyDocCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isCompanyDocCaptured ? "Ready for verification" : "Choose company document",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: _isCompanyDocCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_isCompanyDocCaptured && _companyDocument != null) ...[
+          const SizedBox(height: 16),
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                _companyDocument!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.description,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                          size: 50,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "Document Preview",
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _pickCompanyDocument,
+              icon: Icon(
+                Icons.edit, 
+                size: 18,
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+              label: Text(
+                "Choose Different File",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ================== SELFIE DOCUMENT WIDGET ==================
+  Widget _buildSelfieSection({
+    required bool isDarkMode,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "1. Business Owner Selfie",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "Take a clear selfie to verify your identity as the business owner.",
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildCaptureOptionCard(
+          title: "Take Selfie",
+          subtitle: "Front camera required",
+          icon: Icons.face_retouching_natural,
+          isCaptured: _isSelfieCaptured,
+          accentColor: Colors.blue,
+          onTap: _takeSelfie,
+        ),
+        if (_isSelfieCaptured && _selfieImage != null) ...[
+          const SizedBox(height: 16),
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                _selfieImage!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    child: Icon(
+                      Icons.error_outline, 
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _takeSelfie,
+              icon: Icon(
+                Icons.camera_alt, 
+                size: 18,
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+              label: Text(
+                "Retake",
                 style: TextStyle(
                   color: isDarkMode ? Colors.white70 : Colors.grey[600],
                 ),
@@ -430,7 +780,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
         logger.e("Error is: ${response.message}");
         showCustomSnackBar(
           title: "Error",
-          message: response.message,
+          message: response.message.toString(),
           backgroundColor: Colors.red,
           textColor: Colors.white,
         );
@@ -664,63 +1014,87 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Selfie - Uses Retake button
-                  _buildDocumentSection(
-                    title: "1. Business Owner Selfie",
-                    description: "Take a clear selfie to verify your identity as the business owner.",
-                    icon: Icons.face_retouching_natural,
-                    isCaptured: _isSelfieCaptured,
-                    file: _selfieImage,
-                    onTap: _takeSelfie,
-                    accentColor: Colors.blue,
-                    isDarkMode: isDarkMode,
-                    captureButtonText: "Tap to Capture",
-                    retakeButtonText: "Retake",
-                  ),
+                  // Selfie Section
+                  _buildSelfieSection(isDarkMode: isDarkMode),
 
-                  // National ID front - Uses Recapture button
+                  // National ID Front
                   _buildDocumentSection(
                     title: "2. National ID (Front Side)",
-                    description: "Capture the front side of your government-issued ID card.",
+                    description: "Scan the front side of your government-issued ID card. Use frame guide for perfect alignment.",
                     icon: Icons.credit_card,
                     isCaptured: _isFrontCaptured,
                     file: _nationalIdFront,
-                    onTap: () => _captureNationalId(true),
+                    isFront: true,
                     accentColor: Colors.orange,
                     isDarkMode: isDarkMode,
-                    captureButtonText: "Tap to Capture",
-                    retakeButtonText: "Recapture",
                   ),
 
-                  // National ID back - Uses Recapture button
+                  // National ID Back
                   _buildDocumentSection(
                     title: "3. National ID (Back Side)",
-                    description: "Capture the back side of your government-issued ID card.",
+                    description: "Scan the back side of your government-issued ID card. Use frame guide for perfect alignment.",
                     icon: Icons.credit_card_outlined,
                     isCaptured: _isBackCaptured,
                     file: _nationalIdBack,
-                    onTap: () => _captureNationalId(false),
+                    isFront: false,
                     accentColor: Colors.purple,
                     isDarkMode: isDarkMode,
-                    captureButtonText: "Tap to Capture",
-                    retakeButtonText: "Recapture",
                   ),
 
-                  // Company doc - Uses Choose Different File button
-                  _buildDocumentSection(
-                    title: "4. Company Registration Document",
-                    description: "Upload your business registration certificate or company documents.",
-                    icon: Icons.description_outlined,
-                    isCaptured: _isCompanyDocCaptured,
-                    file: _companyDocument,
-                    onTap: _pickCompanyDocument,
-                    accentColor: Colors.teal,
-                    isDarkMode: isDarkMode,
-                    captureButtonText: "Tap to Upload",
-                    retakeButtonText: "Choose Different File",
-                  ),
+                  // Company Document
+                  _buildCompanyDocumentSection(isDarkMode: isDarkMode),
 
                   const SizedBox(height: 24),
+
+                  // Scanning Instructions
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDarkMode ? Colors.orange.withOpacity(0.1) : Colors.orange.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.withOpacity(0.2)
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.tips_and_updates,
+                          color: Colors.orange,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Scanning Tips for ID Cards",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "• Place ID card on a flat, dark surface\n• Ensure good, even lighting\n• Align the ID card within the frame guide\n• Keep camera steady and parallel to the card\n• Avoid shadows, glare, and reflections\n• Make sure all text is clear and readable",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
 
                   // Security Notice
                   Container(
@@ -820,3 +1194,326 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     super.dispose();
   }
 }
+
+// ================== ID CARD CAMERA FRAME SCREEN ==================
+class IDCardCameraFrame extends StatefulWidget {
+  final bool isFront;
+
+  const IDCardCameraFrame({super.key, required this.isFront});
+
+  @override
+  State<IDCardCameraFrame> createState() => _IDCardCameraFrameState();
+}
+
+class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
+  late CameraController _controller;
+  bool _isCameraInitialized = false;
+  bool _isCardAligned = false;
+  bool _isCapturing = false;
+  Timer? _alignmentTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+    _startAlignmentSimulation();
+  }
+
+  Future<void> _initializeCamera() async {
+    try {
+      final cameras = await availableCameras();
+      _controller = CameraController(
+        cameras.firstWhere(
+          (camera) => camera.lensDirection == CameraLensDirection.back,
+          orElse: () => cameras.first,
+        ),
+        ResolutionPreset.medium,
+      );
+
+      await _controller.initialize();
+      if (mounted) {
+        setState(() {
+          _isCameraInitialized = true;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        showCustomSnackBar(
+          title: "Camera Error",
+          message: "Failed to initialize camera: $e",
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    }
+  }
+
+  void _startAlignmentSimulation() {
+    // Simulate alignment detection - in real app, you'd use image analysis
+    _alignmentTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) {
+      if (mounted && !_isCapturing) {
+        setState(() {
+          _isCardAligned = !_isCardAligned; // Simulate alignment change
+        });
+      }
+    });
+  }
+
+  Future<void> _captureImage() async {
+    if (_isCapturing || !_isCameraInitialized) return;
+
+    setState(() => _isCapturing = true);
+
+    try {
+      final XFile image = await _controller.takePicture();
+      
+      // Save to temporary directory
+      final tempDir = await getTemporaryDirectory();
+      final String fileName = 'id_${widget.isFront ? 'front' : 'back'}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String filePath = '${tempDir.path}/$fileName';
+      
+      final File savedImage = await File(image.path).copy(filePath);
+      
+      if (mounted) {
+        Navigator.pop(context, savedImage);
+      }
+    } catch (e) {
+      if (mounted) {
+        showCustomSnackBar(
+          title: "Capture Error",
+          message: "Failed to capture image: $e",
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+        setState(() => _isCapturing = false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _alignmentTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Scan ID ${widget.isFront ? 'Front' : 'Back'}',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      body: Stack(
+        children: [
+          if (_isCameraInitialized)
+            CameraPreview(_controller),
+          
+          // Frame overlay
+          _buildFrameOverlay(),
+          
+          // Instructions
+          Positioned(
+            bottom: 120,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    _isCardAligned 
+                      ? 'Perfect! Card is aligned ✅' 
+                      : 'Align the ID card within the frame',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.isFront
+                      ? 'Ensure the front side is clearly visible'
+                      : 'Ensure the back side is clearly visible',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Capture button
+          Positioned(
+            bottom: 40,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: FloatingActionButton(
+                onPressed: _isCardAligned ? _captureImage : null,
+                backgroundColor: _isCardAligned ? Colors.green : Colors.grey,
+                child: _isCapturing
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      )
+                    : const Icon(Icons.camera_alt, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFrameOverlay() {
+    return Center(
+      child: Container(
+        width: 300,
+        height: 200,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _isCardAligned ? Colors.green : Colors.white,
+            width: 3,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: CustomPaint(
+          painter: FrameGuidePainter(isAligned: _isCardAligned),
+        ),
+      ),
+    );
+  }
+}
+
+// ================== FRAME GUIDE PAINTER ==================
+class FrameGuidePainter extends CustomPainter {
+  final bool isAligned;
+  
+  FrameGuidePainter({required this.isAligned});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = isAligned ? Colors.green : Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    final cornerLength = 25.0;
+    
+    // Draw corner guides
+    // Top-left corner
+    canvas.drawLine(Offset(0, 0), Offset(cornerLength, 0), paint);
+    canvas.drawLine(Offset(0, 0), Offset(0, cornerLength), paint);
+    
+    // Top-right corner
+    canvas.drawLine(Offset(size.width, 0), Offset(size.width - cornerLength, 0), paint);
+    canvas.drawLine(Offset(size.width, 0), Offset(size.width, cornerLength), paint);
+    
+    // Bottom-left corner
+    canvas.drawLine(Offset(0, size.height), Offset(cornerLength, size.height), paint);
+    canvas.drawLine(Offset(0, size.height), Offset(0, size.height - cornerLength), paint);
+    
+    // Bottom-right corner
+    canvas.drawLine(Offset(size.width, size.height), Offset(size.width - cornerLength, size.height), paint);
+    canvas.drawLine(Offset(size.width, size.height), Offset(size.width, size.height - cornerLength), paint);
+
+    // Draw alignment guides (grid lines)
+    final guidePaint = Paint()
+      ..color = Colors.white.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    // Vertical center line
+    canvas.drawLine(
+      Offset(size.width / 2, 0),
+      Offset(size.width / 2, size.height),
+      guidePaint,
+    );
+
+    // Horizontal center line
+    canvas.drawLine(
+      Offset(0, size.height / 2),
+      Offset(size.width, size.height / 2),
+      guidePaint,
+    );
+
+    // Draw "ID CARD" text
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: 'ID CARD',
+        style: TextStyle(
+          color: isAligned ? Colors.green : Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(
+      canvas,
+      Offset(
+        (size.width - textPainter.width) / 2,
+        size.height + 10,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+// Helper function to show snackbar
+void showCustomSnackBar({
+  required String title,
+  required String message,
+  required Color backgroundColor,
+  required Color textColor,
+}) {
+  final context = navigatorKey.currentContext;
+  if (context != null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: backgroundColor,
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              message,
+              style: TextStyle(color: textColor),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// You'll need to define this in your app
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

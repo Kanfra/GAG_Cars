@@ -7,6 +7,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserListingsProvid
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
@@ -408,6 +409,7 @@ class _ListingItemGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
     // FIXED: Null-safe image handling
     final firstImage = listing.images?.isNotEmpty == true ? listing.images!.first : null;
@@ -540,7 +542,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                     children: [
                       Text(
                         // FIXED: Null-safe price parsing
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(listing.price ?? '0') ?? 0)}',
+                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(listing.price ?? '0') ?? 0)}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -698,6 +700,7 @@ class _ListingItemListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
     // FIXED: Null-safe image handling
     final firstImage = listing.images?.isNotEmpty == true ? listing.images!.first : null;
@@ -818,7 +821,7 @@ class _ListingItemListWidget extends StatelessWidget {
                         Expanded(
                           child: Text(
                             // FIXED: Null-safe price parsing
-                            'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(listing.price ?? '0') ?? 0)}',
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(listing.price ?? '0') ?? 0)}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

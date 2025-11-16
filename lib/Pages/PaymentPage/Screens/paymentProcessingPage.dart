@@ -4,6 +4,7 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dar
 import 'package:get/get.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:logger/Logger.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:provider/provider.dart';
 
 class PaymentProcessingPage extends StatefulWidget {
@@ -30,6 +31,7 @@ class _PaymentProcessingPageState extends State<PaymentProcessingPage> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
     return Scaffold(
@@ -74,7 +76,7 @@ class _PaymentProcessingPageState extends State<PaymentProcessingPage> {
 
               // Amount
               Text(
-                'GH₵ ${widget.allJson['amount'].toStringAsFixed(2)}',
+                '${userProvider.user?.countryCurrencySymbol ?? ''} ${widget.allJson['amount'].toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,

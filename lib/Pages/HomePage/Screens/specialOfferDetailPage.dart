@@ -16,6 +16,7 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dar
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/Logger.dart';
@@ -409,24 +410,25 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
   }
 
   // Price formatting and calculations
-  String _formatPrice(String price) {
+  String _formatPrice(String price, BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     try {
       final number = int.parse(price);
       return NumberFormat.currency(
-        symbol: 'GH₵ ',
+        symbol: '${userProvider.user?.countryCurrencySymbol ?? ''} ',
         decimalDigits: 0,
       ).format(number);
     } catch (e) {
-      return 'GH₵ $price';
+      return '${userProvider.user?.countryCurrencySymbol ?? ''} $price';
     }
   }
 
-  String _calculateDiscountedPrice() {
+  String _calculateDiscountedPrice(BuildContext context) {
     try {
       final originalPrice = int.parse(_item.price ?? '0');
       final discount = _specialOffer.discount;
       final discountedPrice = originalPrice - (originalPrice * discount ~/ 100);
-      return _formatPrice(discountedPrice.toString());
+      return _formatPrice(discountedPrice.toString(), context);
     } catch (e) {
       return 'Price unavailable';
     }
@@ -1198,6 +1200,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     
@@ -1307,7 +1310,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _calculateDiscountedPrice(),
+                                        _calculateDiscountedPrice(context),
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 24.0,
@@ -1318,7 +1321,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                       Row(
                                         children: [
                                           Text(
-                                            _formatPrice(_item.price ?? '0'),
+                                            _formatPrice(_item.price ?? '0', context),
                                             style: const TextStyle(
                                               color: Colors.white70,
                                               fontSize: 16.0,
@@ -1334,7 +1337,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                               borderRadius: BorderRadius.circular(8),
                                             ),
                                             child: Text(
-                                              'Save GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
+                                              'Save ${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12.0,
@@ -1596,7 +1599,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  _calculateDiscountedPrice(),
+                                                  _calculateDiscountedPrice(context),
                                                   style: TextStyle(
                                                     fontSize: 24,
                                                     fontWeight: FontWeight.bold,
@@ -1617,7 +1620,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
-                                                  _formatPrice(_item.price ?? '0'),
+                                                  _formatPrice(_item.price ?? '0', context),
                                                   style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.w600,
@@ -1645,7 +1648,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
                                               Icon(Icons.savings, color: ColorGlobalVariables.redColor, size: 16),
                                               const SizedBox(width: 8),
                                               Text(
-                                                'You save GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
+                                                'You save ${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
                                                 style: TextStyle(
                                                   color: ColorGlobalVariables.redColor,
                                                   fontWeight: FontWeight.bold,

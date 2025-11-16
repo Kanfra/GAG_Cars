@@ -12,6 +12,7 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Services/PromotionService/p
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
@@ -281,18 +282,19 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return 'Vehicle Listing';
   }
 
-  String getListingPrice() {
+  String getListingPrice(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     try {
       final price = listing['price'];
       if (price is String && price.isNotEmpty) {
-        return 'GH₵ ${formatNumber(shortenerRequired: false, number: int.parse(price))}';
+        return '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(price))}';
       } else if (price is num) {
-        return 'GH₵ ${formatNumber(shortenerRequired: false, number: price.toInt())}';
+        return '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: price.toInt())}';
       }
     } catch (e) {
       logger.e('Error getting listing price: $e');
     }
-    return 'GH₵ 0';
+    return '${userProvider.user?.countryCurrencySymbol ?? ''} 0';
   }
 
   String getListingDescription() {
@@ -1055,7 +1057,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            getListingPrice(),
+                            getListingPrice(context),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20.0,

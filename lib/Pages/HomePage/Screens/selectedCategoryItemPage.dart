@@ -12,6 +12,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/similarItemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:provider/provider.dart';
 
@@ -670,6 +671,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final firstImage = widget.item.images?.isNotEmpty == true
         ? widget.item.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
@@ -832,7 +834,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
+                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

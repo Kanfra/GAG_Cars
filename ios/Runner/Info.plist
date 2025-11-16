@@ -37,6 +37,24 @@
     <true/>
     <key>UISupportsDocumentBrowser</key>
     <true/>
+
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>com.yourcompany.gagcars</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>gagcars</string>
+            </array>
+        </dict>
+    </array>
+
+<!-- For Universal Links -->
+<key>FlutterDeepLinkingEnabled</key>
+<true/>
     
     <!-- ============ APP CONFIGURATION ============ -->
     <key>CFBundleDisplayName</key>

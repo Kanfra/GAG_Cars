@@ -6,6 +6,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/myListingsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getMyListingsProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
@@ -394,7 +395,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final listing = listings[index];
-                  return _buildListingItem(listing, isLiveTab: isLiveTab, isDarkMode: isDarkMode);
+                  return _buildListingItem(listing, isLiveTab: isLiveTab, isDarkMode: isDarkMode, context: context);
                 },
                 childCount: listings.length,
               ),
@@ -572,7 +573,8 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildListingItem(MyListing listing, {required bool isLiveTab, required bool isDarkMode}) {
+  Widget _buildListingItem(MyListing listing, {required bool isLiveTab, required bool isDarkMode, required BuildContext context}) {
+    final userProvider = Provider.of<UserProvider>(context);
     final price = _parseSafeDouble(listing.price) ?? 0;
     final mileage = _parseSafeDouble(listing.mileage) ?? 0;
     final condition = listing.condition?.toString() ?? "Used";
@@ -737,7 +739,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${_formatNumber(price)}',
+                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatNumber(price)}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

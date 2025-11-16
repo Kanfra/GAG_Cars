@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/messagetile.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/auth_response_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Models/user_model.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
@@ -261,15 +262,14 @@ class AuthService {
   // auth_service.dart
 // Login with Email 
 // sign in with email
-static Future<AuthResponseModel> logInWithEmail({
+static Future<void> logInWithEmail({
   required String email,
   required String password,
 }) async {
   final logger = Logger();
-  // final UserProvider userProvider = UserProvider();
-  final deviceName = await _getDeviceName();
-  const endpoint = '/sanctum/token'; 
-  final url = Uri.parse('$baseApiUrl$endpoint');
+  final UserProvider userProvider = UserProvider();
+  final deviceName = await _getDeviceName(); 
+  final url = Uri.parse('$baseApiUrl${ApiEndpoint.logInWithEmail}');
   
   logger.i('📧 Email: $email');
   logger.i('📱 Device name: $deviceName');
@@ -284,6 +284,7 @@ static Future<AuthResponseModel> logInWithEmail({
     
     logger.i('📦 Request body: $body');
 
+    // make the request
     final response = await http.post(
       url,
       headers: {
@@ -293,124 +294,53 @@ static Future<AuthResponseModel> logInWithEmail({
       body: body,
     );
 
+    // 
     logger.i('📊 Status Code: ${response.statusCode}');
     logger.i('📝 Response Body: ${response.body}');
 
     // Log detailed response information
-    if (response.statusCode == 201) {
-      logger.i('✅ Login successful (201)');
-      
+    if (response.statusCode == 200) {
       try {
-        final responseData = jsonDecode(response.body);
-        
-        logger.i('🔍 Parsed response data: $responseData');
-        
-        final authResponse = AuthResponseModel.fromJson(
-          responseData as Map<String, dynamic>,
-        );
-        // await userProvider.setUser(authResponse.user);
-        
-        logger.i('🔑 Token received: ${authResponse.token != null ? "YES" : "NO"}');
-        logger.i('👤 User data received: ${authResponse.user != null ? "YES" : "NO"}');
-        
-        if (authResponse.token == null) {
-          logger.e('❌ Token is null in response!');
+        // get the response body
+        final responseBody = jsonDecode(response.body);
+        // get the token and message
+        final token = responseBody['token'];
+        final message = responseBody['message'];
+
+        if(token == null){
+          logger.e('Token is null in response');
           throw Exception('Authentication token not received from server');
         }
+
+        // logger display
+        logger.w('Success for token: $token and message: $message');
+        
+        // pass it in authResponseModel
+        final authResponse = AuthResponseModel.fromJson(responseBody);
+        
 
         // Secure storage of token and user data
         await _storage.write(key: _tokenKey, value: authResponse.token!);
         logger.i('💾 Token stored securely');
-        
-        if (authResponse.user != null) {
-          await _storage.write(
-            key: _userKey, 
-            value: jsonEncode(authResponse.user!.toJson()),
-          );
-          logger.i('💾 User data stored for: ${authResponse.user!.email}');
-        }
-        
-        logger.i('🎉 Login completed successfully');
-        return authResponse;
+
+        // store user in statemanagement
+        await userProvider.setUser(authResponse.user);
+
+        // return authResponse;
         
       } catch (e) {
         logger.e('❌ Error parsing successful response: $e');
         throw Exception('Failed to process login response: $e');
       }
-      
-    } else if (response.statusCode == 200) {
-      logger.i('✅ Login successful (200)');
-      
-      try {
-        final responseData = jsonDecode(response.body);
-        logger.i('🔍 Parsed response data: $responseData');
-        
-        final authResponse = AuthResponseModel.fromJson(
-          responseData as Map<String, dynamic>,
-        );
-        
-        logger.i('🔑 Token received: ${authResponse.token != null ? "YES" : "NO"}');
-        logger.i('👤 User data received: ${authResponse.user != null ? "YES" : "NO"}');
-        
-        if (authResponse.token == null) {
-          logger.e('❌ Token is null in response!');
-          throw Exception('Authentication token not received from server');
-        }
-
-        // Secure storage of token and user data
-        await _storage.write(key: _tokenKey, value: authResponse.token!);
-        logger.i('💾 Token stored securely');
-        
-        if (authResponse.user != null) {
-          await _storage.write(
-            key: _userKey, 
-            value: jsonEncode(authResponse.user!.toJson()),
-          );
-          logger.i('💾 User data stored for: ${authResponse.user!.email}');
-        }
-        
-        logger.i('🎉 Login completed successfully');
-        return authResponse;
-        
-      } catch (e) {
-        logger.e('❌ Error parsing successful response: $e');
-        throw Exception('Failed to process login response: $e');
-      }
-      
-    } else if (response.statusCode == 401) {
-      logger.e('❌ Unauthorized (401) - Invalid credentials');
-      final errorData = jsonDecode(response.body);
-      logger.e('🔍 Error details: $errorData');
-      throw Exception('The provided email or password is incorrect.');
-      
-    } else if (response.statusCode == 422) {
-      logger.e('❌ Unprocessable Entity (422) - Validation error');
+    
+    
+    } else {
       final errorData = jsonDecode(response.body);
       logger.e('🔍 Validation errors: $errorData');
       final errorMessage = errorData['message'] ?? 'Validation failed';
       throw Exception(errorMessage);
       
-    } else if (response.statusCode == 400) {
-      logger.e('❌ Bad Request (400)');
-      final errorData = jsonDecode(response.body);
-      logger.e('🔍 Error details: $errorData');
-      throw Exception(errorData['message'] ?? 'Invalid request');
-      
-    } else if (response.statusCode == 404) {
-      logger.e('❌ Not Found (404)');
-      throw Exception('Login endpoint not found. Please check the API configuration.');
-      
-    } else if (response.statusCode == 500) {
-      logger.e('❌ Internal Server Error (500)');
-      throw Exception('Server error. Please try again later.');
-      
-    } else {
-      logger.e('❌ Unexpected status code: ${response.statusCode}');
-      final errorData = jsonDecode(response.body);
-      logger.e('🔍 Error response: $errorData');
-      throw Exception(errorData['message'] ?? 'Login failed with status: ${response.statusCode}');
-    }
-    
+    } 
   } on SocketException catch (e) {
     logger.e('🌐 Network error: $e');
     throw Exception('No internet connection. Please check your network and try again.');
@@ -472,7 +402,7 @@ static Future<bool> sendOtp(
   }
 }
 
-static Future<AuthResponseModel> verifyOtp({
+static Future<void> verifyOtp({
   required String phone,
   required String otp,
   required UserProvider userProvider,
@@ -488,6 +418,8 @@ static Future<AuthResponseModel> verifyOtp({
         'otp': otp
         });
       logger.i("body: $body");
+
+      // make the request
       final response = await http.post(
         url,
         headers: {
@@ -496,22 +428,25 @@ static Future<AuthResponseModel> verifyOtp({
         },
         body: body,
       );
-      final responseBody = jsonDecode(response.body);
+
+      // final responseBody = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
         final token = responseBody['token'];
         final message = responseBody['message'];
         logger.w("Response body for successful verification of otp: $responseBody");
         logger.i('test success response: $message and token: $token');
 
-        final authResponse = AuthResponseModel.fromJson(responseBody);
-        await userProvider.setUser(authResponse.user);
        // store token securely
         if(token != null){
           await storage.write(key: 'auth_token', value: token);
           logger.i("Auth token stored securely");
         }
+        // store data in provider
+         final authResponse = AuthResponseModel.fromJson(responseBody);
+        await userProvider.setUser(authResponse.user);
         logger.i("OTP verified successfully: ${response.body}");
-        return AuthResponseModel.fromJson(responseBody);
+        // return AuthResponseModel.fromJson(responseBody);
       } else {
         logger.e("Failed to verify OTP: ${response.body}");
         throw Exception('Failed to verify OTP: ${response.body}');

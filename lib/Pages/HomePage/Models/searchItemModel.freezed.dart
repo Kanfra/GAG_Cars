@@ -14,6 +14,418 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
+User _$UserFromJson(Map<String, dynamic> json) {
+  return _User.fromJson(json);
+}
+
+/// @nodoc
+mixin _$User {
+  String get id => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
+  @JsonKey(name: 'email_verified_at')
+  DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'paid_seller')
+  int? get paidSeller => throw _privateConstructorUsedError;
+  @JsonKey(name: 'deleted_at')
+  DateTime? get deletedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id')
+  int? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'state_id')
+  int? get stateId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto => throw _privateConstructorUsedError;
+
+  /// Serializes this User to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $UserCopyWith<User> get copyWith => throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $UserCopyWith<$Res> {
+  factory $UserCopyWith(User value, $Res Function(User) then) =
+      _$UserCopyWithImpl<$Res, User>;
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String email,
+      String? phone,
+      @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') int? paidSeller,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'state_id') int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto});
+}
+
+/// @nodoc
+class _$UserCopyWithImpl<$Res, $Val extends User>
+    implements $UserCopyWith<$Res> {
+  _$UserCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = null,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
+  factory _$$UserImplCopyWith(
+          _$UserImpl value, $Res Function(_$UserImpl) then) =
+      __$$UserImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      String email,
+      String? phone,
+      @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') int? paidSeller,
+      @JsonKey(name: 'deleted_at') DateTime? deletedAt,
+      @JsonKey(name: 'created_at') DateTime? createdAt,
+      @JsonKey(name: 'updated_at') DateTime? updatedAt,
+      @JsonKey(name: 'country_id') int? countryId,
+      @JsonKey(name: 'state_id') int? stateId,
+      @JsonKey(name: 'profile_photo') String? profilePhoto});
+}
+
+/// @nodoc
+class __$$UserImplCopyWithImpl<$Res>
+    extends _$UserCopyWithImpl<$Res, _$UserImpl>
+    implements _$$UserImplCopyWith<$Res> {
+  __$$UserImplCopyWithImpl(_$UserImpl _value, $Res Function(_$UserImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? email = null,
+    Object? phone = freezed,
+    Object? emailVerifiedAt = freezed,
+    Object? paidSeller = freezed,
+    Object? deletedAt = freezed,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
+    Object? countryId = freezed,
+    Object? stateId = freezed,
+    Object? profilePhoto = freezed,
+  }) {
+    return _then(_$UserImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      email: null == email
+          ? _value.email
+          : email // ignore: cast_nullable_to_non_nullable
+              as String,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      emailVerifiedAt: freezed == emailVerifiedAt
+          ? _value.emailVerifiedAt
+          : emailVerifiedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      paidSeller: freezed == paidSeller
+          ? _value.paidSeller
+          : paidSeller // ignore: cast_nullable_to_non_nullable
+              as int?,
+      deletedAt: freezed == deletedAt
+          ? _value.deletedAt
+          : deletedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _value.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      countryId: freezed == countryId
+          ? _value.countryId
+          : countryId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      stateId: freezed == stateId
+          ? _value.stateId
+          : stateId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      profilePhoto: freezed == profilePhoto
+          ? _value.profilePhoto
+          : profilePhoto // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$UserImpl implements _User {
+  const _$UserImpl(
+      {required this.id,
+      required this.name,
+      required this.email,
+      this.phone,
+      @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') this.paidSeller,
+      @JsonKey(name: 'deleted_at') this.deletedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt,
+      @JsonKey(name: 'country_id') this.countryId,
+      @JsonKey(name: 'state_id') this.stateId,
+      @JsonKey(name: 'profile_photo') this.profilePhoto});
+
+  factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
+      _$$UserImplFromJson(json);
+
+  @override
+  final String id;
+  @override
+  final String name;
+  @override
+  final String email;
+  @override
+  final String? phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  final DateTime? emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller')
+  final int? paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  final DateTime? deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  final DateTime? createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
+  @override
+  @JsonKey(name: 'country_id')
+  final int? countryId;
+  @override
+  @JsonKey(name: 'state_id')
+  final int? stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  final String? profilePhoto;
+
+  @override
+  String toString() {
+    return 'User(id: $id, name: $name, email: $email, phone: $phone, emailVerifiedAt: $emailVerifiedAt, paidSeller: $paidSeller, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, countryId: $countryId, stateId: $stateId, profilePhoto: $profilePhoto)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$UserImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.email, email) || other.email == email) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.emailVerifiedAt, emailVerifiedAt) ||
+                other.emailVerifiedAt == emailVerifiedAt) &&
+            (identical(other.paidSeller, paidSeller) ||
+                other.paidSeller == paidSeller) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
+            (identical(other.stateId, stateId) || other.stateId == stateId) &&
+            (identical(other.profilePhoto, profilePhoto) ||
+                other.profilePhoto == profilePhoto));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      email,
+      phone,
+      emailVerifiedAt,
+      paidSeller,
+      deletedAt,
+      createdAt,
+      updatedAt,
+      countryId,
+      stateId,
+      profilePhoto);
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      __$$UserImplCopyWithImpl<_$UserImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$UserImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _User implements User {
+  const factory _User(
+      {required final String id,
+      required final String name,
+      required final String email,
+      final String? phone,
+      @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
+      @JsonKey(name: 'paid_seller') final int? paidSeller,
+      @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
+      @JsonKey(name: 'created_at') final DateTime? createdAt,
+      @JsonKey(name: 'updated_at') final DateTime? updatedAt,
+      @JsonKey(name: 'country_id') final int? countryId,
+      @JsonKey(name: 'state_id') final int? stateId,
+      @JsonKey(name: 'profile_photo') final String? profilePhoto}) = _$UserImpl;
+
+  factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
+
+  @override
+  String get id;
+  @override
+  String get name;
+  @override
+  String get email;
+  @override
+  String? get phone;
+  @override
+  @JsonKey(name: 'email_verified_at')
+  DateTime? get emailVerifiedAt;
+  @override
+  @JsonKey(name: 'paid_seller')
+  int? get paidSeller;
+  @override
+  @JsonKey(name: 'deleted_at')
+  DateTime? get deletedAt;
+  @override
+  @JsonKey(name: 'created_at')
+  DateTime? get createdAt;
+  @override
+  @JsonKey(name: 'updated_at')
+  DateTime? get updatedAt;
+  @override
+  @JsonKey(name: 'country_id')
+  int? get countryId;
+  @override
+  @JsonKey(name: 'state_id')
+  int? get stateId;
+  @override
+  @JsonKey(name: 'profile_photo')
+  String? get profilePhoto;
+
+  /// Create a copy of User
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$UserImplCopyWith<_$UserImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 SearchItem _$SearchItemFromJson(Map<String, dynamic> json) {
   return _SearchItem.fromJson(json);
 }
@@ -54,6 +466,7 @@ mixin _$SearchItem {
   String? get status => throw _privateConstructorUsedError;
   String? get price => throw _privateConstructorUsedError;
   String? get mileage => throw _privateConstructorUsedError;
+  User? get user => throw _privateConstructorUsedError;
   int? get warranty => throw _privateConstructorUsedError;
   @JsonKey(name: 'warranty_expiration')
   String? get warrantyExpiration => throw _privateConstructorUsedError;
@@ -107,6 +520,7 @@ abstract class $SearchItemCopyWith<$Res> {
       String? status,
       String? price,
       String? mileage,
+      User? user,
       int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
@@ -114,6 +528,8 @@ abstract class $SearchItemCopyWith<$Res> {
       @JsonKey(name: 'updated_at') String? updatedAt,
       String? Height,
       String? VIN});
+
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -155,6 +571,7 @@ class _$SearchItemCopyWithImpl<$Res, $Val extends SearchItem>
     Object? status = freezed,
     Object? price = freezed,
     Object? mileage = freezed,
+    Object? user = freezed,
     Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
@@ -260,6 +677,10 @@ class _$SearchItemCopyWithImpl<$Res, $Val extends SearchItem>
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
               as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
@@ -289,6 +710,20 @@ class _$SearchItemCopyWithImpl<$Res, $Val extends SearchItem>
           : VIN // ignore: cast_nullable_to_non_nullable
               as String?,
     ) as $Val);
+  }
+
+  /// Create a copy of SearchItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res>? get user {
+    if (_value.user == null) {
+      return null;
+    }
+
+    return $UserCopyWith<$Res>(_value.user!, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -325,6 +760,7 @@ abstract class _$$SearchItemImplCopyWith<$Res>
       String? status,
       String? price,
       String? mileage,
+      User? user,
       int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
@@ -332,6 +768,9 @@ abstract class _$$SearchItemImplCopyWith<$Res>
       @JsonKey(name: 'updated_at') String? updatedAt,
       String? Height,
       String? VIN});
+
+  @override
+  $UserCopyWith<$Res>? get user;
 }
 
 /// @nodoc
@@ -371,6 +810,7 @@ class __$$SearchItemImplCopyWithImpl<$Res>
     Object? status = freezed,
     Object? price = freezed,
     Object? mileage = freezed,
+    Object? user = freezed,
     Object? warranty = freezed,
     Object? warrantyExpiration = freezed,
     Object? deletedAt = freezed,
@@ -476,6 +916,10 @@ class __$$SearchItemImplCopyWithImpl<$Res>
           ? _value.mileage
           : mileage // ignore: cast_nullable_to_non_nullable
               as String?,
+      user: freezed == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User?,
       warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
@@ -536,6 +980,7 @@ class _$SearchItemImpl implements _SearchItem {
       this.status,
       this.price,
       this.mileage,
+      this.user,
       this.warranty,
       @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
       @JsonKey(name: 'deleted_at') this.deletedAt,
@@ -624,6 +1069,8 @@ class _$SearchItemImpl implements _SearchItem {
   @override
   final String? mileage;
   @override
+  final User? user;
+  @override
   final int? warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
@@ -644,7 +1091,7 @@ class _$SearchItemImpl implements _SearchItem {
 
   @override
   String toString() {
-    return 'SearchItem(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, Height: $Height, VIN: $VIN)';
+    return 'SearchItem(id: $id, userId: $userId, countryId: $countryId, brandModelId: $brandModelId, brandId: $brandId, categoryId: $categoryId, name: $name, year: $year, slug: $slug, description: $description, images: $images, location: $location, serialNumber: $serialNumber, condition: $condition, steerPosition: $steerPosition, engineCapacity: $engineCapacity, transmission: $transmission, color: $color, buildType: $buildType, numberOfPassengers: $numberOfPassengers, features: $features, status: $status, price: $price, mileage: $mileage, user: $user, warranty: $warranty, warrantyExpiration: $warrantyExpiration, deletedAt: $deletedAt, createdAt: $createdAt, updatedAt: $updatedAt, Height: $Height, VIN: $VIN)';
   }
 
   @override
@@ -688,6 +1135,7 @@ class _$SearchItemImpl implements _SearchItem {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.mileage, mileage) || other.mileage == mileage) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.warranty, warranty) ||
                 other.warranty == warranty) &&
             (identical(other.warrantyExpiration, warrantyExpiration) ||
@@ -730,6 +1178,7 @@ class _$SearchItemImpl implements _SearchItem {
         status,
         price,
         mileage,
+        user,
         warranty,
         warrantyExpiration,
         deletedAt,
@@ -781,6 +1230,7 @@ abstract class _SearchItem implements SearchItem {
       final String? status,
       final String? price,
       final String? mileage,
+      final User? user,
       final int? warranty,
       @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') final String? deletedAt,
@@ -850,6 +1300,8 @@ abstract class _SearchItem implements SearchItem {
   String? get price;
   @override
   String? get mileage;
+  @override
+  User? get user;
   @override
   int? get warranty;
   @override

@@ -69,29 +69,73 @@
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
 
+            <!-- ========== INTENT FILTERS ========== -->
+
             <!-- Main launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Deep links for website -->
+            <!-- ========== DEEP LINKING INTENT FILTERS ========== -->
+
+            <!-- 1. Custom Scheme Deep Links for Item Sharing -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="www.gagcars.com" />
+                <data 
+                    android:scheme="gagcars"
+                    android:host="item" />
             </intent-filter>
 
-            <!-- Paystack callback (replace scheme with your app’s) -->
+            <!-- 2. Universal Links for Item Listings (with autoVerify) -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data 
+                    android:scheme="https"
+                    android:host="gagcars.com"
+                    android:pathPrefix="/listing/" />
+            </intent-filter>
+
+            <!-- 3. Universal Links for Main Website -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data 
+                    android:scheme="https"
+                    android:host="www.gagcars.com" />
+                <data 
+                    android:scheme="https"
+                    android:host="gagcars.com" />
+            </intent-filter>
+
+            <!-- 4. HTTP Links for Main Website (fallback) -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data 
+                    android:scheme="http"
+                    android:host="www.gagcars.com" />
+                <data 
+                    android:scheme="http"
+                    android:host="gagcars.com" />
+            </intent-filter>
+
+            <!-- 5. Paystack Payment Callback (Specific) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="gagcars" />
+                <data 
+                    android:scheme="gagcars"
+                    android:host="paystack" />
             </intent-filter>
+
         </activity>
 
         <!-- WebView Safe Browsing -->

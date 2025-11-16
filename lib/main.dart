@@ -29,6 +29,9 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/faqProvider.dart'
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Pages/Splash/Screens/splash_page.dart';
 import 'package:gag_cars_frontend/Themes/appThemes.dart';
+import 'package:gag_cars_frontend/Utils/native_deep_linking_service.dart';
+import 'package:get/get.dart';
+
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +43,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await CloudinaryService.init();
+  
+  // Initialize native deep linking
+  await NativeDeepLinkService.initDeepLinking();
+  
+  // Set system UI overlay style before running app
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.black.withOpacity(0.77),
+    statusBarBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.light,
+  ));
   
   runApp(
     MultiProvider(
@@ -112,12 +125,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-  
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.black.withOpacity(0.77),
-    statusBarBrightness: Brightness.light,
-    statusBarIconBrightness: Brightness.light,
-  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -133,10 +140,59 @@ class MyApp extends StatelessWidget {
           darkTheme: AppThemes.darkTheme,
           themeMode: themeProvider.themeMode,
           debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
+          
+          // ✅ FIX 1: Use ONLY home (remove initialRoute)
           home: const SplashPage(),
+          
+          // ✅ FIX 2: Keep getPages but with safety wrapper
           getPages: RouteClass.routes,
+          
+          // ✅ FIX 3: Remove navigatorObservers (causing conflicts)
+          // navigatorObservers: [],
+          
+          // ✅ FIX 4: Remove routingCallback (causing conflicts)
+          // routingCallback: null,
+          
+          // ✅ FIX 5: Add proper unknown route with safety
+          unknownRoute: GetPage(
+            name: '/not-found',
+            page: () => Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 64, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'Page Not Found',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Use Navigator instead of Get for safety
+                        Navigator.of(Get.context!).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (context) => const SplashPage()),
+                          (route) => false,
+                        );
+                      },
+                      child: Text('Go to Home'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // ✅ FIX 6: Disable route restoration completely
+          navigatorKey: NavigatorKey.key, // Fresh navigation key
         );
       },
     );
   }
+}
+
+// Create a fresh navigation key to prevent restoration conflicts
+class NavigatorKey {
+  static final GlobalKey<NavigatorState> key = GlobalKey<NavigatorState>();
 }

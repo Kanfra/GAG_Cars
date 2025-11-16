@@ -11,6 +11,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/CanUploadItemService/c
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1967,7 +1968,7 @@ class _PostItemPageState extends State<PostItemPage> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildPriceField(),
+                child: _buildPriceField(context),
               ),
             ],
           ),
@@ -2043,7 +2044,8 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildPriceField() {
+  Widget _buildPriceField(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2076,7 +2078,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'GH₵',
+                  '${userProvider.user?.countryCurrencySymbol ?? ''}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,

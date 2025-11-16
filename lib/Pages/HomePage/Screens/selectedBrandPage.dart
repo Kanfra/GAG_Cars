@@ -9,6 +9,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvide
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
@@ -333,7 +334,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           ),
           if (provider.hasItems) ...[
             const SizedBox(height: 8),
-            _buildStatsSection(provider, isDarkMode),
+            _buildStatsSection(provider, isDarkMode, context),
           ],
         ],
       ),
@@ -351,7 +352,8 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     }
   }
 
-  Widget _buildStatsSection(BrandItemsProvider provider, bool isDarkMode) {
+  Widget _buildStatsSection(BrandItemsProvider provider, bool isDarkMode, BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final priceRange = _calculatePriceRange(provider.items);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -363,7 +365,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Price range: GH₵${formatNumber(shortenerRequired: true, number: priceRange['min']!.toInt())} - GH₵${formatNumber(shortenerRequired: true, number: priceRange['max']!.toInt())}',
+            'Price range: ${userProvider.user?.countryCurrencySymbol ?? ''}${formatNumber(shortenerRequired: true, number: priceRange['min']!.toInt())} - ${userProvider.user?.countryCurrencySymbol ?? ''}${formatNumber(shortenerRequired: true, number: priceRange['max']!.toInt())}',
             style: TextStyle(
               color: isDarkMode ? const Color(0xFF90CAF9) : Colors.blue[700],
               fontSize: 12,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,7 +8,6 @@ import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
@@ -33,11 +33,17 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
   bool _isAutoFilling = false;
   final logger = Logger();
   
+  // Timer variables
+  late Timer _timer;
+  int _remainingSeconds = 60;
+  bool _canResend = false;
+  
   // Animation controllers
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
+  late Animation<double> _pulseAnimation;
   late Animation<Color?> _containerColorAnimation;
 
   @override
@@ -46,6 +52,8 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
     _initAnimations();
     // Auto-focus first field
     _focusNodes[0].requestFocus();
+    // Start timer countdown
+    _startCountdown();
     // Start clipboard monitoring
     _startClipboardMonitoring();
   }
@@ -77,6 +85,13 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
       ),
     );
 
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.6, 1.0, curve: Curves.easeInOut),
+      ),
+    );
+
     _containerColorAnimation = ColorTween(
       begin: Colors.transparent,
       end: Colors.red.withOpacity(0.1),
@@ -88,6 +103,29 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
     );
 
     _animationController.forward();
+  }
+
+  void _startCountdown() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_remainingSeconds == 0) {
+        timer.cancel();
+        setState(() {
+          _canResend = true;
+        });
+      } else {
+        setState(() {
+          _remainingSeconds--;
+        });
+      }
+    });
+  }
+
+  void _resetTimer() {
+    setState(() {
+      _remainingSeconds = 60;
+      _canResend = false;
+    });
+    _startCountdown();
   }
 
   Future<void> _successAnimation() async {
@@ -162,6 +200,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
 
   @override
   void dispose() {
+    _timer.cancel();
     _animationController.dispose();
     for (var controller in _otpControllers) {
       controller.dispose();
@@ -281,7 +320,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
   }
 
   Future<void> _resendOTP() async {
-    if (_isResending) return;
+    if (_isResending || !_canResend) return;
 
     setState(() {
       _isResending = true;
@@ -293,11 +332,12 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
         email: widget.allJson['email'],
       );
 
-      // Clear all fields
+      // Clear all fields and reset timer
       for (var controller in _otpControllers) {
         controller.clear();
       }
       _focusNodes[0].requestFocus();
+      _resetTimer();
 
       setState(() {
         _isResending = false;
@@ -415,6 +455,10 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                         ),
                       ),
 
+                      // Timer Section
+                      const SizedBox(height: 16),
+                      _buildTimerSection(isDarkMode),
+
                       // Auto-fill info card
                       const SizedBox(height: 16),
                       _buildAutoFillInfoCard(isDarkMode),
@@ -456,6 +500,73 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
         ),
       ),
     );
+  }
+
+  Widget _buildTimerSection(bool isDarkMode) {
+    return ScaleTransition(
+      scale: _pulseAnimation,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF2D2D2D) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: _remainingSeconds < 10 
+                ? Colors.red.withOpacity(0.5)
+                : Colors.green.withOpacity(0.5),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.timer_rounded,
+              color: _remainingSeconds < 10 ? Colors.red : Colors.green,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Time Remaining',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$_remainingSeconds seconds',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _remainingSeconds < 10 ? Colors.red : Colors.green,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            if (_remainingSeconds < 30)
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.orange,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(delay: 200.ms).slideY();
   }
 
   Widget _buildAutoFillInfoCard(bool isDarkMode) {
@@ -726,55 +837,71 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
 
   Widget _buildResendSection(ThemeData theme, bool isDarkMode) {
     return Center(
-      child: GestureDetector(
-        onTap: _isResending ? null : _resendOTP,
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: _isResending
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: ColorGlobalVariables.brownColor,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Resending...',
-                        style: TextStyle(
-                          color: ColorGlobalVariables.brownColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  )
-                : RichText(
-                    text: TextSpan(
-                      text: "Didn't receive code? ",
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Resend',
-                          style: TextStyle(
-                            color: ColorGlobalVariables.brownColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+      child: Column(
+        children: [
+          Text(
+            "Didn't receive code?",
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isDarkMode ? Colors.white70 : Colors.black54,
+            ),
           ),
-        ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: _canResend ? _resendOTP : null,
+            child: MouseRegion(
+              cursor: _canResend ? SystemMouseCursors.click : SystemMouseCursors.basic,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: _canResend 
+                      ? ColorGlobalVariables.brownColor
+                      : Colors.grey,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: _canResend
+                      ? [
+                          BoxShadow(
+                            color: ColorGlobalVariables.brownColor!.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: _isResending
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Resending...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        _canResend ? 'Resend Code' : 'Wait $_remainingSeconds seconds',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

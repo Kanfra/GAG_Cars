@@ -12,6 +12,7 @@ import 'dart:typed_data';
 
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/myListingPage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:provider/provider.dart';
 
 class PaymentSuccessPage extends StatefulWidget {
@@ -83,7 +84,8 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     return amountDouble / 100;
   }
 
-  Future<Uint8List> _generatePdfReceipt() async {
+  Future<Uint8List> _generatePdfReceipt(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context);
     final pdf = pw.Document();
     final amountInGhs = _getAmountInGhs();
 
@@ -112,7 +114,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                 pw.SizedBox(height: 10),
                 _buildPdfRow('Date:', DateTime.now().toString().split('.').first),
                 pw.SizedBox(height: 10),
-                _buildPdfRow('Amount:', 'GH₵ ${amountInGhs.toStringAsFixed(2)}'),
+                _buildPdfRow('Amount:', '${userProvider.user?.countryCurrencySymbol ?? ''} ${amountInGhs.toStringAsFixed(2)}'),
                 pw.SizedBox(height: 10),
                 _buildPdfRow('Package:', widget.allJson['packageName']?.toString() ?? 'Unknown'),
                 pw.SizedBox(height: 10),
@@ -152,7 +154,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     setState(() => _isSharing = true);
 
     try {
-      final pdfBytes = await _generatePdfReceipt();
+      final pdfBytes = await _generatePdfReceipt(context);
       await Printing.sharePdf(
         bytes: pdfBytes,
         filename: 'receipt-${widget.allJson['transactionReference'] ?? 'payment'}.pdf',
@@ -224,6 +226,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
     
@@ -265,7 +268,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               const SizedBox(height: 16),
 
               Text(
-                'GH₵ ${amountInGhs.toStringAsFixed(2)}',
+                '${userProvider.user?.countryCurrencySymbol ?? ''} ${amountInGhs.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,

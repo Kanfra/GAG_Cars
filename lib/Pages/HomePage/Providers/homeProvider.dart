@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/itemModel.dart'; // NEW: Import for single item model
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
@@ -18,6 +19,78 @@ class HomeProvider with ChangeNotifier {
 
   bool get isLoadingMore => _isLoadingMore;
   bool get hasMoreRecommended => _hasMoreRecommended;
+
+  // State variables
+  List<TrendingMake> _trendingMakes = [];
+  List<SpecialOffer> _specialOffers = [];
+  List<RecommendedItem> _recommendedItems = [];
+  List<Categories> _categories = [];
+  bool _isLoading = false;
+  String _errorMessage = '';
+  bool _hasError = false;
+  
+  // For single recommended item by ID - CHANGED: Using Item instead of RecommendedItem
+  SingleItem? _selectedItem;
+  bool _isLoadingSingleItem = false;
+  String _singleItemErrorMessage = '';
+  bool _hasSingleItemError = false;
+
+  // Getters
+  List<TrendingMake> get trendingMakes => _trendingMakes;
+  List<SpecialOffer> get specialOffers => _specialOffers;
+  List<RecommendedItem> get recommendedItems => _recommendedItems;
+  List<Categories> get categories => _categories;
+  bool get isLoading => _isLoading;
+  String get errorMessage => _errorMessage;
+  bool get hasError => _hasError;
+  
+  // Single item getters - CHANGED: Using Item instead of RecommendedItem
+  SingleItem? get selectedItem => _selectedItem;
+  bool get isLoadingSingleItem => _isLoadingSingleItem;
+  String get singleItemErrorMessage => _singleItemErrorMessage;
+  bool get hasSingleItemError => _hasSingleItemError;
+
+  HomeProvider(this._homeService);
+
+  // Fetch recommended item by ID - CHANGED: Using Item instead of RecommendedItem
+  Future<void> fetchRecommendedById(String id) async {
+    _isLoadingSingleItem = true;
+    _hasSingleItemError = false;
+    _singleItemErrorMessage = '';
+    notifyListeners();
+
+    try {
+      final item = await _homeService.fetchRecommendedById(id);
+      _selectedItem = item;
+      logger.i('Successfully fetched item by id: $id');
+    } catch (e, stackTrace) {
+      _selectedItem = null;
+      _hasSingleItemError = true;
+      _singleItemErrorMessage = 'Failed to load item details. Please try again.';
+      logger.e(
+        'Error fetching item by id: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    } finally {
+      _isLoadingSingleItem = false;
+      notifyListeners();
+    }
+  }
+
+  // Clear single item state - CHANGED: Using _selectedItem instead of _selectedRecommendedItem
+  void clearSelectedItem() {
+    _selectedItem = null;
+    _hasSingleItemError = false;
+    _singleItemErrorMessage = '';
+    notifyListeners();
+  }
+
+  // Retry single item fetch
+  Future<void> retrySingleItemFetch(String id) async {
+    if (!_hasSingleItemError) return;
+    await fetchRecommendedById(id);
+  }
 
   // load more recommended items
   Future<void> loadMoreRecommended() async {
@@ -50,26 +123,6 @@ class HomeProvider with ChangeNotifier {
       notifyListeners();
     }
   } 
-
-  // State variables
-  List<TrendingMake> _trendingMakes = [];
-  List<SpecialOffer> _specialOffers = [];
-  List<RecommendedItem> _recommendedItems = [];
-  List<Categories> _categories = [];
-  bool _isLoading = false;
-  String _errorMessage = '';
-  bool _hasError = false;
-
-  // Getters
-  List<TrendingMake> get trendingMakes => _trendingMakes;
-  List<SpecialOffer> get specialOffers => _specialOffers;
-  List<RecommendedItem> get recommendedItems => _recommendedItems;
-  List<Categories> get categories => _categories;
-  bool get isLoading => _isLoading;
-  String get errorMessage => _errorMessage;
-  bool get hasError => _hasError;
-
-  HomeProvider(this._homeService);
 
   Future<void> fetchAllData() async {
     _recommendedPage = 1;

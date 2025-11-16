@@ -14,6 +14,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
@@ -279,7 +280,6 @@ class _HomePageState extends State<HomePage> {
     final screenSize = MediaQuery.of(context).size;
     final homeProvider = Provider.of<HomeProvider>(context);
     final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -1281,6 +1281,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final firstImage = widget.recommended.images?.isNotEmpty == true
         ? widget.recommended.images!.first
         : null;
@@ -1474,7 +1475,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
+                        '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -1781,6 +1782,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userProvider = Provider.of<UserProvider>(context);
     final firstImage = widget.recommended.images?.isNotEmpty == true
         ? widget.recommended.images!.first
         : null;
@@ -1965,7 +1967,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                       children: [
                         Expanded(
                           child: Text(
-                            'GH₵ ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
                             style: TextStyle(
                               fontSize: 16, // REDUCED from 18
                               fontWeight: FontWeight.bold,
