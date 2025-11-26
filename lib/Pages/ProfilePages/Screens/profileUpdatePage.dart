@@ -21,6 +21,28 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
   final ImagePicker _picker = ImagePicker();
   File? _pendingProfileImage;
   bool _hasNewImageSelected = false;
+  
+  // Local State for pending changes
+  String? _pendingName;
+  String? _pendingEmail;
+  String? _pendingPhone;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePendingData();
+  }
+
+  void _initializePendingData() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    
+    if (user != null) {
+      _pendingName = user.name;
+      _pendingEmail = user.email;
+      _pendingPhone = user.phoneNumber;
+    }
+  }
 
   Future<void> _updateProfileImage() async {
     showImageSourceDialog(
@@ -36,21 +58,8 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
 
   Future<void> _handleUpdateProfile() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user;
     
-    if (user == null) {
-      showCustomAppSnackBar(
-        context: context, 
-        message: 'No user logged in',
-      );
-      return;
-    }
-
-    final currentName = user.name;
-    final currentEmail = user.email;
-    final currentPhone = user.phoneNumber ?? '';
-
-    if(currentName.isEmpty){
+    if (_pendingName == null || _pendingName!.isEmpty) {
       showCustomAppSnackBar(
         context: context, 
         message: 'Please enter your name',
@@ -58,7 +67,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
       return;
     }
     
-    if(currentEmail.isEmpty){
+    if (_pendingEmail == null || _pendingEmail!.isEmpty) {
       showCustomAppSnackBar(
         context: context, 
         message: 'Please enter your email',
@@ -67,25 +76,27 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     }
 
     try {
-      // Store current profile image before update to prevent loss
-      final currentProfileImage = user.profileImage;
+      final currentUser = userProvider.user;
+      final currentProfileImage = currentUser?.profileImage;
+      
+      // Get the current countryId from the user to preserve it
+      final currentCountryId = currentUser?.countryId;
       
       await userProvider.updateUserProfile(
         profileImage: _hasNewImageSelected ? _pendingProfileImage : null,
-        userName: currentName,
-        phoneNumber: currentPhone,
-        email: currentEmail,
-        // countryId is no longer sent since country selection is disabled
+        userName: _pendingName!,
+        phoneNumber: _pendingPhone ?? '',
+        email: _pendingEmail!,
+        // Pass the current countryId to preserve it
+        countryId: currentCountryId,
       );
 
-      // Only clear the pending image if it was actually uploaded
       if (_hasNewImageSelected) {
         setState(() {
           _pendingProfileImage = null;
           _hasNewImageSelected = false;
         });
       } else {
-        // If no new image was selected, ensure the profile image is preserved
         if (userProvider.user?.profileImage == null && currentProfileImage != null) {
           final updatedUser = userProvider.user?.copyWith(profileImage: currentProfileImage);
           if (updatedUser != null) {
@@ -116,7 +127,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     ValueChanged<String> onSave,
   ) {
     final controller = TextEditingController(text: currentValue);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     
     Get.dialog(
@@ -140,9 +150,6 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
             filled: isDarkMode,
             fillColor: isDarkMode ? const Color(0xFF303030) : null,
           ),
-          onChanged: (_) {
-            userProvider.clearError();
-          },
         ),
         actions: [
           TextButton(
@@ -212,7 +219,12 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child){
         final user = userProvider.user;
-        final hasCountry = user?.countryId != null && user?.countryName != null && user?.countryName!.isNotEmpty == true;
+        
+        final displayName = _pendingName ?? user?.name ?? "Guest User";
+        final displayEmail = _pendingEmail ?? user?.email ?? "Not provided";
+        final displayPhone = _pendingPhone ?? user?.phoneNumber ?? "Not provided";
+        
+        final hasCountry = user?.countryId != null;
         final countryName = user?.countryName;
         final countryCode = user?.countryCode;
 
@@ -221,7 +233,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           appBar: _buildAppBar(isDarkMode),
           body: Stack(
             children: [
-              _buildProfileForm(userProvider, user, hasCountry, countryName, countryCode, isDarkMode),
+              _buildProfileForm(userProvider, displayName, displayEmail, displayPhone, hasCountry, countryName, countryCode, isDarkMode),
               if(userProvider.isLoading)
               Container(
                 color: ColorGlobalVariables.blackColor.withOpacity(0.3),
@@ -260,39 +272,42 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     );
   }
 
-  Widget _buildProfileForm(UserProvider userProvider, UserModel? user, bool hasCountry, String? countryName, String? countryCode, bool isDarkMode) {
+  Widget _buildProfileForm(UserProvider userProvider, String displayName, String displayEmail, String displayPhone, bool hasCountry, String? countryName, String? countryCode, bool isDarkMode) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Column(
         children: [
-          _buildProfileHeader(user, hasCountry, countryName, countryCode, isDarkMode),
+          _buildProfileHeader(userProvider.user, hasCountry, countryName, countryCode, isDarkMode),
           const SizedBox(height: 32),
           _buildEditableField(
             label: "Full Name",
-            value: user?.name ?? "Guest User",
-            onTap: () => _showEditDialog("Name", user?.name ?? "", (value) async {
-              final updatedUser = user?.copyWith(name: value);
-              if (updatedUser != null) userProvider.setUser(updatedUser);
+            value: displayName,
+            onTap: () => _showEditDialog("Name", displayName, (value) {
+              setState(() {
+                _pendingName = value;
+              });
             }),
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 20),
           _buildEditableField(
             label: "Phone Number",
-            value: user?.phoneNumber ?? "Not provided",
-            onTap: () => _showEditDialog("Phone Number", user?.phoneNumber ?? "", (value) async {
-              final updatedUser = user?.copyWith(phoneNumber: value);
-              if (updatedUser != null) userProvider.setUser(updatedUser);
+            value: displayPhone,
+            onTap: () => _showEditDialog("Phone Number", displayPhone, (value) {
+              setState(() {
+                _pendingPhone = value;
+              });
             }),
             isDarkMode: isDarkMode,
           ),
           const SizedBox(height: 20),
           _buildEditableField(
             label: "Email Address",
-            value: user?.email ?? "Not provided",
-            onTap: () => _showEditDialog("Email", user?.email ?? "", (value) async {
-              final updatedUser = user?.copyWith(email: value);
-              if (updatedUser != null) userProvider.setUser(updatedUser);
+            value: displayEmail,
+            onTap: () => _showEditDialog("Email", displayEmail, (value) {
+              setState(() {
+                _pendingEmail = value;
+              });
             }),
             isDarkMode: isDarkMode,
           ),
@@ -348,7 +363,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         ),
         const SizedBox(height: 16),
         Text(
-          user?.name ?? "Guest User",
+          _pendingName ?? user?.name ?? "Guest User",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -486,7 +501,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            "Current",
+                            "Selected",
                             style: TextStyle(
                               fontSize: 10,
                               color: ColorGlobalVariables.greenColor,
@@ -532,18 +547,18 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "No country information",
+                          "No country selected",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.4),
+                            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
                           ),
                         ),
                         Text(
-                          "Country data not available",
+                          "Country information not available",
                           style: TextStyle(
                             fontSize: 12,
-                            color: ColorGlobalVariables.redColor.withOpacity(0.7),
+                            color: ColorGlobalVariables.brownColor.withOpacity(0.7),
                           ),
                         ),
                       ],
@@ -552,9 +567,9 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
             ),
           ),
           Icon(
-            Icons.location_on_rounded,
+            Icons.lock_outline,
             size: 20,
-            color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.4),
           ),
         ],
       ),

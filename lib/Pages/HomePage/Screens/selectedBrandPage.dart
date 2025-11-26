@@ -156,8 +156,8 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           _selectedBrand['name'] ?? 'Brand',
           style: TextStyle(
             color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
@@ -525,16 +525,16 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _loadInitialItems,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorGlobalVariables.brownColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-              child: const Text('Try Again'),
-            ),
+            // const SizedBox(height: 32),
+            // ElevatedButton(
+            //   onPressed: _loadInitialItems,
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: ColorGlobalVariables.brownColor,
+            //     foregroundColor: Colors.white,
+            //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            //   ),
+            //   child: const Text('Try Again'),
+            // ),
           ],
         ),
       ),

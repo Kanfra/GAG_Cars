@@ -153,41 +153,258 @@ class MyApp extends StatelessWidget {
           // ✅ FIX 4: Remove routingCallback (causing conflicts)
           // routingCallback: null,
           
-          // ✅ FIX 5: Add proper unknown route with safety
+          // ✅ FIX 5: Enhanced unknown route with beautiful UI
           unknownRoute: GetPage(
             name: '/not-found',
-            page: () => Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                    SizedBox(height: 16),
-                    Text(
-                      'Page Not Found',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        // Use Navigator instead of Get for safety
-                        Navigator.of(Get.context!).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const SplashPage()),
-                          (route) => false,
-                        );
-                      },
-                      child: Text('Go to Home'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            page: () => const _NotFoundScreen(),
           ),
           
           // ✅ FIX 6: Disable route restoration completely
           navigatorKey: NavigatorKey.key, // Fresh navigation key
         );
       },
+    );
+  }
+}
+
+// Beautiful Not Found Screen for Deep Linking Fallback
+class _NotFoundScreen extends StatelessWidget {
+  const _NotFoundScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final brownColor = ColorGlobalVariables.brownColor;
+
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [
+                    Colors.grey[900]!,
+                    Colors.grey[850]!,
+                    Colors.grey[800]!,
+                  ]
+                : [
+                    brownColor.withOpacity(0.08),
+                    brownColor.withOpacity(0.04),
+                    Colors.white,
+                  ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Animated Icon with Brown Color
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: brownColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: brownColor.withOpacity(0.2),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.search_off_rounded,
+                  size: 70,
+                  color: brownColor,
+                ),
+              ),
+              
+              const SizedBox(height: 32),
+              
+              // Title with Brown Color
+              Text(
+                'Page Not Found',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: brownColor,
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Description
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Text(
+                  'The page you\'re looking for doesn\'t exist or the link might be broken. '
+                  'This could happen with deep links if the content is no longer available.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDark ? Colors.white70 : Colors.grey[700],
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+              
+              // Action Buttons with Brown Color
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    // Go Back Button
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else {
+                            _navigateToHome(context);
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(color: brownColor, width: 2),
+                        ),
+                        child: Text(
+                          'Go Back',
+                          style: TextStyle(
+                            color: brownColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    
+                    const SizedBox(width: 16),
+                    
+                    // Home Button with Brown Color
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => _navigateToHome(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: brownColor,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                          shadowColor: brownColor.withOpacity(0.4),
+                        ),
+                        child: const Text(
+                          'Go to Home',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 32),
+              
+              // Additional Help Section
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 24),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : brownColor.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: brownColor.withOpacity(0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.help_outline,
+                      color: brownColor,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Need Assistance?',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: brownColor,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Our support team is here to help you with any issues.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDark ? Colors.white70 : Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              
+              // Support Text with Brown Color
+              TextButton(
+                onPressed: () {
+                  // TODO: Implement support contact
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Support contact will be implemented soon',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: brownColor,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Contact Support Team',
+                  style: TextStyle(
+                    color: brownColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToHome(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const SplashPage()),
+      (route) => false,
     );
   }
 }

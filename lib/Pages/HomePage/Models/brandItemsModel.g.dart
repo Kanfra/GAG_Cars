@@ -126,7 +126,7 @@ _$BrandItemImpl _$$BrandItemImplFromJson(Map<String, dynamic> json) =>
       brandId: (json['brand_id'] as num).toInt(),
       categoryId: (json['category_id'] as num).toInt(),
       name: json['name'] as String,
-      year: json['year'] as String,
+      year: (json['year'] as num).toInt(),
       slug: json['slug'] as String,
       description: json['description'] as String,
       images:
@@ -135,7 +135,7 @@ _$BrandItemImpl _$$BrandItemImplFromJson(Map<String, dynamic> json) =>
       serialNumber: json['serial_number'] as String?,
       condition: json['condition'] as String?,
       steerPosition: json['steer_position'] as String?,
-      engineCapacity: json['engine_capacity'] as String?,
+      engineCapacity: (json['engine_capacity'] as num?)?.toInt(),
       transmission: json['transmission'] as String?,
       color: json['color'] as String?,
       buildType: json['build_type'] as String?,

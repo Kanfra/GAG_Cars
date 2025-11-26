@@ -1,13 +1,12 @@
 buildscript {
-    //ext.kotlin_version = '1.9.20'
-    ext.kotlin_version = '1.9.22'  // Updated Kotlin version (required for AGP 8.3.0+)
+    ext.kotlin_version = '1.8.22'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.6.0'  // Updated AGP version
+        classpath 'com.android.tools.build:gradle:8.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -20,22 +19,11 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
-
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
-
 subprojects {
     project.evaluationDependsOn(':app')
-
-    // ✅ Force all subprojects (like rive_common) to use minSdkVersion 21
-    if (project.hasProperty("android")) {
-        project.android {
-            defaultConfig {
-                minSdkVersion 21
-            }
-        }
-    }
 }
 
 tasks.register("clean", Delete) {

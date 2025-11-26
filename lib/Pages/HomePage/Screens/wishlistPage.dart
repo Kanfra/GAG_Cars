@@ -539,7 +539,7 @@ class _WishlistPageState extends State<WishlistPage> {
   }
 }
 
-// Grid View Item Widget
+// Grid View Item Widget - Updated with consistent brand image handling
 class _WishlistGridItem extends StatefulWidget {
   final dynamic item;
   final int index;
@@ -715,7 +715,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                 _buildImageSection(imageUrl, theme),
                 
                 // Content Section
-                _buildContentSection(brandImage, theme, context),
+                _buildContentSection(brandImage, theme),
               ],
             ),
             
@@ -769,18 +769,30 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
         );
       },
       errorWidget: (context, url, error) {
-        return Container(
-          color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.image_not_supported, color: theme.iconTheme.color, size: 32),
-              const SizedBox(height: 4),
-              Text('No Image', style: TextStyle(color: theme.textTheme.bodySmall?.color, fontSize: 10)),
-            ],
-          ),
-        );
+        return _buildImageErrorPlaceholder(theme);
       },
+    );
+  }
+
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
+    return Container(
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
+            SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10,
+                color: theme.textTheme.bodySmall?.color,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -819,7 +831,9 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     );
   }
 
-  Widget _buildContentSection(dynamic brandImage, ThemeData theme, BuildContext context) {
+  Widget _buildContentSection(String? brandImage, ThemeData theme) {
+    final userProvider = Provider.of<UserProvider>(context);
+    
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -827,131 +841,128 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildTitleSection(theme),
-            _buildPriceSection(context),
-            _buildDetailsSection(brandImage, theme),
+            // Title and Condition
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    _getItemName(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Text(
+                  _getCondition(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.textTheme.bodyMedium?.color,
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: 8),
+
+            // Price and Mileage
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: ColorGlobalVariables.redColor,
+                  ),
+                ),
+                if (_getMileage() != null)
+                  Row(
+                    children: [
+                      Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
+                      SizedBox(width: 4),
+                      Text(
+                        "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+
+            SizedBox(height: 12),
+
+            // Brand and Details - CONSISTENT with HomePage implementation
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Brand Image - Consistent with HomePage
+                if (brandImage != null && !brandImage.contains('assets/'))
+                  Container(
+                    width: 24,
+                    height: 24,
+                    child: CachedNetworkImage(
+                      imageUrl: getImageUrl(brandImage, null),
+                      fit: BoxFit.contain,
+                      errorWidget: (context, url, error) => Icon(
+                        Icons.business,
+                        size: 16,
+                        color: theme.iconTheme.color,
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(width: 24),
+                
+                // Transmission - Consistent with HomePage
+                if (_getTransmission() != null)
+                  Row(
+                    children: [
+                      Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
+                      SizedBox(width: 4),
+                      Text(
+                        _getTransmission()!,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                
+                // Location - Consistent with HomePage
+                if (_getLocation() != null)
+                  Flexible(
+                    child: Row(
+                      children: [
+                        Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            _getLocation()!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: theme.textTheme.bodyMedium?.color,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTitleSection(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          _getItemName(),
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: theme.textTheme.titleLarge?.color,
-            height: 1.2,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          _getCondition(),
-          style: TextStyle(
-            fontSize: 12,
-            color: theme.textTheme.bodyMedium?.color,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPriceSection(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: ColorGlobalVariables.redColor,
-          ),
-        ),
-        if (_getMileage() != null) ...[
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(Icons.speed, size: 12, color: Colors.grey[600]),
-              const SizedBox(width: 4),
-              Text(
-                "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildDetailsSection(dynamic brandImage, ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        if (brandImage != null) _buildBrandImage(brandImage, theme),
-        const Spacer(),
-        if (_getTransmission() != null) _buildTransmission(theme),
-        if (_getLocation() != null) _buildLocation(theme),
-      ],
-    );
-  }
-
-  Widget _buildBrandImage(String brandImage, ThemeData theme) {
-    return Container(
-      width: 20,
-      height: 20,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        color: theme.brightness == Brightness.dark ? Colors.grey[700] : Colors.grey[100],
-      ),
-      child: CachedNetworkImage(
-        imageUrl: getImageUrl(brandImage, null),
-        fit: BoxFit.contain,
-      ),
-    );
-  }
-
-  Widget _buildTransmission(ThemeData theme) {
-    return Row(
-      children: [
-        Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
-        const SizedBox(width: 2),
-        Text(
-          _getTransmission()!,
-          style: TextStyle(fontSize: 10, color: theme.textTheme.bodyMedium?.color),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLocation(ThemeData theme) {
-    return Flexible(
-      child: Row(
-        children: [
-          Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
-          const SizedBox(width: 2),
-          Flexible(
-            child: Text(
-              _getLocation()!,
-              style: TextStyle(fontSize: 10, color: theme.textTheme.bodyMedium?.color),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -1101,7 +1112,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
   }
 }
 
-// List View Item Widget
+// List View Item Widget - Updated with consistent brand image handling
 class _WishlistListItem extends StatefulWidget {
   final dynamic item;
   final int index;
@@ -1301,7 +1312,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
               ),
             ),
 
-            // Content Section
+            // Content Section - CONSISTENT with HomePage list view structure
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -1309,55 +1320,60 @@ class _WishlistListItemState extends State<_WishlistListItem>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Header with Title
+                    // Header with Title and Category
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           _getItemName(),
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: theme.textTheme.titleLarge?.color,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 2),
                         Text(
                           _getCategory(),
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 11,
                             color: theme.textTheme.bodyMedium?.color,
                           ),
                         ),
                       ],
                     ),
 
-                    // Price and Condition
+                    // Price and Condition - Consistent with HomePage
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: ColorGlobalVariables.redColor,
+                        Expanded(
+                          child: Text(
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorGlobalVariables.redColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        SizedBox(width: 8),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                           decoration: BoxDecoration(
                             color: theme.brightness == Brightness.dark 
                                 ? Colors.grey[700] 
                                 : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             _getCondition(),
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               color: theme.textTheme.bodyMedium?.color,
                               fontWeight: FontWeight.w500,
                             ),
@@ -1366,59 +1382,20 @@ class _WishlistListItemState extends State<_WishlistListItem>
                       ],
                     ),
 
-                    // Details Row
+                    // Details Row - Consistent with HomePage
                     Row(
                       children: [
                         if (_getMileage() != null)
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
-                                SizedBox(width: 4),
-                                Text(
-                                  "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: theme.textTheme.bodyMedium?.color,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        
-                        if (_getTransmission() != null)
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
-                                SizedBox(width: 4),
-                                Text(
-                                  _getTransmission()!,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: theme.textTheme.bodyMedium?.color,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-
-                    // Location and Brand
-                    Row(
-                      children: [
-                        if (_getLocation() != null)
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
-                                SizedBox(width: 4),
+                                Icon(Icons.speed, size: 12, color: theme.iconTheme.color),
+                                SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
-                                    _getLocation()!,
+                                    "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 10,
                                       color: theme.textTheme.bodyMedium?.color,
                                     ),
                                     maxLines: 1,
@@ -1429,16 +1406,67 @@ class _WishlistListItemState extends State<_WishlistListItem>
                             ),
                           ),
                         
-                        if (_getBrandImage() != null)
+                        if (_getTransmission() != null)
+                          SizedBox(width: 8),
+                        
+                        if (_getTransmission() != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
+                                SizedBox(width: 2),
+                                Expanded(
+                                  child: Text(
+                                    _getTransmission()!,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    // Location and Brand - Consistent with HomePage
+                    Row(
+                      children: [
+                        if (_getLocation() != null)
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
+                                SizedBox(width: 2),
+                                Expanded(
+                                  child: Text(
+                                    _getLocation()!,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        // Brand Image - Consistent with HomePage
+                        if (_getBrandImage() != null && !_getBrandImage()!.contains('assets/'))
                           Container(
-                            width: 24,
-                            height: 24,
+                            width: 20,
+                            height: 20,
                             child: CachedNetworkImage(
                               imageUrl: getImageUrl(_getBrandImage()!, null),
                               fit: BoxFit.contain,
                               errorWidget: (context, url, error) => Icon(
                                 Icons.business,
-                                size: 16,
+                                size: 14,
                                 color: theme.iconTheme.color,
                               ),
                             ),
@@ -1469,18 +1497,30 @@ class _WishlistListItemState extends State<_WishlistListItem>
         );
       },
       errorWidget: (context, url, error) {
-        return Container(
-          color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.image_not_supported, color: theme.iconTheme.color, size: 32),
-              const SizedBox(height: 4),
-              Text('No Image', style: TextStyle(color: theme.textTheme.bodySmall?.color, fontSize: 10)),
-            ],
-          ),
-        );
+        return _buildImageErrorPlaceholder(theme);
       },
+    );
+  }
+
+  Widget _buildImageErrorPlaceholder(ThemeData theme) {
+    return Container(
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color),
+            SizedBox(height: 2),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 9,
+                color: theme.textTheme.bodySmall?.color,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

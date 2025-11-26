@@ -7,14 +7,14 @@ part of 'itemModel.dart';
 // **************************************************************************
 
 _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-      id: json['id'] as String,
+      id: _parseDynamicToString(json['id']),
       name: json['name'] as String,
       email: json['email'] as String,
       phone: json['phone'] as String?,
       emailVerifiedAt: json['email_verified_at'] == null
           ? null
           : DateTime.parse(json['email_verified_at'] as String),
-      paidSeller: (json['paid_seller'] as num?)?.toInt(),
+      paidSeller: _parseDynamicToInt(json['paid_seller']),
       deletedAt: json['deleted_at'] == null
           ? null
           : DateTime.parse(json['deleted_at'] as String),
@@ -24,9 +24,9 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-      countryId: (json['country_id'] as num?)?.toInt(),
-      stateId: (json['state_id'] as num?)?.toInt(),
-      profilePhoto: json['profile_photo'] as String?,
+      countryId: _parseDynamicToInt(json['country_id']),
+      stateId: _parseDynamicToInt(json['state_id']),
+      profilePhoto: _parseDynamicToString(json['profile_photo']),
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
@@ -46,11 +46,11 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
     };
 
 _$BrandImpl _$$BrandImplFromJson(Map<String, dynamic> json) => _$BrandImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
+      id: _parseDynamicToInt(json['id']),
+      userId: _parseDynamicToString(json['user_id']),
       name: json['name'] as String,
       slug: json['slug'] as String,
-      image: json['image'] as String?,
+      image: _parseDynamicToString(json['image']),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -72,8 +72,8 @@ Map<String, dynamic> _$$BrandImplToJson(_$BrandImpl instance) =>
 
 _$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
     _$BrandModelImpl(
-      id: (json['id'] as num).toInt(),
-      brandId: (json['brand_id'] as num).toInt(),
+      id: _parseDynamicToInt(json['id']),
+      brandId: _parseDynamicToInt(json['brand_id']),
       name: json['name'] as String,
       slug: json['slug'] as String,
       createdAt: json['created_at'] == null
@@ -96,16 +96,16 @@ Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
 
 _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
-      parentId: (json['parent_id'] as num?)?.toInt(),
+      id: _parseDynamicToInt(json['id']),
+      userId: _parseDynamicToString(json['user_id']),
+      parentId: _parseDynamicToInt(json['parent_id']),
       name: json['name'] as String,
       slug: json['slug'] as String,
-      description: json['description'] as String?,
+      description: _parseDynamicToString(json['description']),
       features: (json['features'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      image: json['image'] as String?,
+      image: _parseDynamicToString(json['image']),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -130,34 +130,34 @@ Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
 
 _$SingleItemImpl _$$SingleItemImplFromJson(Map<String, dynamic> json) =>
     _$SingleItemImpl(
-      id: json['id'] as String,
-      userId: json['user_id'] as String?,
-      countryId: (json['country_id'] as num?)?.toInt(),
-      brandModelId: (json['brand_model_id'] as num?)?.toInt(),
-      brandId: (json['brand_id'] as num?)?.toInt(),
-      categoryId: (json['category_id'] as num?)?.toInt(),
-      name: json['name'] as String?,
-      year: json['year'] as String?,
-      slug: json['slug'] as String?,
-      description: json['description'] as String?,
+      id: _parseDynamicToString(json['id']),
+      userId: _parseDynamicToString(json['user_id']),
+      countryId: _parseDynamicToInt(json['country_id']),
+      brandModelId: _parseDynamicToInt(json['brand_model_id']),
+      brandId: _parseDynamicToInt(json['brand_id']),
+      categoryId: _parseDynamicToInt(json['category_id']),
+      name: _parseDynamicToString(json['name']),
+      year: _parseDynamicToString(json['year']),
+      slug: _parseDynamicToString(json['slug']),
+      description: _parseDynamicToString(json['description']),
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      location: json['location'] as String?,
-      serialNumber: json['serial_number'] as String?,
-      condition: json['condition'] as String?,
-      steerPosition: json['steer_position'] as String?,
-      engineCapacity: json['engine_capacity'] as String?,
-      transmission: json['transmission'] as String?,
-      color: json['color'] as String?,
-      buildType: json['build_type'] as String?,
-      numberOfPassengers: (json['number_of_passengers'] as num?)?.toInt(),
+      location: _parseDynamicToString(json['location']),
+      serialNumber: _parseDynamicToString(json['serial_number']),
+      condition: _parseDynamicToString(json['condition']),
+      steerPosition: _parseDynamicToString(json['steer_position']),
+      engineCapacity: _parseDynamicToString(json['engine_capacity']),
+      transmission: _parseDynamicToString(json['transmission']),
+      color: _parseDynamicToString(json['color']),
+      buildType: _parseDynamicToString(json['build_type']),
+      numberOfPassengers: _parseDynamicToInt(json['number_of_passengers']),
       features: (json['features'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      status: json['status'] as String?,
-      price: json['price'] as String?,
-      mileage: json['mileage'] as String?,
-      warranty: (json['warranty'] as num?)?.toInt(),
+      status: _parseDynamicToString(json['status']),
+      price: _parseDynamicToString(json['price']),
+      mileage: _parseDynamicToString(json['mileage']),
+      warranty: _parseDynamicToInt(json['warranty']),
       warrantyExpiration: json['warranty_expiration'] == null
           ? null
           : DateTime.parse(json['warranty_expiration'] as String),
@@ -170,8 +170,8 @@ _$SingleItemImpl _$$SingleItemImplFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-      height: json['Height'] as String?,
-      vin: json['VIN'] as String?,
+      height: _parseDynamicToString(json['Height']),
+      vin: _parseDynamicToString(json['VIN']),
       brand: json['brand'] == null
           ? null
           : Brand.fromJson(json['brand'] as Map<String, dynamic>),
@@ -184,7 +184,7 @@ _$SingleItemImpl _$$SingleItemImplFromJson(Map<String, dynamic> json) =>
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      isPromoted: json['is_promoted'] as bool?,
+      isPromoted: _parseDynamicToBool(json['is_promoted']),
     );
 
 Map<String, dynamic> _$$SingleItemImplToJson(_$SingleItemImpl instance) =>
@@ -265,16 +265,16 @@ Map<String, dynamic> _$$SingleItemLinksImplToJson(
 
 _$SingleItemMetaImpl _$$SingleItemMetaImplFromJson(Map<String, dynamic> json) =>
     _$SingleItemMetaImpl(
-      currentPage: (json['current_page'] as num).toInt(),
-      from: (json['from'] as num?)?.toInt(),
-      lastPage: (json['last_page'] as num).toInt(),
+      currentPage: _parseDynamicToInt(json['current_page']),
+      from: _parseDynamicToInt(json['from']),
+      lastPage: _parseDynamicToInt(json['last_page']),
       links: (json['links'] as List<dynamic>)
           .map((e) => SingleItemMetaLink.fromJson(e as Map<String, dynamic>))
           .toList(),
       path: json['path'] as String,
-      perPage: (json['per_page'] as num).toInt(),
-      to: (json['to'] as num?)?.toInt(),
-      total: (json['total'] as num).toInt(),
+      perPage: _parseDynamicToInt(json['per_page']),
+      to: _parseDynamicToInt(json['to']),
+      total: _parseDynamicToInt(json['total']),
     );
 
 Map<String, dynamic> _$$SingleItemMetaImplToJson(
@@ -293,10 +293,10 @@ Map<String, dynamic> _$$SingleItemMetaImplToJson(
 _$SingleItemMetaLinkImpl _$$SingleItemMetaLinkImplFromJson(
         Map<String, dynamic> json) =>
     _$SingleItemMetaLinkImpl(
-      url: json['url'] as String?,
-      label: json['label'] as String,
-      page: (json['page'] as num?)?.toInt(),
-      active: json['active'] as bool,
+      url: _parseDynamicToString(json['url']),
+      label: _parseDynamicToString(json['label']),
+      page: _parseDynamicToInt(json['page']),
+      active: _parseDynamicToBool(json['active']),
     );
 
 Map<String, dynamic> _$$SingleItemMetaLinkImplToJson(

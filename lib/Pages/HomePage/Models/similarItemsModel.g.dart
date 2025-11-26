@@ -43,23 +43,23 @@ _$SimilarItemImpl _$$SimilarItemImplFromJson(Map<String, dynamic> json) =>
       images: _parseStringList(json['images']),
       location: json['location'] as String?,
       serialNumber: json['serial_number'] as String?,
-      condition: json['condition'] as String?,
+      condition: json['Condition'] as String?,
       steerPosition: json['steer_position'] as String?,
-      engineCapacity: json['engine_capacity'] as String?,
+      engineCapacity: _parseNullableString(json['engine_capacity']),
       transmission: json['transmission'] as String?,
       color: json['color'] as String?,
       buildType: json['build_type'] as String?,
       numberOfPassengers: _parseNullableInt(json['number_of_passengers']),
       features: _parseStringList(json['features']),
       status: json['status'] as String?,
-      price: json['price'] as String?,
-      mileage: json['mileage'] as String?,
+      price: _parseNullableString(json['price']),
+      mileage: _parseNullableString(json['mileage']),
       warranty: _parseNullableInt(json['warranty']),
       warrantyExpiration: json['warranty_expiration'] as String?,
       deletedAt: json['deleted_at'] as String?,
       createdAt: json['created_at'] as String?,
       updatedAt: json['updated_at'] as String?,
-      height: json['Height'] as String?,
+      height: _parseNullableString(json['Height']),
       vin: json['VIN'] as String?,
       brand: json['brand'] == null
           ? null
@@ -90,7 +90,7 @@ Map<String, dynamic> _$$SimilarItemImplToJson(_$SimilarItemImpl instance) =>
       'images': instance.images,
       'location': instance.location,
       'serial_number': instance.serialNumber,
-      'condition': instance.condition,
+      'Condition': instance.condition,
       'steer_position': instance.steerPosition,
       'engine_capacity': instance.engineCapacity,
       'transmission': instance.transmission,
@@ -115,7 +115,7 @@ Map<String, dynamic> _$$SimilarItemImplToJson(_$SimilarItemImpl instance) =>
     };
 
 _$BrandImpl _$$BrandImplFromJson(Map<String, dynamic> json) => _$BrandImpl(
-      id: (json['id'] as num).toInt(),
+      id: _parseInt(json['id']),
       userId: _parseNullableInt(json['user_id']),
       name: json['name'] as String?,
       slug: json['slug'] as String?,
@@ -137,7 +137,7 @@ Map<String, dynamic> _$$BrandImplToJson(_$BrandImpl instance) =>
 
 _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
-      id: (json['id'] as num).toInt(),
+      id: _parseInt(json['id']),
       userId: _parseNullableInt(json['user_id']),
       parentId: _parseNullableInt(json['parent_id']),
       name: json['name'] as String?,
@@ -165,7 +165,7 @@ Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
 
 _$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
     _$BrandModelImpl(
-      id: (json['id'] as num).toInt(),
+      id: _parseInt(json['id']),
       brandId: _parseNullableInt(json['brand_id']),
       name: json['name'] as String?,
       slug: json['slug'] as String?,

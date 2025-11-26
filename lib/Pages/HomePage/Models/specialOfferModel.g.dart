@@ -32,7 +32,7 @@ Map<String, dynamic> _$$SpecialOfferResponseImplToJson(
 _$SpecialOfferImpl _$$SpecialOfferImplFromJson(Map<String, dynamic> json) =>
     _$SpecialOfferImpl(
       id: _parseInt(json['id']),
-      userId: json['user_id'] as String?,
+      userId: _parseInt(json['user_id']),
       itemId: _parseString(json['item_id']),
       startAt: _parseString(json['start_at']),
       endAt: _parseString(json['end_at']),
@@ -65,39 +65,39 @@ Map<String, dynamic> _$$SpecialOfferImplToJson(_$SpecialOfferImpl instance) =>
 
 _$ItemImpl _$$ItemImplFromJson(Map<String, dynamic> json) => _$ItemImpl(
       id: _parseString(json['id']),
-      userId: json['user_id'] as String?,
+      userId: _parseInt(json['user_id']),
       countryId: _parseInt(json['country_id']),
       brandModelId: _parseInt(json['brand_model_id']),
       brandId: _parseInt(json['brand_id']),
       categoryId: _parseInt(json['category_id']),
       name: _parseString(json['name']),
-      year: json['year'] as String?,
-      slug: json['slug'] as String?,
-      description: json['description'] as String?,
+      year: _parseString(json['year']),
+      slug: _parseString(json['slug']),
+      description: _parseString(json['description']),
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      location: json['location'] as String?,
-      serialNumber: json['serial_number'] as String?,
-      condition: json['condition'] as String?,
-      steerPosition: json['steer_position'] as String?,
-      engineCapacity: json['engine_capacity'] as String?,
-      transmission: json['transmission'] as String?,
-      color: json['color'] as String?,
-      buildType: json['build_type'] as String?,
+      location: _parseString(json['location']),
+      serialNumber: _parseString(json['serial_number']),
+      condition: _parseString(json['condition']),
+      steerPosition: _parseString(json['steer_position']),
+      engineCapacity: _parseString(json['engine_capacity']),
+      transmission: _parseString(json['transmission']),
+      color: _parseString(json['color']),
+      buildType: _parseString(json['build_type']),
       numberOfPassengers: _parseInt(json['number_of_passengers']),
       features: (json['features'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      status: json['status'] as String?,
-      price: json['price'] as String?,
-      mileage: json['mileage'] as String?,
+      status: _parseString(json['status']),
+      price: _parseString(json['price']),
+      mileage: _parseString(json['mileage']),
       warranty: _parseInt(json['warranty']),
-      warrantyExpiration: json['warranty_expiration'] as String?,
-      deletedAt: json['deleted_at'] as String?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
-      Height: json['Height'] as String?,
-      VIN: json['VIN'] as String?,
+      warrantyExpiration: _parseString(json['warranty_expiration']),
+      deletedAt: _parseString(json['deleted_at']),
+      createdAt: _parseString(json['created_at']),
+      updatedAt: _parseString(json['updated_at']),
+      Height: _parseString(json['Height']),
+      VIN: _parseString(json['VIN']),
       brand: json['brand'] == null
           ? null
           : Brand.fromJson(json['brand'] as Map<String, dynamic>),
@@ -155,20 +155,20 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       id: _parseString(json['id']),
       name: _parseString(json['name']),
       email: _parseString(json['email']),
-      phone: json['phone'] as String?,
-      emailVerifiedAt: json['email_verified_at'] as String?,
+      phone: _parseString(json['phone']),
+      emailVerifiedAt: _parseString(json['email_verified_at']),
       paidSeller: _parseInt(json['paid_seller']),
-      deletedAt: json['deleted_at'] as String?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      deletedAt: _parseString(json['deleted_at']),
+      createdAt: _parseString(json['created_at']),
+      updatedAt: _parseString(json['updated_at']),
       countryId: _parseInt(json['country_id']),
       stateId: _parseInt(json['state_id']),
-      profilePhoto: json['profile_photo'] as String?,
+      profilePhoto: _parseString(json['profile_photo']),
       uploadsLeft: _parseInt(json['uploads_left']),
       activeStatus: _parseInt(json['active_status']),
-      avatar: json['avatar'] as String?,
+      avatar: _parseString(json['avatar']),
       darkMode: _parseInt(json['dark_mode']),
-      messengerColor: json['messenger_color'] as String?,
+      messengerColor: _parseString(json['messenger_color']),
     );
 
 Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
@@ -194,12 +194,12 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
 
 _$BrandImpl _$$BrandImplFromJson(Map<String, dynamic> json) => _$BrandImpl(
       id: _parseInt(json['id']),
-      userId: json['user_id'] as String?,
+      userId: _parseInt(json['user_id']),
       name: _parseString(json['name']),
-      slug: json['slug'] as String?,
-      image: json['image'] as String?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      slug: _parseString(json['slug']),
+      image: _parseString(json['image']),
+      createdAt: _parseString(json['created_at']),
+      updatedAt: _parseString(json['updated_at']),
     );
 
 Map<String, dynamic> _$$BrandImplToJson(_$BrandImpl instance) =>
@@ -216,17 +216,17 @@ Map<String, dynamic> _$$BrandImplToJson(_$BrandImpl instance) =>
 _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
       id: _parseInt(json['id']),
-      userId: json['user_id'] as String?,
-      parentId: _parseString(json['parent_id']),
+      userId: _parseInt(json['user_id']),
+      parentId: _parseInt(json['parent_id']),
       name: _parseString(json['name']),
-      slug: json['slug'] as String?,
-      description: json['description'] as String?,
+      slug: _parseString(json['slug']),
+      description: _parseString(json['description']),
       features: (json['features'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      image: json['image'] as String?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      image: _parseString(json['image']),
+      createdAt: _parseString(json['created_at']),
+      updatedAt: _parseString(json['updated_at']),
     );
 
 Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
@@ -248,9 +248,9 @@ _$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
       id: _parseInt(json['id']),
       brandId: _parseInt(json['brand_id']),
       name: _parseString(json['name']),
-      slug: json['slug'] as String?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      slug: _parseString(json['slug']),
+      createdAt: _parseString(json['created_at']),
+      updatedAt: _parseString(json['updated_at']),
     );
 
 Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>

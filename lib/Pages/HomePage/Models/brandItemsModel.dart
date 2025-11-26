@@ -76,7 +76,7 @@ class User with _$User {
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
 
-// Your existing BrandItem model - ONLY ADD THE 4 MISSING FIELDS
+// Your existing BrandItem model - FIXED engine_capacity field
 @freezed
 class BrandItem with _$BrandItem {
   const factory BrandItem({
@@ -87,7 +87,7 @@ class BrandItem with _$BrandItem {
     @JsonKey(name: 'brand_id') required int brandId,
     @JsonKey(name: 'category_id') required int categoryId,
     required String name,
-    required String year,
+    required int year,
     required String slug,
     required String description,
     required List<String> images,
@@ -95,7 +95,7 @@ class BrandItem with _$BrandItem {
     @JsonKey(name: 'serial_number') String? serialNumber,
     String? condition,
     @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity') String? engineCapacity,
+    @JsonKey(name: 'engine_capacity') int? engineCapacity, // CHANGED FROM String? to int?
     String? transmission,
     String? color,
     @JsonKey(name: 'build_type') String? buildType,
@@ -122,8 +122,7 @@ class BrandItem with _$BrandItem {
   factory BrandItem.fromJson(Map<String, dynamic> json) => _$BrandItemFromJson(json);
 }
 
-// KEEP ALL YOUR EXISTING EXTENSIONS AND CONVERTER EXACTLY AS THEY ARE
-// Extension for image handling and utility methods
+// UPDATED EXTENSIONS TO HANDLE int YEAR AND int ENGINE_CAPACITY
 extension BrandItemExtensions on BrandItem {
   List<String> get processedImages {
     return images.map((image) {
@@ -170,9 +169,14 @@ extension BrandItemExtensions on BrandItem {
     return condition?.toUpperCase() ?? 'N/A';
   }
   
-  // Helper to get year with fallback
+  // Helper to get year with fallback - UPDATED FOR int
   String get displayYear {
-    return year.isNotEmpty ? year : 'N/A';
+    return year != 0 ? year.toString() : 'N/A';
+  }
+  
+  // Helper to get engine capacity with fallback - UPDATED FOR int
+  String get displayEngineCapacity {
+    return engineCapacity != null ? '${engineCapacity}L' : 'N/A';
   }
   
   // Helper to get location with fallback
@@ -181,11 +185,21 @@ extension BrandItemExtensions on BrandItem {
   }
 }
 
-// Custom JSON converter for handling type conversions
+// UPDATED CUSTOM JSON CONVERTER FOR YEAR AND ENGINE_CAPACITY FIELDS
 class BrandItemConverter {
   static BrandItem fromJson(Map<String, dynamic> json) {
-    // Handle potential string to int conversion for IDs
+    // Handle potential string to int conversion for IDs and year
     final processedJson = Map<String, dynamic>.from(json);
+    
+    // Ensure year is int - THIS IS THE MAIN FIX
+    if (processedJson['year'] is String) {
+      processedJson['year'] = int.tryParse(processedJson['year']) ?? 0;
+    }
+    
+    // Ensure engine_capacity is int - ADDED THIS FIX
+    if (processedJson['engine_capacity'] is String) {
+      processedJson['engine_capacity'] = int.tryParse(processedJson['engine_capacity']);
+    }
     
     // Ensure brand_model_id is int
     if (processedJson['brand_model_id'] is String) {

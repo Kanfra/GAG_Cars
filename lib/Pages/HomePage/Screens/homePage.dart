@@ -120,146 +120,146 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showMenu(BuildContext context) {
-  final theme = Theme.of(context);
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.transparent,
-    builder: (context) {
-      return Container(
-        margin: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 20,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.dividerColor,
-                    width: 1,
-                  ),
-                ),
+    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          margin: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 20,
+                offset: Offset(0, 10),
               ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
-                    child: Icon(
-                      Icons.person,
-                      color: ColorGlobalVariables.brownColor,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Menu',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: theme.textTheme.titleLarge?.color,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'App settings and preferences',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: theme.textTheme.bodySmall?.color,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            
-            // Settings Option
-            ListTile(
-              leading: Container(
-                width: 40,
-                height: 40,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Container(
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.settings,
-                  color: ColorGlobalVariables.brownColor,
-                  size: 20,
-                ),
-              ),
-              title: Text(
-                'Profile',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: theme.textTheme.titleLarge?.color,
-                ),
-              ),
-              subtitle: Text(
-                'Have access to your profile details',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: theme.textTheme.bodySmall?.color,
-                ),
-              ),
-              trailing: Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: theme.iconTheme.color,
-              ),
-              onTap: () {
-                Navigator.pop(context); // Close the menu
-                Get.toNamed(RouteClass.getProfileUpdatePage()); // Navigate to SettingsPage
-              },
-            ),
-            
-            // Close Button
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.brightness == Brightness.dark 
-                        ? Colors.grey[800] 
-                        : Colors.grey[100],
-                    foregroundColor: theme.brightness == Brightness.dark 
-                        ? Colors.grey[300] 
-                        : Colors.grey[700],
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: theme.dividerColor,
+                      width: 1,
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: Text('Close'),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      child: Icon(
+                        Icons.person,
+                        color: ColorGlobalVariables.brownColor,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Menu',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: theme.textTheme.titleLarge?.color,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'App settings and preferences',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.textTheme.bodySmall?.color,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+              
+              // Settings Option
+              ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.settings,
+                    color: ColorGlobalVariables.brownColor,
+                    size: 20,
+                  ),
+                ),
+                title: Text(
+                  'Profile',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: theme.textTheme.titleLarge?.color,
+                  ),
+                ),
+                subtitle: Text(
+                  'Have access to your profile details',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.textTheme.bodySmall?.color,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: theme.iconTheme.color,
+                ),
+                onTap: () {
+                  Navigator.pop(context); // Close the menu
+                  Get.toNamed(RouteClass.getProfileUpdatePage()); // Navigate to SettingsPage
+                },
+              ),
+              
+              // Close Button
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.brightness == Brightness.dark 
+                          ? Colors.grey[800] 
+                          : Colors.grey[100],
+                      foregroundColor: theme.brightness == Brightness.dark 
+                          ? Colors.grey[300] 
+                          : Colors.grey[700],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text('Close'),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   void _toggleRecommendedView(String viewType) {
     setState(() {
@@ -438,63 +438,68 @@ class _HomePageState extends State<HomePage> {
         ),
 
         // Recommended Header
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Recommended for You',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: theme.textTheme.titleLarge?.color,
+        if (homeProvider.recommendedItems.isNotEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Recommended for You',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: theme.textTheme.titleLarge?.color,
+                    ),
                   ),
-                ),
-                Row(
-                  children: [
-                    // List View Button
-                    CustomRoundIconButton(
-                      iconData: Icons.list,
-                      isBorderSlightlyCurved: true,
-                      onIconButtonClickFunction: () => _toggleRecommendedView('list'),
-                      buttonSize: 36,
-                      iconSize: 16,
-                      backgroundColor: _recommendedViewType == 'list' 
-                          ? ColorGlobalVariables.brownColor 
-                          : theme.cardColor,
-                      iconDataColor: _recommendedViewType == 'list' 
-                          ? Colors.white 
-                          : theme.iconTheme.color,
-                    ),
-                    SizedBox(width: 8),
-                    // Grid View Button
-                    CustomRoundIconButton(
-                      iconData: Icons.grid_view,
-                      isBorderSlightlyCurved: true,
-                      onIconButtonClickFunction: () => _toggleRecommendedView('grid'),
-                      buttonSize: 36,
-                      iconSize: 16,
-                      backgroundColor: _recommendedViewType == 'grid' 
-                          ? ColorGlobalVariables.brownColor 
-                          : theme.cardColor,
-                      iconDataColor: _recommendedViewType == 'grid' 
-                          ? Colors.white 
-                          : theme.iconTheme.color,
-                    ),
-                  ],
-                ),
-              ],
+                  Row(
+                    children: [
+                      // List View Button
+                      CustomRoundIconButton(
+                        iconData: Icons.list,
+                        isBorderSlightlyCurved: true,
+                        onIconButtonClickFunction: () => _toggleRecommendedView('list'),
+                        buttonSize: 36,
+                        iconSize: 16,
+                        backgroundColor: _recommendedViewType == 'list' 
+                            ? ColorGlobalVariables.brownColor 
+                            : theme.cardColor,
+                        iconDataColor: _recommendedViewType == 'list' 
+                            ? Colors.white 
+                            : theme.iconTheme.color,
+                      ),
+                      SizedBox(width: 8),
+                      // Grid View Button
+                      CustomRoundIconButton(
+                        iconData: Icons.grid_view,
+                        isBorderSlightlyCurved: true,
+                        onIconButtonClickFunction: () => _toggleRecommendedView('grid'),
+                        buttonSize: 36,
+                        iconSize: 16,
+                        backgroundColor: _recommendedViewType == 'grid' 
+                            ? ColorGlobalVariables.brownColor 
+                            : theme.cardColor,
+                        iconDataColor: _recommendedViewType == 'grid' 
+                            ? Colors.white 
+                            : theme.iconTheme.color,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
 
         // Recommended Items based on selected view
-        if (_recommendedViewType == 'grid')
-          _buildRecommendedGrid(homeProvider, theme)
+        if (homeProvider.recommendedItems.isNotEmpty)
+          _recommendedViewType == 'grid'
+            ? _buildRecommendedGrid(homeProvider, theme)
+            : _buildRecommendedList(homeProvider, theme)
         else
-          _buildRecommendedList(homeProvider, theme),
+          SliverToBoxAdapter(
+            child: _buildEmptyRecommendedSection(theme),
+          ),
 
         // Loading More Indicator
         SliverToBoxAdapter(
@@ -667,6 +672,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTrendingMakes(HomeProvider homeProvider, ThemeData theme) {
+    final hasTrendingMakes = homeProvider.trendingMakes.isNotEmpty;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -683,210 +690,527 @@ class _HomePageState extends State<HomePage> {
                   color: theme.textTheme.titleLarge?.color,
                 ),
               ),
-              Links(
-                linkTextType: 'View All',
-                linkTextColor: ColorGlobalVariables.brownColor,
-                isTextSmall: true,
-                textDecoration: TextDecoration.none,
-                linkFontWeight: FontWeight.w600,
-                isIconWidgetRequiredAtEnd: false,
-                isIconWidgetRequiredAtFront: false,
-                onClickFunction: () {
-                   final make = homeProvider.trendingMakes;
-              final brand = make;
-                  Get.toNamed(
-                    RouteClass.getAllMakesPage(),
-                    arguments: {
-                       'selectedBrand': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
-                      'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
-                      'type': 'brands',
-                    },
-                  );
-                },
-              ),
+              if (hasTrendingMakes)
+                Links(
+                  linkTextType: 'View All',
+                  linkTextColor: ColorGlobalVariables.brownColor,
+                  isTextSmall: true,
+                  textDecoration: TextDecoration.none,
+                  linkFontWeight: FontWeight.w600,
+                  isIconWidgetRequiredAtEnd: false,
+                  isIconWidgetRequiredAtFront: false,
+                  onClickFunction: () {
+                    Get.toNamed(
+                      RouteClass.getAllMakesPage(),
+                      arguments: {
+                        'selectedBrand': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
+                        'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
+                        'type': 'brands',
+                      },
+                    );
+                  },
+                ),
             ],
           ),
         ),
-        SizedBox(
-          height: 80,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            itemCount: homeProvider.trendingMakes.length > 6 ? 6 : homeProvider.trendingMakes.length,
-            itemBuilder: (context, index) {
-              final make = homeProvider.trendingMakes[index];
-              final logger = Logger();
-              logger.w("make: $make");
-              final brand = make;
-              return GestureDetector(
-                onTap: (){
-                  final brandItems = homeProvider.recommendedItems.where((item) {
-                  final itemBrandId = item.brand?.id ?? item.brandId;
-                  return itemBrandId == brand.id;
-                }).toList();
-                  Get.toNamed(
-                    RouteClass.getSelectedBrandPage(),
-                    arguments: {
-                      'selectedBrand': brand.toJson(),
-                      'type': 'selectedBrand'
-                    }
-                  );
-                },
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 6),
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
+        
+        if (hasTrendingMakes)
+          SizedBox(
+            height: 80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              itemCount: homeProvider.trendingMakes.length > 6 ? 6 : homeProvider.trendingMakes.length,
+              itemBuilder: (context, index) {
+                final make = homeProvider.trendingMakes[index];
+                return GestureDetector(
+                  onTap: (){
+                    final brandItems = homeProvider.recommendedItems.where((item) {
+                      final itemBrandId = item.brand?.id ?? item.brandId;
+                      return itemBrandId == make.id;
+                    }).toList();
+                    Get.toNamed(
+                      RouteClass.getSelectedBrandPage(),
+                      arguments: {
+                        'selectedBrand': make.toJson(),
+                        'type': 'selectedBrand'
+                      }
+                    );
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 6),
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: CustomImage(
+                      imagePath: getImageUrl(make.image, null),
+                      isAssetImage: false,
+                      isImageBorderRadiusRequired: false,
+                      imageWidth: 56,
+                      imageHeight: 56,
+                    ),
                   ),
-                  child: CustomImage(
-                    imagePath: getImageUrl(make.image, null),
-                    isAssetImage: false,
-                    isImageBorderRadiusRequired: false,
-                    imageWidth: 56,
-                    imageHeight: 56,
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
+          )
+        else
+          _buildEmptySection(
+            icon: Icons.business_center_outlined,
+            title: 'No Brands Available',
+            subtitle: 'Popular car brands will appear here',
+            theme: theme,
           ),
-        ),
+        
         SizedBox(height: 24),
       ],
     );
   }
 
-Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-        child: Text(
-          'Browse Categories',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: theme.textTheme.titleLarge?.color,
+  Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
+    final hasCategories = homeProvider.categories.isNotEmpty;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Text(
+            'Browse Categories',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.titleLarge?.color,
+            ),
           ),
         ),
-      ),
-      SizedBox(
-        height: 100,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: 12),
-          itemCount: homeProvider.categories.length > 6 ? 6 : homeProvider.categories.length,
-          itemBuilder: (context, index) {
-            final category = homeProvider.categories[index];
-            return GestureDetector(
-              onTap: () {
-                _navigateToCategoryItems(category, homeProvider);
-              },
-              child: Container(
-                width: 90,
-                margin: EdgeInsets.symmetric(horizontal: 6),
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Category Image
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: theme.brightness == Brightness.dark 
-                            ? Colors.grey[700] 
-                            : Colors.grey[100],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: _buildCategoryImage(category, theme),
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    // Category Name
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Text(
-                        category.name,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: theme.textTheme.titleLarge?.color,
+        
+        if (hasCategories)
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              itemCount: homeProvider.categories.length > 6 ? 6 : homeProvider.categories.length,
+              itemBuilder: (context, index) {
+                final category = homeProvider.categories[index];
+                return GestureDetector(
+                  onTap: () {
+                    _navigateToCategoryItems(category, homeProvider);
+                  },
+                  child: Container(
+                    width: 90,
+                    margin: EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
                         ),
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-      SizedBox(height: 24),
-    ],
-  );
-}
-
-void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
-  final logger = Logger();
-  
-  // Filter recommended items that belong to this category
-  final categoryItems = homeProvider.recommendedItems.where((item) {
-    final itemCategoryId = item.category?.id ?? item.categoryId;
-    return itemCategoryId == category.id;
-  }).toList();
-
-  logger.w('📊 Found ${categoryItems.length} items for category: ${category.name}');
-  
-  if (categoryItems.isNotEmpty) {
-    // Get the first item ID to use as reference
-    final firstItemId = categoryItems.first.id ?? '';
-    
-    Get.toNamed(
-      RouteClass.getSelectedCategoryItemPage(),
-      arguments: {
-        'selectedCategory': category,
-        'categoryItems': categoryItems,
-        'itemId': firstItemId,
-      }
-    );
-  } else {
-    logger.w('⚠️ No items found for category: ${category.name}');
-    
-    Get.toNamed(
-      RouteClass.getSelectedCategoryItemPage(),
-      arguments: {
-        'selectedCategory': category,
-        'categoryItems': [],
-        'itemId': category.id.toString(),
-      }
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Category Image
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: theme.brightness == Brightness.dark 
+                                ? Colors.grey[700] 
+                                : Colors.grey[100],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25),
+                            child: _buildCategoryImage(category, theme),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // Category Name
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(
+                            category.name,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: theme.textTheme.titleLarge?.color,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        else
+          _buildEmptySection(
+            icon: Icons.category_outlined,
+            title: 'No Categories Yet',
+            subtitle: 'Vehicle categories will be shown here',
+            theme: theme,
+          ),
+        
+        SizedBox(height: 24),
+      ],
     );
   }
-}
+
+  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize, ThemeData theme) {
+    final hasSpecialOffers = homeProvider.specialOffers.isNotEmpty;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Text(
+            'Special Offers',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: theme.textTheme.titleLarge?.color,
+            ),
+          ),
+        ),
+        
+        if (hasSpecialOffers)
+          SizedBox(
+            height: 180,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              itemCount: homeProvider.specialOffers.length,
+              itemBuilder: (context, index) {
+                final offer = homeProvider.specialOffers[index];
+                final item = offer.item;
+                final brand = item?.brand;
+                final firstImage = item!.images?.isNotEmpty == true
+                    ? item.images?.first
+                    : null;
+                final brandImage = brand?.image;
+                final discount = offer.discount;
+
+                return GestureDetector(
+                  onTap: () {
+                    Get.toNamed( 
+                      RouteClass.getSpecialOfferDetailPage(),
+                      arguments: {
+                        "specialOffer": offer,
+                        "type": "specialOffer",
+                      },
+                    );
+                  },
+                  child: Container(
+                    width: screenSize.width * 0.75,
+                    margin: EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Stack(
+                        children: [
+                          firstImage != null && !firstImage.contains('assets/')
+                              ? CachedNetworkImage(
+                                  imageUrl: getImageUrl(firstImage, null),
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) => _buildImageErrorPlaceholder(theme),
+                                )
+                              : _buildImageErrorPlaceholder(theme),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.8),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 12,
+                            top: 12,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: ColorGlobalVariables.redColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${discount.toString()}% OFF',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 12,
+                            bottom: 12,
+                            right: 12,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (brandImage != null && !brandImage.contains('assets/'))
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    child: CachedNetworkImage(
+                                      imageUrl: getImageUrl(brandImage, null),
+                                      fit: BoxFit.contain,
+                                      errorWidget: (context, url, error) => Icon(
+                                        Icons.business,
+                                        size: 24,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                SizedBox(height: 8),
+                                Text(
+                                  item.name ?? 'Special Offer',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Limited Time Offer',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        else
+          _buildEmptySection(
+            icon: Icons.local_offer_outlined,
+            title: 'No Special Offers',
+            subtitle: 'Check back later for exciting deals',
+            theme: theme,
+            isHorizontal: true,
+          ),
+        
+        SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildEmptyRecommendedSection(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+      child: Column(
+        children: [
+          Icon(
+            Icons.car_rental_outlined,
+            size: 64,
+            color: theme.iconTheme.color?.withOpacity(0.5),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No Recommended Vehicles',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: theme.textTheme.titleLarge?.color,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'We\'ll show personalized recommendations here based on your preferences',
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _loadData,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: ColorGlobalVariables.brownColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(
+              'Refresh',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptySection({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required ThemeData theme,
+    bool isHorizontal = false,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.dividerColor,
+          width: 1,
+        ),
+      ),
+      child: isHorizontal
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 32,
+                  color: theme.iconTheme.color?.withOpacity(0.5),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.textTheme.titleLarge?.color,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 48,
+                  color: theme.iconTheme.color?.withOpacity(0.5),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: theme.textTheme.titleLarge?.color,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+    );
+  }
+
+  void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
+    final logger = Logger();
+    
+    // Filter recommended items that belong to this category
+    final categoryItems = homeProvider.recommendedItems.where((item) {
+      final itemCategoryId = item.category?.id ?? item.categoryId;
+      return itemCategoryId == category.id;
+    }).toList();
+
+    logger.w('📊 Found ${categoryItems.length} items for category: ${category.name}');
+    
+    if (categoryItems.isNotEmpty) {
+      // Get the first item ID to use as reference
+      final firstItemId = categoryItems.first.id ?? '';
+      
+      Get.toNamed(
+        RouteClass.getSelectedCategoryItemPage(),
+        arguments: {
+          'selectedCategory': category,
+          'categoryItems': categoryItems,
+          'itemId': firstItemId,
+        }
+      );
+    } else {
+      logger.w('⚠️ No items found for category: ${category.name}');
+      
+      Get.toNamed(
+        RouteClass.getSelectedCategoryItemPage(),
+        arguments: {
+          'selectedCategory': category,
+          'categoryItems': [],
+          'itemId': category.id.toString(),
+        }
+      );
+    }
+  }
 
   Widget _buildCategoryImage(Categories category, ThemeData theme) {
     final imageUrl = category.image;
@@ -937,160 +1261,6 @@ void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
         ),
       );
     }
-  }
-
-  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Text(
-            'Special Offers',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: theme.textTheme.titleLarge?.color,
-            ),
-          ),
-        ),
-        SizedBox(
-          height: 180,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            itemCount: homeProvider.specialOffers.length,
-            itemBuilder: (context, index) {
-              final offer = homeProvider.specialOffers[index];
-              final item = offer.item;
-              final brand = item?.brand;
-              final firstImage = item!.images?.isNotEmpty == true
-                  ? item.images?.first
-                  : null;
-              final brandImage = brand?.image;
-              final discount = offer.discount;
-
-              return GestureDetector(
-                onTap: () {
-                  Get.toNamed( 
-                    RouteClass.getSpecialOfferDetailPage(),
-                    arguments: {
-                      "specialOffer": offer,
-                      "type": "specialOffer",
-                    },
-                    );
-                },
-                child: Container(
-                width: screenSize.width * 0.75,
-                margin: EdgeInsets.symmetric(horizontal: 6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Stack(
-                    children: [
-                      firstImage != null && !firstImage.contains('assets/')
-                          ? CachedNetworkImage(
-                              imageUrl: getImageUrl(firstImage, null),
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => _buildImageErrorPlaceholder(theme),
-                            )
-                          : _buildImageErrorPlaceholder(theme),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.8),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 12,
-                        top: 12,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: ColorGlobalVariables.redColor,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            '${discount.toString()}% OFF',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 12,
-                        bottom: 12,
-                        right: 12,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (brandImage != null && !brandImage.contains('assets/'))
-                              Container(
-                                width: 32,
-                                height: 32,
-                                child: CachedNetworkImage(
-                                  imageUrl: getImageUrl(brandImage, null),
-                                  fit: BoxFit.contain,
-                                  errorWidget: (context, url, error) => Icon(
-                                    Icons.business,
-                                    size: 24,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            SizedBox(height: 8),
-                            Text(
-                              item.name ?? 'Special Offer',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Limited Time Offer',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              );
-            },
-          ),
-        ),
-        SizedBox(height: 24),
-      ],
-    );
   }
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
@@ -1618,7 +1788,6 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
   }
 }
 
-// List View Widget (Updated Design with Full Height Image)
 // List View Widget (Fixed - No Overflow)
 class _RecommendedItemListWidget extends StatefulWidget {
   final RecommendedItem recommended;
@@ -1874,9 +2043,9 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start, // CHANGED: from spaceBetween to start
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // Header with Title and Wishlist - FIXED: Reduced spacing
+                    // Header with Title and Wishlist
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1887,25 +2056,25 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                               Text(
                                 widget.recommended.name ?? 'Unnamed Vehicle',
                                 style: TextStyle(
-                                  fontSize: 15, // SLIGHTLY SMALLER
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: theme.textTheme.titleLarge?.color,
                                 ),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              SizedBox(height: 2), // REDUCED from 4
+                              SizedBox(height: 2),
                               Text(
                                 widget.recommended.category?.name ?? 'Car',
                                 style: TextStyle(
-                                  fontSize: 11, // SLIGHTLY SMALLER
+                                  fontSize: 11,
                                   color: theme.textTheme.bodyMedium?.color,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(width: 4), // REDUCED from 8
+                        SizedBox(width: 4),
                         // Wishlist Button
                         GestureDetector(
                           onTap: () {
@@ -1917,7 +2086,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                             child: ScaleTransition(
                               scale: _scaleAnimation,
                               child: Container(
-                                padding: EdgeInsets.all(5), // REDUCED from 6
+                                padding: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
                                   color: theme.cardColor,
                                   shape: BoxShape.circle,
@@ -1931,8 +2100,8 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                                 ),
                                 child: _isLoading
                                     ? SizedBox(
-                                        width: 16, // REDUCED from 18
-                                        height: 16, // REDUCED from 18
+                                        width: 16,
+                                        height: 16,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           valueColor: AlwaysStoppedAnimation<Color>(
@@ -1945,7 +2114,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                                         builder: (context, child) {
                                           return Icon(
                                             _isLiked ? Icons.favorite : Icons.favorite_border,
-                                            size: 16, // REDUCED from 18
+                                            size: 16,
                                             color: _isLiked 
                                                 ? _colorAnimation.value 
                                                 : theme.iconTheme.color,
@@ -1959,7 +2128,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                       ],
                     ),
 
-                    SizedBox(height: 8), // KEPT SAME
+                    SizedBox(height: 8),
 
                     // Price and Condition
                     Row(
@@ -1969,7 +2138,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           child: Text(
                             '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
                             style: TextStyle(
-                              fontSize: 16, // REDUCED from 18
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: ColorGlobalVariables.redColor,
                             ),
@@ -1979,7 +2148,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                         ),
                         SizedBox(width: 8),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3), // REDUCED
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                           decoration: BoxDecoration(
                             color: theme.brightness == Brightness.dark 
                                 ? Colors.grey[700] 
@@ -1989,7 +2158,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           child: Text(
                             widget.recommended.condition ?? 'Used',
                             style: TextStyle(
-                              fontSize: 10, // REDUCED from 12
+                              fontSize: 10,
                               color: theme.textTheme.bodyMedium?.color,
                               fontWeight: FontWeight.w500,
                             ),
@@ -1998,22 +2167,22 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                       ],
                     ),
 
-                    SizedBox(height: 6), // REDUCED from 12
+                    SizedBox(height: 6),
 
-                    // Details Row - FIXED: Reduced spacing and font sizes
+                    // Details Row
                     Row(
                       children: [
                         if (widget.recommended.mileage != null)
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.speed, size: 12, color: theme.iconTheme.color), // REDUCED
-                                SizedBox(width: 2), // REDUCED from 4
+                                Icon(Icons.speed, size: 12, color: theme.iconTheme.color),
+                                SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
                                     "${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.mileage!))} km",
                                     style: TextStyle(
-                                      fontSize: 10, // REDUCED from 12
+                                      fontSize: 10,
                                       color: theme.textTheme.bodyMedium?.color,
                                     ),
                                     maxLines: 1,
@@ -2025,19 +2194,19 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           ),
                         
                         if (widget.recommended.transmission != null)
-                          SizedBox(width: 8), // ADDED spacing between details
+                          SizedBox(width: 8),
                         
                         if (widget.recommended.transmission != null)
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.settings, size: 12, color: theme.iconTheme.color), // REDUCED
-                                SizedBox(width: 2), // REDUCED from 4
+                                Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
+                                SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
                                     widget.recommended.transmission!,
                                     style: TextStyle(
-                                      fontSize: 10, // REDUCED from 12
+                                      fontSize: 10,
                                       color: theme.textTheme.bodyMedium?.color,
                                     ),
                                     maxLines: 1,
@@ -2050,22 +2219,22 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                       ],
                     ),
 
-                    SizedBox(height: 4), // REDUCED from 8
+                    SizedBox(height: 4),
 
-                    // Location and Brand - FIXED: Reduced spacing
+                    // Location and Brand
                     Row(
                       children: [
                         if (widget.recommended.location != null)
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.location_on, size: 12, color: theme.iconTheme.color), // REDUCED
-                                SizedBox(width: 2), // REDUCED from 4
+                                Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
+                                SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
                                     widget.recommended.location!,
                                     style: TextStyle(
-                                      fontSize: 10, // REDUCED from 12
+                                      fontSize: 10,
                                       color: theme.textTheme.bodyMedium?.color,
                                     ),
                                     maxLines: 1,
@@ -2078,14 +2247,14 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                         
                         if (brandImage != null && !brandImage.contains('assets/'))
                           Container(
-                            width: 20, // REDUCED from 24
-                            height: 20, // REDUCED from 24
+                            width: 20,
+                            height: 20,
                             child: CachedNetworkImage(
                               imageUrl: getImageUrl(brandImage, null),
                               fit: BoxFit.contain,
                               errorWidget: (context, url, error) => Icon(
                                 Icons.business,
-                                size: 14, // REDUCED from 16
+                                size: 14,
                                 color: theme.iconTheme.color,
                               ),
                             ),
@@ -2141,12 +2310,12 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color), // REDUCED
-            SizedBox(height: 2), // REDUCED
+            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color),
+            SizedBox(height: 2),
             Text(
               'No Image',
               style: TextStyle(
-                fontSize: 9, // REDUCED from 10
+                fontSize: 9,
                 color: theme.textTheme.bodySmall?.color,
               ),
             ),

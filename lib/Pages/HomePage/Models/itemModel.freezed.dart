@@ -20,13 +20,14 @@ User _$UserFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$User {
+  @JsonKey(fromJson: _parseDynamicToString)
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'paid_seller')
+  @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
   int? get paidSeller => throw _privateConstructorUsedError;
   @JsonKey(name: 'deleted_at')
   DateTime? get deletedAt => throw _privateConstructorUsedError;
@@ -34,11 +35,11 @@ mixin _$User {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
   int? get countryId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'state_id')
+  @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt)
   int? get stateId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'profile_photo')
+  @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
   String? get profilePhoto => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
@@ -56,18 +57,20 @@ abstract class $UserCopyWith<$Res> {
       _$UserCopyWithImpl<$Res, User>;
   @useResult
   $Res call(
-      {String id,
+      {@JsonKey(fromJson: _parseDynamicToString) String id,
       String name,
       String email,
       String? phone,
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
-      @JsonKey(name: 'paid_seller') int? paidSeller,
+      @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
+      int? paidSeller,
       @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
-      @JsonKey(name: 'country_id') int? countryId,
-      @JsonKey(name: 'state_id') int? stateId,
-      @JsonKey(name: 'profile_photo') String? profilePhoto});
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt) int? stateId,
+      @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
+      String? profilePhoto});
 }
 
 /// @nodoc
@@ -159,18 +162,20 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {String id,
+      {@JsonKey(fromJson: _parseDynamicToString) String id,
       String name,
       String email,
       String? phone,
       @JsonKey(name: 'email_verified_at') DateTime? emailVerifiedAt,
-      @JsonKey(name: 'paid_seller') int? paidSeller,
+      @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
+      int? paidSeller,
       @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
-      @JsonKey(name: 'country_id') int? countryId,
-      @JsonKey(name: 'state_id') int? stateId,
-      @JsonKey(name: 'profile_photo') String? profilePhoto});
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt) int? stateId,
+      @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
+      String? profilePhoto});
 }
 
 /// @nodoc
@@ -255,23 +260,26 @@ class __$$UserImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserImpl with DiagnosticableTreeMixin implements _User {
   const _$UserImpl(
-      {required this.id,
+      {@JsonKey(fromJson: _parseDynamicToString) required this.id,
       required this.name,
       required this.email,
       this.phone,
       @JsonKey(name: 'email_verified_at') this.emailVerifiedAt,
-      @JsonKey(name: 'paid_seller') this.paidSeller,
+      @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
+      this.paidSeller,
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
-      @JsonKey(name: 'country_id') this.countryId,
-      @JsonKey(name: 'state_id') this.stateId,
-      @JsonKey(name: 'profile_photo') this.profilePhoto});
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) this.countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt) this.stateId,
+      @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
+      this.profilePhoto});
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String id;
   @override
   final String name;
@@ -283,7 +291,7 @@ class _$UserImpl with DiagnosticableTreeMixin implements _User {
   @JsonKey(name: 'email_verified_at')
   final DateTime? emailVerifiedAt;
   @override
-  @JsonKey(name: 'paid_seller')
+  @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
   final int? paidSeller;
   @override
   @JsonKey(name: 'deleted_at')
@@ -295,13 +303,13 @@ class _$UserImpl with DiagnosticableTreeMixin implements _User {
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
   @override
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
   final int? countryId;
   @override
-  @JsonKey(name: 'state_id')
+  @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt)
   final int? stateId;
   @override
-  @JsonKey(name: 'profile_photo')
+  @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
   final String? profilePhoto;
 
   @override
@@ -389,22 +397,27 @@ class _$UserImpl with DiagnosticableTreeMixin implements _User {
 
 abstract class _User implements User {
   const factory _User(
-      {required final String id,
+      {@JsonKey(fromJson: _parseDynamicToString) required final String id,
       required final String name,
       required final String email,
       final String? phone,
       @JsonKey(name: 'email_verified_at') final DateTime? emailVerifiedAt,
-      @JsonKey(name: 'paid_seller') final int? paidSeller,
+      @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
+      final int? paidSeller,
       @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
-      @JsonKey(name: 'country_id') final int? countryId,
-      @JsonKey(name: 'state_id') final int? stateId,
-      @JsonKey(name: 'profile_photo') final String? profilePhoto}) = _$UserImpl;
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
+      final int? countryId,
+      @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt)
+      final int? stateId,
+      @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
+      final String? profilePhoto}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String get id;
   @override
   String get name;
@@ -416,7 +429,7 @@ abstract class _User implements User {
   @JsonKey(name: 'email_verified_at')
   DateTime? get emailVerifiedAt;
   @override
-  @JsonKey(name: 'paid_seller')
+  @JsonKey(name: 'paid_seller', fromJson: _parseDynamicToInt)
   int? get paidSeller;
   @override
   @JsonKey(name: 'deleted_at')
@@ -428,13 +441,13 @@ abstract class _User implements User {
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
   @override
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
   int? get countryId;
   @override
-  @JsonKey(name: 'state_id')
+  @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt)
   int? get stateId;
   @override
-  @JsonKey(name: 'profile_photo')
+  @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
   String? get profilePhoto;
 
   /// Create a copy of User
@@ -451,11 +464,13 @@ Brand _$BrandFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Brand {
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   String? get userId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -477,11 +492,11 @@ abstract class $BrandCopyWith<$Res> {
       _$BrandCopyWithImpl<$Res, Brand>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
+      {@JsonKey(fromJson: _parseDynamicToInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
       String name,
       String slug,
-      String? image,
+      @JsonKey(fromJson: _parseDynamicToString) String? image,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
@@ -550,11 +565,11 @@ abstract class _$$BrandImplCopyWith<$Res> implements $BrandCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
+      {@JsonKey(fromJson: _parseDynamicToInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
       String name,
       String slug,
-      String? image,
+      @JsonKey(fromJson: _parseDynamicToString) String? image,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
@@ -617,11 +632,11 @@ class __$$BrandImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
   const _$BrandImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
+      {@JsonKey(fromJson: _parseDynamicToInt) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) this.userId,
       required this.name,
       required this.slug,
-      this.image,
+      @JsonKey(fromJson: _parseDynamicToString) this.image,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt});
 
@@ -629,15 +644,17 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
       _$$BrandImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   final String? userId;
   @override
   final String name;
   @override
   final String slug;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? image;
   @override
   @JsonKey(name: 'created_at')
@@ -704,26 +721,29 @@ class _$BrandImpl with DiagnosticableTreeMixin implements _Brand {
 
 abstract class _Brand implements Brand {
   const factory _Brand(
-      {required final int id,
-      @JsonKey(name: 'user_id') final String? userId,
+      {@JsonKey(fromJson: _parseDynamicToInt) required final int id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
+      final String? userId,
       required final String name,
       required final String slug,
-      final String? image,
+      @JsonKey(fromJson: _parseDynamicToString) final String? image,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt}) = _$BrandImpl;
 
   factory _Brand.fromJson(Map<String, dynamic> json) = _$BrandImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   String? get userId;
   @override
   String get name;
   @override
   String get slug;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get image;
   @override
   @JsonKey(name: 'created_at')
@@ -746,8 +766,9 @@ BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BrandModel {
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
   int get brandId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
@@ -773,8 +794,8 @@ abstract class $BrandModelCopyWith<$Res> {
       _$BrandModelCopyWithImpl<$Res, BrandModel>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'brand_id') int brandId,
+      {@JsonKey(fromJson: _parseDynamicToInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) int brandId,
       String name,
       String slug,
       @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -841,8 +862,8 @@ abstract class _$$BrandModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'brand_id') int brandId,
+      {@JsonKey(fromJson: _parseDynamicToInt) int id,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) int brandId,
       String name,
       String slug,
       @JsonKey(name: 'created_at') DateTime? createdAt,
@@ -902,8 +923,9 @@ class __$$BrandModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
   const _$BrandModelImpl(
-      {required this.id,
-      @JsonKey(name: 'brand_id') required this.brandId,
+      {@JsonKey(fromJson: _parseDynamicToInt) required this.id,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
+      required this.brandId,
       required this.name,
       required this.slug,
       @JsonKey(name: 'created_at') this.createdAt,
@@ -913,9 +935,10 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
       _$$BrandModelImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int id;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
   final int brandId;
   @override
   final String name;
@@ -984,8 +1007,9 @@ class _$BrandModelImpl with DiagnosticableTreeMixin implements _BrandModel {
 
 abstract class _BrandModel implements BrandModel {
   const factory _BrandModel(
-          {required final int id,
-          @JsonKey(name: 'brand_id') required final int brandId,
+          {@JsonKey(fromJson: _parseDynamicToInt) required final int id,
+          @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
+          required final int brandId,
           required final String name,
           required final String slug,
           @JsonKey(name: 'created_at') final DateTime? createdAt,
@@ -996,9 +1020,10 @@ abstract class _BrandModel implements BrandModel {
       _$BrandModelImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get id;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
   int get brandId;
   @override
   String get name;
@@ -1025,15 +1050,18 @@ Category _$CategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Category {
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   String? get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'parent_id')
+  @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt)
   int? get parentId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get description => throw _privateConstructorUsedError;
   List<String>? get features => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime? get createdAt => throw _privateConstructorUsedError;
@@ -1056,14 +1084,14 @@ abstract class $CategoryCopyWith<$Res> {
       _$CategoryCopyWithImpl<$Res, Category>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'parent_id') int? parentId,
+      {@JsonKey(fromJson: _parseDynamicToInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt) int? parentId,
       String name,
       String slug,
-      String? description,
+      @JsonKey(fromJson: _parseDynamicToString) String? description,
       List<String>? features,
-      String? image,
+      @JsonKey(fromJson: _parseDynamicToString) String? image,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
@@ -1148,14 +1176,14 @@ abstract class _$$CategoryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'parent_id') int? parentId,
+      {@JsonKey(fromJson: _parseDynamicToInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt) int? parentId,
       String name,
       String slug,
-      String? description,
+      @JsonKey(fromJson: _parseDynamicToString) String? description,
       List<String>? features,
-      String? image,
+      @JsonKey(fromJson: _parseDynamicToString) String? image,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt});
 }
@@ -1233,14 +1261,14 @@ class __$$CategoryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   const _$CategoryImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'parent_id') this.parentId,
+      {@JsonKey(fromJson: _parseDynamicToInt) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) this.userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt) this.parentId,
       required this.name,
       required this.slug,
-      this.description,
+      @JsonKey(fromJson: _parseDynamicToString) this.description,
       final List<String>? features,
-      this.image,
+      @JsonKey(fromJson: _parseDynamicToString) this.image,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt})
       : _features = features;
@@ -1249,18 +1277,20 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
       _$$CategoryImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   final String? userId;
   @override
-  @JsonKey(name: 'parent_id')
+  @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt)
   final int? parentId;
   @override
   final String name;
   @override
   final String slug;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? description;
   final List<String>? _features;
   @override
@@ -1273,6 +1303,7 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
   }
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? image;
   @override
   @JsonKey(name: 'created_at')
@@ -1357,14 +1388,16 @@ class _$CategoryImpl with DiagnosticableTreeMixin implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-      {required final int id,
-      @JsonKey(name: 'user_id') final String? userId,
-      @JsonKey(name: 'parent_id') final int? parentId,
+      {@JsonKey(fromJson: _parseDynamicToInt) required final int id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
+      final String? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt)
+      final int? parentId,
       required final String name,
       required final String slug,
-      final String? description,
+      @JsonKey(fromJson: _parseDynamicToString) final String? description,
       final List<String>? features,
-      final String? image,
+      @JsonKey(fromJson: _parseDynamicToString) final String? image,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt}) = _$CategoryImpl;
 
@@ -1372,22 +1405,25 @@ abstract class _Category implements Category {
       _$CategoryImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   String? get userId;
   @override
-  @JsonKey(name: 'parent_id')
+  @JsonKey(name: 'parent_id', fromJson: _parseDynamicToInt)
   int? get parentId;
   @override
   String get name;
   @override
   String get slug;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get description;
   @override
   List<String>? get features;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get image;
   @override
   @JsonKey(name: 'created_at')
@@ -1410,40 +1446,53 @@ SingleItem _$SingleItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SingleItem {
+  @JsonKey(fromJson: _parseDynamicToString)
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   String? get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
   int? get countryId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
   int? get brandModelId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
   int? get brandId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
   int? get categoryId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get year => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get description => throw _privateConstructorUsedError;
   List<String>? get images => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get location => throw _privateConstructorUsedError;
-  @JsonKey(name: 'serial_number')
+  @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
   String? get serialNumber => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get condition => throw _privateConstructorUsedError;
-  @JsonKey(name: 'steer_position')
+  @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
   String? get steerPosition => throw _privateConstructorUsedError;
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
   String? get engineCapacity => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get transmission => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get color => throw _privateConstructorUsedError;
-  @JsonKey(name: 'build_type')
+  @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
   String? get buildType => throw _privateConstructorUsedError;
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
   int? get numberOfPassengers => throw _privateConstructorUsedError;
   List<String>? get features => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get status => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get price => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get mileage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get warranty => throw _privateConstructorUsedError;
   @JsonKey(name: 'warranty_expiration')
   DateTime? get warrantyExpiration => throw _privateConstructorUsedError;
@@ -1453,16 +1502,16 @@ mixin _$SingleItem {
   DateTime? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'Height')
+  @JsonKey(name: 'Height', fromJson: _parseDynamicToString)
   String? get height => throw _privateConstructorUsedError;
-  @JsonKey(name: 'VIN')
+  @JsonKey(name: 'VIN', fromJson: _parseDynamicToString)
   String? get vin => throw _privateConstructorUsedError;
   Brand? get brand => throw _privateConstructorUsedError;
   Category? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'brand_model')
   BrandModel? get brandModel => throw _privateConstructorUsedError;
   User? get user => throw _privateConstructorUsedError;
-  @JsonKey(name: 'is_promoted')
+  @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
   bool? get isPromoted => throw _privateConstructorUsedError;
 
   /// Serializes this SingleItem to a JSON map.
@@ -1482,42 +1531,50 @@ abstract class $SingleItemCopyWith<$Res> {
       _$SingleItemCopyWithImpl<$Res, SingleItem>;
   @useResult
   $Res call(
-      {String id,
-      @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id') int? countryId,
-      @JsonKey(name: 'brand_model_id') int? brandModelId,
-      @JsonKey(name: 'brand_id') int? brandId,
-      @JsonKey(name: 'category_id') int? categoryId,
-      String? name,
-      String? year,
-      String? slug,
-      String? description,
+      {@JsonKey(fromJson: _parseDynamicToString) String id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
+      int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
+      int? categoryId,
+      @JsonKey(fromJson: _parseDynamicToString) String? name,
+      @JsonKey(fromJson: _parseDynamicToString) String? year,
+      @JsonKey(fromJson: _parseDynamicToString) String? slug,
+      @JsonKey(fromJson: _parseDynamicToString) String? description,
       List<String>? images,
-      String? location,
-      @JsonKey(name: 'serial_number') String? serialNumber,
-      String? condition,
-      @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
-      String? transmission,
-      String? color,
-      @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      @JsonKey(fromJson: _parseDynamicToString) String? location,
+      @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
+      String? serialNumber,
+      @JsonKey(fromJson: _parseDynamicToString) String? condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
+      String? steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
+      String? engineCapacity,
+      @JsonKey(fromJson: _parseDynamicToString) String? transmission,
+      @JsonKey(fromJson: _parseDynamicToString) String? color,
+      @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
+      String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
+      int? numberOfPassengers,
       List<String>? features,
-      String? status,
-      String? price,
-      String? mileage,
-      int? warranty,
+      @JsonKey(fromJson: _parseDynamicToString) String? status,
+      @JsonKey(fromJson: _parseDynamicToString) String? price,
+      @JsonKey(fromJson: _parseDynamicToString) String? mileage,
+      @JsonKey(fromJson: _parseDynamicToInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') DateTime? warrantyExpiration,
       @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
-      @JsonKey(name: 'Height') String? height,
-      @JsonKey(name: 'VIN') String? vin,
+      @JsonKey(name: 'Height', fromJson: _parseDynamicToString) String? height,
+      @JsonKey(name: 'VIN', fromJson: _parseDynamicToString) String? vin,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
       User? user,
-      @JsonKey(name: 'is_promoted') bool? isPromoted});
+      @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
+      bool? isPromoted});
 
   $BrandCopyWith<$Res>? get brand;
   $CategoryCopyWith<$Res>? get category;
@@ -1791,42 +1848,50 @@ abstract class _$$SingleItemImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
-      @JsonKey(name: 'user_id') String? userId,
-      @JsonKey(name: 'country_id') int? countryId,
-      @JsonKey(name: 'brand_model_id') int? brandModelId,
-      @JsonKey(name: 'brand_id') int? brandId,
-      @JsonKey(name: 'category_id') int? categoryId,
-      String? name,
-      String? year,
-      String? slug,
-      String? description,
+      {@JsonKey(fromJson: _parseDynamicToString) String id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
+      int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
+      int? categoryId,
+      @JsonKey(fromJson: _parseDynamicToString) String? name,
+      @JsonKey(fromJson: _parseDynamicToString) String? year,
+      @JsonKey(fromJson: _parseDynamicToString) String? slug,
+      @JsonKey(fromJson: _parseDynamicToString) String? description,
       List<String>? images,
-      String? location,
-      @JsonKey(name: 'serial_number') String? serialNumber,
-      String? condition,
-      @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
-      String? transmission,
-      String? color,
-      @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      @JsonKey(fromJson: _parseDynamicToString) String? location,
+      @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
+      String? serialNumber,
+      @JsonKey(fromJson: _parseDynamicToString) String? condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
+      String? steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
+      String? engineCapacity,
+      @JsonKey(fromJson: _parseDynamicToString) String? transmission,
+      @JsonKey(fromJson: _parseDynamicToString) String? color,
+      @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
+      String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
+      int? numberOfPassengers,
       List<String>? features,
-      String? status,
-      String? price,
-      String? mileage,
-      int? warranty,
+      @JsonKey(fromJson: _parseDynamicToString) String? status,
+      @JsonKey(fromJson: _parseDynamicToString) String? price,
+      @JsonKey(fromJson: _parseDynamicToString) String? mileage,
+      @JsonKey(fromJson: _parseDynamicToInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') DateTime? warrantyExpiration,
       @JsonKey(name: 'deleted_at') DateTime? deletedAt,
       @JsonKey(name: 'created_at') DateTime? createdAt,
       @JsonKey(name: 'updated_at') DateTime? updatedAt,
-      @JsonKey(name: 'Height') String? height,
-      @JsonKey(name: 'VIN') String? vin,
+      @JsonKey(name: 'Height', fromJson: _parseDynamicToString) String? height,
+      @JsonKey(name: 'VIN', fromJson: _parseDynamicToString) String? vin,
       Brand? brand,
       Category? category,
       @JsonKey(name: 'brand_model') BrandModel? brandModel,
       User? user,
-      @JsonKey(name: 'is_promoted') bool? isPromoted});
+      @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
+      bool? isPromoted});
 
   @override
   $BrandCopyWith<$Res>? get brand;
@@ -2041,42 +2106,50 @@ class __$$SingleItemImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
   const _$SingleItemImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'country_id') this.countryId,
-      @JsonKey(name: 'brand_model_id') this.brandModelId,
-      @JsonKey(name: 'brand_id') this.brandId,
-      @JsonKey(name: 'category_id') this.categoryId,
-      this.name,
-      this.year,
-      this.slug,
-      this.description,
+      {@JsonKey(fromJson: _parseDynamicToString) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) this.userId,
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) this.countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
+      this.brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) this.brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
+      this.categoryId,
+      @JsonKey(fromJson: _parseDynamicToString) this.name,
+      @JsonKey(fromJson: _parseDynamicToString) this.year,
+      @JsonKey(fromJson: _parseDynamicToString) this.slug,
+      @JsonKey(fromJson: _parseDynamicToString) this.description,
       final List<String>? images,
-      this.location,
-      @JsonKey(name: 'serial_number') this.serialNumber,
-      this.condition,
-      @JsonKey(name: 'steer_position') this.steerPosition,
-      @JsonKey(name: 'engine_capacity') this.engineCapacity,
-      this.transmission,
-      this.color,
-      @JsonKey(name: 'build_type') this.buildType,
-      @JsonKey(name: 'number_of_passengers') this.numberOfPassengers,
+      @JsonKey(fromJson: _parseDynamicToString) this.location,
+      @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
+      this.serialNumber,
+      @JsonKey(fromJson: _parseDynamicToString) this.condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
+      this.steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
+      this.engineCapacity,
+      @JsonKey(fromJson: _parseDynamicToString) this.transmission,
+      @JsonKey(fromJson: _parseDynamicToString) this.color,
+      @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
+      this.buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
+      this.numberOfPassengers,
       final List<String>? features,
-      this.status,
-      this.price,
-      this.mileage,
-      this.warranty,
+      @JsonKey(fromJson: _parseDynamicToString) this.status,
+      @JsonKey(fromJson: _parseDynamicToString) this.price,
+      @JsonKey(fromJson: _parseDynamicToString) this.mileage,
+      @JsonKey(fromJson: _parseDynamicToInt) this.warranty,
       @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
-      @JsonKey(name: 'Height') this.height,
-      @JsonKey(name: 'VIN') this.vin,
+      @JsonKey(name: 'Height', fromJson: _parseDynamicToString) this.height,
+      @JsonKey(name: 'VIN', fromJson: _parseDynamicToString) this.vin,
       this.brand,
       this.category,
       @JsonKey(name: 'brand_model') this.brandModel,
       this.user,
-      @JsonKey(name: 'is_promoted') this.isPromoted})
+      @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
+      this.isPromoted})
       : _images = images,
         _features = features;
 
@@ -2084,29 +2157,34 @@ class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
       _$$SingleItemImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   final String? userId;
   @override
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
   final int? countryId;
   @override
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
   final int? brandModelId;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
   final int? brandId;
   @override
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
   final int? categoryId;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? name;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? year;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? slug;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? description;
   final List<String>? _images;
   @override
@@ -2119,27 +2197,31 @@ class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
   }
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? location;
   @override
-  @JsonKey(name: 'serial_number')
+  @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
   final String? serialNumber;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? condition;
   @override
-  @JsonKey(name: 'steer_position')
+  @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
   final String? steerPosition;
   @override
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
   final String? engineCapacity;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? transmission;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? color;
   @override
-  @JsonKey(name: 'build_type')
+  @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
   final String? buildType;
   @override
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
   final int? numberOfPassengers;
   final List<String>? _features;
   @override
@@ -2152,12 +2234,16 @@ class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
   }
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? status;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? price;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? mileage;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int? warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
@@ -2172,10 +2258,10 @@ class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
   @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
   @override
-  @JsonKey(name: 'Height')
+  @JsonKey(name: 'Height', fromJson: _parseDynamicToString)
   final String? height;
   @override
-  @JsonKey(name: 'VIN')
+  @JsonKey(name: 'VIN', fromJson: _parseDynamicToString)
   final String? vin;
   @override
   final Brand? brand;
@@ -2187,7 +2273,7 @@ class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
   @override
   final User? user;
   @override
-  @JsonKey(name: 'is_promoted')
+  @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
   final bool? isPromoted;
 
   @override
@@ -2361,105 +2447,130 @@ class _$SingleItemImpl with DiagnosticableTreeMixin implements _SingleItem {
 
 abstract class _SingleItem implements SingleItem {
   const factory _SingleItem(
-      {required final String id,
-      @JsonKey(name: 'user_id') final String? userId,
-      @JsonKey(name: 'country_id') final int? countryId,
-      @JsonKey(name: 'brand_model_id') final int? brandModelId,
-      @JsonKey(name: 'brand_id') final int? brandId,
-      @JsonKey(name: 'category_id') final int? categoryId,
-      final String? name,
-      final String? year,
-      final String? slug,
-      final String? description,
+      {@JsonKey(fromJson: _parseDynamicToString) required final String id,
+      @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
+      final String? userId,
+      @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
+      final int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
+      final int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
+      final int? brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
+      final int? categoryId,
+      @JsonKey(fromJson: _parseDynamicToString) final String? name,
+      @JsonKey(fromJson: _parseDynamicToString) final String? year,
+      @JsonKey(fromJson: _parseDynamicToString) final String? slug,
+      @JsonKey(fromJson: _parseDynamicToString) final String? description,
       final List<String>? images,
-      final String? location,
-      @JsonKey(name: 'serial_number') final String? serialNumber,
-      final String? condition,
-      @JsonKey(name: 'steer_position') final String? steerPosition,
-      @JsonKey(name: 'engine_capacity') final String? engineCapacity,
-      final String? transmission,
-      final String? color,
-      @JsonKey(name: 'build_type') final String? buildType,
-      @JsonKey(name: 'number_of_passengers') final int? numberOfPassengers,
+      @JsonKey(fromJson: _parseDynamicToString) final String? location,
+      @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
+      final String? serialNumber,
+      @JsonKey(fromJson: _parseDynamicToString) final String? condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
+      final String? steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
+      final String? engineCapacity,
+      @JsonKey(fromJson: _parseDynamicToString) final String? transmission,
+      @JsonKey(fromJson: _parseDynamicToString) final String? color,
+      @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
+      final String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
+      final int? numberOfPassengers,
       final List<String>? features,
-      final String? status,
-      final String? price,
-      final String? mileage,
-      final int? warranty,
+      @JsonKey(fromJson: _parseDynamicToString) final String? status,
+      @JsonKey(fromJson: _parseDynamicToString) final String? price,
+      @JsonKey(fromJson: _parseDynamicToString) final String? mileage,
+      @JsonKey(fromJson: _parseDynamicToInt) final int? warranty,
       @JsonKey(name: 'warranty_expiration') final DateTime? warrantyExpiration,
       @JsonKey(name: 'deleted_at') final DateTime? deletedAt,
       @JsonKey(name: 'created_at') final DateTime? createdAt,
       @JsonKey(name: 'updated_at') final DateTime? updatedAt,
-      @JsonKey(name: 'Height') final String? height,
-      @JsonKey(name: 'VIN') final String? vin,
+      @JsonKey(name: 'Height', fromJson: _parseDynamicToString)
+      final String? height,
+      @JsonKey(name: 'VIN', fromJson: _parseDynamicToString) final String? vin,
       final Brand? brand,
       final Category? category,
       @JsonKey(name: 'brand_model') final BrandModel? brandModel,
       final User? user,
-      @JsonKey(name: 'is_promoted') final bool? isPromoted}) = _$SingleItemImpl;
+      @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
+      final bool? isPromoted}) = _$SingleItemImpl;
 
   factory _SingleItem.fromJson(Map<String, dynamic> json) =
       _$SingleItemImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String get id;
   @override
-  @JsonKey(name: 'user_id')
+  @JsonKey(name: 'user_id', fromJson: _parseDynamicToString)
   String? get userId;
   @override
-  @JsonKey(name: 'country_id')
+  @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt)
   int? get countryId;
   @override
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
   int? get brandModelId;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
   int? get brandId;
   @override
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt)
   int? get categoryId;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get name;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get year;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get slug;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get description;
   @override
   List<String>? get images;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get location;
   @override
-  @JsonKey(name: 'serial_number')
+  @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
   String? get serialNumber;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get condition;
   @override
-  @JsonKey(name: 'steer_position')
+  @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
   String? get steerPosition;
   @override
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
   String? get engineCapacity;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get transmission;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get color;
   @override
-  @JsonKey(name: 'build_type')
+  @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
   String? get buildType;
   @override
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
   int? get numberOfPassengers;
   @override
   List<String>? get features;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get status;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get price;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get mileage;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get warranty;
   @override
   @JsonKey(name: 'warranty_expiration')
@@ -2474,10 +2585,10 @@ abstract class _SingleItem implements SingleItem {
   @JsonKey(name: 'updated_at')
   DateTime? get updatedAt;
   @override
-  @JsonKey(name: 'Height')
+  @JsonKey(name: 'Height', fromJson: _parseDynamicToString)
   String? get height;
   @override
-  @JsonKey(name: 'VIN')
+  @JsonKey(name: 'VIN', fromJson: _parseDynamicToString)
   String? get vin;
   @override
   Brand? get brand;
@@ -2489,7 +2600,7 @@ abstract class _SingleItem implements SingleItem {
   @override
   User? get user;
   @override
-  @JsonKey(name: 'is_promoted')
+  @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
   bool? get isPromoted;
 
   /// Create a copy of SingleItem
@@ -2960,16 +3071,19 @@ SingleItemMeta _$SingleItemMetaFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SingleItemMeta {
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
   int get currentPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get from => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt)
   int get lastPage => throw _privateConstructorUsedError;
   List<SingleItemMetaLink> get links => throw _privateConstructorUsedError;
   String get path => throw _privateConstructorUsedError;
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt)
   int get perPage => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get to => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get total => throw _privateConstructorUsedError;
 
   /// Serializes this SingleItemMeta to a JSON map.
@@ -2989,14 +3103,15 @@ abstract class $SingleItemMetaCopyWith<$Res> {
       _$SingleItemMetaCopyWithImpl<$Res, SingleItemMeta>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int? from,
-      @JsonKey(name: 'last_page') int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
+      int currentPage,
+      @JsonKey(fromJson: _parseDynamicToInt) int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt) int lastPage,
       List<SingleItemMetaLink> links,
       String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int? to,
-      int total});
+      @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt) int perPage,
+      @JsonKey(fromJson: _parseDynamicToInt) int? to,
+      @JsonKey(fromJson: _parseDynamicToInt) int total});
 }
 
 /// @nodoc
@@ -3069,14 +3184,15 @@ abstract class _$$SingleItemMetaImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'current_page') int currentPage,
-      int? from,
-      @JsonKey(name: 'last_page') int lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
+      int currentPage,
+      @JsonKey(fromJson: _parseDynamicToInt) int? from,
+      @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt) int lastPage,
       List<SingleItemMetaLink> links,
       String path,
-      @JsonKey(name: 'per_page') int perPage,
-      int? to,
-      int total});
+      @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt) int perPage,
+      @JsonKey(fromJson: _parseDynamicToInt) int? to,
+      @JsonKey(fromJson: _parseDynamicToInt) int total});
 }
 
 /// @nodoc
@@ -3144,26 +3260,30 @@ class _$SingleItemMetaImpl
     with DiagnosticableTreeMixin
     implements _SingleItemMeta {
   const _$SingleItemMetaImpl(
-      {@JsonKey(name: 'current_page') required this.currentPage,
-      required this.from,
-      @JsonKey(name: 'last_page') required this.lastPage,
+      {@JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
+      required this.currentPage,
+      @JsonKey(fromJson: _parseDynamicToInt) required this.from,
+      @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt)
+      required this.lastPage,
       required final List<SingleItemMetaLink> links,
       required this.path,
-      @JsonKey(name: 'per_page') required this.perPage,
-      required this.to,
-      required this.total})
+      @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt)
+      required this.perPage,
+      @JsonKey(fromJson: _parseDynamicToInt) required this.to,
+      @JsonKey(fromJson: _parseDynamicToInt) required this.total})
       : _links = links;
 
   factory _$SingleItemMetaImpl.fromJson(Map<String, dynamic> json) =>
       _$$SingleItemMetaImplFromJson(json);
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
   final int currentPage;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int? from;
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt)
   final int lastPage;
   final List<SingleItemMetaLink> _links;
   @override
@@ -3176,11 +3296,13 @@ class _$SingleItemMetaImpl
   @override
   final String path;
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt)
   final int perPage;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int? to;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int total;
 
   @override
@@ -3244,36 +3366,43 @@ class _$SingleItemMetaImpl
 
 abstract class _SingleItemMeta implements SingleItemMeta {
   const factory _SingleItemMeta(
-      {@JsonKey(name: 'current_page') required final int currentPage,
-      required final int? from,
-      @JsonKey(name: 'last_page') required final int lastPage,
-      required final List<SingleItemMetaLink> links,
-      required final String path,
-      @JsonKey(name: 'per_page') required final int perPage,
-      required final int? to,
-      required final int total}) = _$SingleItemMetaImpl;
+          {@JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
+          required final int currentPage,
+          @JsonKey(fromJson: _parseDynamicToInt) required final int? from,
+          @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt)
+          required final int lastPage,
+          required final List<SingleItemMetaLink> links,
+          required final String path,
+          @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt)
+          required final int perPage,
+          @JsonKey(fromJson: _parseDynamicToInt) required final int? to,
+          @JsonKey(fromJson: _parseDynamicToInt) required final int total}) =
+      _$SingleItemMetaImpl;
 
   factory _SingleItemMeta.fromJson(Map<String, dynamic> json) =
       _$SingleItemMetaImpl.fromJson;
 
   @override
-  @JsonKey(name: 'current_page')
+  @JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
   int get currentPage;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get from;
   @override
-  @JsonKey(name: 'last_page')
+  @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt)
   int get lastPage;
   @override
   List<SingleItemMetaLink> get links;
   @override
   String get path;
   @override
-  @JsonKey(name: 'per_page')
+  @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt)
   int get perPage;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get to;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int get total;
 
   /// Create a copy of SingleItemMeta
@@ -3290,9 +3419,13 @@ SingleItemMetaLink _$SingleItemMetaLinkFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$SingleItemMetaLink {
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get url => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToString)
   String get label => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get page => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseDynamicToBool)
   bool get active => throw _privateConstructorUsedError;
 
   /// Serializes this SingleItemMetaLink to a JSON map.
@@ -3311,7 +3444,11 @@ abstract class $SingleItemMetaLinkCopyWith<$Res> {
           SingleItemMetaLink value, $Res Function(SingleItemMetaLink) then) =
       _$SingleItemMetaLinkCopyWithImpl<$Res, SingleItemMetaLink>;
   @useResult
-  $Res call({String? url, String label, int? page, bool active});
+  $Res call(
+      {@JsonKey(fromJson: _parseDynamicToString) String? url,
+      @JsonKey(fromJson: _parseDynamicToString) String label,
+      @JsonKey(fromJson: _parseDynamicToInt) int? page,
+      @JsonKey(fromJson: _parseDynamicToBool) bool active});
 }
 
 /// @nodoc
@@ -3363,7 +3500,11 @@ abstract class _$$SingleItemMetaLinkImplCopyWith<$Res>
       __$$SingleItemMetaLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? url, String label, int? page, bool active});
+  $Res call(
+      {@JsonKey(fromJson: _parseDynamicToString) String? url,
+      @JsonKey(fromJson: _parseDynamicToString) String label,
+      @JsonKey(fromJson: _parseDynamicToInt) int? page,
+      @JsonKey(fromJson: _parseDynamicToBool) bool active});
 }
 
 /// @nodoc
@@ -3411,18 +3552,25 @@ class _$SingleItemMetaLinkImpl
     with DiagnosticableTreeMixin
     implements _SingleItemMetaLink {
   const _$SingleItemMetaLinkImpl(
-      {this.url, required this.label, this.page, required this.active});
+      {@JsonKey(fromJson: _parseDynamicToString) this.url,
+      @JsonKey(fromJson: _parseDynamicToString) required this.label,
+      @JsonKey(fromJson: _parseDynamicToInt) this.page,
+      @JsonKey(fromJson: _parseDynamicToBool) required this.active});
 
   factory _$SingleItemMetaLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$SingleItemMetaLinkImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String? url;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   final String label;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   final int? page;
   @override
+  @JsonKey(fromJson: _parseDynamicToBool)
   final bool active;
 
   @override
@@ -3475,21 +3623,26 @@ class _$SingleItemMetaLinkImpl
 
 abstract class _SingleItemMetaLink implements SingleItemMetaLink {
   const factory _SingleItemMetaLink(
-      {final String? url,
-      required final String label,
-      final int? page,
-      required final bool active}) = _$SingleItemMetaLinkImpl;
+          {@JsonKey(fromJson: _parseDynamicToString) final String? url,
+          @JsonKey(fromJson: _parseDynamicToString) required final String label,
+          @JsonKey(fromJson: _parseDynamicToInt) final int? page,
+          @JsonKey(fromJson: _parseDynamicToBool) required final bool active}) =
+      _$SingleItemMetaLinkImpl;
 
   factory _SingleItemMetaLink.fromJson(Map<String, dynamic> json) =
       _$SingleItemMetaLinkImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String? get url;
   @override
+  @JsonKey(fromJson: _parseDynamicToString)
   String get label;
   @override
+  @JsonKey(fromJson: _parseDynamicToInt)
   int? get page;
   @override
+  @JsonKey(fromJson: _parseDynamicToBool)
   bool get active;
 
   /// Create a copy of SingleItemMetaLink

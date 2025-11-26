@@ -35,6 +35,12 @@ class HomeProvider with ChangeNotifier {
   String _singleItemErrorMessage = '';
   bool _hasSingleItemError = false;
 
+  // For single special offer by ID - NEW: Added special offer state
+  SpecialOffer? _selectedSpecialOffer;
+  bool _isLoadingSingleSpecialOffer = false;
+  String _singleSpecialOfferErrorMessage = '';
+  bool _hasSingleSpecialOfferError = false;
+
   // Getters
   List<TrendingMake> get trendingMakes => _trendingMakes;
   List<SpecialOffer> get specialOffers => _specialOffers;
@@ -50,6 +56,12 @@ class HomeProvider with ChangeNotifier {
   String get singleItemErrorMessage => _singleItemErrorMessage;
   bool get hasSingleItemError => _hasSingleItemError;
 
+  // Single special offer getters - NEW: Added special offer getters
+  SpecialOffer? get selectedSpecialOffer => _selectedSpecialOffer;
+  bool get isLoadingSingleSpecialOffer => _isLoadingSingleSpecialOffer;
+  String get singleSpecialOfferErrorMessage => _singleSpecialOfferErrorMessage;
+  bool get hasSingleSpecialOfferError => _hasSingleSpecialOfferError;
+
   HomeProvider(this._homeService);
 
   // Fetch recommended item by ID - CHANGED: Using Item instead of RecommendedItem
@@ -62,18 +74,55 @@ class HomeProvider with ChangeNotifier {
     try {
       final item = await _homeService.fetchRecommendedById(id);
       _selectedItem = item;
-      logger.i('Successfully fetched item by id: $id');
+      logger.i('✅ [HOME_PROVIDER] Successfully fetched item by id: $id');
+      logger.i('   - Item Name: ${item.name}');
+      logger.i('   - Item Brand: ${item.brand?.name}');
+      logger.i('   - Item Price: ${item.price}');
     } catch (e, stackTrace) {
       _selectedItem = null;
       _hasSingleItemError = true;
       _singleItemErrorMessage = 'Failed to load item details. Please try again.';
       logger.e(
-        'Error fetching item by id: $id',
+        '❌ [HOME_PROVIDER] Error fetching item by id: $id',
         error: e,
         stackTrace: stackTrace,
       );
     } finally {
       _isLoadingSingleItem = false;
+      notifyListeners();
+    }
+  }
+
+  // Fetch special offer by ID - NEW: Added special offer fetch method
+  Future<void> fetchSpecialOfferById(String id) async {
+    _isLoadingSingleSpecialOffer = true;
+    _hasSingleSpecialOfferError = false;
+    _singleSpecialOfferErrorMessage = '';
+    notifyListeners();
+
+    try {
+      logger.i('🔄 [HOME_PROVIDER] Fetching special offer by ID: $id');
+      
+      final specialOffer = await _homeService.fetchSpecialOfferById(id);
+      _selectedSpecialOffer = specialOffer;
+      
+      logger.i('✅ [HOME_PROVIDER] Special offer fetched successfully: ${specialOffer.id}');
+      logger.i('   - Item: ${specialOffer.item?.name}');
+      logger.i('   - Discount: ${specialOffer.discount}%');
+      logger.i('   - Start Date: ${specialOffer.startAt}');
+      logger.i('   - End Date: ${specialOffer.endAt}');
+      
+    } catch (e, stackTrace) {
+      _selectedSpecialOffer = null;
+      _hasSingleSpecialOfferError = true;
+      _singleSpecialOfferErrorMessage = 'Failed to load special offer details. Please try again.';
+      logger.e(
+        '❌ [HOME_PROVIDER] Error fetching special offer by ID: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    } finally {
+      _isLoadingSingleSpecialOffer = false;
       notifyListeners();
     }
   }
@@ -86,38 +135,52 @@ class HomeProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear single special offer state - NEW: Added special offer clear method
+  void clearSelectedSpecialOffer() {
+    _selectedSpecialOffer = null;
+    _hasSingleSpecialOfferError = false;
+    _singleSpecialOfferErrorMessage = '';
+    notifyListeners();
+  }
+
   // Retry single item fetch
   Future<void> retrySingleItemFetch(String id) async {
     if (!_hasSingleItemError) return;
     await fetchRecommendedById(id);
   }
 
+  // Retry single special offer fetch - NEW: Added special offer retry method
+  Future<void> retrySingleSpecialOfferFetch(String id) async {
+    if (!_hasSingleSpecialOfferError) return;
+    await fetchSpecialOfferById(id);
+  }
+
   // load more recommended items
   Future<void> loadMoreRecommended() async {
     if (_isLoadingMore || !_hasMoreRecommended) return;
 
-    logger.w("Loading more items... Page: ${_recommendedPage + 1}");
+    logger.w("🔄 [HOME_PROVIDER] Loading more items... Page: ${_recommendedPage + 1}");
     _isLoadingMore = true;
     notifyListeners();
 
     try {
       final newItems = await _homeService.fetchRecommended(page: _recommendedPage + 1);
-      logger.w("Received ${newItems.length} new items");
+      logger.w("📦 [HOME_PROVIDER] Received ${newItems.length} new items");
       
       if (newItems.isEmpty) {
-        logger.w("No more items available");
+        logger.w("⚠️ [HOME_PROVIDER] No more items available");
         _hasMoreRecommended = false;
       } else {
-        logger.w("Adding ${newItems.length} items to existing ${_recommendedItems.length}");
+        logger.w("➕ [HOME_PROVIDER] Adding ${newItems.length} items to existing ${_recommendedItems.length}");
         
         // FIX: Create a new modifiable list instead of using addAll on unmodifiable list
         _recommendedItems = [..._recommendedItems, ...newItems];
         
         _recommendedPage++;
-        logger.w("Total items now: ${_recommendedItems.length}");
+        logger.w("📊 [HOME_PROVIDER] Total items now: ${_recommendedItems.length}");
       }
     } catch (e) {
-      logger.e("Failed to load more recommended, error: $e");
+      logger.e("❌ [HOME_PROVIDER] Failed to load more recommended, error: $e");
     } finally {
       _isLoadingMore = false;
       notifyListeners();
@@ -134,6 +197,8 @@ class HomeProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      logger.i("🔄 [HOME_PROVIDER] Fetching all home data...");
+      
       final results = await Future.wait([
         _homeService.fetchTrendingMakes(),
         _homeService.fetchSpecialOffers(),
@@ -148,6 +213,12 @@ class HomeProvider with ChangeNotifier {
       _recommendedItems = List<RecommendedItem>.from(results[2] as List<RecommendedItem>);
       
       _categories = results[3] as List<Categories>;
+
+      logger.i("✅ [HOME_PROVIDER] All data fetched successfully");
+      logger.i("   - Trending Makes: ${_trendingMakes.length}");
+      logger.i("   - Special Offers: ${_specialOffers.length}");
+      logger.i("   - Recommended Items: ${_recommendedItems.length}");
+      logger.i("   - Categories: ${_categories.length}");
 
     } on FormatException catch (e, stackTrace) {
       _handleError('Data format error. Please try again later.', e, stackTrace);
@@ -169,7 +240,7 @@ class HomeProvider with ChangeNotifier {
     _errorMessage = message;
     _hasError = true;
     logger.e(
-      'Data loading failed',
+      '❌ [HOME_PROVIDER] Data loading failed',
       error: error,
       stackTrace: stackTrace,
     );

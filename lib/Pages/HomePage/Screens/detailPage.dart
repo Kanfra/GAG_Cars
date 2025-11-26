@@ -29,9 +29,9 @@ import 'package:gag_cars_frontend/Utils/simple_deep_link_handler.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
 
 class DetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
@@ -44,14 +44,14 @@ class DetailPage extends StatefulWidget {
   State<DetailPage> createState() => _DetailPageState();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final _similarItemsScrollThreshold = 200.0;
   double _appBarHeight = 300;
   double _imageOpacity = 1.0;
   int selectedIndex = 0;
 
-  // State variables - SIMPLIFIED: No deep link loading states
+  // State variables
   Map<String, dynamic>? item;
   Map<String, dynamic>? product;
   String? type;
@@ -62,16 +62,234 @@ class _DetailPageState extends State<DetailPage> {
   Map<String, dynamic> user = {};
   final logger = Logger();
 
+  // Profile image animation controllers
+  late AnimationController _profileImageController;
+  late Animation<double> _profileImageScaleAnimation;
+  late Animation<double> _profileImageFadeAnimation;
+  bool _showProfilePopup = false;
+
   @override
   void initState() {
     super.initState();
+    
+    // Initialize profile image animation controller
+    _profileImageController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    
+    _profileImageScaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.1), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(
+      parent: _profileImageController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _profileImageFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _profileImageController,
+      curve: Curves.easeInOut,
+    ));
+    
     _initializeData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _profileImageController.dispose();
+    super.dispose();
+  }
+
+  // ========== PROFILE IMAGE POPUP ANIMATION METHODS ==========
+
+  void _openProfilePopup() {
+    logger.i('Opening profile popup');
+    setState(() {
+      _showProfilePopup = true;
+    });
+    _profileImageController.forward();
+  }
+
+  void _closeProfilePopup() {
+    logger.i('Closing profile popup');
+    _profileImageController.reverse().then((_) {
+      if (mounted) {
+        setState(() {
+          _showProfilePopup = false;
+        });
+      }
+    });
+  }
+
+  Widget _buildProfilePopup() {
+    if (!_showProfilePopup) return const SizedBox.shrink();
+
+    final profilePhoto = _getUserProfilePhoto();
+    final userName = _getUserName();
+    final hasProfilePhoto = profilePhoto != null;
+    
+    logger.i('Building profile popup - Has photo: $hasProfilePhoto');
+
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          // Backdrop - click to close
+          GestureDetector(
+            onTap: _closeProfilePopup,
+            child: AnimatedBuilder(
+              animation: _profileImageFadeAnimation,
+              builder: (context, child) {
+                return Container(
+                  color: Colors.black.withOpacity(0.9 * _profileImageFadeAnimation.value),
+                );
+              },
+            ),
+          ),
+          
+          // Profile image content
+          Center(
+            child: AnimatedBuilder(
+              animation: _profileImageScaleAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _profileImageScaleAnimation.value,
+                  child: child,
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Profile image container
+                    Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.3),
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: hasProfilePhoto
+                            ? _buildSafeNetworkImage(
+                                profilePhoto!,
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              )
+                            : _buildDefaultProfileAvatar(size: 200),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // User name
+                    Text(
+                      userName,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // User info
+                    Text(
+                      'Vehicle Seller',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+
+                    // Info text when no profile photo
+                    if (!hasProfilePhoto) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'No profile photo available',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Close button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _closeProfilePopup,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorGlobalVariables.brownColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _initializeData() {
     final allJson = widget.allJson;
     
-    // SIMPLIFIED: Just check if we have valid data, no deep link handling
     if (_hasValidData(allJson)) {
       _setupWithCompleteData(allJson);
     } else {
@@ -99,7 +317,6 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void _handleInvalidData() {
-    // SIMPLIFIED: Just show error, no fetching
     logger.e('❌ Invalid data provided to DetailPage: ${widget.allJson}');
   }
 
@@ -340,7 +557,6 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // SIMPLIFIED: Only show main content or error state
     if (item != null) {
       return _buildMainContent(theme);
     }
@@ -406,412 +622,524 @@ class _DetailPageState extends State<DetailPage> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Consumer2<SimilarItemsProvider, UserDetailsProvider>(
-        builder: (context, similarItemsProvider, userDetailsProvider, child) {
-          return CustomScrollView(
-            controller: _scrollController,
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            slivers: [
-              // ========== SLIVER APP BAR ==========
-              SliverAppBar(
-                expandedHeight: 350,
-                floating: false,
-                pinned: true,
-                backgroundColor: Colors.black,
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                          color: Colors.white, size: 18),
-                    ),
-                    onPressed: () => Get.back(),
-                  ),
-                ),
-                title: AnimatedOpacity(
-                  opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Text(
-                    item!['name'] ?? 'Item Details',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16.0,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: IconButton(
-                      onPressed: _shareListing,
-                      icon: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Icon(Icons.share, color: Colors.white, size: 20),
-                      ),
-                    ),
-                  ),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    children: [
-                      Opacity(
-                        opacity: _imageOpacity,
-                        child: _buildSafeImage(
-                          currentImage,
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.8),
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.3),
-                            ],
+      body: Stack(
+        children: [
+          Consumer2<SimilarItemsProvider, UserDetailsProvider>(
+            builder: (context, similarItemsProvider, userDetailsProvider, child) {
+              return CustomScrollView(
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                slivers: [
+                  // ========== SLIVER APP BAR ==========
+                  SliverAppBar(
+                    expandedHeight: 350,
+                    floating: false,
+                    pinned: true,
+                    backgroundColor: Colors.black,
+                    leading: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: IconButton(
+                        icon: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(20),
                           ),
+                          child: const Icon(Icons.arrow_back_ios_new_outlined, 
+                              color: Colors.white, size: 18),
                         ),
+                        onPressed: () => Get.back(),
                       ),
-                      
-                      Positioned(
-                        left: 20,
-                        bottom: 80,
-                        child: AnimatedOpacity(
-                          opacity: _imageOpacity,
-                          duration: const Duration(milliseconds: 200),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item!['name'] ?? 'Unnamed Item',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 26.0,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Consumer<UserProvider>(
-                                builder: (context, userProvider, child) {
-                                  return Text(
-                                    '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+                    ),
+                    title: AnimatedOpacity(
+                      opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        item!['name'] ?? 'Item Details',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16.0,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: AnimatedOpacity(
-                          opacity: _imageOpacity,
-                          duration: const Duration(milliseconds: 200),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    ),
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: IconButton(
+                          onPressed: _shareListing,
+                          icon: Container(
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               color: Colors.black54,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
-                              '${selectedIndex + 1}/${images.length}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12.0,
+                            child: const Icon(Icons.share, color: Colors.white, size: 20),
+                          ),
+                        ),
+                      ),
+                    ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      background: Stack(
+                        children: [
+                          Opacity(
+                            opacity: _imageOpacity,
+                            child: _buildSafeImage(
+                              currentImage,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.8),
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              // ========== IMAGE GALLERY ==========
-              SliverToBoxAdapter(
-                child: Container(
-                  color: theme.scaffoldBackgroundColor,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 140,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: images.length,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemBuilder: (context, index) {
-                            final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
-                            return GestureDetector(
-                              onTap: () {
-                                if (mounted) {
-                                  setState(() {
-                                    selectedIndex = index;
-                                  });
-                                }
-                              },
-                              child: _buildGalleryItem(image, index, theme),
-                            );
-                          },
-                        ),
-                      ),
-                      
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Text(
-                          "Tap image to set as main display • Tap 'View' to see full size",
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            color: theme.textTheme.bodyMedium?.color,
-                            fontStyle: FontStyle.italic,
+                          
+                          Positioned(
+                            left: 20,
+                            bottom: 80,
+                            child: AnimatedOpacity(
+                              opacity: _imageOpacity,
+                              duration: const Duration(milliseconds: 200),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item!['name'] ?? 'Unnamed Item',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 26.0,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Consumer<UserProvider>(
+                                    builder: (context, userProvider, child) {
+                                      return Text(
+                                        '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: AnimatedOpacity(
+                              opacity: _imageOpacity,
+                              duration: const Duration(milliseconds: 200),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${selectedIndex + 1}/${images.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12.0,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              
-              // ========== ITEM DETAILS ==========
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item!['name'] ?? 'Unnamed Item',
+                  
+                  // ========== IMAGE GALLERY ==========
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: theme.scaffoldBackgroundColor,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 140,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: images.length,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              itemBuilder: (context, index) {
+                                final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                                return GestureDetector(
+                                  onTap: () {
+                                    if (mounted) {
+                                      setState(() {
+                                        selectedIndex = index;
+                                      });
+                                    }
+                                  },
+                                  child: _buildGalleryItem(image, index, theme),
+                                );
+                              },
+                            ),
+                          ),
+                          
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Text(
+                              "Tap image to set as main display • Tap 'View' to see full size",
                               style: TextStyle(
-                                fontSize: 22.0,
+                                fontSize: 12.0,
+                                color: theme.textTheme.bodyMedium?.color,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
+                  // ========== ITEM DETAILS ==========
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item!['name'] ?? 'Unnamed Item',
+                                  style: TextStyle(
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.textTheme.titleLarge?.color,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Consumer<UserProvider>(
+                                  builder: (context, userProvider, child) {
+                                    return Text(
+                                      '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
+                                      style: TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.textTheme.titleLarge?.color,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                if (item!['description'] != null) ...[
+                                  Text(
+                                    item!['description'],
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      height: 1.5,
+                                      color: theme.textTheme.bodyLarge?.color,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                                if (item!['location'] != null) ...[
+                                  _buildInfoRow(Icons.location_on_outlined, item!['location']),
+                                  const SizedBox(height: 8),
+                                ],
+                                _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item!['created_at'] ?? '')),
+                                const SizedBox(height: 16),
+                                
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: _buildVerificationBadges(),
+                                ),
+                                
+                                const SizedBox(height: 16),
+                                
+                                const SizedBox(height: 20),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    if(item!["warranty"] != null)
+                                    _buildTag(
+                                      "Warranty", 
+                                      theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
+                                  ],
+                                ),
+                                
+                                // ========== HIGHLIGHTS SECTION ==========
+                                if (highlights.isNotEmpty) ...[
+                                  const SizedBox(height: 20),
+                                  _buildSectionTitle("Highlights"),
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 20.0,
+                                    runSpacing: 12.0,
+                                    children: highlights.map((highlight) {
+                                      return _buildInfoItem(
+                                        highlight['title'] ?? 'N/A',
+                                        highlight['value'] ?? 'N/A',
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                                
+                                // ========== SPECIFICATIONS SECTION ==========
+                                if (specifications.isNotEmpty) ...[
+                                  const SizedBox(height: 20),
+                                  _buildSectionTitle("Specifications"),
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 20.0,
+                                    runSpacing: 12.0,
+                                    children: specifications.map((spec) {
+                                      return _buildInfoItem(
+                                        spec['title'] ?? 'N/A',
+                                        spec['value'] ?? 'N/A',
+                                        isSpecification: true,
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                                
+                                const SizedBox(height: 16),
+                                
+                                Divider(
+                                  color: theme.dividerColor,
+                                  height: 12,
+                                  thickness: 0.5,
+                                ),
+                                const SizedBox(height: 16),
+                                Row(
+                                  children: [
+                                    _buildUserProfileImage(),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                _getUserName(),
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: theme.textTheme.titleLarge?.color,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
+                                                CustomImage(
+                                                  imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
+                                                  imageWidth: 16,
+                                                  imageHeight: 16,
+                                                  fit: BoxFit.cover, 
+                                                  isAssetImage: true, 
+                                                  isImageBorderRadiusRequired: false,
+                                                ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text(
+                                            "Joined: ${formatTimeAgo(_getUserCreatedAt() ?? '')}",
+                                            style: TextStyle(
+                                              fontSize: 13.0,
+                                              color: theme.textTheme.bodyMedium?.color,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          _buildAdsCount(),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                
+                                Row(
+                                  children: [
+                                    _buildChatButton(),
+                                    const SizedBox(width: 16),
+                                    _buildShowContactButton(),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
+                            child: Text(
+                              'Similar Items',
+                              style: TextStyle(
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: theme.textTheme.titleLarge?.color,
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            Consumer<UserProvider>(
-                              builder: (context, userProvider, child) {
-                                return Text(
-                                  '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.w500,
-                                    color: theme.textTheme.titleLarge?.color,
-                                  ),
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 16),
-                            if (item!['description'] != null) ...[
-                              Text(
-                                item!['description'],
-                                style: TextStyle(
-                                  fontSize: 15.0,
-                                  height: 1.5,
-                                  color: theme.textTheme.bodyLarge?.color,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                            if (item!['location'] != null) ...[
-                              _buildInfoRow(Icons.location_on_outlined, item!['location']),
-                              const SizedBox(height: 8),
-                            ],
-                            _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item!['created_at'] ?? '')),
-                            const SizedBox(height: 16),
-                            
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: _buildVerificationBadges(),
-                            ),
-                            
-                            const SizedBox(height: 16),
-                            
-                            const SizedBox(height: 20),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                if(item!["warranty"] != null)
-                                _buildTag(
-                                  "Warranty", 
-                                  theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            _buildSectionTitle("Highlights"),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 20.0,
-                              runSpacing: 12.0,
-                              children: highlights.map((highlight) {
-                                return _buildInfoItem(
-                                  highlight['title'] ?? 'N/A',
-                                  highlight['value'] ?? 'N/A',
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 20),
-                            _buildSectionTitle("Specifications"),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 20.0,
-                              runSpacing: 12.0,
-                              children: specifications.map((spec) {
-                                return _buildInfoItem(
-                                  spec['title'] ?? 'N/A',
-                                  spec['value'] ?? 'N/A',
-                                  isSpecification: true,
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            Divider(
-                              color: theme.dividerColor,
-                              height: 12,
-                              thickness: 0.5,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                _buildUserProfileImage(),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            _getUserName(),
-                                            style: TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: theme.textTheme.titleLarge?.color,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
-                                            CustomImage(
-                                              imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
-                                              imageWidth: 16,
-                                              imageHeight: 16,
-                                              fit: BoxFit.cover, 
-                                              isAssetImage: true, 
-                                              isImageBorderRadiusRequired: false,
-                                            ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        "Joined: ${formatTimeAgo(_getUserCreatedAt() ?? '')}",
-                                        style: TextStyle(
-                                          fontSize: 13.0,
-                                          color: theme.textTheme.bodyMedium?.color,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      _buildAdsCount(),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            
-                            Row(
-                              children: [
-                                _buildChatButton(),
-                                const SizedBox(width: 16),
-                                _buildShowContactButton(),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
-                        child: Text(
-                          'Similar Items',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: theme.textTheme.titleLarge?.color,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              // ========== SIMILAR ITEMS ==========
-              _buildSimilarItemsSection(similarItemsProvider),
-              
-              if (similarItemsProvider.isLoadingMore)
-                SliverToBoxAdapter(
-                  child: _buildLoadingMoreIndicator(),
-                ),
-              
-              if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Center(
-                      child: Text(
-                        'No more similar items',
-                        style: TextStyle(
-                          color: theme.textTheme.bodyMedium?.color,
-                          fontSize: 14,
-                        ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 40),
+                  
+                  // ========== SIMILAR ITEMS ==========
+                  _buildSimilarItemsSection(similarItemsProvider),
+                  
+                  if (similarItemsProvider.isLoadingMore)
+                    SliverToBoxAdapter(
+                      child: _buildLoadingMoreIndicator(),
+                    ),
+                  
+                  if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Center(
+                          child: Text(
+                            'No more similar items',
+                            style: TextStyle(
+                              color: theme.textTheme.bodyMedium?.color,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 40),
+                  ),
+                ],
+              );
+            },
+          ),
+          
+          // ========== PROFILE IMAGE POPUP OVERLAY ==========
+          if (_showProfilePopup)
+            Positioned.fill(
+              child: _buildProfilePopup(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ========== ENHANCED USER PROFILE IMAGE WITH ANIMATION ==========
+
+  Widget _buildDefaultProfileAvatar({double size = 60}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.blue.shade400,
+            Colors.purple.shade400,
+          ],
+        ),
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Icon(
+          Icons.person,
+          size: size * 0.5,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserProfileImage() {
+    final dynamic userObj = item!['user'];
+    String? profilePhoto;
+    
+    if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
+      profilePhoto = user['profilePhoto'];
+    } else if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
+      profilePhoto = user['profile_photo'];
+    } else {
+      if (userObj is Map<String, dynamic>) {
+        profilePhoto = userObj['profilePhoto'] ?? userObj['profile_photo'];
+      } else {
+        try {
+          profilePhoto = userObj.profilePhoto ?? userObj.profile_photo;
+        } catch (e) {
+          profilePhoto = null;
+        }
+      }
+    }
+    
+    logger.w('🔍 [PROFILE PHOTO] Final profile photo: $profilePhoto');
+    
+    return GestureDetector(
+      onTap: _openProfilePopup,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
               ),
             ],
-          );
-        },
+          ),
+          child: ClipOval(
+            child: profilePhoto != null && profilePhoto.isNotEmpty
+                ? _buildSafeNetworkImage(
+                    profilePhoto,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  )
+                : _buildDefaultProfileAvatar(size: 60),
+          ),
+        ),
       ),
     );
   }
@@ -836,7 +1164,7 @@ class _DetailPageState extends State<DetailPage> {
       
       // Create the share text
       final String shareText = '''
-🚗 Check out this vehicle on Gag Cars!
+🚗 Check out this vehicle on GAGcars!
 
 $itemName
 💰 Price: $itemPrice
@@ -844,7 +1172,7 @@ $itemName
 
 🔗 View details: $shareableLink
 
-Download Gag Cars app for more amazing vehicles!''';
+Download GAGcars app for more amazing vehicles!''';
 
       logger.i("📝 Generated share link: $shareableLink");
       
@@ -852,7 +1180,7 @@ Download Gag Cars app for more amazing vehicles!''';
       
       final result = await Share.share(
         shareText,
-        subject: 'Check out this vehicle on Gag Cars!',
+        subject: 'Check out this vehicle on GAGcars!',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
       
@@ -892,12 +1220,6 @@ Download Gag Cars app for more amazing vehicles!''';
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 3),
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   // ========== IMAGE HANDLING METHODS ==========
@@ -1030,85 +1352,6 @@ Download Gag Cars app for more amazing vehicles!''';
   }
 
   // ========== USER PROFILE METHODS ==========
-
-  Widget _buildDefaultProfileAvatar({double size = 60}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade400,
-            Colors.purple.shade400,
-          ],
-        ),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Icon(
-          Icons.person,
-          size: size * 0.5,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUserProfileImage() {
-    final dynamic userObj = item!['user'];
-    String? profilePhoto;
-    
-    if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
-      profilePhoto = user['profilePhoto'];
-    } else if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
-      profilePhoto = user['profile_photo'];
-    } else {
-      if (userObj is Map<String, dynamic>) {
-        profilePhoto = userObj['profilePhoto'] ?? userObj['profile_photo'];
-      } else {
-        try {
-          profilePhoto = userObj.profilePhoto ?? userObj.profile_photo;
-        } catch (e) {
-          profilePhoto = null;
-        }
-      }
-    }
-    
-    logger.w('🔍 [PROFILE PHOTO] Final profile photo: $profilePhoto');
-    
-    if (profilePhoto != null && profilePhoto.isNotEmpty) {
-      return Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-            width: 2,
-          ),
-        ),
-        child: ClipOval(
-          child: _buildSafeNetworkImage(
-            profilePhoto,
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-          ),
-        ),
-      );
-    } else {
-      return _buildDefaultProfileAvatar(size: 60);
-    }
-  }
 
   String? _getUserPhoneNumber() {
     try {
@@ -1881,13 +2124,8 @@ Download Gag Cars app for more amazing vehicles!''';
   }
 
   List<Map<String, String>> getSpecifications() {
-    final categoryId = item!['category_id'] ?? _extractCategoryId(item!['category']);
-    if (categoryId == null) {
-      return _getDefaultSpecifications();
-    }
-    
-    final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: true);
-    return categoryDetailProvider.buildSpecifications(categoryId, item!);
+    // FIXED: Always use the default specifications to ensure brand name is used for "Make"
+    return _getDefaultSpecifications();
   }
 
   String? _safeGetString(dynamic obj, String key) {
@@ -1924,60 +2162,64 @@ Download Gag Cars app for more amazing vehicles!''';
     }
   }
 
+  // ========== FILTERED HIGHLIGHTS AND SPECIFICATIONS ==========
+
   List<Map<String, String>> _getDefaultHighlights() {
     final List<Map<String, String>> highlights = [];
     
-    if (item!['year'] != null) {
+    // Filter out empty values - only add if value exists and is not empty/null
+    if (item!['year'] != null && item!['year'].toString().isNotEmpty && item!['year'].toString().toLowerCase() != 'null') {
       highlights.add({'title': 'Model Year', 'value': item!['year'].toString()});
     }
-    if (item!['mileage'] != null) {
+    if (item!['mileage'] != null && item!['mileage'].toString().isNotEmpty && item!['mileage'].toString().toLowerCase() != 'null') {
       highlights.add({'title': 'Mileage', 'value': '${item!['mileage']} km'});
     }
-    if (item!['engine_capacity'] != null) {
+    if (item!['engine_capacity'] != null && item!['engine_capacity'].toString().isNotEmpty && item!['engine_capacity'].toString().toLowerCase() != 'null') {
       highlights.add({'title': 'Engine', 'value': '${item!['engine_capacity']} L'});
     }
-    if (item!['condition'] != null) {
+    if (item!['condition'] != null && item!['condition'].toString().isNotEmpty && item!['condition'].toString().toLowerCase() != 'null') {
       highlights.add({'title': 'Condition', 'value': item!['condition'].toString()});
     }
     
-    return highlights.isNotEmpty ? highlights : [
-      {'title': 'Model Year', 'value': 'N/A'},
-      {'title': 'Mileage', 'value': 'N/A'},
-      {'title': 'Engine', 'value': 'N/A'},
-    ];
+    return highlights; // Return only non-empty highlights
   }
 
   List<Map<String, String>> _getDefaultSpecifications() {
     final List<Map<String, String>> specifications = [];
     
-    final categoryName = _safeGetString(item!['category'], 'name') ?? 
-                        _safeGetString(item!['brand'], 'name');
-    if (categoryName != null) {
-      specifications.add({'title': 'Make', 'value': categoryName});
+    // FIXED: Always use brand name for "Make" - this was the main issue
+    final brandName = _safeGetString(item!['brand'], 'name');
+    if (brandName != null && brandName.isNotEmpty && brandName.toLowerCase() != 'null') {
+      specifications.add({'title': 'Make', 'value': brandName});
     }
     
     final modelName = _safeGetString(item!['brand_model'], 'name');
-    if (modelName != null) {
+    if (modelName != null && modelName.isNotEmpty && modelName.toLowerCase() != 'null') {
       specifications.add({'title': 'Model', 'value': modelName});
     }
     
-    if (item!['color'] != null) {
+    if (item!['color'] != null && item!['color'].toString().isNotEmpty && item!['color'].toString().toLowerCase() != 'null') {
       specifications.add({'title': 'Color', 'value': item!['color'].toString()});
     }
     
-    if (item!['number_of_passengers'] != null) {
+    if (item!['number_of_passengers'] != null && item!['number_of_passengers'].toString().isNotEmpty && item!['number_of_passengers'].toString().toLowerCase() != 'null') {
       specifications.add({'title': 'Seats', 'value': '${item!['number_of_passengers']} seats'});
     }
     
-    if (item!['transmission'] != null) {
+    if (item!['transmission'] != null && item!['transmission'].toString().isNotEmpty && item!['transmission'].toString().toLowerCase() != 'null') {
       specifications.add({'title': 'Transmission', 'value': item!['transmission'].toString()});
     }
     
-    return specifications.isNotEmpty ? specifications : [
-      {'title': 'Make', 'value': 'N/A'},
-      {'title': 'Model', 'value': 'N/A'},
-      {'title': 'Color', 'value': 'N/A'},
-    ];
+    // Add additional specifications if available and not empty
+    if (item!['engine_capacity'] != null && item!['engine_capacity'].toString().isNotEmpty && item!['engine_capacity'].toString().toLowerCase() != 'null') {
+      specifications.add({'title': 'Engine Capacity', 'value': '${item!['engine_capacity']} L'});
+    }
+    
+    if (item!['steer_position'] != null && item!['steer_position'].toString().isNotEmpty && item!['steer_position'].toString().toLowerCase() != 'null') {
+      specifications.add({'title': 'Steering', 'value': item!['steer_position'].toString()});
+    }
+    
+    return specifications; // Return only non-empty specifications
   }
 
   // ========== UI COMPONENTS ==========
@@ -2369,7 +2611,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -2709,7 +2951,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                         ),
                       ),
                   ],
-                ),
+                ), 
               ],
             ),
           ),

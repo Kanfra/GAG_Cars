@@ -122,7 +122,7 @@ class BrandItemsProvider with ChangeNotifier {
             brandId: item.brandId,
             categoryId: item.categoryId,
             name: '${item.name} (Page ${_currentPage + 1})',
-            year: item.year,
+            year: item.year, // ✅ CORRECT - year is already int
             slug: '${item.slug}-page-${_currentPage + 1}',
             description: item.description,
             images: item.images,
@@ -273,9 +273,8 @@ class BrandItemsProvider with ChangeNotifier {
         break;
       case 'year':
         _items.sort((a, b) {
-          final yearA = int.tryParse(a.year) ?? 0;
-          final yearB = int.tryParse(b.year) ?? 0;
-          return ascending ? yearA.compareTo(yearB) : yearB.compareTo(yearA);
+          // ✅ FIXED: No parsing needed - year is already int
+          return ascending ? a.year.compareTo(b.year) : b.year.compareTo(a.year);
         });
         break;
       case 'name':
@@ -325,7 +324,8 @@ class BrandItemsProvider with ChangeNotifier {
   Map<String, int> getYearRange() {
     if (_items.isEmpty) return {'min': 0, 'max': 0};
     
-    final years = _items.map((item) => int.tryParse(item.year) ?? 0).toList();
+    // ✅ FIXED: No parsing needed - year is already int
+    final years = _items.map((item) => item.year).toList();
     years.sort();
     
     return {

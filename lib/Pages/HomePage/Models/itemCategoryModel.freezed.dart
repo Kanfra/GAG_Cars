@@ -254,10 +254,15 @@ mixin _$ItemCategory {
   int? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
   int? get parentId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get description => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseStringList)
   List<String> get features => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get image => throw _privateConstructorUsedError;
   @JsonKey(name: 'created_at')
   DateTime get createdAt => throw _privateConstructorUsedError;
@@ -286,11 +291,11 @@ abstract class $ItemCategoryCopyWith<$Res> {
       {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
-      String name,
-      String slug,
-      String description,
-      List<String> features,
-      String image,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String slug,
+      @JsonKey(fromJson: _parseString) String description,
+      @JsonKey(fromJson: _parseStringList) List<String> features,
+      @JsonKey(fromJson: _parseString) String image,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
       @JsonKey(name: 'item_fields') List<ItemField> itemFields});
@@ -384,11 +389,11 @@ abstract class _$$ItemCategoryImplCopyWith<$Res>
       {@JsonKey(fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
-      String name,
-      String slug,
-      String description,
-      List<String> features,
-      String image,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String slug,
+      @JsonKey(fromJson: _parseString) String description,
+      @JsonKey(fromJson: _parseStringList) List<String> features,
+      @JsonKey(fromJson: _parseString) String image,
       @JsonKey(name: 'created_at') DateTime createdAt,
       @JsonKey(name: 'updated_at') DateTime updatedAt,
       @JsonKey(name: 'item_fields') List<ItemField> itemFields});
@@ -476,11 +481,11 @@ class _$ItemCategoryImpl extends _ItemCategory {
       {@JsonKey(fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) this.userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) this.parentId,
-      required this.name,
-      required this.slug,
-      required this.description,
-      required final List<String> features,
-      required this.image,
+      @JsonKey(fromJson: _parseString) required this.name,
+      @JsonKey(fromJson: _parseString) required this.slug,
+      @JsonKey(fromJson: _parseString) required this.description,
+      @JsonKey(fromJson: _parseStringList) required final List<String> features,
+      @JsonKey(fromJson: _parseString) required this.image,
       @JsonKey(name: 'created_at') required this.createdAt,
       @JsonKey(name: 'updated_at') required this.updatedAt,
       @JsonKey(name: 'item_fields') required final List<ItemField> itemFields})
@@ -501,13 +506,17 @@ class _$ItemCategoryImpl extends _ItemCategory {
   @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
   final int? parentId;
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
+  @JsonKey(fromJson: _parseString)
   final String slug;
   @override
+  @JsonKey(fromJson: _parseString)
   final String description;
   final List<String> _features;
   @override
+  @JsonKey(fromJson: _parseStringList)
   List<String> get features {
     if (_features is EqualUnmodifiableListView) return _features;
     // ignore: implicit_dynamic_type
@@ -515,6 +524,7 @@ class _$ItemCategoryImpl extends _ItemCategory {
   }
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String image;
   @override
   @JsonKey(name: 'created_at')
@@ -597,11 +607,11 @@ abstract class _ItemCategory extends ItemCategory {
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) final int? userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
       final int? parentId,
-      required final String name,
-      required final String slug,
-      required final String description,
-      required final List<String> features,
-      required final String image,
+      @JsonKey(fromJson: _parseString) required final String name,
+      @JsonKey(fromJson: _parseString) required final String slug,
+      @JsonKey(fromJson: _parseString) required final String description,
+      @JsonKey(fromJson: _parseStringList) required final List<String> features,
+      @JsonKey(fromJson: _parseString) required final String image,
       @JsonKey(name: 'created_at') required final DateTime createdAt,
       @JsonKey(name: 'updated_at') required final DateTime updatedAt,
       @JsonKey(name: 'item_fields')
@@ -621,14 +631,19 @@ abstract class _ItemCategory extends ItemCategory {
   @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
   int? get parentId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
+  @JsonKey(fromJson: _parseString)
   String get slug;
   @override
+  @JsonKey(fromJson: _parseString)
   String get description;
   @override
+  @JsonKey(fromJson: _parseStringList)
   List<String> get features;
   @override
+  @JsonKey(fromJson: _parseString)
   String get image;
   @override
   @JsonKey(name: 'created_at')
@@ -656,8 +671,11 @@ ItemField _$ItemFieldFromJson(Map<String, dynamic> json) {
 mixin _$ItemField {
   @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get label => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get type => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _boolFromInt)
   bool get required => throw _privateConstructorUsedError;
@@ -689,9 +707,9 @@ abstract class $ItemFieldCopyWith<$Res> {
   @useResult
   $Res call(
       {@JsonKey(fromJson: _parseInt) int id,
-      String name,
-      String label,
-      String type,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String label,
+      @JsonKey(fromJson: _parseString) String type,
       @JsonKey(fromJson: _boolFromInt) bool required,
       @JsonKey(fromJson: _boolFromInt) bool unique,
       @JsonKey(fromJson: _boolFromInt) bool nullable,
@@ -799,9 +817,9 @@ abstract class _$$ItemFieldImplCopyWith<$Res>
   @useResult
   $Res call(
       {@JsonKey(fromJson: _parseInt) int id,
-      String name,
-      String label,
-      String type,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String label,
+      @JsonKey(fromJson: _parseString) String type,
       @JsonKey(fromJson: _boolFromInt) bool required,
       @JsonKey(fromJson: _boolFromInt) bool unique,
       @JsonKey(fromJson: _boolFromInt) bool nullable,
@@ -894,9 +912,9 @@ class __$$ItemFieldImplCopyWithImpl<$Res>
 class _$ItemFieldImpl extends _ItemField {
   const _$ItemFieldImpl(
       {@JsonKey(fromJson: _parseInt) required this.id,
-      required this.name,
-      required this.label,
-      required this.type,
+      @JsonKey(fromJson: _parseString) required this.name,
+      @JsonKey(fromJson: _parseString) required this.label,
+      @JsonKey(fromJson: _parseString) required this.type,
       @JsonKey(fromJson: _boolFromInt) required this.required,
       @JsonKey(fromJson: _boolFromInt) required this.unique,
       @JsonKey(fromJson: _boolFromInt) required this.nullable,
@@ -914,10 +932,13 @@ class _$ItemFieldImpl extends _ItemField {
   @JsonKey(fromJson: _parseInt)
   final int id;
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
+  @JsonKey(fromJson: _parseString)
   final String label;
   @override
+  @JsonKey(fromJson: _parseString)
   final String type;
   @override
   @JsonKey(fromJson: _boolFromInt)
@@ -1009,9 +1030,9 @@ class _$ItemFieldImpl extends _ItemField {
 abstract class _ItemField extends ItemField {
   const factory _ItemField(
       {@JsonKey(fromJson: _parseInt) required final int id,
-      required final String name,
-      required final String label,
-      required final String type,
+      @JsonKey(fromJson: _parseString) required final String name,
+      @JsonKey(fromJson: _parseString) required final String label,
+      @JsonKey(fromJson: _parseString) required final String type,
       @JsonKey(fromJson: _boolFromInt) required final bool required,
       @JsonKey(fromJson: _boolFromInt) required final bool unique,
       @JsonKey(fromJson: _boolFromInt) required final bool nullable,
@@ -1028,10 +1049,13 @@ abstract class _ItemField extends ItemField {
   @JsonKey(fromJson: _parseInt)
   int get id;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
+  @JsonKey(fromJson: _parseString)
   String get label;
   @override
+  @JsonKey(fromJson: _parseString)
   String get type;
   @override
   @JsonKey(fromJson: _boolFromInt)
@@ -1255,9 +1279,13 @@ PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationLinks {
+  @JsonKey(fromJson: _parseString)
   String get first => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get last => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseNullableString)
   String? get prev => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseNullableString)
   String? get next => throw _privateConstructorUsedError;
 
   /// Serializes this PaginationLinks to a JSON map.
@@ -1276,7 +1304,11 @@ abstract class $PaginationLinksCopyWith<$Res> {
           PaginationLinks value, $Res Function(PaginationLinks) then) =
       _$PaginationLinksCopyWithImpl<$Res, PaginationLinks>;
   @useResult
-  $Res call({String first, String last, String? prev, String? next});
+  $Res call(
+      {@JsonKey(fromJson: _parseString) String first,
+      @JsonKey(fromJson: _parseString) String last,
+      @JsonKey(fromJson: _parseNullableString) String? prev,
+      @JsonKey(fromJson: _parseNullableString) String? next});
 }
 
 /// @nodoc
@@ -1328,7 +1360,11 @@ abstract class _$$PaginationLinksImplCopyWith<$Res>
       __$$PaginationLinksImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String first, String last, String? prev, String? next});
+  $Res call(
+      {@JsonKey(fromJson: _parseString) String first,
+      @JsonKey(fromJson: _parseString) String last,
+      @JsonKey(fromJson: _parseNullableString) String? prev,
+      @JsonKey(fromJson: _parseNullableString) String? next});
 }
 
 /// @nodoc
@@ -1374,22 +1410,26 @@ class __$$PaginationLinksImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaginationLinksImpl extends _PaginationLinks {
   const _$PaginationLinksImpl(
-      {required this.first,
-      required this.last,
-      required this.prev,
-      required this.next})
+      {@JsonKey(fromJson: _parseString) required this.first,
+      @JsonKey(fromJson: _parseString) required this.last,
+      @JsonKey(fromJson: _parseNullableString) required this.prev,
+      @JsonKey(fromJson: _parseNullableString) required this.next})
       : super._();
 
   factory _$PaginationLinksImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationLinksImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String first;
   @override
+  @JsonKey(fromJson: _parseString)
   final String last;
   @override
+  @JsonKey(fromJson: _parseNullableString)
   final String? prev;
   @override
+  @JsonKey(fromJson: _parseNullableString)
   final String? next;
 
   @override
@@ -1431,9 +1471,10 @@ class _$PaginationLinksImpl extends _PaginationLinks {
 
 abstract class _PaginationLinks extends PaginationLinks {
   const factory _PaginationLinks(
-      {required final String first,
-      required final String last,
-      required final String? prev,
+      {@JsonKey(fromJson: _parseString) required final String first,
+      @JsonKey(fromJson: _parseString) required final String last,
+      @JsonKey(fromJson: _parseNullableString) required final String? prev,
+      @JsonKey(fromJson: _parseNullableString)
       required final String? next}) = _$PaginationLinksImpl;
   const _PaginationLinks._() : super._();
 
@@ -1441,12 +1482,16 @@ abstract class _PaginationLinks extends PaginationLinks {
       _$PaginationLinksImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseString)
   String get first;
   @override
+  @JsonKey(fromJson: _parseString)
   String get last;
   @override
+  @JsonKey(fromJson: _parseNullableString)
   String? get prev;
   @override
+  @JsonKey(fromJson: _parseNullableString)
   String? get next;
 
   /// Create a copy of PaginationLinks
@@ -1470,6 +1515,7 @@ mixin _$PaginationMeta {
   @JsonKey(name: 'last_page', fromJson: _parseInt)
   int get lastPage => throw _privateConstructorUsedError;
   List<PaginationLink> get links => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get path => throw _privateConstructorUsedError;
   @JsonKey(name: 'per_page', fromJson: _parseInt)
   int get perPage => throw _privateConstructorUsedError;
@@ -1499,7 +1545,7 @@ abstract class $PaginationMetaCopyWith<$Res> {
       @JsonKey(fromJson: _parseInt) int from,
       @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
       List<PaginationLink> links,
-      String path,
+      @JsonKey(fromJson: _parseString) String path,
       @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
       @JsonKey(fromJson: _parseInt) int to,
       @JsonKey(fromJson: _parseInt) int total});
@@ -1579,7 +1625,7 @@ abstract class _$$PaginationMetaImplCopyWith<$Res>
       @JsonKey(fromJson: _parseInt) int from,
       @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
       List<PaginationLink> links,
-      String path,
+      @JsonKey(fromJson: _parseString) String path,
       @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
       @JsonKey(fromJson: _parseInt) int to,
       @JsonKey(fromJson: _parseInt) int total});
@@ -1653,7 +1699,7 @@ class _$PaginationMetaImpl extends _PaginationMeta {
       @JsonKey(fromJson: _parseInt) required this.from,
       @JsonKey(name: 'last_page', fromJson: _parseInt) required this.lastPage,
       required final List<PaginationLink> links,
-      required this.path,
+      @JsonKey(fromJson: _parseString) required this.path,
       @JsonKey(name: 'per_page', fromJson: _parseInt) required this.perPage,
       @JsonKey(fromJson: _parseInt) required this.to,
       @JsonKey(fromJson: _parseInt) required this.total})
@@ -1681,6 +1727,7 @@ class _$PaginationMetaImpl extends _PaginationMeta {
   }
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String path;
   @override
   @JsonKey(name: 'per_page', fromJson: _parseInt)
@@ -1744,7 +1791,7 @@ abstract class _PaginationMeta extends PaginationMeta {
           @JsonKey(name: 'last_page', fromJson: _parseInt)
           required final int lastPage,
           required final List<PaginationLink> links,
-          required final String path,
+          @JsonKey(fromJson: _parseString) required final String path,
           @JsonKey(name: 'per_page', fromJson: _parseInt)
           required final int perPage,
           @JsonKey(fromJson: _parseInt) required final int to,
@@ -1767,6 +1814,7 @@ abstract class _PaginationMeta extends PaginationMeta {
   @override
   List<PaginationLink> get links;
   @override
+  @JsonKey(fromJson: _parseString)
   String get path;
   @override
   @JsonKey(name: 'per_page', fromJson: _parseInt)
@@ -1792,7 +1840,9 @@ PaginationLink _$PaginationLinkFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PaginationLink {
+  @JsonKey(fromJson: _parseNullableString)
   String? get url => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get label => throw _privateConstructorUsedError;
   bool get active => throw _privateConstructorUsedError;
 
@@ -1812,7 +1862,10 @@ abstract class $PaginationLinkCopyWith<$Res> {
           PaginationLink value, $Res Function(PaginationLink) then) =
       _$PaginationLinkCopyWithImpl<$Res, PaginationLink>;
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call(
+      {@JsonKey(fromJson: _parseNullableString) String? url,
+      @JsonKey(fromJson: _parseString) String label,
+      bool active});
 }
 
 /// @nodoc
@@ -1859,7 +1912,10 @@ abstract class _$$PaginationLinkImplCopyWith<$Res>
       __$$PaginationLinkImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? url, String label, bool active});
+  $Res call(
+      {@JsonKey(fromJson: _parseNullableString) String? url,
+      @JsonKey(fromJson: _parseString) String label,
+      bool active});
 }
 
 /// @nodoc
@@ -1900,15 +1956,19 @@ class __$$PaginationLinkImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PaginationLinkImpl extends _PaginationLink {
   const _$PaginationLinkImpl(
-      {required this.url, required this.label, required this.active})
+      {@JsonKey(fromJson: _parseNullableString) required this.url,
+      @JsonKey(fromJson: _parseString) required this.label,
+      required this.active})
       : super._();
 
   factory _$PaginationLinkImpl.fromJson(Map<String, dynamic> json) =>
       _$$PaginationLinkImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseNullableString)
   final String? url;
   @override
+  @JsonKey(fromJson: _parseString)
   final String label;
   @override
   final bool active;
@@ -1951,8 +2011,8 @@ class _$PaginationLinkImpl extends _PaginationLink {
 
 abstract class _PaginationLink extends PaginationLink {
   const factory _PaginationLink(
-      {required final String? url,
-      required final String label,
+      {@JsonKey(fromJson: _parseNullableString) required final String? url,
+      @JsonKey(fromJson: _parseString) required final String label,
       required final bool active}) = _$PaginationLinkImpl;
   const _PaginationLink._() : super._();
 
@@ -1960,8 +2020,10 @@ abstract class _PaginationLink extends PaginationLink {
       _$PaginationLinkImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseNullableString)
   String? get url;
   @override
+  @JsonKey(fromJson: _parseString)
   String get label;
   @override
   bool get active;

@@ -5,40 +5,54 @@ part 'myListingsModel.g.dart';
 
 typedef MyListings = List<MyListing>;
 
+// Custom JSON converters to handle type issues
+String _parseString(dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value;
+  return value.toString();
+}
+
+int _parseInt(dynamic value) {
+  if (value == null) return 0;
+  if (value is int) return value;
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
 @freezed
 class MyListing with _$MyListing {
   const factory MyListing({
-    required String id,
-    @JsonKey(name: 'user_id') required String userId,
-    @JsonKey(name: 'country_id') dynamic countryId,
-    @JsonKey(name: 'brand_model_id') int? brandModelId,
-    @JsonKey(name: 'brand_id') required int brandId,
-    @JsonKey(name: 'category_id') required int categoryId,
-    required String name,
-    required String year,
-    required String slug,
-    required String description,
+    @JsonKey(fromJson: _parseString) required String id,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) required int userId,
+    @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+    @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
+    @JsonKey(name: 'brand_id', fromJson: _parseInt) required int brandId,
+    @JsonKey(name: 'category_id', fromJson: _parseInt) required int categoryId,
+    @JsonKey(fromJson: _parseString) required String name,
+    @JsonKey(fromJson: _parseString) required String year,
+    @JsonKey(fromJson: _parseString) required String slug,
+    @JsonKey(fromJson: _parseString) required String description,
     required List<String> images,
-    required String location,
-    @JsonKey(name: 'serial_number') dynamic serialNumber,
-    dynamic condition,
-    @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity') String? engineCapacity,
-    String? transmission,
-    String? color,
-    @JsonKey(name: 'build_type') String? buildType,
-    @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+    @JsonKey(fromJson: _parseString) required String location,
+    @JsonKey(name: 'serial_number', fromJson: _parseString) String? serialNumber,
+    @JsonKey(fromJson: _parseString) String? condition,
+    @JsonKey(name: 'steer_position', fromJson: _parseString) String? steerPosition,
+    @JsonKey(name: 'engine_capacity', fromJson: _parseString) String? engineCapacity,
+    @JsonKey(fromJson: _parseString) String? transmission,
+    @JsonKey(fromJson: _parseString) String? color,
+    @JsonKey(name: 'build_type', fromJson: _parseString) String? buildType,
+    @JsonKey(name: 'number_of_passengers', fromJson: _parseInt) int? numberOfPassengers,
     required List<dynamic> features,
-    dynamic status,
-    required String price,
-    String? mileage,
-    dynamic warranty,
-    @JsonKey(name: 'warranty_expiration') dynamic warrantyExpiration,
-    @JsonKey(name: 'deleted_at') dynamic deletedAt,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
-    dynamic Height,
-    dynamic VIN,
+    @JsonKey(fromJson: _parseString) String? status,
+    @JsonKey(fromJson: _parseString) required String price, // Use custom converter
+    @JsonKey(fromJson: _parseString) String? mileage,
+    @JsonKey(fromJson: _parseInt) int? warranty,
+    @JsonKey(name: 'warranty_expiration', fromJson: _parseString) String? warrantyExpiration,
+    @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
+    @JsonKey(name: 'created_at', fromJson: _parseString) required String createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) required String updatedAt,
+    @JsonKey(fromJson: _parseString) String? Height,
+    @JsonKey(fromJson: _parseString) String? VIN,
     Category? category,
     @JsonKey(name: 'is_promoted') bool? isPromoted,
   }) = _MyListing;
@@ -50,16 +64,16 @@ class MyListing with _$MyListing {
 @freezed
 class Category with _$Category {
   const factory Category({
-    required int id,
-    @JsonKey(name: 'user_id') dynamic userId,
-    @JsonKey(name: 'parent_id') dynamic parentId,
-    required String name,
-    required String slug,
-    required String description,
+    @JsonKey(fromJson: _parseInt) required int id,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
+    @JsonKey(name: 'parent_id', fromJson: _parseInt) int? parentId,
+    @JsonKey(fromJson: _parseString) required String name,
+    @JsonKey(fromJson: _parseString) required String slug,
+    @JsonKey(fromJson: _parseString) required String description,
     required List<dynamic> features,
-    required String image,
-    @JsonKey(name: 'created_at') required String createdAt,
-    @JsonKey(name: 'updated_at') required String updatedAt,
+    @JsonKey(fromJson: _parseString) required String image,
+    @JsonKey(name: 'created_at', fromJson: _parseString) required String createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) required String updatedAt,
   }) = _Category;
 
   factory Category.fromJson(Map<String, dynamic> json) =>

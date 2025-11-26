@@ -40,6 +40,60 @@ class HomeService {
   }
   }
 
+  // speical offer by id
+ // speical offer by id
+Future<SpecialOffer> fetchSpecialOfferById(String id) async {
+  final logger = Logger();
+  final uri = Uri.parse("$baseApiUrl${ApiEndpoint.specialOffers}/$id");
+  logger.w('base api url: $baseApiUrl');
+  logger.w('URI for special offer by id: $uri');
+  try{
+    // get user token
+    final token = await AuthService.getToken();
+    if(token  == null) throw Exception("No token available");
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if(response.statusCode == 200){
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+      logger.i('Raw API response for special offer: $responseBody');
+      
+      // Check if the response has a nested structure
+      final SpecialOffer specialOffer;
+      if (responseBody.containsKey('data')) {
+        // If response is wrapped in 'data' key
+        specialOffer = SpecialOffer.fromJson(responseBody['data']);
+        logger.i('Special offer fetched successfully from nested data: ${responseBody['data']['id']}');
+      } else {
+        // If response is direct
+        specialOffer = SpecialOffer.fromJson(responseBody);
+        logger.i('Special offer fetched successfully: ${responseBody['id']}');
+      }
+      
+      // ✅ ADDED: Debug logging to check the structure
+      logger.i('Parsed special offer: ${specialOffer.toJson()}');
+      logger.i('Special offer item: ${specialOffer.item?.toJson()}');
+      logger.i('Special offer discount: ${specialOffer.discount}');
+      
+      return specialOffer;
+    }
+    else{
+      final errorData = jsonDecode(response.body);
+      throw Exception("${response.statusCode} error: ${errorData['message'] ?? "Error fetching special offer"}");
+    }
+  } catch(e, stackTrace){
+    logger.e('Error fetching special offer by id: $e');
+    logger.e('Stack trace: $stackTrace');
+    rethrow;
+  }
+}
+
   // recommended
   Future<List<RecommendedItem>> fetchRecommended({
     int page = 1,

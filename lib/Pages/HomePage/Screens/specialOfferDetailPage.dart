@@ -17,9 +17,11 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
+import 'package:gag_cars_frontend/Utils/special_offer_deep_link_handler.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/Logger.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,7 +37,7 @@ class SpecialOfferDetailPage extends StatefulWidget {
   State<SpecialOfferDetailPage> createState() => _SpecialOfferDetailPageState();
 }
 
-class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with SingleTickerProviderStateMixin {
+class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   double _appBarHeight = 300;
   double _imageOpacity = 1.0;
@@ -51,6 +53,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
 
+  // Profile image animation controllers
+  late AnimationController _profileImageController;
+  late Animation<double> _profileImageScaleAnimation;
+  late Animation<double> _profileImageFadeAnimation;
+  bool _showProfilePopup = false;
+
   @override
   void initState() {
     super.initState();
@@ -60,7 +68,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
     _brand = _item.brand;
     _user = _item.user;
     
-    // Animation setup
+    // Main animation setup
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -79,6 +87,28 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
         curve: Curves.elasticOut,
       ),
     );
+    
+    // Profile image animation setup
+    _profileImageController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    
+    _profileImageScaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.1), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
+    ]).animate(CurvedAnimation(
+      parent: _profileImageController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _profileImageFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _profileImageController,
+      curve: Curves.easeInOut,
+    ));
     
     _animationController.forward();
     
@@ -121,10 +151,194 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
   void dispose() {
     _scrollController.dispose();
     _animationController.dispose();
+    _profileImageController.dispose();
     super.dispose();
   }
 
-  // ========== ENHANCED BUTTON UI METHODS ==========
+  // ========== PROFILE IMAGE POPUP ANIMATION METHODS ==========
+
+  void _openProfilePopup() {
+    logger.i('Opening profile popup');
+    setState(() {
+      _showProfilePopup = true;
+    });
+    _profileImageController.forward();
+  }
+
+  void _closeProfilePopup() {
+    logger.i('Closing profile popup');
+    _profileImageController.reverse().then((_) {
+      if (mounted) {
+        setState(() {
+          _showProfilePopup = false;
+        });
+      }
+    });
+  }
+
+  Widget _buildProfilePopup() {
+    if (!_showProfilePopup) return const SizedBox.shrink();
+
+    final profilePhoto = _getUserProfilePhoto();
+    final userName = _getUserName();
+    final hasProfilePhoto = profilePhoto.isNotEmpty;
+    
+    logger.i('Building profile popup - Has photo: $hasProfilePhoto');
+
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          // Backdrop - click to close
+          GestureDetector(
+            onTap: _closeProfilePopup,
+            child: AnimatedBuilder(
+              animation: _profileImageFadeAnimation,
+              builder: (context, child) {
+                return Container(
+                  color: Colors.black.withOpacity(0.9 * _profileImageFadeAnimation.value),
+                );
+              },
+            ),
+          ),
+          
+          // Profile image content
+          Center(
+            child: AnimatedBuilder(
+              animation: _profileImageScaleAnimation,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _profileImageScaleAnimation.value,
+                  child: child,
+                );
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.85,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Profile image container
+                    Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.3),
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: hasProfilePhoto
+                            ? _buildSafeImage(
+                                profilePhoto,
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              )
+                            : _buildDefaultProfileAvatar(size: 200),
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // User name
+                    Text(
+                      userName,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // User info
+                    Text(
+                      'Vehicle Seller',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+
+                    // Info text when no profile photo
+                    if (!hasProfilePhoto) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'No profile photo available',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Close button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _closeProfilePopup,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorGlobalVariables.brownColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ========== ENHANCED USER PROFILE IMAGE WITH ANIMATION ==========
 
   Widget _buildDefaultProfileAvatar({double size = 60}) {
     return Container(
@@ -161,28 +375,127 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
   Widget _buildUserProfileImage() {
     final profilePhoto = _getUserProfilePhoto();
     
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-      width: 60,
-      height: 60,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-          width: 2,
+    return GestureDetector(
+      onTap: _openProfilePopup,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: profilePhoto.isNotEmpty
+                ? _buildSafeImage(
+                    getImageUrl(profilePhoto, null),
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  )
+                : _buildDefaultProfileAvatar(size: 60),
+          ),
         ),
       ),
-      child: ClipOval(
-        child: profilePhoto.isNotEmpty 
-            ? _buildSafeImage(
-                getImageUrl(profilePhoto, null),
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              )
-            : _buildDefaultProfileAvatar(size: 60),
-      ),
+    );
+  }
+
+  // ========== EXISTING METHODS (KEEPING ALL FUNCTIONALITY) ==========
+
+  // Share functionality
+  Future<void> _shareSpecialOffer() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    try {
+      final String offerId = _specialOffer.id.toString();
+      final String itemId = _specialOffer.itemId;
+      final String offerName = _item.name ?? 'Amazing Special Offer';
+      final String discount = '${_specialOffer.discount}%';
+      final String originalPrice = '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(_item.price?.toString() ?? '0'))}';
+      final String discountedPrice = _calculateDiscountedPrice(context);
+      final String itemLocation = _item.location ?? 'Location not specified';
+      
+      if (offerId.isEmpty) {
+        _showErrorSnackbar('Cannot share: Offer ID missing');
+        return;
+      }
+      
+      final String shareableLink = SpecialOfferDeepLinkHandler.generateSpecialOfferShareableLink(
+        offerId,
+        itemId,
+        offerName,
+        _specialOffer.discount,
+      );
+      
+      final String shareText = '''
+🔥 SPECIAL OFFER! 🔥
+
+🚗 $offerName
+💰 Original Price: $originalPrice
+💥 Discounted Price: $discountedPrice
+🎁 Discount: $discount OFF
+📍 Location: $itemLocation
+
+🔗 Get this exclusive deal: $shareableLink
+
+Download GAGcars app for more amazing deals!''';
+
+      logger.i("📝 Generated special offer share link: $shareableLink");
+      
+      final box = context.findRenderObject() as RenderBox?;
+      
+      final result = await Share.share(
+        shareText,
+        subject: '🔥 Special Offer: $offerName - $discount OFF!',
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+      );
+      
+      if (result.status == ShareResultStatus.success) {
+        logger.i("✅ Special offer share completed successfully");
+        _showSuccessSnackbar('Special offer shared successfully!');
+      } else {
+        logger.w("⚠️ Share dialog was dismissed");
+      }
+      
+    } catch (e, stackTrace) {
+      logger.e("❌ Error sharing special offer: $e");
+      logger.e("❌ Stack trace: $stackTrace");
+      _showErrorSnackbar('Failed to share special offer');
+    }
+  }
+
+  /// Show success snackbar
+  void _showSuccessSnackbar(String message) {
+    Get.snackbar(
+      'Success!',
+      message,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  /// Show error snackbar
+  void _showErrorSnackbar(String message) {
+    Get.snackbar(
+      'Error',
+      message,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 3),
     );
   }
 
@@ -356,8 +669,6 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
     );
   }
 
-  // ========== EXISTING METHODS (KEEPING ALL FUNCTIONALITY) ==========
-
   // Phone Call Functionality
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
@@ -402,11 +713,11 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
     return '';
   }
 
-  String _getUserPhoneNumber() {
+  String? _getUserPhoneNumber() {
     if (_user != null) {
-      return _user!.phone ?? '';
+      return _user!.phone;
     }
-    return '';
+    return null;
   }
 
   // Price formatting and calculations
@@ -527,6 +838,19 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
         return _buildCustomErrorWidget(width, height);
       }
 
+      // Check if it's an asset image
+      if (imagePath.contains('assets/') || imagePath.endsWith('car_placeholder.png')) {
+        return Image.asset(
+          imagePath,
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildCustomErrorWidget(width, height);
+          },
+        );
+      }
+
       final imageUrl = getImageUrl(imagePath, '${ImageStringGlobalVariables.imagePath}car_placeholder.png');
       
       return Image.network(
@@ -559,13 +883,23 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
   }
 
-  // Safe time ago formatting
-  String safeFormatTimeAgo(String? dateString) {
-    if (dateString == null || dateString.isEmpty) {
+  // Safe time ago formatting - FIXED: Use special offer createdAt instead of item createdAt
+  String safeFormatTimeAgo() {
+    try {
+      // Use special offer's createdAt instead of item's createdAt
+      return formatTimeAgo(_specialOffer.createdAt);
+    } catch (e) {
       return 'Recently';
     }
+  }
+
+  // Safe time ago for user join date
+  String safeFormatUserJoinTimeAgo() {
     try {
-      return formatTimeAgo(dateString);
+      if (_user?.createdAt != null && _user!.createdAt!.isNotEmpty) {
+        return formatTimeAgo(_user!.createdAt!);
+      }
+      return 'Recently';
     } catch (e) {
       return 'Recently';
     }
@@ -1097,61 +1431,87 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
     );
   }
 
-  // Get highlights based on special offer data
+  // ========== FIXED FILTERED HIGHLIGHTS AND SPECIFICATIONS ==========
+
+  // Get highlights based on special offer data - FILTERED VERSION
   List<Map<String, String>> getHighlights() {
     final List<Map<String, String>> highlights = [];
     
-    // Special offer highlights
+    // Special offer highlights - always show discount
     highlights.add({
       'title': 'Discount', 
       'value': '${_specialOffer.discount}%'
     });
     
-    if (_item.year != null) {
+    // Only add highlights that have valid, non-empty data
+    // Handle year (String type)
+    if (_item.year != null && _item.year!.isNotEmpty && _item.year!.toLowerCase() != 'null') {
       highlights.add({'title': 'Model Year', 'value': _item.year!});
     }
+    
+    // Handle mileage (could be String or int)
     if (_item.mileage != null) {
-      highlights.add({'title': 'Mileage', 'value': '${_item.mileage} km'});
+      final mileageValue = _item.mileage.toString();
+      if (mileageValue.isNotEmpty && mileageValue.toLowerCase() != 'null') {
+        highlights.add({'title': 'Mileage', 'value': '${_item.mileage} km'});
+      }
     }
+    
+    // Handle engine capacity (could be String or int/double)
     if (_item.engineCapacity != null) {
-      highlights.add({'title': 'Engine', 'value': '${_item.engineCapacity} L'});
+      final engineValue = _item.engineCapacity.toString();
+      if (engineValue.isNotEmpty && engineValue.toLowerCase() != 'null') {
+        highlights.add({'title': 'Engine', 'value': '${_item.engineCapacity} L'});
+      }
     }
-    if (_item.condition != null) {
+    
+    // Handle condition (String type)
+    if (_item.condition != null && _item.condition!.isNotEmpty && _item.condition!.toLowerCase() != 'null') {
       highlights.add({'title': 'Condition', 'value': _item.condition!});
     }
     
-    return highlights;
+    return highlights; // Return only non-empty highlights
   }
 
-  // Get specifications based on special offer data
+  // Get specifications based on special offer data - FILTERED VERSION
   List<Map<String, String>> getSpecifications() {
     final List<Map<String, String>> specifications = [];
     
-    if (_brand?.name != null) {
+    // Only add specifications that have valid, non-empty data
+    // Handle brand name (String type)
+    if (_brand?.name != null && _brand!.name!.isNotEmpty && _brand!.name!.toLowerCase() != 'null') {
       specifications.add({'title': 'Brand', 'value': _brand!.name!});
     }
     
-    if (_item.brandModel?.name != null) {
+    // Handle model name (String type)
+    if (_item.brandModel?.name != null && _item.brandModel!.name!.isNotEmpty && _item.brandModel!.name!.toLowerCase() != 'null') {
       specifications.add({'title': 'Model', 'value': _item.brandModel!.name!});
     }
     
-    if (_item.color != null) {
+    // Handle color (String type)
+    if (_item.color != null && _item.color!.isNotEmpty && _item.color!.toLowerCase() != 'null') {
       specifications.add({'title': 'Color', 'value': _item.color!});
     }
     
+    // Handle numberOfPassengers (int type)
     if (_item.numberOfPassengers != null) {
-      specifications.add({'title': 'Seats', 'value': '${_item.numberOfPassengers} seats'});
+      final passengersValue = _item.numberOfPassengers.toString();
+      if (passengersValue.isNotEmpty && passengersValue.toLowerCase() != 'null') {
+        specifications.add({'title': 'Seats', 'value': '${_item.numberOfPassengers} seats'});
+      }
     }
     
-    if (_item.transmission != null) {
+    // Handle transmission (String type)
+    if (_item.transmission != null && _item.transmission!.isNotEmpty && _item.transmission!.toLowerCase() != 'null') {
       specifications.add({'title': 'Transmission', 'value': _item.transmission!});
     }
     
-    if (_item.location != null) {
+    // Handle location (String type)
+    if (_item.location != null && _item.location!.isNotEmpty && _item.location!.toLowerCase() != 'null') {
       specifications.add({'title': 'Location', 'value': _item.location!});
     }
     
-    return specifications;
+    return specifications; // Return only non-empty specifications
   }
 
   // Build special offer badge with animation
@@ -1215,717 +1575,714 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Si
 
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
-      body: AnimatedBuilder(
-        animation: _animationController,
-        builder: (context, child) {
-          return FadeTransition(
-            opacity: _fadeAnimation,
-            child: ScaleTransition(
-              scale: _scaleAnimation,
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: 350,
-                    floating: false,
-                    pinned: true,
-                    backgroundColor: isDarkMode ? Colors.black : Colors.black,
-                    leading: IconButton(
-                      icon: AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                            color: Colors.white, size: 18),
-                      ),
-                      onPressed: () => Get.back(),
-                    ),
-                    title: AnimatedOpacity(
-                      opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
-                      child: Text(
-                        _item.name ?? 'Special Offer',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16.0,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Stack(
-                        children: [
-                          // Main image
-                          Opacity(
-                            opacity: _imageOpacity,
-                            child: _buildSafeImage(
-                              currentImage,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          
-                          Container(
+      body: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _fadeAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      SliverAppBar(
+                        expandedHeight: 350,
+                        floating: false,
+                        pinned: true,
+                        backgroundColor: isDarkMode ? Colors.black : Colors.black,
+                        leading: IconButton(
+                          icon: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.bottomCenter,
-                                end: Alignment.topCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.8),
-                                  Colors.transparent,
-                                  Colors.black.withOpacity(0.3),
-                                ],
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Icon(Icons.arrow_back_ios_new_outlined, 
+                                color: Colors.white, size: 18),
+                          ),
+                          onPressed: () => Get.back(),
+                        ),
+                        actions: [
+                          // Share button in app bar ONLY (removed from bottom)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: IconButton(
+                              onPressed: _shareSpecialOffer,
+                              icon: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Icon(Icons.share, color: Colors.white, size: 20),
                               ),
                             ),
                           ),
-                          
-                          Positioned(
-                            left: 20,
-                            bottom: 80,
-                            child: AnimatedOpacity(
-                              opacity: _imageOpacity,
-                              duration: const Duration(milliseconds: 200),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _item.name ?? 'Special Offer Vehicle',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 26.0,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                        ],
+                        title: AnimatedOpacity(
+                          opacity: _imageOpacity < 0.2 ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 200),
+                          child: Text(
+                            _item.name ?? 'Special Offer',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16.0,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: Stack(
+                            children: [
+                              // Main image
+                              Opacity(
+                                opacity: _imageOpacity,
+                                child: _buildSafeImage(
+                                  currentImage,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                    colors: [
+                                      Colors.black.withOpacity(0.8),
+                                      Colors.transparent,
+                                      Colors.black.withOpacity(0.3),
+                                    ],
                                   ),
-                                  const SizedBox(height: 6),
-                                  // Special Offer Price Display
-                                  Column(
+                                ),
+                              ),
+                              
+                              Positioned(
+                                left: 20,
+                                bottom: 80,
+                                child: AnimatedOpacity(
+                                  opacity: _imageOpacity,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _calculateDiscountedPrice(context),
+                                        _item.name ?? 'Special Offer Vehicle',
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 24.0,
                                           fontWeight: FontWeight.bold,
+                                          fontSize: 26.0,
                                         ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            _formatPrice(_item.price ?? '0', context),
-                                            style: const TextStyle(
-                                              color: Colors.white70,
-                                              fontSize: 16.0,
-                                              decoration: TextDecoration.lineThrough,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          AnimatedContainer(
-                                            duration: const Duration(milliseconds: 300),
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: Colors.green,
-                                              borderRadius: BorderRadius.circular(8),
-                                            ),
-                                            child: Text(
-                                              'Save ${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12.0,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          // Special Offer Badge
-                          Positioned(
-                            top: 80,
-                            left: 20,
-                            child: AnimatedOpacity(
-                              opacity: _imageOpacity,
-                              duration: const Duration(milliseconds: 200),
-                              child: _buildSpecialOfferBadge(),
-                            ),
-                          ),
-
-                          Positioned(
-                            top: 16,
-                            right: 16,
-                            child: AnimatedOpacity(
-                              opacity: _imageOpacity,
-                              duration: const Duration(milliseconds: 200),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${selectedIndex + 1}/${images.length}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  
-                  // Enhanced Gallery Section with View Buttons
-                  SliverToBoxAdapter(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 400),
-                      color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Gallery with view buttons
-                          SizedBox(
-                            height: 140,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: images.length,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              itemBuilder: (context, index) {
-                                final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
-                                return GestureDetector(
-                                  onTap: () {
-                                    if (mounted) {
-                                      setState(() {
-                                        selectedIndex = index;
-                                      });
-                                    }
-                                  },
-                                  child: _buildGalleryItem(image, index, isDarkMode),
-                                );
-                              },
-                            ),
-                          ),
-                          
-                          // Instructions
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: Text(
-                              "Tap image to set as main display • Tap 'View' to see full size",
-                              style: TextStyle(
-                                fontSize: 12.0,
-                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  
-                  // Main Content Section
-                  SliverToBoxAdapter(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 16),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Vehicle name and brand
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 400),
-                                    child: Row(
-                                      children: [
-                                        if (_brand?.image != null)
-                                          Container(
-                                            width: 40,
-                                            height: 40,
-                                            margin: const EdgeInsets.only(right: 12),
-                                            child: CustomImage(
-                                              imagePath: getImageUrl(_brand!.image!, null),
-                                              isAssetImage: false,
-                                              isImageBorderRadiusRequired: false,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                _item.name ?? 'Special Offer Vehicle',
-                                                style: TextStyle(
-                                                  fontSize: 22.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: isDarkMode ? Colors.white : Colors.black87,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                '${_brand?.name ?? ''} • ${_item.year ?? ''} • ${_item.condition?.toUpperCase() ?? ''}',
-                                                style: TextStyle(
-                                                  fontSize: 14.0,
-                                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Special Offer Time Info with animation
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 500),
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: isActive 
-                                          ? (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]) 
-                                          : (isDarkMode ? Colors.grey[800]! : Colors.grey[100]),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: isActive 
-                                            ? (isDarkMode ? Colors.green[700]! : Colors.green[100]!)
-                                            : (isDarkMode ? Colors.grey[600]! : Colors.grey[300]!),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          isActive ? Icons.timer : Icons.timer_off,
-                                          color: isActive ? Colors.green : (isDarkMode ? Colors.grey[400] : Colors.grey),
-                                          size: 24,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                isActive ? 'Special Offer Active' : 'Offer Ended',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: isActive 
-                                                      ? (isDarkMode ? Colors.green[300] : Colors.green[700])
-                                                      : (isDarkMode ? Colors.grey[400] : Colors.grey[700]),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                _getTimeRemaining(),
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  color: isActive 
-                                                      ? (isDarkMode ? Colors.green[300] : Colors.green[600])
-                                                      : (isDarkMode ? Colors.grey[500] : Colors.grey[600]),
-                                                ),
-                                              ),
-                                              if (isActive) ...[
-                                                const SizedBox(height: 8),
-                                                Text(
-                                                  'Valid: ${_formatDate(_specialOffer.startAt)} - ${_formatDate(_specialOffer.endAt)}',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: isDarkMode ? Colors.white60 : Colors.grey,
-                                                  ),
-                                                ),
-                                              ],
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Price Comparison with animation
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 600),
-                                    padding: const EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: isDarkMode 
-                                          ? ColorGlobalVariables.redColor.withOpacity(0.1)
-                                          : ColorGlobalVariables.redColor.withOpacity(0.05),
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: isDarkMode
-                                            ? ColorGlobalVariables.redColor.withOpacity(0.3)
-                                            : ColorGlobalVariables.redColor.withOpacity(0.2)
-                                      ),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Discounted Price',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: isDarkMode ? Colors.white70 : Colors.grey,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  _calculateDiscountedPrice(context),
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: ColorGlobalVariables.redColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  'Original Price',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: isDarkMode ? Colors.white70 : Colors.grey,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  _formatPrice(_item.price ?? '0', context),
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                                                    decoration: TextDecoration.lineThrough,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 12),
-                                        AnimatedContainer(
-                                          duration: const Duration(milliseconds: 400),
-                                          padding: const EdgeInsets.all(8),
-                                          decoration: BoxDecoration(
-                                            color: isDarkMode
-                                                ? ColorGlobalVariables.redColor.withOpacity(0.2)
-                                                : ColorGlobalVariables.redColor.withOpacity(0.1),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(Icons.savings, color: ColorGlobalVariables.redColor, size: 16),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                'You save ${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
-                                                style: TextStyle(
-                                                  color: ColorGlobalVariables.redColor,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-
-                                  // Description with fade animation
-                                  if (_item.description != null && _item.description!.isNotEmpty) ...[
-                                    AnimatedOpacity(
-                                      opacity: 1.0,
-                                      duration: const Duration(milliseconds: 500),
-                                      child: Text(
-                                        _item.description!,
-                                        style: TextStyle(
-                                          fontSize: 15.0,
-                                          height: 1.5,
-                                          color: isDarkMode ? Colors.white : Colors.black87,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-
-                                  // Location and date info with animations
-                                  if (_item.location != null) ...[
-                                    _buildInfoRow(Icons.location_on_outlined, _item.location!, isDarkMode),
-                                    const SizedBox(height: 8),
-                                  ],
-                                  _buildInfoRow(Icons.refresh_outlined, safeFormatTimeAgo(_item.createdAt), isDarkMode),
-                                  const SizedBox(height: 16),
-                                  
-                                  // Special Offer Description with animation
-                                  if (_specialOffer.description != null && _specialOffer.description!.isNotEmpty) ...[
-                                    AnimatedContainer(
-                                      duration: const Duration(milliseconds: 500),
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
-                                        ),
-                                      ),
-                                      child: Column(
+                                      const SizedBox(height: 6),
+                                      // Special Offer Price Display
+                                      Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Special Offer Details',
-                                            style: TextStyle(
-                                              fontSize: 16,
+                                            _calculateDiscountedPrice(context),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 24.0,
                                               fontWeight: FontWeight.bold,
-                                              color: isDarkMode ? Colors.blue[200] : Colors.blue[800],
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            _specialOffer.description!,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: isDarkMode ? Colors.white : Colors.black87,
-                                              height: 1.4,
-                                            ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                _formatPrice(_item.price ?? '0', context),
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 16.0,
+                                                  decoration: TextDecoration.lineThrough,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              AnimatedContainer(
+                                                duration: const Duration(milliseconds: 300),
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  'Save ${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12.0,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-                                  
-                                  // Tags section with staggered animation
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: [
-                                      _buildTag(
-                                        "${_specialOffer.discount}% OFF", 
-                                        ColorGlobalVariables.redColor.withOpacity(0.9)
-                                      ),
-                                      if(_item.warranty != null && _item.warranty! > 0)
-                                        _buildTag(
-                                          "Warranty", 
-                                          Colors.green
-                                        ),
-                                      if(_item.condition != null)
-                                        _buildTag(
-                                          _item.condition!.toUpperCase(), 
-                                          Colors.orange
-                                        ),
                                     ],
                                   ),
-                                  const SizedBox(height: 20),
-                                  
-                                  // Highlights section
-                                  _buildSectionTitle("Highlights", isDarkMode),
-                                  const SizedBox(height: 12),
-                                  Wrap(
-                                    spacing: 20.0,
-                                    runSpacing: 12.0,
-                                    children: highlights.asMap().entries.map((entry) {
-                                      final index = entry.key;
-                                      final highlight = entry.value;
-                                      return AnimatedContainer(
-                                        duration: Duration(milliseconds: 400 + (index * 100)),
-                                        child: _buildInfoItem(
-                                          highlight['title'] ?? 'N/A',
-                                          highlight['value'] ?? 'N/A',
-                                          isDarkMode,
+                                ),
+                              ),
+
+                              // Special Offer Badge
+                              Positioned(
+                                top: 80,
+                                left: 20,
+                                child: AnimatedOpacity(
+                                  opacity: _imageOpacity,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: _buildSpecialOfferBadge(),
+                                ),
+                              ),
+
+                              Positioned(
+                                top: 16,
+                                right: 16,
+                                child: AnimatedOpacity(
+                                  opacity: _imageOpacity,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '${selectedIndex + 1}/${images.length}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 12.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      // Enhanced Gallery Section with View Buttons
+                      SliverToBoxAdapter(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Gallery with view buttons
+                              SizedBox(
+                                height: 140,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: images.length,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  itemBuilder: (context, index) {
+                                    final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (mounted) {
+                                          setState(() {
+                                            selectedIndex = index;
+                                          });
+                                        }
+                                      },
+                                      child: _buildGalleryItem(image, index, isDarkMode),
+                                    );
+                                  },
+                                ),
+                              ),
+                              
+                              // Instructions
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Text(
+                                  "Tap image to set as main display • Tap 'View' to see full size",
+                                  style: TextStyle(
+                                    fontSize: 12.0,
+                                    color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      // Main Content Section
+                      SliverToBoxAdapter(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 500),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 16),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Vehicle name and brand
+                                      AnimatedContainer(
+                                        duration: const Duration(milliseconds: 400),
+                                        child: Row(
+                                          children: [
+                                            if (_brand?.image != null)
+                                              Container(
+                                                width: 40,
+                                                height: 40,
+                                                margin: const EdgeInsets.only(right: 12),
+                                                child: CustomImage(
+                                                  imagePath: getImageUrl(_brand!.image!, null),
+                                                  isAssetImage: false,
+                                                  isImageBorderRadiusRequired: false,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    _item.name ?? 'Special Offer Vehicle',
+                                                    style: TextStyle(
+                                                      fontSize: 22.0,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: isDarkMode ? Colors.white : Colors.black87,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    '${_brand?.name ?? ''} • ${_item.year ?? ''} • ${_item.condition?.toUpperCase() ?? ''}',
+                                                    style: TextStyle(
+                                                      fontSize: 14.0,
+                                                      color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  
-                                  // Specifications section
-                                  _buildSectionTitle("Specifications", isDarkMode),
-                                  const SizedBox(height: 12),
-                                  Wrap(
-                                    spacing: 20.0,
-                                    runSpacing: 12.0,
-                                    children: specifications.asMap().entries.map((entry) {
-                                      final index = entry.key;
-                                      final spec = entry.value;
-                                      return AnimatedContainer(
-                                        duration: Duration(milliseconds: 400 + (index * 100)),
-                                        child: _buildInfoItem(
-                                          spec['title'] ?? 'N/A',
-                                          spec['value'] ?? 'N/A',
-                                          isDarkMode,
-                                          isSpecification: true,
+                                      ),
+                                      const SizedBox(height: 16),
+
+                                      // Special Offer Time Info with animation
+                                      AnimatedContainer(
+                                        duration: const Duration(milliseconds: 500),
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: isActive 
+                                              ? (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]) 
+                                              : (isDarkMode ? Colors.grey[800]! : Colors.grey[100]),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: isActive 
+                                                ? (isDarkMode ? Colors.green[700]! : Colors.green[100]!)
+                                                : (isDarkMode ? Colors.grey[600]! : Colors.grey[300]!),
+                                          ),
                                         ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  
-                                  Divider(
-                                    color: isDarkMode ? const Color(0xFF616161) : ColorGlobalVariables.fadedBlackColor,
-                                    height: 12,
-                                    thickness: 0.5,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  
-                                  // Features section with animation
-                                  if (_item.features != null && _item.features!.isNotEmpty) ...[
-                                    _buildSectionTitle("Features", isDarkMode),
-                                    const SizedBox(height: 12),
-                                    Wrap(
-                                      spacing: 8,
-                                      runSpacing: 8,
-                                      children: _item.features!.asMap().entries.map((entry) {
-                                        final index = entry.key;
-                                        final feature = entry.value;
-                                        return AnimatedContainer(
-                                          duration: Duration(milliseconds: 300 + (index * 50)),
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              isActive ? Icons.timer : Icons.timer_off,
+                                              color: isActive ? Colors.green : (isDarkMode ? Colors.grey[400] : Colors.grey),
+                                              size: 24,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    isActive ? 'Special Offer Active' : 'Offer Ended',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: isActive 
+                                                          ? (isDarkMode ? Colors.green[300] : Colors.green[700])
+                                                          : (isDarkMode ? Colors.grey[400] : Colors.grey[700]),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    _getTimeRemaining(),
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: isActive 
+                                                          ? (isDarkMode ? Colors.green[300] : Colors.green[600])
+                                                          : (isDarkMode ? Colors.grey[500] : Colors.grey[600]),
+                                                    ),
+                                                  ),
+                                                  if (isActive) ...[
+                                                    const SizedBox(height: 8),
+                                                    Text(
+                                                      'Valid: ${_formatDate(_specialOffer.startAt)} - ${_formatDate(_specialOffer.endAt)}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: isDarkMode ? Colors.white60 : Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+
+                                      // Price Comparison with animation
+                                      AnimatedContainer(
+                                        duration: const Duration(milliseconds: 600),
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: isDarkMode 
+                                              ? ColorGlobalVariables.redColor.withOpacity(0.1)
+                                              : ColorGlobalVariables.redColor.withOpacity(0.05),
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: isDarkMode
+                                                ? ColorGlobalVariables.redColor.withOpacity(0.3)
+                                                : ColorGlobalVariables.redColor.withOpacity(0.2)
+                                          ),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Discounted Price',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: isDarkMode ? Colors.white70 : Colors.grey,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      _calculateDiscountedPrice(context),
+                                                      style: TextStyle(
+                                                        fontSize: 24,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: ColorGlobalVariables.redColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      'Original Price',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: isDarkMode ? Colors.white70 : Colors.grey,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      _formatPrice(_item.price ?? '0', context),
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                                                        decoration: TextDecoration.lineThrough,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 12),
+                                            AnimatedContainer(
+                                              duration: const Duration(milliseconds: 400),
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: isDarkMode
+                                                    ? ColorGlobalVariables.redColor.withOpacity(0.2)
+                                                    : ColorGlobalVariables.redColor.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(Icons.savings, color: ColorGlobalVariables.redColor, size: 16),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    'You save ${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(_getSavingsAmount()))}',
+                                                    style: TextStyle(
+                                                      color: ColorGlobalVariables.redColor,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+
+                                      // Description with fade animation
+                                      if (_item.description != null && _item.description!.isNotEmpty) ...[
+                                        AnimatedOpacity(
+                                          opacity: 1.0,
+                                          duration: const Duration(milliseconds: 500),
+                                          child: Text(
+                                            _item.description!,
+                                            style: TextStyle(
+                                              fontSize: 15.0,
+                                              height: 1.5,
+                                              color: isDarkMode ? Colors.white : Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                      ],
+
+                                      // Location and date info with animations
+                                      if (_item.location != null) ...[
+                                        _buildInfoRow(Icons.location_on_outlined, _item.location!, isDarkMode),
+                                        const SizedBox(height: 8),
+                                      ],
+                                      // FIXED: Use special offer's createdAt instead of item's createdAt
+                                      _buildInfoRow(Icons.refresh_outlined, safeFormatTimeAgo(), isDarkMode),
+                                      const SizedBox(height: 16),
+                                      
+                                      // Special Offer Description with animation
+                                      if (_specialOffer.description != null && _specialOffer.description!.isNotEmpty) ...[
+                                        AnimatedContainer(
+                                          duration: const Duration(milliseconds: 500),
+                                          padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
                                             color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
-                                            borderRadius: BorderRadius.circular(20),
+                                            borderRadius: BorderRadius.circular(12),
                                             border: Border.all(
                                               color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
                                             ),
                                           ),
-                                          child: Text(
-                                            feature,
-                                            style: TextStyle(
-                                              color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    const SizedBox(height: 20),
-                                  ],
-                                  
-                                  // Seller information section with animation
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 500),
-                                    child: Row(
-                                      children: [
-                                        // Professional User Profile Icon
-                                        _buildUserProfileImage(),
-                                        const SizedBox(width: 12),
-                                        // User details
-                                        Expanded(
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                _getUserName(),
+                                                'Special Offer Details',
                                                 style: TextStyle(
-                                                  fontSize: 16.0,
+                                                  fontSize: 16,
                                                   fontWeight: FontWeight.bold,
-                                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                                  color: isDarkMode ? Colors.blue[200] : Colors.blue[800],
                                                 ),
                                               ),
-                                              const SizedBox(height: 6),
+                                              const SizedBox(height: 8),
                                               Text(
-                                                "Joined: ${safeFormatTimeAgo(_item.createdAt)}",
+                                                _specialOffer.description!,
                                                 style: TextStyle(
-                                                  fontSize: 13.0,
-                                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                                  fontSize: 14,
+                                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                                  height: 1.4,
                                                 ),
                                               ),
-                                              const SizedBox(height: 4),
-                                              // COMMENTED OUT: Ads section removed as requested
-                                              /*
-                                              GestureDetector(
-                                                onTap: (){
-                                                  logger.e('User data: $_user');
-                                                  if (_user != null) {
-                                                    Get.toNamed(
-                                                      RouteClass.getAdsPage(),
-                                                      arguments: {
-                                                        'user': _user!.toJson(),
-                                                        'phoneNumber': _getUserPhoneNumber(),
-                                                        'type': 'adsPage'
-                                                      }
-                                                    );
-                                                  } else {
-                                                    Get.snackbar(
-                                                      'Error',
-                                                      'Seller information not available',
-                                                      backgroundColor: Colors.red,
-                                                      colorText: Colors.white,
-                                                    );
-                                                  }
-                                                },
-                                                child: Text(
-                                                  '34 Ads',
-                                                  style: TextStyle(
-                                                    fontSize: 13.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: ColorGlobalVariables.greenColor,
-                                                    decoration: TextDecoration.underline,
-                                                  ),
-                                                ),
-                                              ),
-                                              */
                                             ],
                                           ),
                                         ),
+                                        const SizedBox(height: 16),
                                       ],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  
-                                  // ENHANCED ACTION BUTTONS SECTION
-                                  Row(
-                                    children: [
-                                      _buildChatButton(),
-                                      const SizedBox(width: 16),
-                                      _buildShowContactButton(),
+                                      
+                                      // Tags section with staggered animation
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children: [
+                                          _buildTag(
+                                            "${_specialOffer.discount}% OFF", 
+                                            ColorGlobalVariables.redColor.withOpacity(0.9)
+                                          ),
+                                          if(_item.warranty != null && _item.warranty! > 0)
+                                            _buildTag(
+                                              "Warranty", 
+                                              Colors.green
+                                            ),
+                                          if(_item.condition != null)
+                                            _buildTag(
+                                              _item.condition!.toUpperCase(), 
+                                              Colors.orange
+                                            ),
+                                        ],
+                                      ),
+                                      
+                                      // ========== HIGHLIGHTS SECTION (CONDITIONAL) ==========
+                                      if (highlights.isNotEmpty) ...[
+                                        const SizedBox(height: 20),
+                                        _buildSectionTitle("Highlights", isDarkMode),
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 20.0,
+                                          runSpacing: 12.0,
+                                          children: highlights.asMap().entries.map((entry) {
+                                            final index = entry.key;
+                                            final highlight = entry.value;
+                                            return AnimatedContainer(
+                                              duration: Duration(milliseconds: 400 + (index * 100)),
+                                              child: _buildInfoItem(
+                                                highlight['title'] ?? 'N/A',
+                                                highlight['value'] ?? 'N/A',
+                                                isDarkMode,
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                      
+                                      // ========== SPECIFICATIONS SECTION (CONDITIONAL) ==========
+                                      if (specifications.isNotEmpty) ...[
+                                        const SizedBox(height: 20),
+                                        _buildSectionTitle("Specifications", isDarkMode),
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 20.0,
+                                          runSpacing: 12.0,
+                                          children: specifications.asMap().entries.map((entry) {
+                                            final index = entry.key;
+                                            final spec = entry.value;
+                                            return AnimatedContainer(
+                                              duration: Duration(milliseconds: 400 + (index * 100)),
+                                              child: _buildInfoItem(
+                                                spec['title'] ?? 'N/A',
+                                                spec['value'] ?? 'N/A',
+                                                isDarkMode,
+                                                isSpecification: true,
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                      
+                                      const SizedBox(height: 16),
+                                      
+                                      Divider(
+                                        color: isDarkMode ? const Color(0xFF616161) : ColorGlobalVariables.fadedBlackColor,
+                                        height: 12,
+                                        thickness: 0.5,
+                                      ),
+                                      const SizedBox(height: 16),
+                                      
+                                      // Features section with animation
+                                      if (_item.features != null && _item.features!.isNotEmpty) ...[
+                                        _buildSectionTitle("Features", isDarkMode),
+                                        const SizedBox(height: 12),
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: _item.features!.asMap().entries.map((entry) {
+                                            final index = entry.key;
+                                            final feature = entry.value;
+                                            return AnimatedContainer(
+                                              duration: Duration(milliseconds: 300 + (index * 50)),
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                              decoration: BoxDecoration(
+                                                color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                                borderRadius: BorderRadius.circular(20),
+                                                border: Border.all(
+                                                  color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
+                                                ),
+                                              ),
+                                              child: Text(
+                                                feature,
+                                                style: TextStyle(
+                                                  color: isDarkMode ? Colors.blue[200] : Colors.blue[700],
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        const SizedBox(height: 20),
+                                      ],  
+                                      // Seller information section with animation
+                                      AnimatedContainer(
+                                        duration: const Duration(milliseconds: 500),
+                                        child: Row(
+                                          children: [
+                                            // Professional User Profile Icon with popup functionality
+                                            _buildUserProfileImage(),
+                                            const SizedBox(width: 12),
+                                            // User details
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    _getUserName(),
+                                                    style: TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: isDarkMode ? Colors.white : Colors.black87,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    "Joined: ${safeFormatUserJoinTimeAgo()}",
+                                                    style: TextStyle(
+                                                      fontSize: 13.0,
+                                                      color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      
+                                      // ACTION BUTTONS SECTION (ONLY CHAT AND CONTACT - NO SHARE BUTTON)
+                                      Row(
+                                        children: [
+                                          _buildChatButton(),
+                                          const SizedBox(width: 16),
+                                          _buildShowContactButton(),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
                             ),
-                            const SizedBox(height: 24),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              );
+            },
+          ),
+          
+          // ========== PROFILE IMAGE POPUP OVERLAY ==========
+          if (_showProfilePopup)
+            Positioned.fill(
+              child: _buildProfilePopup(),
             ),
-          );
-        },
+        ],
       ),
     );
   }

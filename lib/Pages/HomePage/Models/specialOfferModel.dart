@@ -20,7 +20,7 @@ class SpecialOfferResponse with _$SpecialOfferResponse {
 class SpecialOffer with _$SpecialOffer {
   const factory SpecialOffer({
     @JsonKey(fromJson: _parseInt) required int id,
-    @JsonKey(name: 'user_id') String? userId,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
     @JsonKey(name: 'item_id', fromJson: _parseString) required String itemId,
     @JsonKey(name: 'start_at', fromJson: _parseString) required String startAt,
     @JsonKey(name: 'end_at', fromJson: _parseString) required String endAt,
@@ -41,37 +41,37 @@ class SpecialOffer with _$SpecialOffer {
 class Item with _$Item {
   const factory Item({
     @JsonKey(fromJson: _parseString) required String id,
-    @JsonKey(name: 'user_id') String? userId,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
     @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
     @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
     @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
     @JsonKey(name: 'category_id', fromJson: _parseInt) int? categoryId,
     @JsonKey(fromJson: _parseString) required String name,
-    String? year,
-    String? slug,
-    String? description,
+    @JsonKey(fromJson: _parseString) String? year, // Added converter
+    @JsonKey(fromJson: _parseString) String? slug,
+    @JsonKey(fromJson: _parseString) String? description,
     List<String>? images,
-    String? location,
-    @JsonKey(name: 'serial_number') String? serialNumber,
-    String? condition,
-    @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity') String? engineCapacity,
-    String? transmission,
-    String? color,
-    @JsonKey(name: 'build_type') String? buildType,
+    @JsonKey(fromJson: _parseString) String? location,
+    @JsonKey(name: 'serial_number', fromJson: _parseString) String? serialNumber, // Added converter
+    @JsonKey(fromJson: _parseString) String? condition, // Added converter
+    @JsonKey(name: 'steer_position', fromJson: _parseString) String? steerPosition,
+    @JsonKey(name: 'engine_capacity', fromJson: _parseString) String? engineCapacity,
+    @JsonKey(fromJson: _parseString) String? transmission,
+    @JsonKey(fromJson: _parseString) String? color,
+    @JsonKey(name: 'build_type', fromJson: _parseString) String? buildType,
     @JsonKey(name: 'number_of_passengers', fromJson: _parseInt) int? numberOfPassengers,
     List<String>? features,
-    String? status,
-    String? price,
-    String? mileage,
+    @JsonKey(fromJson: _parseString) String? status, // Added converter
+    @JsonKey(fromJson: _parseString) String? price,
+    @JsonKey(fromJson: _parseString) String? mileage,
     @JsonKey(fromJson: _parseInt) int? warranty,
-    @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
-    @JsonKey(name: 'deleted_at') String? deletedAt,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(name: 'warranty_expiration', fromJson: _parseString) String? warrantyExpiration,
+    @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
+    @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
     // New fields from response
-    String? Height,
-    String? VIN,
+    @JsonKey(fromJson: _parseString) String? Height,
+    @JsonKey(fromJson: _parseString) String? VIN,
     Brand? brand,
     Category? category,
     @JsonKey(name: 'brand_model') BrandModel? brandModel,
@@ -87,20 +87,20 @@ class User with _$User {
     @JsonKey(fromJson: _parseString) required String id,
     @JsonKey(fromJson: _parseString) required String name,
     @JsonKey(fromJson: _parseString) required String email,
-    String? phone,
-    @JsonKey(name: 'email_verified_at') String? emailVerifiedAt,
+    @JsonKey(fromJson: _parseString) String? phone,
+    @JsonKey(name: 'email_verified_at', fromJson: _parseString) String? emailVerifiedAt,
     @JsonKey(name: 'paid_seller', fromJson: _parseInt) int? paidSeller,
-    @JsonKey(name: 'deleted_at') String? deletedAt,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
+    @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
     @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
     @JsonKey(name: 'state_id', fromJson: _parseInt) int? stateId,
-    @JsonKey(name: 'profile_photo') String? profilePhoto,
+    @JsonKey(name: 'profile_photo', fromJson: _parseString) String? profilePhoto,
     @JsonKey(name: 'uploads_left', fromJson: _parseInt) int? uploadsLeft,
     @JsonKey(name: 'active_status', fromJson: _parseInt) int? activeStatus,
-    String? avatar,
+    @JsonKey(fromJson: _parseString) String? avatar,
     @JsonKey(name: 'dark_mode', fromJson: _parseInt) int? darkMode,
-    @JsonKey(name: 'messenger_color') String? messengerColor,
+    @JsonKey(name: 'messenger_color', fromJson: _parseString) String? messengerColor,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -110,12 +110,12 @@ class User with _$User {
 class Brand with _$Brand {
   const factory Brand({
     @JsonKey(fromJson: _parseInt) required int id,
-    @JsonKey(name: 'user_id') String? userId,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
     @JsonKey(fromJson: _parseString) required String name,
-    String? slug,
-    String? image,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(fromJson: _parseString) String? slug,
+    @JsonKey(fromJson: _parseString) String? image,
+    @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
   }) = _Brand;
 
   factory Brand.fromJson(Map<String, dynamic> json) => _$BrandFromJson(json);
@@ -125,15 +125,15 @@ class Brand with _$Brand {
 class Category with _$Category {
   const factory Category({
     @JsonKey(fromJson: _parseInt) required int id,
-    @JsonKey(name: 'user_id') String? userId,
-    @JsonKey(name: 'parent_id', fromJson: _parseString) String? parentId,
+    @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
+    @JsonKey(name: 'parent_id', fromJson: _parseInt) int? parentId,
     @JsonKey(fromJson: _parseString) required String name,
-    String? slug,
-    String? description,
+    @JsonKey(fromJson: _parseString) String? slug,
+    @JsonKey(fromJson: _parseString) String? description,
     List<String>? features,
-    String? image,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(fromJson: _parseString) String? image,
+    @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
   }) = _Category;
 
   factory Category.fromJson(Map<String, dynamic> json) =>
@@ -146,9 +146,9 @@ class BrandModel with _$BrandModel {
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
     @JsonKey(fromJson: _parseString) required String name,
-    String? slug,
-    @JsonKey(name: 'created_at') String? createdAt,
-    @JsonKey(name: 'updated_at') String? updatedAt,
+    @JsonKey(fromJson: _parseString) String? slug,
+    @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
   }) = _BrandModel;
 
   factory BrandModel.fromJson(Map<String, dynamic> json) =>

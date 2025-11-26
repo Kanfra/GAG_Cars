@@ -34,24 +34,23 @@ class SimilarItem with _$SimilarItem {
     @JsonKey(name: 'images', fromJson: _parseStringList) List<String>? images,
     @JsonKey(name: 'location') String? location,
     @JsonKey(name: 'serial_number') String? serialNumber,
-    @JsonKey(name: 'condition') String? condition,
+    @JsonKey(name: 'Condition') String? condition, // ✅ FIXED: Capital 'C' to match JSON
     @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity') String? engineCapacity,
+    @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString) String? engineCapacity, // ✅ FIXED: Handle both int and string
     @JsonKey(name: 'transmission') String? transmission,
     @JsonKey(name: 'color') String? color,
     @JsonKey(name: 'build_type') String? buildType,
-    @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
-        int? numberOfPassengers,
+    @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt) int? numberOfPassengers,
     @JsonKey(name: 'features', fromJson: _parseStringList) List<String>? features,
     @JsonKey(name: 'status') String? status,
-    @JsonKey(name: 'price') String? price,
-    @JsonKey(name: 'mileage') String? mileage,
+    @JsonKey(name: 'price', fromJson: _parseNullableString) String? price, // ✅ FIXED: Handle both int and string
+    @JsonKey(name: 'mileage', fromJson: _parseNullableString) String? mileage, // ✅ FIXED: Handle both int and string
     @JsonKey(name: 'warranty', fromJson: _parseNullableInt) int? warranty,
     @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
     @JsonKey(name: 'deleted_at') String? deletedAt,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
-    @JsonKey(name: 'Height') String? height,
+    @JsonKey(name: 'Height', fromJson: _parseNullableString) String? height, // ✅ FIXED: Handle both int and string
     @JsonKey(name: 'VIN') String? vin,
     // Added nested objects
     @JsonKey(name: 'brand') Brand? brand,
@@ -67,7 +66,7 @@ class SimilarItem with _$SimilarItem {
 @freezed
 class Brand with _$Brand {
   const factory Brand({
-    @JsonKey(name: 'id') required int id,
+    @JsonKey(name: 'id', fromJson: _parseInt) required int id, // ✅ FIXED: Ensure int parsing
     @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
     @JsonKey(name: 'name') String? name,
     @JsonKey(name: 'slug') String? slug,
@@ -82,7 +81,7 @@ class Brand with _$Brand {
 @freezed
 class Category with _$Category {
   const factory Category({
-    @JsonKey(name: 'id') required int id,
+    @JsonKey(name: 'id', fromJson: _parseInt) required int id, // ✅ FIXED: Ensure int parsing
     @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
     @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
     @JsonKey(name: 'name') String? name,
@@ -100,7 +99,7 @@ class Category with _$Category {
 @freezed
 class BrandModel with _$BrandModel {
   const factory BrandModel({
-    @JsonKey(name: 'id') required int id,
+    @JsonKey(name: 'id', fromJson: _parseInt) required int id, // ✅ FIXED: Ensure int parsing
     @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
     @JsonKey(name: 'name') String? name,
     @JsonKey(name: 'slug') String? slug,
@@ -179,29 +178,40 @@ class PaginationLink with _$PaginationLink {
 }
 
 // ---------------------
-// Helper parse functions
+// Enhanced Helper parse functions
 // ---------------------
 
 int _parseInt(dynamic value) {
   if (value == null) return 0;
   if (value is int) return value;
-  if (value is String && value.isNotEmpty) return int.tryParse(value) ?? 0;
+  if (value is String) {
+    if (value.isEmpty) return 0;
+    return int.tryParse(value) ?? 0;
+  }
   if (value is num) return value.toInt();
+  if (value is bool) return value ? 1 : 0;
   return 0;
 }
 
 int? _parseNullableInt(dynamic value) {
   if (value == null) return null;
   if (value is int) return value;
-  if (value is String && value.isNotEmpty) return int.tryParse(value);
+  if (value is String) {
+    if (value.isEmpty) return null;
+    return int.tryParse(value);
+  }
   if (value is num) return value.toInt();
+  if (value is bool) return value ? 1 : 0;
   return null;
 }
 
 double? _parseNullableDouble(dynamic value) {
   if (value == null) return null;
   if (value is double) return value;
-  if (value is String && value.isNotEmpty) return double.tryParse(value);
+  if (value is String) {
+    if (value.isEmpty) return null;
+    return double.tryParse(value);
+  }
   if (value is num) return value.toDouble();
   return null;
 }
@@ -219,14 +229,32 @@ bool _parseBool(dynamic value) {
 String? _parseNullableString(dynamic value) {
   if (value == null) return null;
   if (value is String) return value.isEmpty ? null : value;
+  // ✅ CRITICAL FIX: Handle numbers and other types gracefully
+  if (value is int) return value.toString();
+  if (value is double) return value.toString();
+  if (value is num) return value.toString();
+  if (value is bool) return value.toString();
+  
   final stringValue = value.toString();
   return stringValue.isEmpty ? null : stringValue;
+}
+
+String _parseString(dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value;
+  // ✅ CRITICAL FIX: Handle numbers and other types gracefully
+  if (value is int) return value.toString();
+  if (value is double) return value.toString();
+  if (value is num) return value.toString();
+  if (value is bool) return value.toString();
+  
+  return value.toString();
 }
 
 List<String> _parseStringList(dynamic value) {
   if (value == null) return [];
   if (value is List) {
-    return value.whereType<String>().where((item) => item.isNotEmpty).toList();
+    return value.map((item) => _parseString(item)).where((item) => item.isNotEmpty).toList();
   }
   return [];
 }

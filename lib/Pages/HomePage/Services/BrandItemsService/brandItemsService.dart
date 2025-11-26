@@ -5,32 +5,33 @@ import 'package:gag_cars_frontend/Pages/HomePage/Models/brandItemsModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/Logger.dart';
+import 'package:logger/logger.dart';
 
 class BrandItemsService {
-  
+  static final Logger _logger = Logger();
+
   /// Fetches items by brand ID
   static Future<List<BrandItem>> getItemsByBrand({
     required int brandId,
   }) async {
-    print('🚀 [SERVICE] Starting API call - brandId: $brandId');
+    _logger.i('🚀 [SERVICE] Starting API call - brandId: $brandId');
     
     try {
-      final logger = Logger();
-      logger.w("brand id: $brandId");
+      _logger.w("Brand id: $brandId");
+      
       // Get token
       final token = await AuthService.getToken();
-      print('🔐 [SERVICE] Token obtained: ${token != null ? "YES" : "NO"}');
+      _logger.i('🔐 [SERVICE] Token obtained: ${token != null ? "YES" : "NO"}');
 
       // Construct URL
       final endpointPath = '${ApiEndpoint.brandItems}/$brandId';
       final fullUrl = '$baseApiUrl$endpointPath';
       final uri = Uri.parse(fullUrl);
 
-      print('🔗 [SERVICE] Full URL: $fullUrl');
+      _logger.i('🔗 [SERVICE] Full URL: $fullUrl');
 
       // Make HTTP request
-      print('📤 [SERVICE] Making GET request...');
+      _logger.i('📤 [SERVICE] Making GET request...');
       final response = await http.get(
         uri,
         headers: {
@@ -40,41 +41,40 @@ class BrandItemsService {
         },
       ).timeout(const Duration(seconds: 30));
 
-      print('📥 [SERVICE] Response status: ${response.statusCode}');
-      print('📦 [SERVICE] Response body length: ${response.body.length}');
+      _logger.i('📥 [SERVICE] Response status: ${response.statusCode}');
+      _logger.i('📦 [SERVICE] Response body length: ${response.body.length}');
 
       // Handle response
       if (response.statusCode == 200) {
-        print('✅ [SERVICE] Request successful (200)');
+        _logger.i('✅ [SERVICE] Request successful (200)');
         
         // First, let's see what we're actually getting
         final dynamic jsonData = json.decode(response.body);
-        print('🔍 [SERVICE] Response type: ${jsonData.runtimeType}');
+        _logger.i('🔍 [SERVICE] Response type: ${jsonData.runtimeType}');
         
         if (jsonData is Map<String, dynamic>) {
-          print('🔍 [SERVICE] Response keys: ${jsonData.keys.join(', ')}');
-          print('🔍 [SERVICE] Full response structure: $jsonData');
+          _logger.i('🔍 [SERVICE] Response keys: ${jsonData.keys.join(', ')}');
         }
         
         return _parseResponse(jsonData);
       } else {
-        print('❌ [SERVICE] HTTP Error ${response.statusCode}');
+        _logger.e('❌ [SERVICE] HTTP Error ${response.statusCode}');
         final errorMessage = _handleError(response.statusCode, response.body);
-        print('💥 [SERVICE] Error message: $errorMessage');
+        _logger.e('💥 [SERVICE] Error message: $errorMessage');
         throw errorMessage;
       }
     } on http.ClientException catch (e) {
-      print('🌐 [SERVICE] Network/Client exception: ${e.message}');
+      _logger.e('🌐 [SERVICE] Network/Client exception: ${e.message}');
       throw NetworkException('Network error: ${e.message}');
     } on FormatException catch (e) {
-      print('📝 [SERVICE] Format exception: ${e.message}');
+      _logger.e('📝 [SERVICE] Format exception: ${e.message}');
       throw DataParsingException('Invalid response format: ${e.message}');
     } on TimeoutException catch (e) {
-      print('⏰ [SERVICE] Timeout exception: ${e.message}');
+      _logger.e('⏰ [SERVICE] Timeout exception: ${e.message}');
       throw NetworkException('Request timeout: ${e.message}');
     } catch (e) {
-      print('💥 [SERVICE] Unexpected error: $e');
-      print('📋 [SERVICE] Error type: ${e.runtimeType}');
+      _logger.e('💥 [SERVICE] Unexpected error: $e');
+      _logger.e('📋 [SERVICE] Error type: ${e.runtimeType}');
       throw UnknownException('An unexpected error occurred: $e');
     }
   }
@@ -84,7 +84,7 @@ class BrandItemsService {
     try {
       // Case 1: Direct array of items
       if (jsonData is List) {
-        print('📋 [SERVICE] API returned direct array with ${jsonData.length} items');
+        _logger.i('📋 [SERVICE] API returned direct array with ${jsonData.length} items');
         return _parseItemsList(jsonData);
       }
       
@@ -94,31 +94,69 @@ class BrandItemsService {
         final List<dynamic>? itemsList = _extractItemsFromMap(jsonData);
         
         if (itemsList != null) {
-          print('📋 [SERVICE] Found items list with ${itemsList.length} items');
+          _logger.i('📋 [SERVICE] Found items list with ${itemsList.length} items');
           return _parseItemsList(itemsList);
         }
         
         // If no items found in common keys, check if it's a single item
-        print('🔍 [SERVICE] No items list found in response. Checking if single item...');
+        _logger.i('🔍 [SERVICE] No items list found in response. Checking if single item...');
         try {
-          final singleItem = BrandItemConverter.fromJson(jsonData);
-          print('✅ [SERVICE] Successfully parsed single item');
+          // Use the converter for single item too
+          final singleItem = _parseSingleItem(jsonData);
+          _logger.i('✅ [SERVICE] Successfully parsed single item');
           return [singleItem];
         } catch (e) {
-          print('❌ [SERVICE] Failed to parse as single item: $e');
+          _logger.e('❌ [SERVICE] Failed to parse as single item: $e');
           // Log the actual data that failed to parse
-          print('📄 [SERVICE] Problematic data: $jsonData');
+          _logger.e('📄 [SERVICE] Problematic data: $jsonData');
           throw DataParsingException('Could not parse API response. Expected array of items or single item.');
         }
       }
       
       // Case 3: Unexpected format
-      print('❌ [SERVICE] Unexpected response format: ${jsonData.runtimeType}');
+      _logger.e('❌ [SERVICE] Unexpected response format: ${jsonData.runtimeType}');
       throw DataParsingException('Unexpected API response format: ${jsonData.runtimeType}');
       
     } catch (e) {
-      print('💥 [SERVICE] Error in _parseResponse: $e');
+      _logger.e('💥 [SERVICE] Error in _parseResponse: $e');
       rethrow;
+    }
+  }
+
+  /// Parse a single item with enhanced error handling
+  static BrandItem _parseSingleItem(Map<String, dynamic> itemData) {
+    try {
+      _logger.d('🔍 [SERVICE] Parsing single item with keys: ${itemData.keys.join(', ')}');
+      
+      // Debug each field before parsing
+      _debugFields(itemData);
+      
+      // Use the converter
+      return BrandItemConverter.fromJson(itemData);
+    } catch (e, stackTrace) {
+      _logger.e('❌ [SERVICE] Failed to parse single item: $e');
+      _logger.e('📋 [SERVICE] Stack trace: $stackTrace');
+      _logger.e('📄 [SERVICE] Problematic item data: $itemData');
+      rethrow;
+    }
+  }
+
+  /// Debug all fields to identify type mismatches
+  static void _debugFields(Map<String, dynamic> itemData) {
+    _logger.d('🔍 [SERVICE] Field-by-field inspection:');
+    
+    // Check all fields that might cause type issues
+    const criticalFields = [
+      'id', 'user_id', 'country_id', 'brand_model_id', 'brand_id', 
+      'category_id', 'year', 'engine_capacity', 'number_of_passengers',
+      'warranty', 'paid_seller', 'active_status', 'dark_mode'
+    ];
+    
+    for (final field in criticalFields) {
+      if (itemData.containsKey(field)) {
+        final value = itemData[field];
+        _logger.d('  $field: $value (type: ${value?.runtimeType})');
+      }
     }
   }
 
@@ -129,7 +167,7 @@ class BrandItemsService {
     
     for (final key in possibleItemKeys) {
       if (jsonData.containsKey(key) && jsonData[key] is List) {
-        print('✅ [SERVICE] Found items using key: "$key"');
+        _logger.i('✅ [SERVICE] Found items using key: "$key"');
         return jsonData[key] as List<dynamic>;
       }
     }
@@ -142,7 +180,7 @@ class BrandItemsService {
           // Check if the first item has expected vehicle fields
           final firstItem = list.first as Map<String, dynamic>;
           if (firstItem.containsKey('name') && firstItem.containsKey('price')) {
-            print('✅ [SERVICE] Found items in key: "$key" (detected by content)');
+            _logger.i('✅ [SERVICE] Found items in key: "$key" (detected by content)');
             return list;
           }
         }
@@ -152,30 +190,42 @@ class BrandItemsService {
     return null;
   }
 
-  /// Parse a list of items into BrandItem objects
+  /// Parse a list of items into BrandItem objects with enhanced error handling
   static List<BrandItem> _parseItemsList(List<dynamic> itemsList) {
     final List<BrandItem> items = [];
+    int successCount = 0;
+    int failureCount = 0;
     
     for (int i = 0; i < itemsList.length; i++) {
       try {
         final itemData = itemsList[i];
         
         if (itemData is Map<String, dynamic>) {
+          // Debug the first item to see what we're working with
+          if (i == 0) {
+            _logger.d('🔍 [SERVICE] First item structure - keys: ${itemData.keys.join(', ')}');
+            _debugFields(itemData);
+          }
+          
           // Use the converter for proper type handling
           final brandItem = BrandItemConverter.fromJson(itemData);
           items.add(brandItem);
+          successCount++;
         } else {
-          print('⚠️ [SERVICE] Item at index $i is not a Map: ${itemData.runtimeType}');
+          _logger.w('⚠️ [SERVICE] Item at index $i is not a Map: ${itemData.runtimeType}');
+          failureCount++;
         }
-      } catch (e) {
-        print('❌ [SERVICE] Failed to parse item at index $i: $e');
-        print('📄 [SERVICE] Problematic item data: ${itemsList[i]}');
+      } catch (e, stackTrace) {
+        _logger.e('❌ [SERVICE] Failed to parse item at index $i: $e');
+        _logger.e('📋 [SERVICE] Stack trace: $stackTrace');
+        _logger.e('📄 [SERVICE] Problematic item data: ${itemsList[i]}');
+        failureCount++;
         // Continue with other items instead of failing completely
         continue;
       }
     }
     
-    print('✅ [SERVICE] Successfully parsed ${items.length} out of ${itemsList.length} items');
+    _logger.i('✅ [SERVICE] Successfully parsed $successCount out of ${itemsList.length} items. Failures: $failureCount');
     return items;
   }
 
@@ -183,7 +233,7 @@ class BrandItemsService {
   static Future<List<BrandItem>> getItemsByBrandId({
     required String brandId,
   }) async {
-    print('🚀 [SERVICE] Starting API call with string brandId: $brandId');
+    _logger.i('🚀 [SERVICE] Starting API call with string brandId: $brandId');
     
     try {
       final parsedBrandId = int.tryParse(brandId);
@@ -195,14 +245,14 @@ class BrandItemsService {
     } on InvalidArgumentException {
       rethrow;
     } catch (e) {
-      print('💥 [SERVICE] Error in getItemsByBrandId: $e');
+      _logger.e('💥 [SERVICE] Error in getItemsByBrandId: $e');
       rethrow;
     }
   }
   
   /// Handles different HTTP status codes
   static String _handleError(int statusCode, String responseBody) {
-    print('🔍 [SERVICE] Handling error - Status: $statusCode, Body: $responseBody');
+    _logger.e('🔍 [SERVICE] Handling error - Status: $statusCode, Body: $responseBody');
     
     try {
       final jsonResponse = json.decode(responseBody);

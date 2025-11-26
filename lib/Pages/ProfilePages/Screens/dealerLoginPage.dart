@@ -155,45 +155,6 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
     }
   }
 
-  // ================== QUICK NATIONAL ID CAPTURE ==================
-  Future<void> _quickCaptureNationalId(bool isFront) async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        preferredCameraDevice: CameraDevice.rear,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 90,
-      );
-      
-      if (image == null) return;
-
-      setState(() {
-        if (isFront) {
-          _nationalIdFront = File(image.path);
-          _isFrontCaptured = true;
-        } else {
-          _nationalIdBack = File(image.path);
-          _isBackCaptured = true;
-        }
-      });
-      
-      showCustomSnackBar(
-        title: "Success",
-        message: "ID ${isFront ? 'front' : 'back'} captured successfully.",
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } catch (e) {
-      showCustomSnackBar(
-        title: "Error",
-        message: "Failed to capture ID: $e",
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
   // ================== DOCUMENT PICKER ==================
   Future<void> _pickCompanyDocument() async {
     try {
@@ -254,44 +215,66 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
         ),
         const SizedBox(height: 16),
         
-        // Capture Options
-        Column(
-          children: [
-            _buildCaptureOptionCard(
-              title: "Scan with Frame Guide",
-              subtitle: "Perfect alignment assistance",
-              icon: Icons.crop_free,
-              isCaptured: isCaptured,
-              accentColor: accentColor,
-              onTap: () => _captureNationalIdWithFrame(isFront),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCaptureOptionCard(
-                    title: "Quick Camera",
-                    subtitle: "Basic camera",
-                    icon: Icons.photo_camera,
-                    isCaptured: isCaptured,
-                    accentColor: accentColor,
-                    onTap: () => _quickCaptureNationalId(isFront),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildCaptureOptionCard(
-                    title: "From Gallery",
-                    subtitle: "Choose existing",
-                    icon: Icons.photo_library,
-                    isCaptured: isCaptured,
-                    accentColor: accentColor,
-                    onTap: () => _quickCaptureNationalId(isFront), // Uses same function but from gallery
-                  ),
+        // Single Capture Option - Scan with Frame Guide
+        InkWell(
+          onTap: () => _captureNationalIdWithFrame(isFront),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isCaptured 
+                  ? Colors.green 
+                  : (accentColor ?? ColorGlobalVariables.brownColor),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-          ],
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
+                        .withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  isCaptured ? "Successfully Captured!" : "Scan with Frame Guide",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isCaptured ? "Perfect alignment achieved" : "Perfect alignment assistance",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
         
         if (isCaptured && file != null) ...[
@@ -353,78 +336,6 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
         ],
         const SizedBox(height: 24),
       ],
-    );
-  }
-
-  Widget _buildCaptureOptionCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required bool isCaptured,
-    required Color? accentColor,
-    required VoidCallback onTap,
-  }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isCaptured 
-              ? Colors.green 
-              : (accentColor ?? ColorGlobalVariables.brownColor).withOpacity(0.5),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
-                    .withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -613,13 +524,65 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           ),
         ),
         const SizedBox(height: 16),
-        _buildCaptureOptionCard(
-          title: "Take Selfie",
-          subtitle: "Front camera required",
-          icon: Icons.face_retouching_natural,
-          isCaptured: _isSelfieCaptured,
-          accentColor: Colors.blue,
+        InkWell(
           onTap: _takeSelfie,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isSelfieCaptured 
+                  ? Colors.green 
+                  : Colors.blue,
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (_isSelfieCaptured ? Colors.green : Colors.blue)
+                        .withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.face_retouching_natural,
+                    color: _isSelfieCaptured ? Colors.green : Colors.blue,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _isSelfieCaptured ? "Successfully Captured!" : "Take Selfie",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: _isSelfieCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isSelfieCaptured ? "Face verified successfully" : "Front camera required",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: _isSelfieCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
         if (_isSelfieCaptured && _selfieImage != null) ...[
           const SizedBox(height: 16),

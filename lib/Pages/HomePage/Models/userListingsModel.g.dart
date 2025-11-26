@@ -8,15 +8,14 @@ part of 'userListingsModel.dart';
 
 _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
-      id: (json['id'] as num).toInt(),
+      id: _parseInt(json['id']),
       userId: json['user_id'],
       parentId: json['parent_id'],
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      description: json['description'] as String,
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
-      image: json['image'] as String,
+      name: _parseString(json['name']),
+      slug: _parseString(json['slug']),
+      description: _parseString(json['description']),
+      features: _parseStringList(json['features']),
+      image: _parseString(json['image']),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
@@ -37,22 +36,21 @@ Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
 
 _$ListingImpl _$$ListingImplFromJson(Map<String, dynamic> json) =>
     _$ListingImpl(
-      id: json['id'] as String?,
-      userId: json['user_id'] as String?,
+      id: _parseNullableString(json['id']),
+      userId: _parseNullableString(json['user_id']),
       countryId: json['country_id'],
-      brandModelId: (json['brand_model_id'] as num?)?.toInt(),
-      brandId: (json['brand_id'] as num?)?.toInt(),
-      categoryId: (json['category_id'] as num?)?.toInt(),
-      name: json['name'] as String?,
-      year: json['year'] as String?,
-      slug: json['slug'] as String?,
-      description: json['description'] as String?,
-      images:
-          (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      location: json['location'] as String?,
+      brandModelId: _parseNullableInt(json['brand_model_id']),
+      brandId: _parseNullableInt(json['brand_id']),
+      categoryId: _parseNullableInt(json['category_id']),
+      name: _parseNullableString(json['name']),
+      year: _parseNullableString(json['year']),
+      slug: _parseNullableString(json['slug']),
+      description: _parseNullableString(json['description']),
+      images: _parseStringList(json['images']),
+      location: _parseNullableString(json['location']),
       serialNumber: json['serial_number'],
       condition: json['condition'],
-      steerPosition: json['steer_position'] as String?,
+      steerPosition: _parseNullableString(json['steer_position']),
       engineCapacity: json['engine_capacity'],
       transmission: json['transmission'],
       color: json['color'],
@@ -60,7 +58,7 @@ _$ListingImpl _$$ListingImplFromJson(Map<String, dynamic> json) =>
       numberOfPassengers: json['number_of_passengers'],
       features: json['features'] as List<dynamic>?,
       status: json['status'],
-      price: json['price'] as String?,
+      price: _parseNullableString(json['price']),
       mileage: json['mileage'],
       warranty: json['warranty'],
       warrantyExpiration: json['warranty_expiration'],
@@ -132,9 +130,9 @@ Map<String, dynamic> _$$ListingResponseImplToJson(
 
 _$ErrorResponseImpl _$$ErrorResponseImplFromJson(Map<String, dynamic> json) =>
     _$ErrorResponseImpl(
-      message: json['message'] as String?,
-      error: json['error'] as String?,
-      errorDescription: json['error_description'] as String?,
+      message: _parseNullableString(json['message']),
+      error: _parseNullableString(json['error']),
+      errorDescription: _parseNullableString(json['error_description']),
     );
 
 Map<String, dynamic> _$$ErrorResponseImplToJson(_$ErrorResponseImpl instance) =>

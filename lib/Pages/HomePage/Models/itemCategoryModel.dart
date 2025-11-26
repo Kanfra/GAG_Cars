@@ -24,11 +24,11 @@ class ItemCategory with _$ItemCategory {
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
     @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
-    required String name,
-    required String slug,
-    required String description,
-    required List<String> features,
-    required String image,
+    @JsonKey(fromJson: _parseString) required String name,
+    @JsonKey(fromJson: _parseString) required String slug,
+    @JsonKey(fromJson: _parseString) required String description,
+    @JsonKey(fromJson: _parseStringList) required List<String> features,
+    @JsonKey(fromJson: _parseString) required String image,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
     @JsonKey(name: 'item_fields') required List<ItemField> itemFields,
@@ -46,9 +46,9 @@ class ItemField with _$ItemField {
   @JsonSerializable(explicitToJson: true)
   const factory ItemField({
     @JsonKey(fromJson: _parseInt) required int id,
-    required String name,
-    required String label,
-    required String type,
+    @JsonKey(fromJson: _parseString) required String name,
+    @JsonKey(fromJson: _parseString) required String label,
+    @JsonKey(fromJson: _parseString) required String type,
     @JsonKey(fromJson: _boolFromInt) required bool required,
     @JsonKey(fromJson: _boolFromInt) required bool unique,
     @JsonKey(fromJson: _boolFromInt) required bool nullable,
@@ -81,10 +81,10 @@ class PaginationLinks with _$PaginationLinks {
   const PaginationLinks._(); // Added constructor for methods
 
   const factory PaginationLinks({
-    required String first,
-    required String last,
-    required String? prev,
-    required String? next,
+    @JsonKey(fromJson: _parseString) required String first,
+    @JsonKey(fromJson: _parseString) required String last,
+    @JsonKey(fromJson: _parseNullableString) required String? prev,
+    @JsonKey(fromJson: _parseNullableString) required String? next,
   }) = _PaginationLinks;
 
   factory PaginationLinks.fromJson(Map<String, dynamic> json) =>
@@ -100,7 +100,7 @@ class PaginationMeta with _$PaginationMeta {
     @JsonKey(fromJson: _parseInt) required int from,
     @JsonKey(name: 'last_page', fromJson: _parseInt) required int lastPage,
     required List<PaginationLink> links,
-    required String path,
+    @JsonKey(fromJson: _parseString) required String path,
     @JsonKey(name: 'per_page', fromJson: _parseInt) required int perPage,
     @JsonKey(fromJson: _parseInt) required int to,
     @JsonKey(fromJson: _parseInt) required int total,
@@ -115,8 +115,8 @@ class PaginationLink with _$PaginationLink {
   const PaginationLink._(); // Added constructor for methods
 
   const factory PaginationLink({
-    required String? url,
-    required String label,
+    @JsonKey(fromJson: _parseNullableString) required String? url,
+    @JsonKey(fromJson: _parseString) required String label,
     required bool active,
   }) = _PaginationLink;
 
@@ -146,4 +146,24 @@ bool _boolFromInt(dynamic value) {
   if (value is int) return value == 1;
   if (value is String) return value == '1';
   return false;
+}
+
+String _parseString(dynamic value) {
+  if (value == null) return '';
+  if (value is String) return value;
+  return value.toString();
+}
+
+String? _parseNullableString(dynamic value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  return value.toString();
+}
+
+List<String> _parseStringList(dynamic value) {
+  if (value == null) return [];
+  if (value is List) {
+    return value.map((e) => e?.toString() ?? '').toList();
+  }
+  return [];
 }

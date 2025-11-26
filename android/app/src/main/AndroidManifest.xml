@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.gag_cars_frontend">
+    package="com.gagcars.gordonautogarage">
 
-    <!-- Permissions -->
+    <!-- Permissions (UNCHANGED) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -89,7 +89,29 @@
                     android:host="item" />
             </intent-filter>
 
-            <!-- 2. Universal Links for Item Listings (with autoVerify) -->
+            <!-- 2. Custom Scheme Deep Links for Special Offers -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data 
+                    android:scheme="gagcars"
+                    android:host="special-offer" />
+            </intent-filter>
+
+            <!-- 3. Custom Scheme Deep Links for Offers (alternative) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data 
+                    android:scheme="gagcars"
+                    android:host="offer" />
+            </intent-filter>
+
+            <!-- ========== UPDATED: GAGCARS DOMAIN INTENT FILTERS ========== -->
+
+            <!-- 4. Universal Links for Regular Items on gagcars.com/route -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -97,10 +119,29 @@
                 <data 
                     android:scheme="https"
                     android:host="gagcars.com"
-                    android:pathPrefix="/listing/" />
+                    android:pathPrefix="/route" />
+                <data 
+                    android:scheme="http"
+                    android:host="gagcars.com"
+                    android:pathPrefix="/route" />
             </intent-filter>
 
-            <!-- 3. Universal Links for Main Website -->
+            <!-- 5. Universal Links for Special Offers on gagcars.com/route/specialoffer/ -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data 
+                    android:scheme="https"
+                    android:host="gagcars.com"
+                    android:pathPrefix="/route/specialoffer/" />
+                <data 
+                    android:scheme="http"
+                    android:host="gagcars.com"
+                    android:pathPrefix="/route/specialoffer/" />
+            </intent-filter>
+
+            <!-- 6. Universal Links for Main Domain (catch-all) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -111,13 +152,6 @@
                 <data 
                     android:scheme="https"
                     android:host="gagcars.com" />
-            </intent-filter>
-
-            <!-- 4. HTTP Links for Main Website (fallback) -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
                 <data 
                     android:scheme="http"
                     android:host="www.gagcars.com" />
@@ -126,7 +160,7 @@
                     android:host="gagcars.com" />
             </intent-filter>
 
-            <!-- 5. Paystack Payment Callback (Specific) -->
+            <!-- 7. Paystack Payment Callback (Specific) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

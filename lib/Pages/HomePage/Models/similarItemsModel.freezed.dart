@@ -296,12 +296,14 @@ mixin _$SimilarItem {
   String? get location => throw _privateConstructorUsedError;
   @JsonKey(name: 'serial_number')
   String? get serialNumber => throw _privateConstructorUsedError;
-  @JsonKey(name: 'condition')
-  String? get condition => throw _privateConstructorUsedError;
+  @JsonKey(name: 'Condition')
+  String? get condition =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Capital 'C' to match JSON
   @JsonKey(name: 'steer_position')
   String? get steerPosition => throw _privateConstructorUsedError;
-  @JsonKey(name: 'engine_capacity')
-  String? get engineCapacity => throw _privateConstructorUsedError;
+  @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+  String? get engineCapacity =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Handle both int and string
   @JsonKey(name: 'transmission')
   String? get transmission => throw _privateConstructorUsedError;
   @JsonKey(name: 'color')
@@ -314,10 +316,12 @@ mixin _$SimilarItem {
   List<String>? get features => throw _privateConstructorUsedError;
   @JsonKey(name: 'status')
   String? get status => throw _privateConstructorUsedError;
-  @JsonKey(name: 'price')
-  String? get price => throw _privateConstructorUsedError;
-  @JsonKey(name: 'mileage')
-  String? get mileage => throw _privateConstructorUsedError;
+  @JsonKey(name: 'price', fromJson: _parseNullableString)
+  String? get price =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Handle both int and string
+  @JsonKey(name: 'mileage', fromJson: _parseNullableString)
+  String? get mileage =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Handle both int and string
   @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
   int? get warranty => throw _privateConstructorUsedError;
   @JsonKey(name: 'warranty_expiration')
@@ -328,8 +332,9 @@ mixin _$SimilarItem {
   String? get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'Height')
-  String? get height => throw _privateConstructorUsedError;
+  @JsonKey(name: 'Height', fromJson: _parseNullableString)
+  String? get height =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Handle both int and string
   @JsonKey(name: 'VIN')
   String? get vin => throw _privateConstructorUsedError; // Added nested objects
   @JsonKey(name: 'brand')
@@ -373,9 +378,10 @@ abstract class $SimilarItemCopyWith<$Res> {
       @JsonKey(name: 'images', fromJson: _parseStringList) List<String>? images,
       @JsonKey(name: 'location') String? location,
       @JsonKey(name: 'serial_number') String? serialNumber,
-      @JsonKey(name: 'condition') String? condition,
+      @JsonKey(name: 'Condition') String? condition,
       @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+      String? engineCapacity,
       @JsonKey(name: 'transmission') String? transmission,
       @JsonKey(name: 'color') String? color,
       @JsonKey(name: 'build_type') String? buildType,
@@ -384,14 +390,14 @@ abstract class $SimilarItemCopyWith<$Res> {
       @JsonKey(name: 'features', fromJson: _parseStringList)
       List<String>? features,
       @JsonKey(name: 'status') String? status,
-      @JsonKey(name: 'price') String? price,
-      @JsonKey(name: 'mileage') String? mileage,
+      @JsonKey(name: 'price', fromJson: _parseNullableString) String? price,
+      @JsonKey(name: 'mileage', fromJson: _parseNullableString) String? mileage,
       @JsonKey(name: 'warranty', fromJson: _parseNullableInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
-      @JsonKey(name: 'Height') String? height,
+      @JsonKey(name: 'Height', fromJson: _parseNullableString) String? height,
       @JsonKey(name: 'VIN') String? vin,
       @JsonKey(name: 'brand') Brand? brand,
       @JsonKey(name: 'category') Category? category,
@@ -680,9 +686,10 @@ abstract class _$$SimilarItemImplCopyWith<$Res>
       @JsonKey(name: 'images', fromJson: _parseStringList) List<String>? images,
       @JsonKey(name: 'location') String? location,
       @JsonKey(name: 'serial_number') String? serialNumber,
-      @JsonKey(name: 'condition') String? condition,
+      @JsonKey(name: 'Condition') String? condition,
       @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+      String? engineCapacity,
       @JsonKey(name: 'transmission') String? transmission,
       @JsonKey(name: 'color') String? color,
       @JsonKey(name: 'build_type') String? buildType,
@@ -691,14 +698,14 @@ abstract class _$$SimilarItemImplCopyWith<$Res>
       @JsonKey(name: 'features', fromJson: _parseStringList)
       List<String>? features,
       @JsonKey(name: 'status') String? status,
-      @JsonKey(name: 'price') String? price,
-      @JsonKey(name: 'mileage') String? mileage,
+      @JsonKey(name: 'price', fromJson: _parseNullableString) String? price,
+      @JsonKey(name: 'mileage', fromJson: _parseNullableString) String? mileage,
       @JsonKey(name: 'warranty', fromJson: _parseNullableInt) int? warranty,
       @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') String? deletedAt,
       @JsonKey(name: 'created_at') String? createdAt,
       @JsonKey(name: 'updated_at') String? updatedAt,
-      @JsonKey(name: 'Height') String? height,
+      @JsonKey(name: 'Height', fromJson: _parseNullableString) String? height,
       @JsonKey(name: 'VIN') String? vin,
       @JsonKey(name: 'brand') Brand? brand,
       @JsonKey(name: 'category') Category? category,
@@ -930,9 +937,10 @@ class _$SimilarItemImpl extends _SimilarItem {
       final List<String>? images,
       @JsonKey(name: 'location') this.location,
       @JsonKey(name: 'serial_number') this.serialNumber,
-      @JsonKey(name: 'condition') this.condition,
+      @JsonKey(name: 'Condition') this.condition,
       @JsonKey(name: 'steer_position') this.steerPosition,
-      @JsonKey(name: 'engine_capacity') this.engineCapacity,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+      this.engineCapacity,
       @JsonKey(name: 'transmission') this.transmission,
       @JsonKey(name: 'color') this.color,
       @JsonKey(name: 'build_type') this.buildType,
@@ -941,14 +949,14 @@ class _$SimilarItemImpl extends _SimilarItem {
       @JsonKey(name: 'features', fromJson: _parseStringList)
       final List<String>? features,
       @JsonKey(name: 'status') this.status,
-      @JsonKey(name: 'price') this.price,
-      @JsonKey(name: 'mileage') this.mileage,
+      @JsonKey(name: 'price', fromJson: _parseNullableString) this.price,
+      @JsonKey(name: 'mileage', fromJson: _parseNullableString) this.mileage,
       @JsonKey(name: 'warranty', fromJson: _parseNullableInt) this.warranty,
       @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
       @JsonKey(name: 'deleted_at') this.deletedAt,
       @JsonKey(name: 'created_at') this.createdAt,
       @JsonKey(name: 'updated_at') this.updatedAt,
-      @JsonKey(name: 'Height') this.height,
+      @JsonKey(name: 'Height', fromJson: _parseNullableString) this.height,
       @JsonKey(name: 'VIN') this.vin,
       @JsonKey(name: 'brand') this.brand,
       @JsonKey(name: 'category') this.category,
@@ -1009,14 +1017,16 @@ class _$SimilarItemImpl extends _SimilarItem {
   @JsonKey(name: 'serial_number')
   final String? serialNumber;
   @override
-  @JsonKey(name: 'condition')
+  @JsonKey(name: 'Condition')
   final String? condition;
+// ✅ FIXED: Capital 'C' to match JSON
   @override
   @JsonKey(name: 'steer_position')
   final String? steerPosition;
   @override
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
   final String? engineCapacity;
+// ✅ FIXED: Handle both int and string
   @override
   @JsonKey(name: 'transmission')
   final String? transmission;
@@ -1044,11 +1054,13 @@ class _$SimilarItemImpl extends _SimilarItem {
   @JsonKey(name: 'status')
   final String? status;
   @override
-  @JsonKey(name: 'price')
+  @JsonKey(name: 'price', fromJson: _parseNullableString)
   final String? price;
+// ✅ FIXED: Handle both int and string
   @override
-  @JsonKey(name: 'mileage')
+  @JsonKey(name: 'mileage', fromJson: _parseNullableString)
   final String? mileage;
+// ✅ FIXED: Handle both int and string
   @override
   @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
   final int? warranty;
@@ -1065,8 +1077,9 @@ class _$SimilarItemImpl extends _SimilarItem {
   @JsonKey(name: 'updated_at')
   final String? updatedAt;
   @override
-  @JsonKey(name: 'Height')
+  @JsonKey(name: 'Height', fromJson: _parseNullableString)
   final String? height;
+// ✅ FIXED: Handle both int and string
   @override
   @JsonKey(name: 'VIN')
   final String? vin;
@@ -1227,9 +1240,10 @@ abstract class _SimilarItem extends SimilarItem {
       final List<String>? images,
       @JsonKey(name: 'location') final String? location,
       @JsonKey(name: 'serial_number') final String? serialNumber,
-      @JsonKey(name: 'condition') final String? condition,
+      @JsonKey(name: 'Condition') final String? condition,
       @JsonKey(name: 'steer_position') final String? steerPosition,
-      @JsonKey(name: 'engine_capacity') final String? engineCapacity,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+      final String? engineCapacity,
       @JsonKey(name: 'transmission') final String? transmission,
       @JsonKey(name: 'color') final String? color,
       @JsonKey(name: 'build_type') final String? buildType,
@@ -1238,15 +1252,18 @@ abstract class _SimilarItem extends SimilarItem {
       @JsonKey(name: 'features', fromJson: _parseStringList)
       final List<String>? features,
       @JsonKey(name: 'status') final String? status,
-      @JsonKey(name: 'price') final String? price,
-      @JsonKey(name: 'mileage') final String? mileage,
+      @JsonKey(name: 'price', fromJson: _parseNullableString)
+      final String? price,
+      @JsonKey(name: 'mileage', fromJson: _parseNullableString)
+      final String? mileage,
       @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
       final int? warranty,
       @JsonKey(name: 'warranty_expiration') final String? warrantyExpiration,
       @JsonKey(name: 'deleted_at') final String? deletedAt,
       @JsonKey(name: 'created_at') final String? createdAt,
       @JsonKey(name: 'updated_at') final String? updatedAt,
-      @JsonKey(name: 'Height') final String? height,
+      @JsonKey(name: 'Height', fromJson: _parseNullableString)
+      final String? height,
       @JsonKey(name: 'VIN') final String? vin,
       @JsonKey(name: 'brand') final Brand? brand,
       @JsonKey(name: 'category') final Category? category,
@@ -1297,14 +1314,14 @@ abstract class _SimilarItem extends SimilarItem {
   @JsonKey(name: 'serial_number')
   String? get serialNumber;
   @override
-  @JsonKey(name: 'condition')
-  String? get condition;
+  @JsonKey(name: 'Condition')
+  String? get condition; // ✅ FIXED: Capital 'C' to match JSON
   @override
   @JsonKey(name: 'steer_position')
   String? get steerPosition;
   @override
-  @JsonKey(name: 'engine_capacity')
-  String? get engineCapacity;
+  @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+  String? get engineCapacity; // ✅ FIXED: Handle both int and string
   @override
   @JsonKey(name: 'transmission')
   String? get transmission;
@@ -1324,11 +1341,11 @@ abstract class _SimilarItem extends SimilarItem {
   @JsonKey(name: 'status')
   String? get status;
   @override
-  @JsonKey(name: 'price')
-  String? get price;
+  @JsonKey(name: 'price', fromJson: _parseNullableString)
+  String? get price; // ✅ FIXED: Handle both int and string
   @override
-  @JsonKey(name: 'mileage')
-  String? get mileage;
+  @JsonKey(name: 'mileage', fromJson: _parseNullableString)
+  String? get mileage; // ✅ FIXED: Handle both int and string
   @override
   @JsonKey(name: 'warranty', fromJson: _parseNullableInt)
   int? get warranty;
@@ -1345,8 +1362,8 @@ abstract class _SimilarItem extends SimilarItem {
   @JsonKey(name: 'updated_at')
   String? get updatedAt;
   @override
-  @JsonKey(name: 'Height')
-  String? get height;
+  @JsonKey(name: 'Height', fromJson: _parseNullableString)
+  String? get height; // ✅ FIXED: Handle both int and string
   @override
   @JsonKey(name: 'VIN')
   String? get vin; // Added nested objects
@@ -1377,8 +1394,9 @@ Brand _$BrandFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Brand {
-  @JsonKey(name: 'id')
-  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'id', fromJson: _parseInt)
+  int get id =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Ensure int parsing
   @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
   int? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'name')
@@ -1407,7 +1425,7 @@ abstract class $BrandCopyWith<$Res> {
       _$BrandCopyWithImpl<$Res, Brand>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
       @JsonKey(name: 'name') String? name,
       @JsonKey(name: 'slug') String? slug,
@@ -1480,7 +1498,7 @@ abstract class _$$BrandImplCopyWith<$Res> implements $BrandCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
       @JsonKey(name: 'name') String? name,
       @JsonKey(name: 'slug') String? slug,
@@ -1547,7 +1565,7 @@ class __$$BrandImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BrandImpl implements _Brand {
   const _$BrandImpl(
-      {@JsonKey(name: 'id') required this.id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) this.userId,
       @JsonKey(name: 'name') this.name,
       @JsonKey(name: 'slug') this.slug,
@@ -1559,8 +1577,9 @@ class _$BrandImpl implements _Brand {
       _$$BrandImplFromJson(json);
 
   @override
-  @JsonKey(name: 'id')
+  @JsonKey(name: 'id', fromJson: _parseInt)
   final int id;
+// ✅ FIXED: Ensure int parsing
   @override
   @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
   final int? userId;
@@ -1624,7 +1643,7 @@ class _$BrandImpl implements _Brand {
 
 abstract class _Brand implements Brand {
   const factory _Brand(
-      {@JsonKey(name: 'id') required final int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) required final int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) final int? userId,
       @JsonKey(name: 'name') final String? name,
       @JsonKey(name: 'slug') final String? slug,
@@ -1635,8 +1654,8 @@ abstract class _Brand implements Brand {
   factory _Brand.fromJson(Map<String, dynamic> json) = _$BrandImpl.fromJson;
 
   @override
-  @JsonKey(name: 'id')
-  int get id;
+  @JsonKey(name: 'id', fromJson: _parseInt)
+  int get id; // ✅ FIXED: Ensure int parsing
   @override
   @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
   int? get userId;
@@ -1670,8 +1689,9 @@ Category _$CategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Category {
-  @JsonKey(name: 'id')
-  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'id', fromJson: _parseInt)
+  int get id =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Ensure int parsing
   @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
   int? get userId => throw _privateConstructorUsedError;
   @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
@@ -1707,7 +1727,7 @@ abstract class $CategoryCopyWith<$Res> {
       _$CategoryCopyWithImpl<$Res, Category>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
       @JsonKey(name: 'name') String? name,
@@ -1800,7 +1820,7 @@ abstract class _$$CategoryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
       @JsonKey(name: 'name') String? name,
@@ -1886,7 +1906,7 @@ class __$$CategoryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CategoryImpl implements _Category {
   const _$CategoryImpl(
-      {@JsonKey(name: 'id') required this.id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) required this.id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) this.userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) this.parentId,
       @JsonKey(name: 'name') this.name,
@@ -1903,8 +1923,9 @@ class _$CategoryImpl implements _Category {
       _$$CategoryImplFromJson(json);
 
   @override
-  @JsonKey(name: 'id')
+  @JsonKey(name: 'id', fromJson: _parseInt)
   final int id;
+// ✅ FIXED: Ensure int parsing
   @override
   @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
   final int? userId;
@@ -2000,7 +2021,7 @@ class _$CategoryImpl implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-      {@JsonKey(name: 'id') required final int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) required final int id,
       @JsonKey(name: 'user_id', fromJson: _parseNullableInt) final int? userId,
       @JsonKey(name: 'parent_id', fromJson: _parseNullableInt)
       final int? parentId,
@@ -2017,8 +2038,8 @@ abstract class _Category implements Category {
       _$CategoryImpl.fromJson;
 
   @override
-  @JsonKey(name: 'id')
-  int get id;
+  @JsonKey(name: 'id', fromJson: _parseInt)
+  int get id; // ✅ FIXED: Ensure int parsing
   @override
   @JsonKey(name: 'user_id', fromJson: _parseNullableInt)
   int? get userId;
@@ -2061,8 +2082,9 @@ BrandModel _$BrandModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$BrandModel {
-  @JsonKey(name: 'id')
-  int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'id', fromJson: _parseInt)
+  int get id =>
+      throw _privateConstructorUsedError; // ✅ FIXED: Ensure int parsing
   @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
   int? get brandId => throw _privateConstructorUsedError;
   @JsonKey(name: 'name')
@@ -2091,7 +2113,7 @@ abstract class $BrandModelCopyWith<$Res> {
       _$BrandModelCopyWithImpl<$Res, BrandModel>;
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) int id,
       @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
       @JsonKey(name: 'name') String? name,
       @JsonKey(name: 'slug') String? slug,
@@ -2159,7 +2181,7 @@ abstract class _$$BrandModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {@JsonKey(name: 'id') int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) int id,
       @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
       @JsonKey(name: 'name') String? name,
       @JsonKey(name: 'slug') String? slug,
@@ -2220,7 +2242,7 @@ class __$$BrandModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$BrandModelImpl implements _BrandModel {
   const _$BrandModelImpl(
-      {@JsonKey(name: 'id') required this.id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) required this.id,
       @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) this.brandId,
       @JsonKey(name: 'name') this.name,
       @JsonKey(name: 'slug') this.slug,
@@ -2231,8 +2253,9 @@ class _$BrandModelImpl implements _BrandModel {
       _$$BrandModelImplFromJson(json);
 
   @override
-  @JsonKey(name: 'id')
+  @JsonKey(name: 'id', fromJson: _parseInt)
   final int id;
+// ✅ FIXED: Ensure int parsing
   @override
   @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
   final int? brandId;
@@ -2292,7 +2315,7 @@ class _$BrandModelImpl implements _BrandModel {
 
 abstract class _BrandModel implements BrandModel {
   const factory _BrandModel(
-      {@JsonKey(name: 'id') required final int id,
+      {@JsonKey(name: 'id', fromJson: _parseInt) required final int id,
       @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
       final int? brandId,
       @JsonKey(name: 'name') final String? name,
@@ -2304,8 +2327,8 @@ abstract class _BrandModel implements BrandModel {
       _$BrandModelImpl.fromJson;
 
   @override
-  @JsonKey(name: 'id')
-  int get id;
+  @JsonKey(name: 'id', fromJson: _parseInt)
+  int get id; // ✅ FIXED: Ensure int parsing
   @override
   @JsonKey(name: 'brand_id', fromJson: _parseNullableInt)
   int? get brandId;

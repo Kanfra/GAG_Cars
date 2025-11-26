@@ -84,8 +84,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     return amountDouble / 100;
   }
 
-  Future<Uint8List> _generatePdfReceipt(BuildContext context) async {
-    final userProvider = Provider.of<UserProvider>(context);
+  // FIXED: Added listen: false for async context
+  Future<Uint8List> _generatePdfReceipt() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final pdf = pw.Document();
     final amountInGhs = _getAmountInGhs();
 
@@ -154,7 +155,8 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     setState(() => _isSharing = true);
 
     try {
-      final pdfBytes = await _generatePdfReceipt(context);
+      // FIXED: Call without context parameter since we're using listen: false
+      final pdfBytes = await _generatePdfReceipt();
       await Printing.sharePdf(
         bytes: pdfBytes,
         filename: 'receipt-${widget.allJson['transactionReference'] ?? 'payment'}.pdf',

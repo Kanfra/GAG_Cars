@@ -29,12 +29,11 @@ _$ItemCategoryImpl _$$ItemCategoryImplFromJson(Map<String, dynamic> json) =>
       id: _parseInt(json['id']),
       userId: _parseNullableInt(json['user_id']),
       parentId: _parseNullableInt(json['parent_id']),
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      description: json['description'] as String,
-      features:
-          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
-      image: json['image'] as String,
+      name: _parseString(json['name']),
+      slug: _parseString(json['slug']),
+      description: _parseString(json['description']),
+      features: _parseStringList(json['features']),
+      image: _parseString(json['image']),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       itemFields: (json['item_fields'] as List<dynamic>)
@@ -60,9 +59,9 @@ Map<String, dynamic> _$$ItemCategoryImplToJson(_$ItemCategoryImpl instance) =>
 _$ItemFieldImpl _$$ItemFieldImplFromJson(Map<String, dynamic> json) =>
     _$ItemFieldImpl(
       id: _parseInt(json['id']),
-      name: json['name'] as String,
-      label: json['label'] as String,
-      type: json['type'] as String,
+      name: _parseString(json['name']),
+      label: _parseString(json['label']),
+      type: _parseString(json['type']),
       required: _boolFromInt(json['required']),
       unique: _boolFromInt(json['unique']),
       nullable: _boolFromInt(json['nullable']),
@@ -103,10 +102,10 @@ Map<String, dynamic> _$$ItemFieldPivotImplToJson(
 _$PaginationLinksImpl _$$PaginationLinksImplFromJson(
         Map<String, dynamic> json) =>
     _$PaginationLinksImpl(
-      first: json['first'] as String,
-      last: json['last'] as String,
-      prev: json['prev'] as String?,
-      next: json['next'] as String?,
+      first: _parseString(json['first']),
+      last: _parseString(json['last']),
+      prev: _parseNullableString(json['prev']),
+      next: _parseNullableString(json['next']),
     );
 
 Map<String, dynamic> _$$PaginationLinksImplToJson(
@@ -126,7 +125,7 @@ _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
       links: (json['links'] as List<dynamic>)
           .map((e) => PaginationLink.fromJson(e as Map<String, dynamic>))
           .toList(),
-      path: json['path'] as String,
+      path: _parseString(json['path']),
       perPage: _parseInt(json['per_page']),
       to: _parseInt(json['to']),
       total: _parseInt(json['total']),
@@ -147,8 +146,8 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
 
 _$PaginationLinkImpl _$$PaginationLinkImplFromJson(Map<String, dynamic> json) =>
     _$PaginationLinkImpl(
-      url: json['url'] as String?,
-      label: json['label'] as String,
+      url: _parseNullableString(json['url']),
+      label: _parseString(json['label']),
       active: json['active'] as bool,
     );
 

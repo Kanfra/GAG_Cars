@@ -13,10 +13,14 @@ class SimpleDeepLinkHandler {
   static final logger = Logger();
   static bool _isInitialized = false;
 
+  // Your actual domain for regular items
+  static const String _domainBaseUrl = 'https://gagcars.com';
+  static const String _routePath = '/route';
+
   static Future<void> initDeepLinking() async {
     if (_isInitialized) return;
     _isInitialized = true;
-    logger.i("🔗 SimpleDeepLinkHandler initialized");
+    logger.i("🔗 SimpleDeepLinkHandler initialized with domain: $_domainBaseUrl");
   }
 
   static void handleIncomingLink(String link) {
@@ -37,7 +41,7 @@ class SimpleDeepLinkHandler {
     if (uri.scheme == 'gagcars') {
       _handleCustomScheme(uri);
     }
-    // Handle universal links (including Netlify)
+    // Handle universal links (including your actual domain)
     else if (uri.scheme.startsWith('http')) {
       _handleUniversalLink(uri);
     }
@@ -78,40 +82,52 @@ class SimpleDeepLinkHandler {
     
     logger.i("🔍 [UNIVERSAL_LINK] Host: ${uri.host}, Path: ${uri.path}, Query: ${uri.query}");
     
-    // Handle Netlify redirect URLs: https://radiant-sable-70d147.netlify.app/?id=123&name=Test
-    if (uri.host == 'radiant-sable-70d147.netlify.app') {
-      final itemId = uri.queryParameters['id'];
-      final itemName = uri.queryParameters['name'];
-      
-      logger.i("🔍 [NETLIFY_REDIRECT] Item ID: $itemId, Name: $itemName");
-      if (itemId != null && itemId.isNotEmpty) {
-        _navigateToDetailPage(itemId, itemName, 'netlify_redirect');
-        return;
-      }
-    }
-    
-    // Handle your actual domain URLs (for future use)
-    else if ((uri.host == 'gagcars.com' || uri.host == 'www.gagcars.com')) {
-      // Handle listing URLs: https://gagcars.com/listing/{itemId}
-      if (pathSegments.isNotEmpty && pathSegments[0] == 'listing' && pathSegments.length >= 2) {
-        final itemId = pathSegments[1];
+    // Handle your actual domain URLs: https://gagcars.com/route?id=123&name=Test
+    if ((uri.host == 'gagcars.com' || uri.host == 'www.gagcars.com')) {
+      // Handle route path: https://gagcars.com/route?id=123&name=Test
+      if (uri.path == _routePath || uri.path == '$_routePath/') {
+        final itemId = uri.queryParameters['id'];
         final itemName = uri.queryParameters['name'];
         
-        logger.i("🔍 [UNIVERSAL_LINK] Extracted - Item ID: $itemId, Name: $itemName");
-        _navigateToDetailPage(itemId, itemName, 'universal_link');
-        return;
+        logger.i("🔍 [GAGCARS_ROUTE_REDIRECT] Item ID: $itemId, Name: $itemName");
+        if (itemId != null && itemId.isNotEmpty) {
+          _navigateToDetailPage(itemId, itemName, 'gagcars_route_redirect');
+          return;
+        }
       }
       
-      // Handle redirect URLs: https://gagcars.com/listing.html?id=123&name=Test
+      // Handle alternative route formats for backward compatibility
       if (uri.path == '/listing.html' || uri.path == '/listing.php') {
         final itemId = uri.queryParameters['id'];
         final itemName = uri.queryParameters['name'];
         
-        logger.i("🔍 [WEBSITE_REDIRECT] Item ID: $itemId, Name: $itemName");
+        logger.i("🔍 [LEGACY_WEBSITE_REDIRECT] Item ID: $itemId, Name: $itemName");
         if (itemId != null && itemId.isNotEmpty) {
-          _navigateToDetailPage(itemId, itemName, 'website_redirect');
+          _navigateToDetailPage(itemId, itemName, 'legacy_website_redirect');
           return;
         }
+      }
+      
+      // Handle path-based routes: https://gagcars.com/route/listing/123
+      if (pathSegments.isNotEmpty && pathSegments[0] == 'route' && pathSegments.length >= 3 && pathSegments[1] == 'listing') {
+        final itemId = pathSegments[2];
+        final itemName = uri.queryParameters['name'];
+        
+        logger.i("🔍 [PATH_BASED_ROUTE] Extracted - Item ID: $itemId, Name: $itemName");
+        _navigateToDetailPage(itemId, itemName, 'path_based_route');
+        return;
+      }
+    }
+    
+    // Handle old Netlify domains for backward compatibility
+    else if (uri.host == 'radiant-sable-70d147.netlify.app') {
+      final itemId = uri.queryParameters['id'];
+      final itemName = uri.queryParameters['name'];
+      
+      logger.i("🔍 [NETLIFY_LEGACY_REDIRECT] Item ID: $itemId, Name: $itemName");
+      if (itemId != null && itemId.isNotEmpty) {
+        _navigateToDetailPage(itemId, itemName, 'netlify_legacy_redirect');
+        return;
       }
     }
     
@@ -296,27 +312,47 @@ class SimpleDeepLinkHandler {
     }
   }
 
-  /// Generate deep link for a specific item
+  /// ========== UPDATED LINK GENERATION METHODS WITH GAGCARS.COM DOMAIN ==========
+
+  /// Generate deep link for a specific item (custom scheme)
   static String generateItemDeepLink(String itemId, String itemName) {
     final String encodedItemName = Uri.encodeComponent(itemName);
     return 'gagcars://item?id=$itemId&name=$encodedItemName';
   }
 
-  /// Generate universal link for a specific item
+  /// Generate universal link for a specific item (using your actual domain)
   static String generateUniversalLink(String itemId, String itemName) {
     final String encodedItemName = Uri.encodeComponent(itemName);
     
-    // Use your Netlify URL for maximum compatibility
-    return 'https://radiant-sable-70d147.netlify.app/?id=$itemId&name=$encodedItemName';
+    // Use your actual domain with /route path
+    return '$_domainBaseUrl$_routePath?id=$itemId&name=$encodedItemName';
   }
 
   /// Generate shareable link that works across all platforms
   static String generateShareableLink(String itemId, String itemName) {
     final String encodedItemName = Uri.encodeComponent(itemName);
     
-    // Use your Netlify URL for maximum compatibility
-    return 'https://radiant-sable-70d147.netlify.app/?id=$itemId&name=$encodedItemName';
+    // Use your actual domain for maximum compatibility and branding
+    return '$_domainBaseUrl$_routePath?id=$itemId&name=$encodedItemName';
   }
+
+  /// Generate alternative path-based link: https://gagcars.com/route/listing/{itemId}
+  static String generatePathBasedLink(String itemId, String itemName) {
+    final String encodedItemName = Uri.encodeComponent(itemName);
+    
+    // Path-based format for better SEO and readability
+    return '$_domainBaseUrl$_routePath/listing/$itemId?name=$encodedItemName';
+  }
+
+  /// Generate short link for easy sharing
+  static String generateShortLink(String itemId, String itemName) {
+    final String encodedItemName = Uri.encodeComponent(itemName);
+    
+    // Short URL format using your domain
+    return '$_domainBaseUrl/route/$itemId?name=$encodedItemName';
+  }
+
+  /// ========== HELPER METHODS ==========
 
   /// Show error snackbar
   static void _showErrorSnackbar(String message) {
@@ -344,5 +380,86 @@ class SimpleDeepLinkHandler {
       margin: const EdgeInsets.all(16),
       borderRadius: 12,
     );
+  }
+
+  /// ========== BULK LINK GENERATION FOR MULTIPLE ITEMS ==========
+
+  /// Generate links for multiple items at once
+  static Map<String, String> generateAllLinkTypes(String itemId, String itemName) {
+    return {
+      'custom_scheme': generateItemDeepLink(itemId, itemName),
+      'universal_link': generateUniversalLink(itemId, itemName),
+      'shareable_link': generateShareableLink(itemId, itemName),
+      'path_based_link': generatePathBasedLink(itemId, itemName),
+      'short_link': generateShortLink(itemId, itemName),
+    };
+  }
+
+  /// Validate if a URL is a valid GAGcars item link
+  static bool isValidGagCarsItemLink(String url) {
+    try {
+      final uri = Uri.parse(url);
+      
+      // Check custom scheme
+      if (uri.scheme == 'gagcars' && uri.host == 'item') {
+        return uri.queryParameters.containsKey('id');
+      }
+      
+      // Check HTTP/HTTPS schemes with your domain
+      if ((uri.scheme == 'http' || uri.scheme == 'https') && 
+          (uri.host == 'gagcars.com' || uri.host == 'www.gagcars.com')) {
+        
+        // Check route path with query parameters
+        if (uri.path == _routePath || uri.path == '$_routePath/') {
+          return uri.queryParameters.containsKey('id');
+        }
+        
+        // Check path-based routes
+        final segments = uri.pathSegments;
+        if (segments.isNotEmpty && segments[0] == 'route') {
+          return segments.length >= 2; // At least /route/{id}
+        }
+      }
+      
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Extract item ID from any valid GAGcars link
+  static String? extractItemIdFromLink(String url) {
+    try {
+      final uri = Uri.parse(url);
+      
+      // From custom scheme
+      if (uri.scheme == 'gagcars' && uri.host == 'item') {
+        return uri.queryParameters['id'];
+      }
+      
+      // From HTTP/HTTPS schemes
+      if ((uri.scheme == 'http' || uri.scheme == 'https') && 
+          (uri.host == 'gagcars.com' || uri.host == 'www.gagcars.com')) {
+        
+        // From query parameters
+        if (uri.path == _routePath || uri.path == '$_routePath/') {
+          return uri.queryParameters['id'];
+        }
+        
+        // From path segments
+        final segments = uri.pathSegments;
+        if (segments.isNotEmpty && segments[0] == 'route') {
+          if (segments.length >= 3 && segments[1] == 'listing') {
+            return segments[2]; // /route/listing/{id}
+          } else if (segments.length >= 2) {
+            return segments[1]; // /route/{id}
+          }
+        }
+      }
+      
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 }

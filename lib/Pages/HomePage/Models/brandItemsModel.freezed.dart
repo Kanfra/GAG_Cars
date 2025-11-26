@@ -1481,7 +1481,7 @@ mixin _$BrandItem {
   @JsonKey(name: 'category_id')
   int get categoryId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get year => throw _privateConstructorUsedError;
+  int get year => throw _privateConstructorUsedError;
   String get slug => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
   List<String> get images => throw _privateConstructorUsedError;
@@ -1492,7 +1492,8 @@ mixin _$BrandItem {
   @JsonKey(name: 'steer_position')
   String? get steerPosition => throw _privateConstructorUsedError;
   @JsonKey(name: 'engine_capacity')
-  String? get engineCapacity => throw _privateConstructorUsedError;
+  int? get engineCapacity =>
+      throw _privateConstructorUsedError; // CHANGED FROM String? to int?
   String? get transmission => throw _privateConstructorUsedError;
   String? get color => throw _privateConstructorUsedError;
   @JsonKey(name: 'build_type')
@@ -1545,7 +1546,7 @@ abstract class $BrandItemCopyWith<$Res> {
       @JsonKey(name: 'brand_id') int brandId,
       @JsonKey(name: 'category_id') int categoryId,
       String name,
-      String year,
+      int year,
       String slug,
       String description,
       List<String> images,
@@ -1553,7 +1554,7 @@ abstract class $BrandItemCopyWith<$Res> {
       @JsonKey(name: 'serial_number') String? serialNumber,
       String? condition,
       @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
+      @JsonKey(name: 'engine_capacity') int? engineCapacity,
       String? transmission,
       String? color,
       @JsonKey(name: 'build_type') String? buildType,
@@ -1663,7 +1664,7 @@ class _$BrandItemCopyWithImpl<$Res, $Val extends BrandItem>
       year: null == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       slug: null == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
@@ -1695,7 +1696,7 @@ class _$BrandItemCopyWithImpl<$Res, $Val extends BrandItem>
       engineCapacity: freezed == engineCapacity
           ? _value.engineCapacity
           : engineCapacity // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       transmission: freezed == transmission
           ? _value.transmission
           : transmission // ignore: cast_nullable_to_non_nullable
@@ -1848,7 +1849,7 @@ abstract class _$$BrandItemImplCopyWith<$Res>
       @JsonKey(name: 'brand_id') int brandId,
       @JsonKey(name: 'category_id') int categoryId,
       String name,
-      String year,
+      int year,
       String slug,
       String description,
       List<String> images,
@@ -1856,7 +1857,7 @@ abstract class _$$BrandItemImplCopyWith<$Res>
       @JsonKey(name: 'serial_number') String? serialNumber,
       String? condition,
       @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
+      @JsonKey(name: 'engine_capacity') int? engineCapacity,
       String? transmission,
       String? color,
       @JsonKey(name: 'build_type') String? buildType,
@@ -1968,7 +1969,7 @@ class __$$BrandItemImplCopyWithImpl<$Res>
       year: null == year
           ? _value.year
           : year // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       slug: null == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
@@ -2000,7 +2001,7 @@ class __$$BrandItemImplCopyWithImpl<$Res>
       engineCapacity: freezed == engineCapacity
           ? _value.engineCapacity
           : engineCapacity // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as int?,
       transmission: freezed == transmission
           ? _value.transmission
           : transmission // ignore: cast_nullable_to_non_nullable
@@ -2146,7 +2147,7 @@ class _$BrandItemImpl implements _BrandItem {
   @override
   final String name;
   @override
-  final String year;
+  final int year;
   @override
   final String slug;
   @override
@@ -2171,7 +2172,8 @@ class _$BrandItemImpl implements _BrandItem {
   final String? steerPosition;
   @override
   @JsonKey(name: 'engine_capacity')
-  final String? engineCapacity;
+  final int? engineCapacity;
+// CHANGED FROM String? to int?
   @override
   final String? transmission;
   @override
@@ -2358,7 +2360,7 @@ abstract class _BrandItem implements BrandItem {
       @JsonKey(name: 'brand_id') required final int brandId,
       @JsonKey(name: 'category_id') required final int categoryId,
       required final String name,
-      required final String year,
+      required final int year,
       required final String slug,
       required final String description,
       required final List<String> images,
@@ -2366,7 +2368,7 @@ abstract class _BrandItem implements BrandItem {
       @JsonKey(name: 'serial_number') final String? serialNumber,
       final String? condition,
       @JsonKey(name: 'steer_position') final String? steerPosition,
-      @JsonKey(name: 'engine_capacity') final String? engineCapacity,
+      @JsonKey(name: 'engine_capacity') final int? engineCapacity,
       final String? transmission,
       final String? color,
       @JsonKey(name: 'build_type') final String? buildType,
@@ -2410,7 +2412,7 @@ abstract class _BrandItem implements BrandItem {
   @override
   String get name;
   @override
-  String get year;
+  int get year;
   @override
   String get slug;
   @override
@@ -2429,7 +2431,7 @@ abstract class _BrandItem implements BrandItem {
   String? get steerPosition;
   @override
   @JsonKey(name: 'engine_capacity')
-  String? get engineCapacity;
+  int? get engineCapacity; // CHANGED FROM String? to int?
   @override
   String? get transmission;
   @override

@@ -158,8 +158,8 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
             color: Theme.of(context).brightness == Brightness.dark
                 ? Colors.white
                 : ColorGlobalVariables.brownColor,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,

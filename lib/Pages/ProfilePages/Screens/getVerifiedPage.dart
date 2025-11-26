@@ -139,88 +139,152 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     }
   }
 
-  // ================== QUICK CAPTURE WITHOUT FRAME ==================
-  Future<void> _quickCaptureNationalId(bool isFront) async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        preferredCameraDevice: CameraDevice.rear,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 90,
-      );
-
-      if (image == null) return;
-
-      final File capturedImage = File(image.path);
-      
-      setState(() {
-        if (isFront) {
-          _nationalIdFront = capturedImage;
-          _isFrontCaptured = true;
-        } else {
-          _nationalIdBack = capturedImage;
-          _isBackCaptured = true;
-        }
-      });
-      
-      showCustomSnackBar(
-        title: "Success",
-        message: "ID ${isFront ? 'front' : 'back'} captured successfully!",
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } catch (e) {
-      showCustomSnackBar(
-        title: "Error",
-        message: "Failed to capture ID: ${e.toString()}",
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
+  // ================== SELFIE DOCUMENT WIDGET ==================
+  Widget _buildSelfieSection({
+    required bool isDarkMode,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "1. Take a Selfie",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          "We need to verify that you're a real person. Please take a clear selfie with your face clearly visible.",
+          style: TextStyle(
+            fontSize: 14,
+            color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        InkWell(
+          onTap: _takeSelfie,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isSelfieCaptured 
+                  ? Colors.green 
+                  : Colors.blue,
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (_isSelfieCaptured ? Colors.green : Colors.blue)
+                        .withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.face_retouching_natural,
+                    color: _isSelfieCaptured ? Colors.green : Colors.blue,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _isSelfieCaptured ? "Successfully Captured!" : "Take Selfie",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: _isSelfieCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _isSelfieCaptured ? "Face verified successfully" : "Front camera required",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: _isSelfieCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_isSelfieCaptured && _selfieImage != null) ...[
+          const SizedBox(height: 16),
+          Container(
+            height: 200,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                _selfieImage!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    child: Icon(
+                      Icons.error_outline, 
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: _takeSelfie,
+              icon: Icon(
+                Icons.camera_alt, 
+                size: 18,
+                color: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+              label: Text(
+                "Retake",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white70 : Colors.grey[600],
+                ),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[600],
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+      ],
+    );
   }
 
-  // ================== GALLERY CAPTURE ==================
-  Future<void> _captureFromGallery(bool isFront) async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1920,
-        maxHeight: 1080,
-        imageQuality: 90,
-      );
-
-      if (image == null) return;
-
-      final File capturedImage = File(image.path);
-      
-      setState(() {
-        if (isFront) {
-          _nationalIdFront = capturedImage;
-          _isFrontCaptured = true;
-        } else {
-          _nationalIdBack = capturedImage;
-          _isBackCaptured = true;
-        }
-      });
-      
-      showCustomSnackBar(
-        title: "Success",
-        message: "ID ${isFront ? 'front' : 'back'} selected from gallery!",
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } catch (e) {
-      showCustomSnackBar(
-        title: "Error",
-        message: "Failed to select image: ${e.toString()}",
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
-  // ================== DOCUMENT WIDGET ==================
+  // ================== ENHANCED DOCUMENT WIDGET ==================
   Widget _buildDocumentSection({
     required String title,
     required String description,
@@ -229,9 +293,8 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
     required File? file,
     required bool isFront,
     Color? accentColor,
+    required bool isDarkMode,
   }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -254,44 +317,66 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
         ),
         const SizedBox(height: 16),
         
-        // Capture Options
-        Column(
-          children: [
-            _buildCaptureOptionCard(
-              title: "Scan with Frame Guide",
-              subtitle: "Perfect alignment assistance",
-              icon: Icons.crop_free,
-              isCaptured: isCaptured,
-              accentColor: accentColor,
-              onTap: () => _captureNationalIdWithFrame(isFront),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildCaptureOptionCard(
-                    title: "Quick Camera",
-                    subtitle: "Basic camera",
-                    icon: Icons.photo_camera,
-                    isCaptured: isCaptured,
-                    accentColor: accentColor,
-                    onTap: () => _quickCaptureNationalId(isFront),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildCaptureOptionCard(
-                    title: "From Gallery",
-                    subtitle: "Choose existing",
-                    icon: Icons.photo_library,
-                    isCaptured: isCaptured,
-                    accentColor: accentColor,
-                    onTap: () => _captureFromGallery(isFront),
-                  ),
+        // Single Capture Option - Scan with Frame Guide
+        InkWell(
+          onTap: () => _captureNationalIdWithFrame(isFront),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isCaptured 
+                  ? Colors.green 
+                  : (accentColor ?? ColorGlobalVariables.brownColor),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-          ],
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
+                        .withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  isCaptured ? "Successfully Captured!" : "Scan with Frame Guide",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  isCaptured ? "Perfect alignment achieved" : "Perfect alignment assistance",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
         
         if (isCaptured && file != null) ...[
@@ -301,7 +386,9 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -351,78 +438,6 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
         ],
         const SizedBox(height: 24),
       ],
-    );
-  }
-
-  Widget _buildCaptureOptionCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required bool isCaptured,
-    required Color? accentColor,
-    required VoidCallback onTap,
-  }) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF424242) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isCaptured 
-              ? Colors.green 
-              : (accentColor ?? ColorGlobalVariables.brownColor).withOpacity(0.5),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
-                    .withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -505,36 +520,34 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   }
 
   // ================== PROGRESS INDICATOR ==================
-  Widget _buildProgressStep(String label, int stepNumber, bool isCompleted) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildProgressStep(String label, int stepNumber, bool isCompleted, bool isDarkMode) {
     return Column(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
             color: isCompleted ? Colors.green : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: Center(
             child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 20)
+                ? const Icon(Icons.check, color: Colors.white, size: 18)
                 : Text(
                     stepNumber.toString(),
                     style: TextStyle(
                       color: isDarkMode ? Colors.white70 : Colors.grey[700],
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 14,
                     ),
                   ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: FontWeight.w500,
             color: isCompleted ? Colors.green : (isDarkMode ? Colors.white70 : Colors.grey[600]),
           ),
@@ -640,80 +653,15 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildProgressStep("Selfie", 1, _isSelfieCaptured),
-                    _buildProgressStep("ID Front", 2, _isFrontCaptured),
-                    _buildProgressStep("ID Back", 3, _isBackCaptured),
+                    _buildProgressStep("Selfie", 1, _isSelfieCaptured, isDarkMode),
+                    _buildProgressStep("ID Front", 2, _isFrontCaptured, isDarkMode),
+                    _buildProgressStep("ID Back", 3, _isBackCaptured, isDarkMode),
                   ],
                 ),
                 const SizedBox(height: 32),
 
                 // Selfie Section
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "1. Take a Selfie",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "We need to verify that you're a real person. Please take a clear selfie with your face clearly visible.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildCaptureOptionCard(
-                      title: "Take Selfie",
-                      subtitle: "Front camera required",
-                      icon: Icons.face_retouching_natural,
-                      isCaptured: _isSelfieCaptured,
-                      accentColor: Colors.blue,
-                      onTap: _takeSelfie,
-                    ),
-                    if (_isSelfieCaptured && _selfieImage != null) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        height: 200,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            _selfieImage!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                                child: Icon(
-                                  Icons.error_outline, 
-                                  color: isDarkMode ? Colors.grey[400] : Colors.grey
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                _buildSelfieSection(isDarkMode: isDarkMode),
 
                 // National ID Front
                 _buildDocumentSection(
@@ -724,6 +672,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                   file: _nationalIdFront,
                   isFront: true,
                   accentColor: Colors.orange,
+                  isDarkMode: isDarkMode,
                 ),
 
                 // National ID Back
@@ -735,6 +684,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                   file: _nationalIdBack,
                   isFront: false,
                   accentColor: Colors.purple,
+                  isDarkMode: isDarkMode,
                 ),
 
                 const SizedBox(height: 24),

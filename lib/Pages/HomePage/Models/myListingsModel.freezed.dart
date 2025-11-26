@@ -20,51 +20,67 @@ MyListing _$MyListingFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$MyListing {
+  @JsonKey(fromJson: _parseString)
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
-  String get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'country_id')
-  dynamic get countryId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
+  int get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  int? get countryId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
   int? get brandModelId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   int get brandId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseInt)
   int get categoryId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get year => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get description => throw _privateConstructorUsedError;
   List<String> get images => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get location => throw _privateConstructorUsedError;
-  @JsonKey(name: 'serial_number')
-  dynamic get serialNumber => throw _privateConstructorUsedError;
-  dynamic get condition => throw _privateConstructorUsedError;
-  @JsonKey(name: 'steer_position')
+  @JsonKey(name: 'serial_number', fromJson: _parseString)
+  String? get serialNumber => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String? get condition => throw _privateConstructorUsedError;
+  @JsonKey(name: 'steer_position', fromJson: _parseString)
   String? get steerPosition => throw _privateConstructorUsedError;
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseString)
   String? get engineCapacity => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String? get transmission => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String? get color => throw _privateConstructorUsedError;
-  @JsonKey(name: 'build_type')
+  @JsonKey(name: 'build_type', fromJson: _parseString)
   String? get buildType => throw _privateConstructorUsedError;
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
   int? get numberOfPassengers => throw _privateConstructorUsedError;
   List<dynamic> get features => throw _privateConstructorUsedError;
-  dynamic get status => throw _privateConstructorUsedError;
-  String get price => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String? get status => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String get price =>
+      throw _privateConstructorUsedError; // Use custom converter
+  @JsonKey(fromJson: _parseString)
   String? get mileage => throw _privateConstructorUsedError;
-  dynamic get warranty => throw _privateConstructorUsedError;
-  @JsonKey(name: 'warranty_expiration')
-  dynamic get warrantyExpiration => throw _privateConstructorUsedError;
-  @JsonKey(name: 'deleted_at')
-  dynamic get deletedAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
+  @JsonKey(fromJson: _parseInt)
+  int? get warranty => throw _privateConstructorUsedError;
+  @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+  String? get warrantyExpiration => throw _privateConstructorUsedError;
+  @JsonKey(name: 'deleted_at', fromJson: _parseString)
+  String? get deletedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   String get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   String get updatedAt => throw _privateConstructorUsedError;
-  dynamic get Height => throw _privateConstructorUsedError;
-  dynamic get VIN => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String? get Height => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
+  String? get VIN => throw _privateConstructorUsedError;
   Category? get category => throw _privateConstructorUsedError;
   @JsonKey(name: 'is_promoted')
   bool? get isPromoted => throw _privateConstructorUsedError;
@@ -85,37 +101,42 @@ abstract class $MyListingCopyWith<$Res> {
       _$MyListingCopyWithImpl<$Res, MyListing>;
   @useResult
   $Res call(
-      {String id,
-      @JsonKey(name: 'user_id') String userId,
-      @JsonKey(name: 'country_id') dynamic countryId,
-      @JsonKey(name: 'brand_model_id') int? brandModelId,
-      @JsonKey(name: 'brand_id') int brandId,
-      @JsonKey(name: 'category_id') int categoryId,
-      String name,
-      String year,
-      String slug,
-      String description,
+      {@JsonKey(fromJson: _parseString) String id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) int userId,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt) int categoryId,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String year,
+      @JsonKey(fromJson: _parseString) String slug,
+      @JsonKey(fromJson: _parseString) String description,
       List<String> images,
-      String location,
-      @JsonKey(name: 'serial_number') dynamic serialNumber,
-      dynamic condition,
-      @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
-      String? transmission,
-      String? color,
-      @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      @JsonKey(fromJson: _parseString) String location,
+      @JsonKey(name: 'serial_number', fromJson: _parseString)
+      String? serialNumber,
+      @JsonKey(fromJson: _parseString) String? condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseString)
+      String? steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseString)
+      String? engineCapacity,
+      @JsonKey(fromJson: _parseString) String? transmission,
+      @JsonKey(fromJson: _parseString) String? color,
+      @JsonKey(name: 'build_type', fromJson: _parseString) String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      int? numberOfPassengers,
       List<dynamic> features,
-      dynamic status,
-      String price,
-      String? mileage,
-      dynamic warranty,
-      @JsonKey(name: 'warranty_expiration') dynamic warrantyExpiration,
-      @JsonKey(name: 'deleted_at') dynamic deletedAt,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
-      dynamic Height,
-      dynamic VIN,
+      @JsonKey(fromJson: _parseString) String? status,
+      @JsonKey(fromJson: _parseString) String price,
+      @JsonKey(fromJson: _parseString) String? mileage,
+      @JsonKey(fromJson: _parseInt) int? warranty,
+      @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+      String? warrantyExpiration,
+      @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString) String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString) String updatedAt,
+      @JsonKey(fromJson: _parseString) String? Height,
+      @JsonKey(fromJson: _parseString) String? VIN,
       Category? category,
       @JsonKey(name: 'is_promoted') bool? isPromoted});
 
@@ -179,11 +200,11 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       countryId: freezed == countryId
           ? _value.countryId
           : countryId // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       brandModelId: freezed == brandModelId
           ? _value.brandModelId
           : brandModelId // ignore: cast_nullable_to_non_nullable
@@ -223,11 +244,11 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
       serialNumber: freezed == serialNumber
           ? _value.serialNumber
           : serialNumber // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       condition: freezed == condition
           ? _value.condition
           : condition // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       steerPosition: freezed == steerPosition
           ? _value.steerPosition
           : steerPosition // ignore: cast_nullable_to_non_nullable
@@ -259,7 +280,7 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       price: null == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
@@ -271,15 +292,15 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
       warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       deletedAt: freezed == deletedAt
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -291,11 +312,11 @@ class _$MyListingCopyWithImpl<$Res, $Val extends MyListing>
       Height: freezed == Height
           ? _value.Height
           : Height // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       VIN: freezed == VIN
           ? _value.VIN
           : VIN // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       category: freezed == category
           ? _value.category
           : category // ignore: cast_nullable_to_non_nullable
@@ -331,37 +352,42 @@ abstract class _$$MyListingImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String id,
-      @JsonKey(name: 'user_id') String userId,
-      @JsonKey(name: 'country_id') dynamic countryId,
-      @JsonKey(name: 'brand_model_id') int? brandModelId,
-      @JsonKey(name: 'brand_id') int brandId,
-      @JsonKey(name: 'category_id') int categoryId,
-      String name,
-      String year,
-      String slug,
-      String description,
+      {@JsonKey(fromJson: _parseString) String id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) int userId,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) int brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt) int categoryId,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String year,
+      @JsonKey(fromJson: _parseString) String slug,
+      @JsonKey(fromJson: _parseString) String description,
       List<String> images,
-      String location,
-      @JsonKey(name: 'serial_number') dynamic serialNumber,
-      dynamic condition,
-      @JsonKey(name: 'steer_position') String? steerPosition,
-      @JsonKey(name: 'engine_capacity') String? engineCapacity,
-      String? transmission,
-      String? color,
-      @JsonKey(name: 'build_type') String? buildType,
-      @JsonKey(name: 'number_of_passengers') int? numberOfPassengers,
+      @JsonKey(fromJson: _parseString) String location,
+      @JsonKey(name: 'serial_number', fromJson: _parseString)
+      String? serialNumber,
+      @JsonKey(fromJson: _parseString) String? condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseString)
+      String? steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseString)
+      String? engineCapacity,
+      @JsonKey(fromJson: _parseString) String? transmission,
+      @JsonKey(fromJson: _parseString) String? color,
+      @JsonKey(name: 'build_type', fromJson: _parseString) String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      int? numberOfPassengers,
       List<dynamic> features,
-      dynamic status,
-      String price,
-      String? mileage,
-      dynamic warranty,
-      @JsonKey(name: 'warranty_expiration') dynamic warrantyExpiration,
-      @JsonKey(name: 'deleted_at') dynamic deletedAt,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt,
-      dynamic Height,
-      dynamic VIN,
+      @JsonKey(fromJson: _parseString) String? status,
+      @JsonKey(fromJson: _parseString) String price,
+      @JsonKey(fromJson: _parseString) String? mileage,
+      @JsonKey(fromJson: _parseInt) int? warranty,
+      @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+      String? warrantyExpiration,
+      @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString) String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString) String updatedAt,
+      @JsonKey(fromJson: _parseString) String? Height,
+      @JsonKey(fromJson: _parseString) String? VIN,
       Category? category,
       @JsonKey(name: 'is_promoted') bool? isPromoted});
 
@@ -424,11 +450,11 @@ class __$$MyListingImplCopyWithImpl<$Res>
       userId: null == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as String,
+              as int,
       countryId: freezed == countryId
           ? _value.countryId
           : countryId // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       brandModelId: freezed == brandModelId
           ? _value.brandModelId
           : brandModelId // ignore: cast_nullable_to_non_nullable
@@ -468,11 +494,11 @@ class __$$MyListingImplCopyWithImpl<$Res>
       serialNumber: freezed == serialNumber
           ? _value.serialNumber
           : serialNumber // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       condition: freezed == condition
           ? _value.condition
           : condition // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       steerPosition: freezed == steerPosition
           ? _value.steerPosition
           : steerPosition // ignore: cast_nullable_to_non_nullable
@@ -504,7 +530,7 @@ class __$$MyListingImplCopyWithImpl<$Res>
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       price: null == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
@@ -516,15 +542,15 @@ class __$$MyListingImplCopyWithImpl<$Res>
       warranty: freezed == warranty
           ? _value.warranty
           : warranty // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       warrantyExpiration: freezed == warrantyExpiration
           ? _value.warrantyExpiration
           : warrantyExpiration // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       deletedAt: freezed == deletedAt
           ? _value.deletedAt
           : deletedAt // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -536,11 +562,11 @@ class __$$MyListingImplCopyWithImpl<$Res>
       Height: freezed == Height
           ? _value.Height
           : Height // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       VIN: freezed == VIN
           ? _value.VIN
           : VIN // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as String?,
       category: freezed == category
           ? _value.category
           : category // ignore: cast_nullable_to_non_nullable
@@ -557,37 +583,44 @@ class __$$MyListingImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$MyListingImpl implements _MyListing {
   const _$MyListingImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') required this.userId,
-      @JsonKey(name: 'country_id') this.countryId,
-      @JsonKey(name: 'brand_model_id') this.brandModelId,
-      @JsonKey(name: 'brand_id') required this.brandId,
-      @JsonKey(name: 'category_id') required this.categoryId,
-      required this.name,
-      required this.year,
-      required this.slug,
-      required this.description,
+      {@JsonKey(fromJson: _parseString) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) required this.userId,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) this.countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt) this.brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt) required this.brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt)
+      required this.categoryId,
+      @JsonKey(fromJson: _parseString) required this.name,
+      @JsonKey(fromJson: _parseString) required this.year,
+      @JsonKey(fromJson: _parseString) required this.slug,
+      @JsonKey(fromJson: _parseString) required this.description,
       required final List<String> images,
-      required this.location,
-      @JsonKey(name: 'serial_number') this.serialNumber,
-      this.condition,
-      @JsonKey(name: 'steer_position') this.steerPosition,
-      @JsonKey(name: 'engine_capacity') this.engineCapacity,
-      this.transmission,
-      this.color,
-      @JsonKey(name: 'build_type') this.buildType,
-      @JsonKey(name: 'number_of_passengers') this.numberOfPassengers,
+      @JsonKey(fromJson: _parseString) required this.location,
+      @JsonKey(name: 'serial_number', fromJson: _parseString) this.serialNumber,
+      @JsonKey(fromJson: _parseString) this.condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseString)
+      this.steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseString)
+      this.engineCapacity,
+      @JsonKey(fromJson: _parseString) this.transmission,
+      @JsonKey(fromJson: _parseString) this.color,
+      @JsonKey(name: 'build_type', fromJson: _parseString) this.buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      this.numberOfPassengers,
       required final List<dynamic> features,
-      this.status,
-      required this.price,
-      this.mileage,
-      this.warranty,
-      @JsonKey(name: 'warranty_expiration') this.warrantyExpiration,
-      @JsonKey(name: 'deleted_at') this.deletedAt,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt,
-      this.Height,
-      this.VIN,
+      @JsonKey(fromJson: _parseString) this.status,
+      @JsonKey(fromJson: _parseString) required this.price,
+      @JsonKey(fromJson: _parseString) this.mileage,
+      @JsonKey(fromJson: _parseInt) this.warranty,
+      @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+      this.warrantyExpiration,
+      @JsonKey(name: 'deleted_at', fromJson: _parseString) this.deletedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString)
+      required this.createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString)
+      required this.updatedAt,
+      @JsonKey(fromJson: _parseString) this.Height,
+      @JsonKey(fromJson: _parseString) this.VIN,
       this.category,
       @JsonKey(name: 'is_promoted') this.isPromoted})
       : _images = images,
@@ -597,29 +630,34 @@ class _$MyListingImpl implements _MyListing {
       _$$MyListingImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String id;
   @override
-  @JsonKey(name: 'user_id')
-  final String userId;
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
+  final int userId;
   @override
-  @JsonKey(name: 'country_id')
-  final dynamic countryId;
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  final int? countryId;
   @override
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
   final int? brandModelId;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   final int brandId;
   @override
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseInt)
   final int categoryId;
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
+  @JsonKey(fromJson: _parseString)
   final String year;
   @override
+  @JsonKey(fromJson: _parseString)
   final String slug;
   @override
+  @JsonKey(fromJson: _parseString)
   final String description;
   final List<String> _images;
   @override
@@ -630,27 +668,31 @@ class _$MyListingImpl implements _MyListing {
   }
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String location;
   @override
-  @JsonKey(name: 'serial_number')
-  final dynamic serialNumber;
+  @JsonKey(name: 'serial_number', fromJson: _parseString)
+  final String? serialNumber;
   @override
-  final dynamic condition;
+  @JsonKey(fromJson: _parseString)
+  final String? condition;
   @override
-  @JsonKey(name: 'steer_position')
+  @JsonKey(name: 'steer_position', fromJson: _parseString)
   final String? steerPosition;
   @override
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseString)
   final String? engineCapacity;
   @override
+  @JsonKey(fromJson: _parseString)
   final String? transmission;
   @override
+  @JsonKey(fromJson: _parseString)
   final String? color;
   @override
-  @JsonKey(name: 'build_type')
+  @JsonKey(name: 'build_type', fromJson: _parseString)
   final String? buildType;
   @override
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
   final int? numberOfPassengers;
   final List<dynamic> _features;
   @override
@@ -661,29 +703,36 @@ class _$MyListingImpl implements _MyListing {
   }
 
   @override
-  final dynamic status;
+  @JsonKey(fromJson: _parseString)
+  final String? status;
   @override
+  @JsonKey(fromJson: _parseString)
   final String price;
+// Use custom converter
   @override
+  @JsonKey(fromJson: _parseString)
   final String? mileage;
   @override
-  final dynamic warranty;
+  @JsonKey(fromJson: _parseInt)
+  final int? warranty;
   @override
-  @JsonKey(name: 'warranty_expiration')
-  final dynamic warrantyExpiration;
+  @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+  final String? warrantyExpiration;
   @override
-  @JsonKey(name: 'deleted_at')
-  final dynamic deletedAt;
+  @JsonKey(name: 'deleted_at', fromJson: _parseString)
+  final String? deletedAt;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   final String createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   final String updatedAt;
   @override
-  final dynamic Height;
+  @JsonKey(fromJson: _parseString)
+  final String? Height;
   @override
-  final dynamic VIN;
+  @JsonKey(fromJson: _parseString)
+  final String? VIN;
   @override
   final Category? category;
   @override
@@ -702,7 +751,8 @@ class _$MyListingImpl implements _MyListing {
             other is _$MyListingImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
-            const DeepCollectionEquality().equals(other.countryId, countryId) &&
+            (identical(other.countryId, countryId) ||
+                other.countryId == countryId) &&
             (identical(other.brandModelId, brandModelId) ||
                 other.brandModelId == brandModelId) &&
             (identical(other.brandId, brandId) || other.brandId == brandId) &&
@@ -716,9 +766,10 @@ class _$MyListingImpl implements _MyListing {
             const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.location, location) ||
                 other.location == location) &&
-            const DeepCollectionEquality()
-                .equals(other.serialNumber, serialNumber) &&
-            const DeepCollectionEquality().equals(other.condition, condition) &&
+            (identical(other.serialNumber, serialNumber) ||
+                other.serialNumber == serialNumber) &&
+            (identical(other.condition, condition) ||
+                other.condition == condition) &&
             (identical(other.steerPosition, steerPosition) ||
                 other.steerPosition == steerPosition) &&
             (identical(other.engineCapacity, engineCapacity) ||
@@ -731,19 +782,21 @@ class _$MyListingImpl implements _MyListing {
             (identical(other.numberOfPassengers, numberOfPassengers) ||
                 other.numberOfPassengers == numberOfPassengers) &&
             const DeepCollectionEquality().equals(other._features, _features) &&
-            const DeepCollectionEquality().equals(other.status, status) &&
+            (identical(other.status, status) || other.status == status) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.mileage, mileage) || other.mileage == mileage) &&
-            const DeepCollectionEquality().equals(other.warranty, warranty) &&
-            const DeepCollectionEquality()
-                .equals(other.warrantyExpiration, warrantyExpiration) &&
-            const DeepCollectionEquality().equals(other.deletedAt, deletedAt) &&
+            (identical(other.warranty, warranty) ||
+                other.warranty == warranty) &&
+            (identical(other.warrantyExpiration, warrantyExpiration) ||
+                other.warrantyExpiration == warrantyExpiration) &&
+            (identical(other.deletedAt, deletedAt) ||
+                other.deletedAt == deletedAt) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
-            const DeepCollectionEquality().equals(other.Height, Height) &&
-            const DeepCollectionEquality().equals(other.VIN, VIN) &&
+            (identical(other.Height, Height) || other.Height == Height) &&
+            (identical(other.VIN, VIN) || other.VIN == VIN) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.isPromoted, isPromoted) ||
@@ -756,7 +809,7 @@ class _$MyListingImpl implements _MyListing {
         runtimeType,
         id,
         userId,
-        const DeepCollectionEquality().hash(countryId),
+        countryId,
         brandModelId,
         brandId,
         categoryId,
@@ -766,8 +819,8 @@ class _$MyListingImpl implements _MyListing {
         description,
         const DeepCollectionEquality().hash(_images),
         location,
-        const DeepCollectionEquality().hash(serialNumber),
-        const DeepCollectionEquality().hash(condition),
+        serialNumber,
+        condition,
         steerPosition,
         engineCapacity,
         transmission,
@@ -775,16 +828,16 @@ class _$MyListingImpl implements _MyListing {
         buildType,
         numberOfPassengers,
         const DeepCollectionEquality().hash(_features),
-        const DeepCollectionEquality().hash(status),
+        status,
         price,
         mileage,
-        const DeepCollectionEquality().hash(warranty),
-        const DeepCollectionEquality().hash(warrantyExpiration),
-        const DeepCollectionEquality().hash(deletedAt),
+        warranty,
+        warrantyExpiration,
+        deletedAt,
         createdAt,
         updatedAt,
-        const DeepCollectionEquality().hash(Height),
-        const DeepCollectionEquality().hash(VIN),
+        Height,
+        VIN,
         category,
         isPromoted
       ]);
@@ -807,37 +860,49 @@ class _$MyListingImpl implements _MyListing {
 
 abstract class _MyListing implements MyListing {
   const factory _MyListing(
-      {required final String id,
-      @JsonKey(name: 'user_id') required final String userId,
-      @JsonKey(name: 'country_id') final dynamic countryId,
-      @JsonKey(name: 'brand_model_id') final int? brandModelId,
-      @JsonKey(name: 'brand_id') required final int brandId,
-      @JsonKey(name: 'category_id') required final int categoryId,
-      required final String name,
-      required final String year,
-      required final String slug,
-      required final String description,
+      {@JsonKey(fromJson: _parseString) required final String id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) required final int userId,
+      @JsonKey(name: 'country_id', fromJson: _parseInt) final int? countryId,
+      @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
+      final int? brandModelId,
+      @JsonKey(name: 'brand_id', fromJson: _parseInt)
+      required final int brandId,
+      @JsonKey(name: 'category_id', fromJson: _parseInt)
+      required final int categoryId,
+      @JsonKey(fromJson: _parseString) required final String name,
+      @JsonKey(fromJson: _parseString) required final String year,
+      @JsonKey(fromJson: _parseString) required final String slug,
+      @JsonKey(fromJson: _parseString) required final String description,
       required final List<String> images,
-      required final String location,
-      @JsonKey(name: 'serial_number') final dynamic serialNumber,
-      final dynamic condition,
-      @JsonKey(name: 'steer_position') final String? steerPosition,
-      @JsonKey(name: 'engine_capacity') final String? engineCapacity,
-      final String? transmission,
-      final String? color,
-      @JsonKey(name: 'build_type') final String? buildType,
-      @JsonKey(name: 'number_of_passengers') final int? numberOfPassengers,
+      @JsonKey(fromJson: _parseString) required final String location,
+      @JsonKey(name: 'serial_number', fromJson: _parseString)
+      final String? serialNumber,
+      @JsonKey(fromJson: _parseString) final String? condition,
+      @JsonKey(name: 'steer_position', fromJson: _parseString)
+      final String? steerPosition,
+      @JsonKey(name: 'engine_capacity', fromJson: _parseString)
+      final String? engineCapacity,
+      @JsonKey(fromJson: _parseString) final String? transmission,
+      @JsonKey(fromJson: _parseString) final String? color,
+      @JsonKey(name: 'build_type', fromJson: _parseString)
+      final String? buildType,
+      @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+      final int? numberOfPassengers,
       required final List<dynamic> features,
-      final dynamic status,
-      required final String price,
-      final String? mileage,
-      final dynamic warranty,
-      @JsonKey(name: 'warranty_expiration') final dynamic warrantyExpiration,
-      @JsonKey(name: 'deleted_at') final dynamic deletedAt,
-      @JsonKey(name: 'created_at') required final String createdAt,
-      @JsonKey(name: 'updated_at') required final String updatedAt,
-      final dynamic Height,
-      final dynamic VIN,
+      @JsonKey(fromJson: _parseString) final String? status,
+      @JsonKey(fromJson: _parseString) required final String price,
+      @JsonKey(fromJson: _parseString) final String? mileage,
+      @JsonKey(fromJson: _parseInt) final int? warranty,
+      @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+      final String? warrantyExpiration,
+      @JsonKey(name: 'deleted_at', fromJson: _parseString)
+      final String? deletedAt,
+      @JsonKey(name: 'created_at', fromJson: _parseString)
+      required final String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString)
+      required final String updatedAt,
+      @JsonKey(fromJson: _parseString) final String? Height,
+      @JsonKey(fromJson: _parseString) final String? VIN,
       final Category? category,
       @JsonKey(name: 'is_promoted') final bool? isPromoted}) = _$MyListingImpl;
 
@@ -845,81 +910,96 @@ abstract class _MyListing implements MyListing {
       _$MyListingImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseString)
   String get id;
   @override
-  @JsonKey(name: 'user_id')
-  String get userId;
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
+  int get userId;
   @override
-  @JsonKey(name: 'country_id')
-  dynamic get countryId;
+  @JsonKey(name: 'country_id', fromJson: _parseInt)
+  int? get countryId;
   @override
-  @JsonKey(name: 'brand_model_id')
+  @JsonKey(name: 'brand_model_id', fromJson: _parseInt)
   int? get brandModelId;
   @override
-  @JsonKey(name: 'brand_id')
+  @JsonKey(name: 'brand_id', fromJson: _parseInt)
   int get brandId;
   @override
-  @JsonKey(name: 'category_id')
+  @JsonKey(name: 'category_id', fromJson: _parseInt)
   int get categoryId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
+  @JsonKey(fromJson: _parseString)
   String get year;
   @override
+  @JsonKey(fromJson: _parseString)
   String get slug;
   @override
+  @JsonKey(fromJson: _parseString)
   String get description;
   @override
   List<String> get images;
   @override
+  @JsonKey(fromJson: _parseString)
   String get location;
   @override
-  @JsonKey(name: 'serial_number')
-  dynamic get serialNumber;
+  @JsonKey(name: 'serial_number', fromJson: _parseString)
+  String? get serialNumber;
   @override
-  dynamic get condition;
+  @JsonKey(fromJson: _parseString)
+  String? get condition;
   @override
-  @JsonKey(name: 'steer_position')
+  @JsonKey(name: 'steer_position', fromJson: _parseString)
   String? get steerPosition;
   @override
-  @JsonKey(name: 'engine_capacity')
+  @JsonKey(name: 'engine_capacity', fromJson: _parseString)
   String? get engineCapacity;
   @override
+  @JsonKey(fromJson: _parseString)
   String? get transmission;
   @override
+  @JsonKey(fromJson: _parseString)
   String? get color;
   @override
-  @JsonKey(name: 'build_type')
+  @JsonKey(name: 'build_type', fromJson: _parseString)
   String? get buildType;
   @override
-  @JsonKey(name: 'number_of_passengers')
+  @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
   int? get numberOfPassengers;
   @override
   List<dynamic> get features;
   @override
-  dynamic get status;
+  @JsonKey(fromJson: _parseString)
+  String? get status;
   @override
-  String get price;
+  @JsonKey(fromJson: _parseString)
+  String get price; // Use custom converter
   @override
+  @JsonKey(fromJson: _parseString)
   String? get mileage;
   @override
-  dynamic get warranty;
+  @JsonKey(fromJson: _parseInt)
+  int? get warranty;
   @override
-  @JsonKey(name: 'warranty_expiration')
-  dynamic get warrantyExpiration;
+  @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+  String? get warrantyExpiration;
   @override
-  @JsonKey(name: 'deleted_at')
-  dynamic get deletedAt;
+  @JsonKey(name: 'deleted_at', fromJson: _parseString)
+  String? get deletedAt;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   String get createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   String get updatedAt;
   @override
-  dynamic get Height;
+  @JsonKey(fromJson: _parseString)
+  String? get Height;
   @override
-  dynamic get VIN;
+  @JsonKey(fromJson: _parseString)
+  String? get VIN;
   @override
   Category? get category;
   @override
@@ -940,19 +1020,24 @@ Category _$CategoryFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Category {
+  @JsonKey(fromJson: _parseInt)
   int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
-  dynamic get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'parent_id')
-  dynamic get parentId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
+  int? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'parent_id', fromJson: _parseInt)
+  int? get parentId => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get slug => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get description => throw _privateConstructorUsedError;
   List<dynamic> get features => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _parseString)
   String get image => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   String get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   String get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Category to a JSON map.
@@ -971,16 +1056,16 @@ abstract class $CategoryCopyWith<$Res> {
       _$CategoryCopyWithImpl<$Res, Category>;
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') dynamic userId,
-      @JsonKey(name: 'parent_id') dynamic parentId,
-      String name,
-      String slug,
-      String description,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseInt) int? parentId,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String slug,
+      @JsonKey(fromJson: _parseString) String description,
       List<dynamic> features,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      @JsonKey(fromJson: _parseString) String image,
+      @JsonKey(name: 'created_at', fromJson: _parseString) String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString) String updatedAt});
 }
 
 /// @nodoc
@@ -1017,11 +1102,11 @@ class _$CategoryCopyWithImpl<$Res, $Val extends Category>
       userId: freezed == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       parentId: freezed == parentId
           ? _value.parentId
           : parentId // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -1063,16 +1148,16 @@ abstract class _$$CategoryImplCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {int id,
-      @JsonKey(name: 'user_id') dynamic userId,
-      @JsonKey(name: 'parent_id') dynamic parentId,
-      String name,
-      String slug,
-      String description,
+      {@JsonKey(fromJson: _parseInt) int id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseInt) int? parentId,
+      @JsonKey(fromJson: _parseString) String name,
+      @JsonKey(fromJson: _parseString) String slug,
+      @JsonKey(fromJson: _parseString) String description,
       List<dynamic> features,
-      String image,
-      @JsonKey(name: 'created_at') String createdAt,
-      @JsonKey(name: 'updated_at') String updatedAt});
+      @JsonKey(fromJson: _parseString) String image,
+      @JsonKey(name: 'created_at', fromJson: _parseString) String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString) String updatedAt});
 }
 
 /// @nodoc
@@ -1107,11 +1192,11 @@ class __$$CategoryImplCopyWithImpl<$Res>
       userId: freezed == userId
           ? _value.userId
           : userId // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       parentId: freezed == parentId
           ? _value.parentId
           : parentId // ignore: cast_nullable_to_non_nullable
-              as dynamic,
+              as int?,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -1148,34 +1233,40 @@ class __$$CategoryImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$CategoryImpl implements _Category {
   const _$CategoryImpl(
-      {required this.id,
-      @JsonKey(name: 'user_id') this.userId,
-      @JsonKey(name: 'parent_id') this.parentId,
-      required this.name,
-      required this.slug,
-      required this.description,
+      {@JsonKey(fromJson: _parseInt) required this.id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) this.userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseInt) this.parentId,
+      @JsonKey(fromJson: _parseString) required this.name,
+      @JsonKey(fromJson: _parseString) required this.slug,
+      @JsonKey(fromJson: _parseString) required this.description,
       required final List<dynamic> features,
-      required this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt})
+      @JsonKey(fromJson: _parseString) required this.image,
+      @JsonKey(name: 'created_at', fromJson: _parseString)
+      required this.createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString)
+      required this.updatedAt})
       : _features = features;
 
   factory _$CategoryImpl.fromJson(Map<String, dynamic> json) =>
       _$$CategoryImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _parseInt)
   final int id;
   @override
-  @JsonKey(name: 'user_id')
-  final dynamic userId;
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
+  final int? userId;
   @override
-  @JsonKey(name: 'parent_id')
-  final dynamic parentId;
+  @JsonKey(name: 'parent_id', fromJson: _parseInt)
+  final int? parentId;
   @override
+  @JsonKey(fromJson: _parseString)
   final String name;
   @override
+  @JsonKey(fromJson: _parseString)
   final String slug;
   @override
+  @JsonKey(fromJson: _parseString)
   final String description;
   final List<dynamic> _features;
   @override
@@ -1186,12 +1277,13 @@ class _$CategoryImpl implements _Category {
   }
 
   @override
+  @JsonKey(fromJson: _parseString)
   final String image;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   final String createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   final String updatedAt;
 
   @override
@@ -1205,8 +1297,9 @@ class _$CategoryImpl implements _Category {
         (other.runtimeType == runtimeType &&
             other is _$CategoryImpl &&
             (identical(other.id, id) || other.id == id) &&
-            const DeepCollectionEquality().equals(other.userId, userId) &&
-            const DeepCollectionEquality().equals(other.parentId, parentId) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.parentId, parentId) ||
+                other.parentId == parentId) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.slug, slug) || other.slug == slug) &&
             (identical(other.description, description) ||
@@ -1224,8 +1317,8 @@ class _$CategoryImpl implements _Category {
   int get hashCode => Object.hash(
       runtimeType,
       id,
-      const DeepCollectionEquality().hash(userId),
-      const DeepCollectionEquality().hash(parentId),
+      userId,
+      parentId,
       name,
       slug,
       description,
@@ -1252,44 +1345,50 @@ class _$CategoryImpl implements _Category {
 
 abstract class _Category implements Category {
   const factory _Category(
-          {required final int id,
-          @JsonKey(name: 'user_id') final dynamic userId,
-          @JsonKey(name: 'parent_id') final dynamic parentId,
-          required final String name,
-          required final String slug,
-          required final String description,
-          required final List<dynamic> features,
-          required final String image,
-          @JsonKey(name: 'created_at') required final String createdAt,
-          @JsonKey(name: 'updated_at') required final String updatedAt}) =
-      _$CategoryImpl;
+      {@JsonKey(fromJson: _parseInt) required final int id,
+      @JsonKey(name: 'user_id', fromJson: _parseInt) final int? userId,
+      @JsonKey(name: 'parent_id', fromJson: _parseInt) final int? parentId,
+      @JsonKey(fromJson: _parseString) required final String name,
+      @JsonKey(fromJson: _parseString) required final String slug,
+      @JsonKey(fromJson: _parseString) required final String description,
+      required final List<dynamic> features,
+      @JsonKey(fromJson: _parseString) required final String image,
+      @JsonKey(name: 'created_at', fromJson: _parseString)
+      required final String createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _parseString)
+      required final String updatedAt}) = _$CategoryImpl;
 
   factory _Category.fromJson(Map<String, dynamic> json) =
       _$CategoryImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _parseInt)
   int get id;
   @override
-  @JsonKey(name: 'user_id')
-  dynamic get userId;
+  @JsonKey(name: 'user_id', fromJson: _parseInt)
+  int? get userId;
   @override
-  @JsonKey(name: 'parent_id')
-  dynamic get parentId;
+  @JsonKey(name: 'parent_id', fromJson: _parseInt)
+  int? get parentId;
   @override
+  @JsonKey(fromJson: _parseString)
   String get name;
   @override
+  @JsonKey(fromJson: _parseString)
   String get slug;
   @override
+  @JsonKey(fromJson: _parseString)
   String get description;
   @override
   List<dynamic> get features;
   @override
+  @JsonKey(fromJson: _parseString)
   String get image;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _parseString)
   String get createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _parseString)
   String get updatedAt;
 
   /// Create a copy of Category

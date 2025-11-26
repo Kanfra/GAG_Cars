@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
@@ -8,6 +9,7 @@ import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_i
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/custom_text_field.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class SignInWithEmailPage extends StatefulWidget {
   const SignInWithEmailPage({super.key});
@@ -28,7 +30,7 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> with SingleTi
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
   
-  // form validation
+  // Form validation
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -83,22 +85,36 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> with SingleTi
         .then((_) => _animationController.forward());
   }
 
-  Future<void> _login() async {
+  // ✅ UPDATED: Now properly uses UserProvider from context
+  Future<void> _login(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
+        // ✅ Get UserProvider from context
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        
+        // ✅ Pass UserProvider to login method
         await AuthService.logInWithEmail(
           email: _emailController.text,
           password: _passwordController.text,
+          userProvider: userProvider, // Pass the provider instance
         );
+        
         await _successAnimation();
+        
+        // Navigate to main page after successful login
         Get.offNamed(RouteClass.getMainBottomNavigationPage());
+        
       } catch (e) {
         showCustomSnackBar(
-          message: "Error, ${e.toString()}"
+          title: "Login Error",
+          message: "Error: ${e.toString()}",
+          backgroundColor: ColorGlobalVariables.redColor
         );
       } finally {
-        setState(() => _isLoading = false);
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
       }
     }
   }
@@ -214,8 +230,12 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> with SingleTi
                                 prefixImage: AppIcons.lock_icon,
                                 onChanged: (value)=>{},
                                 validator: (value){
-                                  if(value == null || value.isEmpty){return "Please enter password";}
-                                  if(value.length < 6){return "Password must be at least 6 characters";}
+                                  if(value == null || value.isEmpty){
+                                    return "Please enter password";
+                                  }
+                                  if(value.length < 6){
+                                    return "Password must be at least 6 characters";
+                                  }
                                   return null;
                                 },
                               ),
@@ -242,12 +262,12 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> with SingleTi
                             
                             const SizedBox(height: 20),
                             
-                            // Login button with scale animation
+                            // ✅ UPDATED: Login button now passes context to _login method
                             Transform.translate(
                               offset: Offset(0, _slideAnimation.value),
                               child: CustomButton(
                                 buttonName: 'Login', 
-                                onPressed: _login, 
+                                onPressed: () => _login(context), // Pass context here
                                 isLoading: _isLoading,
                               ),
                             ),
@@ -316,24 +336,6 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> with SingleTi
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // _buildSocialAuthButton(
-                                  //   AppIcons.facebook,
-                                  //   'Facebook',
-                                  //   () => _onSocialAuthTap('facebook'),
-                                  //   delay: 0,
-                                  // ),
-                                  // _buildSocialAuthButton(
-                                  //   AppIcons.apple_logo,
-                                  //   'Apple',
-                                  //   () => _onSocialAuthTap('apple'),
-                                  //   delay: 100,
-                                  // ),
-                                  // _buildSocialAuthButton(
-                                  //   AppIcons.google_logo,
-                                  //   'Google',
-                                  //   () => _onSocialAuthTap('google'),
-                                  //   delay: 200,
-                                  // ),
                                   _buildSocialAuthButton(
                                     AppIcons.phone_call_logo,
                                     'Phone',

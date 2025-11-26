@@ -190,6 +190,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
       await _successAnimation();
       
       showCustomSnackBar(
+        title: 'Success',
         message: 'Password reset successfully',
         backgroundColor: ColorGlobalVariables.greenColor,
         textColor: ColorGlobalVariables.whiteColor,
