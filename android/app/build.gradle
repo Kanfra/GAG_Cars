@@ -33,7 +33,8 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "com.gagcars.gordonautogarage"
     compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    // ndkVersion flutter.ndkVersion
+    ndkVersion "29.0.14206865"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -55,6 +56,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders = [GOOGLE_API_KEY: localProperties.getProperty("GOOGLE_API_KEY")]
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -85,7 +87,6 @@ android {
             minifyEnabled false
             shrinkResources false
             
-            // Add packaging options for camera plugin compatibility
             packagingOptions {
                 pickFirst 'lib/**/libc++_shared.so'
                 pickFirst 'lib/**/libflutter.so'
@@ -99,5 +100,5 @@ flutter {
 }
 
 dependencies {
-    // Let Flutter handle dependencies automatically
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
