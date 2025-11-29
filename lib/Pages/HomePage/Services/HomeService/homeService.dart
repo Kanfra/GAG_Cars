@@ -29,7 +29,6 @@ class HomeService {
       endpoint: ApiEndpoint.specialOffers,
       fromJson: (json) {
         // Handle case where response doesn't match expected format
-        if (json == null) return SpecialOfferResponse(data: [], links: null, meta: null);
         return SpecialOfferResponse.fromJson(json);
       },
     );

@@ -327,7 +327,7 @@ class _EditItemPageState extends State<EditItemPage> {
       }
 
       final normalizedFields = selectedFields.map((key, value) => 
-        MapEntry(key?.toLowerCase().replaceAll(' ', '_'), value));
+        MapEntry(key.toLowerCase().replaceAll(' ', '_'), value));
 
       // Process images: separate existing URLs from new files
       List<dynamic> allImages = [];
@@ -1385,7 +1385,7 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   Widget _buildBeautifulFeatures() {
-    final hasFeatures = selectedCategory?.features?.isNotEmpty ?? false;
+    final hasFeatures = selectedCategory?.features.isNotEmpty ?? false;
     if (!hasFeatures) return const SizedBox();
     
     return Container(
@@ -1441,7 +1441,7 @@ class _EditItemPageState extends State<EditItemPage> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: selectedCategory!.features!.map((feature) => _buildBeautifulFeatureChip(feature)).toList(),
+            children: selectedCategory!.features.map((feature) => _buildBeautifulFeatureChip(feature)).toList(),
           ),
         ],
       ),

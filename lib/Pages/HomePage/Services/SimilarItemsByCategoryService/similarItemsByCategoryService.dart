@@ -116,7 +116,7 @@ class SimilarItemsByCategoryService {
           
         } catch (e, stackTrace) {
           logger.e('❌ JSON parsing error: $e');
-          logger.e('📋 First 500 chars of response body: ${response.body.length > 500 ? response.body.substring(0, 500) + "..." : response.body}');
+          logger.e('📋 First 500 chars of response body: ${response.body.length > 500 ? "${response.body.substring(0, 500)}..." : response.body}');
           logger.e('🔍 Stack trace: $stackTrace');
           throw DataParsingException('Failed to parse response: $e');
         }

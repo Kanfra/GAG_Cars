@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController searchEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   Timer? _loadMoreDebouncer;
-  SfRangeValues _priceRange = const SfRangeValues(700, 2000);
+  final SfRangeValues _priceRange = const SfRangeValues(700, 2000);
   bool _showSearchBar = true;
   double _lastScrollOffset = 0.0;
   String _recommendedViewType = 'grid'; // 'grid' or 'list'
@@ -986,7 +986,7 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (brandImage != null && !brandImage.contains('assets/'))
-                                  Container(
+                                  SizedBox(
                                     width: 32,
                                     height: 32,
                                     child: CachedNetworkImage(
@@ -1214,8 +1214,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCategoryImage(Categories category, ThemeData theme) {
     final imageUrl = category.image;
-    final hasValidImage = imageUrl != null && 
-                         imageUrl.isNotEmpty && 
+    final hasValidImage = imageUrl.isNotEmpty && 
                          !imageUrl.contains('assets/');
     
     if (hasValidImage) {
@@ -1676,7 +1675,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (brandImage != null && !brandImage.contains('assets/'))
-                        Container(
+                        SizedBox(
                           width: 24,
                           height: 24,
                           child: CachedNetworkImage(
@@ -1986,7 +1985,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         child: Row(
           children: [
             // Image Section
-            Container(
+            SizedBox(
               width: 160,
               height: 160,
               child: Stack(
@@ -2246,7 +2245,7 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           ),
                         
                         if (brandImage != null && !brandImage.contains('assets/'))
-                          Container(
+                          SizedBox(
                             width: 20,
                             height: 20,
                             child: CachedNetworkImage(

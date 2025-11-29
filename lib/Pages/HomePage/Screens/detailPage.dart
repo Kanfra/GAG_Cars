@@ -200,7 +200,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       child: ClipOval(
                         child: hasProfilePhoto
                             ? _buildSafeNetworkImage(
-                                profilePhoto!,
+                                profilePhoto,
                                 width: 200,
                                 height: 200,
                                 fit: BoxFit.cover,
@@ -416,7 +416,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     }
     
     try {
-      if (userObj is dynamic && userObj.toJson != null) {
+      if (userObj.toJson != null) {
         final jsonResult = userObj.toJson();
         if (jsonResult is Map<String, dynamic>) {
           logger.w('🔍 [USER CONVERSION] Using toJson() result: $jsonResult');
@@ -1846,7 +1846,7 @@ Download GAGcars app for more amazing vehicles!''';
           insetPadding: EdgeInsets.zero,
           child: Stack(
             children: [
-              Container(
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: InteractiveViewer(
@@ -1999,7 +1999,7 @@ Download GAGcars app for more amazing vehicles!''';
                   ),
                 ),
                 const SizedBox(width: 4),
-                Container(
+                SizedBox(
                   height: 28,
                   child: ElevatedButton(
                     onPressed: () {
@@ -2611,7 +2611,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
               style: TextStyle(color: Colors.white),
             ),
             backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
+            duration: Duration(seconds: 2),
           ),
         );
       }

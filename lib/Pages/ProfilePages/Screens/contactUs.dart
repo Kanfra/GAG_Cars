@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/ContactUsService/contactUsService.dart';
-import '../../../GeneralComponents/EdemComponents/CardContainers/contactUsCard.dart';
 
 class ContactUs extends StatelessWidget {
   const ContactUs({super.key});

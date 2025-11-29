@@ -712,7 +712,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                       borderSide: BorderSide(
                         color: _isError 
                           ? theme.colorScheme.error 
-                          : ColorGlobalVariables.brownColor!,
+                          : ColorGlobalVariables.brownColor,
                         width: 2,
                       ),
                     ),
@@ -861,7 +861,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                   boxShadow: _canResend
                       ? [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor!.withOpacity(0.3),
+                            color: ColorGlobalVariables.brownColor.withOpacity(0.3),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),

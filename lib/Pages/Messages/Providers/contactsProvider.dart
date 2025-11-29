@@ -24,13 +24,8 @@ class ContactsProvider with ChangeNotifier {
       final response = await ChatService.getContacts();
       
       // Safe handling of the response
-      if (response.contacts != null) {
-        _contacts = response.contacts;
-      } else {
-        _contacts = [];
-        _error = 'No contacts found';
-      }
-      
+      _contacts = response.contacts;
+          
     } catch (e) {
       _error = 'Failed to load contacts: ${e.toString()}';
       _contacts = []; // Clear contacts on error

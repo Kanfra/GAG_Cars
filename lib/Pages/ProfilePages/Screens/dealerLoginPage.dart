@@ -6,8 +6,6 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/titleWithText
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/VerifyDealerService/verifyDealerService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
-import 'package:gag_cars_frontend/Pages/ProfilePages/Models/verifyDealerModel.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';

@@ -156,7 +156,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
       categories.add(post.category.name);
     }
 
-    final newTabTitles = ['All News', ...categories.toList()];
+    final newTabTitles = ['All News', ...categories];
     
     // Initialize controllers for new tabs
     for (final title in newTabTitles) {
@@ -282,7 +282,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                 body = Text("No more articles", 
                   style: TextStyle(color: Colors.grey.shade500, fontSize: 12));
               }
-              return Container(
+              return SizedBox(
                 height: 60,
                 child: Center(child: body),
               );

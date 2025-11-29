@@ -223,7 +223,7 @@ class HomeProvider with ChangeNotifier {
     } on FormatException catch (e, stackTrace) {
       _handleError('Data format error. Please try again later.', e, stackTrace);
     } on http.ClientException catch (e, stackTrace) {
-      if (e.message?.contains('500') ?? false) {
+      if (e.message.contains('500') ?? false) {
         _handleError('Server is currently unavailable.', e, stackTrace);
       } else {
         _handleError('Network connection failed.', e, stackTrace);

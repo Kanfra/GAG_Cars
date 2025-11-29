@@ -43,6 +43,10 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += [
+            '-Xopt-in=kotlin.RequiresOptIn',
+            '-Xjvm-default=all'
+        ]
     }
 
     sourceSets {
@@ -93,6 +97,11 @@ android {
             }
         }
     }
+
+    // Kotlin compilation optimization
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+    }
 }
 
 flutter {
@@ -101,4 +110,5 @@ flutter {
 
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 }

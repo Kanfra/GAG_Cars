@@ -341,7 +341,7 @@ class BrandItemsProvider with ChangeNotifier {
     final lowercaseQuery = query.toLowerCase();
     return _items.where((item) {
       return item.name.toLowerCase().contains(lowercaseQuery) ||
-          (item.description?.toLowerCase().contains(lowercaseQuery) ?? false);
+          (item.description.toLowerCase().contains(lowercaseQuery) ?? false);
     }).toList();
   }
 

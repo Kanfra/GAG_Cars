@@ -906,7 +906,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
               children: [
                 // Brand Image - Consistent with HomePage
                 if (brandImage != null && !brandImage.contains('assets/'))
-                  Container(
+                  SizedBox(
                     width: 24,
                     height: 24,
                     child: CachedNetworkImage(
@@ -1282,7 +1282,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
         child: Row(
           children: [
             // Image Section
-            Container(
+            SizedBox(
               width: 160,
               height: 160,
               child: Stack(
@@ -1458,7 +1458,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
                         
                         // Brand Image - Consistent with HomePage
                         if (_getBrandImage() != null && !_getBrandImage()!.contains('assets/'))
-                          Container(
+                          SizedBox(
                             width: 20,
                             height: 20,
                             child: CachedNetworkImage(

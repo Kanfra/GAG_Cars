@@ -28,7 +28,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   final Logger _logger = Logger();
   late WebViewController _webViewController;
   bool _isLoading = true;
-  bool _paymentVerified = false;
+  final bool _paymentVerified = false;
   bool _paymentFailed = false;
   bool _isProcessing = false;
   bool _isUploading = false;
@@ -302,7 +302,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             throw Exception('Unknown payment type: $_type');
           }
           
-        } catch (storageError, storageStack) {
+        } catch (storageError) {
           _navigateToPaymentFailedPage(
             errorMessage: 'Payment successful but failed to process: $storageError',
             transactionReference: _reference,
@@ -315,12 +315,12 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
           transactionReference: _reference,
         );
       }
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       _navigateToPaymentFailedPage(
         errorMessage: 'Payment verification timed out',
         transactionReference: _reference,
       );
-    } catch (e, stackTrace) {
+    } catch (e) {
       _navigateToPaymentFailedPage(
         errorMessage: 'Failed to verify payment: ${e.toString()}',
         transactionReference: _reference,
@@ -683,7 +683,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   }
 
   String _createSlug(String name) {
-    return name.toLowerCase().replaceAll(' ', '-') + '-${DateTime.now().millisecondsSinceEpoch}';
+    return '${name.toLowerCase().replaceAll(' ', '-')}-${DateTime.now().millisecondsSinceEpoch}';
   }
 
   Future<void> _uploadVehicleAndNavigate() async {
@@ -847,7 +847,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         RouteClass.getPaymentFailedPage(),
         arguments: failedData,
       );
-    } catch (e, stackTrace) {
+    } catch (e) {
       Get.offAllNamed(RouteClass.getMainBottomNavigationPage());
     }
   }
@@ -879,7 +879,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       };
       
       await prefs.setString('last_payment_data', json.encode(paymentData));
-    } catch (e, stackTrace) {
+    } catch (e) {
       rethrow;
     }
   }

@@ -114,7 +114,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   void _loadInitialItems() {
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
     
-    if (_brandId != null && !provider.isLoading && !_initialLoadCompleted) {
+    if (!provider.isLoading && !_initialLoadCompleted) {
       print('🔄 Loading vehicles for brand: $_brandId');
       provider.loadInitialItems(_brandId);
       _initialLoadCompleted = true;
@@ -400,7 +400,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
 
   Widget _buildLoadingState(bool isDarkMode) {
     return SliverToBoxAdapter(
-      child: Container(
+      child: SizedBox(
         height: 200,
         child: Center(
           child: Column(

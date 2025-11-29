@@ -10,6 +10,8 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/settingsPage.dart';
 import 'package:get/get.dart';
 
 class MainBottomNavigationPage extends StatefulWidget {
+  const MainBottomNavigationPage({super.key});
+
   @override
   _MainBottomNavigationPageState createState() => _MainBottomNavigationPageState();
 }

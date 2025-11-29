@@ -1,6 +1,5 @@
 // lib/Services/PromotionService/promotion_service.dart
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;

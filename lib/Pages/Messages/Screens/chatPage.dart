@@ -17,9 +17,9 @@ class ChatPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
 
   const ChatPage({
-    Key? key,
+    super.key,
     required this.allJson,
-  }) : super(key: key);
+  });
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -39,7 +39,7 @@ class _ChatPageState extends State<ChatPage> {
 
   bool _isSending = false;
   bool _showScrollToBottom = false;
-  double _scrollThreshold = 100.0;
+  final double _scrollThreshold = 100.0;
   bool _isFirstLoad = true;
   bool _showEmojiPicker = false;
   File? _selectedImage;
@@ -1232,14 +1232,14 @@ class ChatBubble extends StatefulWidget {
   final String? currentUserImage;
 
   const ChatBubble({
-    Key? key,
+    super.key,
     required this.message,
     required this.isSentByMe,
     required this.showAvatar,
     required this.isDarkMode,
     required this.contactImage,
     required this.currentUserImage,
-  }) : super(key: key);
+  });
 
   @override
   State<ChatBubble> createState() => _ChatBubbleState();
@@ -1530,10 +1530,10 @@ class EnhancedImageView extends StatefulWidget {
   final VoidCallback onClose;
 
   const EnhancedImageView({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.onClose,
-  }) : super(key: key);
+  });
 
   @override
   State<EnhancedImageView> createState() => _EnhancedImageViewState();

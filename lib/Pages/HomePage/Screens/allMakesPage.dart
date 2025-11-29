@@ -159,7 +159,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
       } else {
         _filteredBrands = _brands
             .where((brand) =>
-                brand.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
+                brand.name.toLowerCase().contains(query.toLowerCase()) ?? false)
             .toList();
       }
     });

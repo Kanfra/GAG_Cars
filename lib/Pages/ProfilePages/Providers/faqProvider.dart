@@ -21,7 +21,7 @@ class FaqProvider with ChangeNotifier {
   String? _error;
   String? get error => _error;
   
-  List<int> _expandedQuestionIndices = [];
+  final List<int> _expandedQuestionIndices = [];
   List<int> get expandedQuestionIndices => _expandedQuestionIndices;
 
   // Get category names for tabs

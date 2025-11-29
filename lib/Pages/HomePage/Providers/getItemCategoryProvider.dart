@@ -4,9 +4,9 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/ItemCategoryService/it
 
 class CategoryDetailProvider with ChangeNotifier {
   // State for detailed category data (with fields)
-  Map<int, DetailedCategory> _categoryDetails = {};
-  Map<int, bool> _loadingStates = {};
-  Map<int, String> _errorStates = {};
+  final Map<int, DetailedCategory> _categoryDetails = {};
+  final Map<int, bool> _loadingStates = {};
+  final Map<int, String> _errorStates = {};
   bool _isLoading = false;
 
   // Getters

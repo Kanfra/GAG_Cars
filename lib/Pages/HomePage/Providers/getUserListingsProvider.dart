@@ -244,7 +244,7 @@ class UserListingsProvider with ChangeNotifier {
       return (listing.name?.toLowerCase().contains(lowercaseQuery) ?? false) ||
              (listing.description?.toLowerCase().contains(lowercaseQuery) ?? false) ||
              (listing.location?.toLowerCase().contains(lowercaseQuery) ?? false) ||
-             (listing.category?.name?.toLowerCase().contains(lowercaseQuery) ?? false);
+             (listing.category?.name.toLowerCase().contains(lowercaseQuery) ?? false);
     }).toList();
   }
 
@@ -257,7 +257,7 @@ class UserListingsProvider with ChangeNotifier {
       return (listing.name?.toLowerCase().contains(lowercaseQuery) ?? false) ||
              (listing.description?.toLowerCase().contains(lowercaseQuery) ?? false) ||
              (listing.location?.toLowerCase().contains(lowercaseQuery) ?? false) ||
-             (listing.category?.name?.toLowerCase().contains(lowercaseQuery) ?? false);
+             (listing.category?.name.toLowerCase().contains(lowercaseQuery) ?? false);
     }).toList();
   }
 

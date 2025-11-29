@@ -223,7 +223,7 @@ class _PostItemPageState extends State<PostItemPage> {
 
       final canUploadService = CanUploadItemService();
       final result = await canUploadService.checkCanUpload(
-        categoryId: selectedCategory!.id!,
+        categoryId: selectedCategory!.id,
       );
       
       final bool canUpload = result['can_upload'] ?? false;
@@ -268,7 +268,7 @@ class _PostItemPageState extends State<PostItemPage> {
     }
 
     normalizedFields.addAll(selectedFields.map((key, value) => 
-      MapEntry(key!.toLowerCase().replaceAll(' ', '_'), value)));
+      MapEntry(key.toLowerCase().replaceAll(' ', '_'), value)));
 
     return {
       'category_id': selectedCategory?.id,
@@ -363,7 +363,7 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   String _createSlug(String name) {
-    return name.toLowerCase().replaceAll(' ', '-') + '-${DateTime.now().millisecondsSinceEpoch}';
+    return '${name.toLowerCase().replaceAll(' ', '-')}-${DateTime.now().millisecondsSinceEpoch}';
   }
 
   bool _validateRequiredFields() {
@@ -2078,7 +2078,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${userProvider.user?.countryCurrencySymbol ?? ''}',
+                  userProvider.user?.countryCurrencySymbol ?? '',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -2122,7 +2122,7 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   Widget _buildFeatures() {
-    final hasFeatures = selectedCategory?.features?.isNotEmpty ?? false;
+    final hasFeatures = selectedCategory?.features.isNotEmpty ?? false;
     if (!hasFeatures) return const SizedBox();
     
     return Container(
@@ -2178,7 +2178,7 @@ class _PostItemPageState extends State<PostItemPage> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: selectedCategory!.features!.map((feature) => _buildFeatureChip(feature)).toList(),
+            children: selectedCategory!.features.map((feature) => _buildFeatureChip(feature)).toList(),
           ),
         ],
       ),

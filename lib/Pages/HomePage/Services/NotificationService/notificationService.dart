@@ -26,12 +26,12 @@ class NotificationService {
         // Handle both cases: direct list OR list inside 'data' field
         if (responseData is List) {
           logger.i("✅ Success: Loaded ${responseData.length} notifications");
-          return responseData as List<dynamic>;
+          return responseData;
         } else if (responseData is Map<String, dynamic> && responseData.containsKey('data')) {
           final data = responseData['data'];
           if (data is List) {
             logger.i("✅ Success: Loaded ${data.length} notifications from data field");
-            return data as List<dynamic>;
+            return data;
           } else {
             throw FormatException('Data field is not a list: $data');
           }

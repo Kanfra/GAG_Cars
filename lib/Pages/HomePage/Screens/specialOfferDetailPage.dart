@@ -533,7 +533,7 @@ Download GAGcars app for more amazing deals!''';
               final userProfilePhoto = _getUserProfilePhoto();
               final userPhone = _getUserPhoneNumber();
               
-               if (userId != null && userId != 'unknown_user') {
+               if (userId != 'unknown_user') {
                 logger.e('User id in Special offers is: $userId');
                 Get.toNamed(
                   RouteClass.getChatPage(),
@@ -875,7 +875,7 @@ Download GAGcars app for more amazing deals!''';
     try {
       final images = _item.images;
       if (images != null && images.isNotEmpty) {
-        return images.where((image) => image != null && image.isNotEmpty).toList();
+        return images.where((image) => image.isNotEmpty).toList();
       }
     } catch (e) {
       print('Error getting item images: $e');
@@ -1148,7 +1148,7 @@ Download GAGcars app for more amazing deals!''';
           child: Stack(
             children: [
               // Full screen image with zoom capability
-              Container(
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: InteractiveViewer(
@@ -1392,7 +1392,7 @@ Download GAGcars app for more amazing deals!''';
                 ),
                 const SizedBox(width: 4),
                 // View button
-                Container(
+                SizedBox(
                   height: 28,
                   child: ElevatedButton(
                     onPressed: () {
@@ -1479,13 +1479,13 @@ Download GAGcars app for more amazing deals!''';
     
     // Only add specifications that have valid, non-empty data
     // Handle brand name (String type)
-    if (_brand?.name != null && _brand!.name!.isNotEmpty && _brand!.name!.toLowerCase() != 'null') {
-      specifications.add({'title': 'Brand', 'value': _brand!.name!});
+    if (_brand?.name != null && _brand!.name.isNotEmpty && _brand!.name.toLowerCase() != 'null') {
+      specifications.add({'title': 'Brand', 'value': _brand!.name});
     }
     
     // Handle model name (String type)
-    if (_item.brandModel?.name != null && _item.brandModel!.name!.isNotEmpty && _item.brandModel!.name!.toLowerCase() != 'null') {
-      specifications.add({'title': 'Model', 'value': _item.brandModel!.name!});
+    if (_item.brandModel?.name != null && _item.brandModel!.name.isNotEmpty && _item.brandModel!.name.toLowerCase() != 'null') {
+      specifications.add({'title': 'Model', 'value': _item.brandModel!.name});
     }
     
     // Handle color (String type)

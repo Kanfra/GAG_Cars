@@ -109,10 +109,10 @@ class CanUploadItemService {
         throw Exception('Unexpected response: ${response.statusCode}');
       }
       
-    } on http.ClientException catch (e) {
+    } on http.ClientException {
       // logger.e("🔴 [CAN_UPLOAD_SERVICE] Network Error: $e");
       throw Exception('Network error: Please check your connection');
-    } on FormatException catch (e) {
+    } on FormatException {
       // logger.e("🔴 [CAN_UPLOAD_SERVICE] JSON Parse Error: $e");
       throw Exception('Invalid response format from server');
     } catch (e) {

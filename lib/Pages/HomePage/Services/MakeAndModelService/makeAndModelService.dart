@@ -10,27 +10,6 @@ class MakeAndModelService {
       final response = await fetchApiData<MakeAndModelResponse>(
         endpoint: ApiEndpoint.brands,
         fromJson: (json) {
-          if (json == null) {
-            return MakeAndModelResponse(
-              data: [],
-              links: PaginationLinks(
-                first: '',
-                last: '',
-                prev: null,
-                next: null,
-              ),
-              meta: PaginationMeta(
-                currentPage: 1,
-                from: 1,
-                lastPage: 1,
-                links: [],
-                path: '',
-                perPage: 15,
-                to: 1,
-                total: 0,
-              ),
-            );
-          }
           return MakeAndModelResponse.fromJson(json);
         },
       );

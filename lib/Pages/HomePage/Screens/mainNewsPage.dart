@@ -13,9 +13,9 @@ class MainNewsPage extends StatefulWidget {
   final Post post;
   
   const MainNewsPage({
-    Key? key,
+    super.key,
     required this.post,
-  }) : super(key: key);
+  });
 
   @override
   State<MainNewsPage> createState() => _MainNewsPageState();

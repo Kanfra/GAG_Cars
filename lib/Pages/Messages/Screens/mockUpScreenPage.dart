@@ -138,7 +138,7 @@ class Message {
 class ChatBubble extends StatelessWidget {
   final Message message;
 
-  const ChatBubble({Key? key, required this.message}) : super(key: key);
+  const ChatBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -193,10 +193,10 @@ class _MessageInputField extends StatelessWidget {
   final VoidCallback onSend;
 
   const _MessageInputField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.onSend,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +246,7 @@ class _MessageInputField extends StatelessWidget {
 class _DateHeader extends StatelessWidget {
   final DateTime date;
 
-  const _DateHeader({Key? key, required this.date}) : super(key: key);
+  const _DateHeader({super.key, required this.date});
 
   @override
   Widget build(BuildContext context) {

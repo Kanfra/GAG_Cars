@@ -10,7 +10,6 @@ import 'package:gag_cars_frontend/GlobalVariables/sizeGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/GetVerifiedService/getVerifiedService.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import '../../../GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
-import '../../../Utils/WidgetUtils/widgetUtils.dart';
 
 class GetVerifiedPage extends StatefulWidget {
   const GetVerifiedPage({super.key});

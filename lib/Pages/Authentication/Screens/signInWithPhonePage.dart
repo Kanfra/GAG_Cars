@@ -125,14 +125,14 @@ class _SignInWithPhonePageState extends State<SignInWithPhonePage> with SingleTi
     });
 
     try {
-      final _fullPhoneNumber = "+${_selectedCountry!.phoneCode}${_phoneController.text}";
+      final fullPhoneNumber = "+${_selectedCountry!.phoneCode}${_phoneController.text}";
       
       await _successAnimation();
       
       Get.offNamed(
         RouteClass.getVerifyCodePage(),
         arguments: {
-          'phone': _fullPhoneNumber,
+          'phone': fullPhoneNumber,
           'isSignIn': true,
         },
       );
@@ -495,7 +495,7 @@ class _SignInWithPhonePageState extends State<SignInWithPhonePage> with SingleTi
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             width: 100,
             child: GestureDetector(
               onTap: _showCountrySelectionDialog,

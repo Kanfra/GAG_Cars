@@ -543,7 +543,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             width: 100,
             child: GestureDetector(
               onTap: _showCountrySelectionDialog,

@@ -501,7 +501,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             width: 100,
             child: GestureDetector(
               onTap: _showCountrySelectionDialog,

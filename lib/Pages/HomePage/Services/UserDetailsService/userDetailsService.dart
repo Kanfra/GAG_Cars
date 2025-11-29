@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/userDetailsModel.dart';
-import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';

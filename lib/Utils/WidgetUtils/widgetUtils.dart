@@ -55,7 +55,7 @@ String formatTimeAgo(String isoDate) {
     } 
     // 1-30 days ago (show "X days ago" + time)
     else if (diffInDays <= 30) {
-      return '${diffInDays} ${diffInDays == 1 ? 'day' : 'days'} ago at ${date.format(pattern: "h:mm a")}';
+      return '$diffInDays ${diffInDays == 1 ? 'day' : 'days'} ago at ${date.format(pattern: "h:mm a")}';
     }
     // 1-12 months ago (show "X months ago" + time)
     else if (diffInDays <= 365) {
@@ -601,8 +601,8 @@ class DisposableBuilder extends StatefulWidget {
   const DisposableBuilder({
     required this.dispose,
     required this.child,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _DisposableBuilderState createState() => _DisposableBuilderState();

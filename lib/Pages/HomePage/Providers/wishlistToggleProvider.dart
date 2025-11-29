@@ -35,10 +35,10 @@ class WishlistToggleProvider with ChangeNotifier{
         // Sync with WishlistManager using the provided context
         try {
           final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
-          if (response.message?.toLowerCase().contains('added') == true) {
+          if (response.message.toLowerCase().contains('added') == true) {
             wishlistManager.addToWishlist(itemId);
             logger.i('✅ Added item $itemId to WishlistManager');
-          } else if (response.message?.toLowerCase().contains('removed') == true) {
+          } else if (response.message.toLowerCase().contains('removed') == true) {
             wishlistManager.removeFromWishlist(itemId);
             logger.i('✅ Removed item $itemId from WishlistManager');
           } else {

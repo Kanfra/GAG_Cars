@@ -12,11 +12,9 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Services/PromotionService/p
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
-import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,6 +81,441 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     super.dispose();
   }
 
+  // ========== CUSTOM DIALOG METHODS ==========
+
+  Future<bool?> _showConfirmationDialog({
+    required String title,
+    required String message,
+    String confirmText = 'Confirm',
+    String cancelText = 'Cancel',
+    Color confirmColor = Colors.blue,
+    IconData? icon,
+  }) async {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (icon != null) ...[
+                  Center(
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: confirmColor.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        icon,
+                        color: confirmColor,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 16),
+                
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(
+                            color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!
+                          ),
+                        ),
+                        child: Text(
+                          cancelText,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: confirmColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          confirmText,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog({
+    required String title,
+    required String message,
+    String buttonText = 'OK',
+    VoidCallback? onPressed,
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 40,
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
+                
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 12),
+                
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onPressed?.call();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      buttonText,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog({
+    required String title,
+    required String message,
+    String buttonText = 'OK',
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 40,
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
+                
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 12),
+                
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      buttonText,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showInfoDialog({
+    required String title,
+    required String message,
+    String confirmText = 'Confirm',
+    String cancelText = 'Cancel',
+    VoidCallback? onConfirm,
+  }) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          surfaceTintColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.info_outline,
+                    color: Colors.blue,
+                    size: 40,
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
+                
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 12),
+                
+                Text(
+                  message,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.black54,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                
+                const SizedBox(height: 24),
+                
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(
+                            color: isDarkMode ? Colors.grey[600]! : Colors.grey[300]!
+                          ),
+                        ),
+                        child: Text(
+                          cancelText,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          onConfirm?.call();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          confirmText,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // ========== ENHANCED IMAGE GALLERY METHODS ==========
 
   void _showFullScreenImage(String imageUrl, int imageIndex) {
@@ -99,7 +532,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
           child: Stack(
             children: [
               // Full screen image with zoom capability
-              Container(
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: InteractiveViewer(
@@ -255,7 +688,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 ),
                 const SizedBox(width: 4),
                 // View button
-                Container(
+                SizedBox(
                   height: 28,
                   child: ElevatedButton(
                     onPressed: () {
@@ -378,19 +811,15 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         logger.i("✅ Promotion activated successfully");
         
         // Show success dialog with navigation to MyListingPage
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.success,
-          animType: AnimType.bottomSlide,
+        _showSuccessDialog(
           title: 'Promotion Activated!',
-          desc: 'Your listing is now being promoted and will receive more visibility.',
-          btnOkText: 'View My Listings',
-          btnOkOnPress: () {
+          message: 'Your listing is now being promoted and will receive more visibility.',
+          buttonText: 'View My Listings',
+          onPressed: () {
             // ✅ FIXED: Navigate to MyListingPage after successful promotion
             _navigateToMyListingPage();
           },
-          autoHide: Duration(seconds: 4),
-        ).show();
+        );
 
         // Update UI state
         if (mounted) {
@@ -401,28 +830,18 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
 
       } else {
         logger.e("❌ Failed to activate promotion: ${result['message']}");
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.error,
-          animType: AnimType.bottomSlide,
+        _showErrorDialog(
           title: 'Promotion Failed',
-          desc: result['message'] ?? 'Failed to activate promotion',
-          btnOkText: 'OK',
-          btnOkOnPress: () {},
-        ).show();
+          message: result['message'] ?? 'Failed to activate promotion',
+        );
       }
     } catch (e, stackTrace) {
       logger.e("❌ Error activating promotion: $e");
       logger.e("❌ Stack trace: $stackTrace");
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.error,
-        animType: AnimType.bottomSlide,
+      _showErrorDialog(
         title: 'Error',
-        desc: 'Failed to activate promotion: ${e.toString()}',
-        btnOkText: 'OK',
-        btnOkOnPress: () {},
-      ).show();
+        message: 'Failed to activate promotion: ${e.toString()}',
+      );
     } finally {
       if (mounted) {
         setState(() => _isActivatingPromotion = false);
@@ -458,18 +877,13 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   }
 
   void _showDirectPromotionConfirmation() {
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.info,
-      animType: AnimType.bottomSlide,
+    _showInfoDialog(
       title: 'Activate Promotion?',
-      desc: 'Do you want to activate promotion for this listing? This will increase your listing visibility.',
-      btnCancelText: 'Cancel',
-      btnOkText: 'Yes, Activate',
-      btnCancelOnPress: () {},
-      btnOkOnPress: _activatePromotionDirectly,
-      btnOkColor: Colors.blue,
-    ).show();
+      message: 'Do you want to activate promotion for this listing? This will increase your listing visibility.',
+      confirmText: 'Yes, Activate',
+      cancelText: 'Cancel',
+      onConfirm: _activatePromotionDirectly,
+    );
   }
 
   void _showErrorSnackBar(String message) {
@@ -836,22 +1250,18 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   }
 
   void _showMarkAsSoldConfirmationDialog() {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.question,
-      animType: AnimType.bottomSlide,
+    _showConfirmationDialog(
       title: 'Mark as Sold?',
-      desc: 'Are you sure you want to mark this item as sold? This action cannot be undone.',
-      btnCancelText: 'Cancel',
-      btnOkText: 'Yes, Mark as Sold',
-      btnCancelOnPress: () {},
-      btnOkOnPress: () {
+      message: 'Are you sure you want to mark this item as sold? This action cannot be undone.',
+      confirmText: 'Yes, Mark as Sold',
+      cancelText: 'Cancel',
+      confirmColor: Colors.green,
+      icon: Icons.check_circle,
+    ).then((confirmed) {
+      if (confirmed == true) {
         _performMarkAsSold();
-      },
-      btnOkColor: Colors.green,
-    ).show();
+      }
+    });
   }
 
   Future<void> _performMarkAsSold() async {
@@ -868,45 +1278,31 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       final result = await VehicleService.markAsSold(listingId);
 
       if (result['success'] == true) {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.success,
-          animType: AnimType.bottomSlide,
+        _showSuccessDialog(
           title: 'Success!',
-          desc: 'Item has been marked as sold successfully.',
-          btnOkText: 'OK',
-          btnOkOnPress: () {
+          message: 'Item has been marked as sold successfully.',
+          buttonText: 'OK',
+          onPressed: () {
             // Navigate back to MyListingPage after successful marking
             _navigateToMyListingPage();
           },
-          autoHide: Duration(seconds: 3),
-        ).show();
+        );
 
         setState(() {
           _isSold = true;
         });
 
       } else {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.error,
-          animType: AnimType.bottomSlide,
+        _showErrorDialog(
           title: 'Error',
-          desc: result['message'] ?? 'Failed to mark item as sold',
-          btnOkText: 'OK',
-          btnOkOnPress: () {},
-        ).show();
+          message: result['message'] ?? 'Failed to mark item as sold',
+        );
       }
     } catch (e) {
-      AwesomeDialog(
-        context: context,
-        dialogType: DialogType.error,
-        animType: AnimType.bottomSlide,
+      _showErrorDialog(
         title: 'Error',
-        desc: 'Failed to mark item as sold: ${e.toString()}',
-        btnOkText: 'OK',
-        btnOkOnPress: () {},
-      ).show();
+        message: 'Failed to mark item as sold: ${e.toString()}',
+      );
     } finally {
       if (mounted) {
         setState(() => _isMarkingAsSold = false);

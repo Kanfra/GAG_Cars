@@ -1,13 +1,10 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/specialOfferModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class SpecialOfferDeepLinkHandler {

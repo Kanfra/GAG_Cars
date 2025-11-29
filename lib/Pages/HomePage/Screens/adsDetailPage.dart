@@ -205,7 +205,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       child: ClipOval(
                         child: hasProfilePhoto
                             ? _buildSafeNetworkImage(
-                                profilePhoto!,
+                                profilePhoto,
                                 width: 200,
                                 height: 200,
                                 fit: BoxFit.cover,
@@ -319,7 +319,6 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
       }
       
       final validImages = images.where((image) => 
-        image != null && 
         image.toString().isNotEmpty
       ).map((image) {
         String imageUrl = image.toString();
@@ -650,7 +649,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
           insetPadding: EdgeInsets.zero,
           child: Stack(
             children: [
-              Container(
+              SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: InteractiveViewer(
@@ -805,7 +804,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   ),
                 ),
                 const SizedBox(width: 4),
-                Container(
+                SizedBox(
                   height: 28,
                   child: ElevatedButton(
                     onPressed: () {

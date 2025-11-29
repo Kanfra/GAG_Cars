@@ -7,7 +7,6 @@ import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 

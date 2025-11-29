@@ -8,7 +8,7 @@ class FilterBottomSheetContent extends StatefulWidget {
   final SfRangeValues priceRange;
   final ValueChanged<SfRangeValues> onPriceRangeChanged;
 
-  const FilterBottomSheetContent({
+  const FilterBottomSheetContent({super.key, 
     required this.priceRange,
     required this.onPriceRangeChanged,
   });

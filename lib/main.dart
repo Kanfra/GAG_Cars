@@ -32,7 +32,6 @@ import 'package:gag_cars_frontend/Themes/appThemes.dart';
 import 'package:gag_cars_frontend/Utils/native_deep_linking_service.dart';
 import 'package:get/get.dart';
 
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
 
 // Import the new theme provider and themes

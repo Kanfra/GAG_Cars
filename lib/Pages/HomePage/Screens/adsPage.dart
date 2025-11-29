@@ -726,7 +726,7 @@ class _ListingItemListWidget extends StatelessWidget {
         child: Row(
           children: [
             // Image Section
-            Container(
+            SizedBox(
               width: 160,
               height: 160,
               child: Stack(

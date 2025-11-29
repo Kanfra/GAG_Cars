@@ -466,7 +466,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: ColorGlobalVariables.brownColor!,
+                color: ColorGlobalVariables.brownColor,
                 width: 2,
               ),
             ),

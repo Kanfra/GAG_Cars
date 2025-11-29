@@ -436,7 +436,7 @@ class _MessagesPageState extends State<MessagesPage> {
     final isDarkMode = theme.brightness == Brightness.dark;
     final imageUrl = contact.profilePhoto ?? contact.avatar;
     
-    if (imageUrl != null && imageUrl.isNotEmpty && imageUrl.startsWith('http')) {
+    if (imageUrl.isNotEmpty && imageUrl.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
@@ -585,8 +585,8 @@ class _MessagesPageState extends State<MessagesPage> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Icon(Icons.edit_rounded, color: Colors.white, size: 24),
       onPressed: _startNewChat,
+      child: const Icon(Icons.edit_rounded, color: Colors.white, size: 24),
     );
   }
 

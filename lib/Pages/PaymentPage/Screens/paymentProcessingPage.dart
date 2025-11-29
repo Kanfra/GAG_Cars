@@ -1,7 +1,6 @@
 // lib/Pages/Payment/payment_processing_page.dart
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
-import 'package:get/get.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:logger/Logger.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';

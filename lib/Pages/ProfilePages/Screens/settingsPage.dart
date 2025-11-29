@@ -499,11 +499,11 @@ class ImageViewerScreen extends StatefulWidget {
   final String userName;
 
   const ImageViewerScreen({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.isAssetImage,
     required this.userName,
-  }) : super(key: key);
+  });
 
   @override
   State<ImageViewerScreen> createState() => _ImageViewerScreenState();

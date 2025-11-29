@@ -13,6 +13,8 @@ import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 
 class HomePageSearchPage extends StatefulWidget {
+  const HomePageSearchPage({super.key});
+
   @override
   _HomePageSearchPageState createState() => _HomePageSearchPageState();
 }
@@ -451,8 +453,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
 
   Widget _buildCategoryImage(Categories category) {
     final imageUrl = category.image;
-    final hasValidImage = imageUrl != null && 
-                         imageUrl.isNotEmpty && 
+    final hasValidImage = imageUrl.isNotEmpty && 
                          !imageUrl.contains('assets/');
     
     if (hasValidImage) {

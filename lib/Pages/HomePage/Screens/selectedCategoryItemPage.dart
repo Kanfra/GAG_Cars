@@ -62,7 +62,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
   void _loadInitialItems() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<SimilarItemsProvider>(context, listen: false);
-      provider.loadInitialItems(_category.id!, _itemId);
+      provider.loadInitialItems(_category.id, _itemId);
     });
   }
 

@@ -512,7 +512,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                   ),
                 ],
               ),
-            )).toList(),
+            )),
             const SizedBox(height: 32),
 
             SizedBox(
@@ -704,7 +704,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
                                 child: Text(
-                                  '${numberOfListings} items',
+                                  '$numberOfListings items',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: isDarkMode ? Colors.green[300] : Colors.green[700],
@@ -756,7 +756,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                        )).toList(),
+                        )),
                         if ((promotion['features'] as List<dynamic>).length > 2)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

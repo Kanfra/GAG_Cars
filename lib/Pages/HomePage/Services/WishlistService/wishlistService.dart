@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/wishlistModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;

@@ -14,10 +14,10 @@ class SecurityPage extends StatefulWidget {
 
 class _SecurityPageState extends State<SecurityPage> {
   // Security features state
-  bool _biometricEnabled = true;
-  bool _twoFactorEnabled = false;
-  bool _emailNotifications = true;
-  bool _smsAlerts = false;
+  final bool _biometricEnabled = true;
+  final bool _twoFactorEnabled = false;
+  final bool _emailNotifications = true;
+  final bool _smsAlerts = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +49,8 @@ class _SecurityPageState extends State<SecurityPage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  ColorGlobalVariables.brownColor!.withOpacity(0.9),
-                  ColorGlobalVariables.brownColor!.withOpacity(0.7),
+                  ColorGlobalVariables.brownColor.withOpacity(0.9),
+                  ColorGlobalVariables.brownColor.withOpacity(0.7),
                 ],
               ),
               borderRadius: const BorderRadius.only(
