@@ -2179,4 +2179,4 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
             ),
     );
   }
-}
+}  

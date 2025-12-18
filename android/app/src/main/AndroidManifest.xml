@@ -2,20 +2,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.gagcars.gordonautogarage">
 
-    <!-- Permissions (UNCHANGED) -->
+    <!-- Permissions (BACKGROUND LOCATION REMOVED) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- REMOVED: ACCESS_BACKGROUND_LOCATION -->
+    
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- Optional: Remove if not needed -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
+    <!-- Optional permission removal example -->
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove" />
+
+    <uses-permission
+        android:name="android.permission.READ_CONTACTS"
+        tools:node="remove" />
 
     <!-- Queries for external apps -->
     <queries>
@@ -23,14 +29,17 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
+
         <intent>
             <action android:name="android.intent.action.DIAL" />
             <data android:scheme="tel" />
         </intent>
+
         <intent>
             <action android:name="android.intent.action.SENDTO" />
             <data android:scheme="smsto" />
         </intent>
+
         <intent>
             <action android:name="android.intent.action.SEND" />
             <data android:mimeType="text/plain" />
@@ -69,105 +78,67 @@
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
 
-            <!-- ========== INTENT FILTERS ========== -->
-
             <!-- Main launcher -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- ========== DEEP LINKING INTENT FILTERS ========== -->
-
-            <!-- 1. Custom Scheme Deep Links for Item Sharing -->
+            <!-- Custom Scheme Deep Links -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="gagcars"
-                    android:host="item" />
+                <data android:scheme="gagcars" android:host="item" />
             </intent-filter>
 
-            <!-- 2. Custom Scheme Deep Links for Special Offers -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="gagcars"
-                    android:host="special-offer" />
+                <data android:scheme="gagcars" android:host="special-offer" />
             </intent-filter>
 
-            <!-- 3. Custom Scheme Deep Links for Offers (alternative) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="gagcars"
-                    android:host="offer" />
+                <data android:scheme="gagcars" android:host="offer" />
             </intent-filter>
 
-            <!-- ========== UPDATED: GAGCARS DOMAIN INTENT FILTERS ========== -->
-
-            <!-- 4. Universal Links for Regular Items on gagcars.com/route -->
+            <!-- Universal Links -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="https"
-                    android:host="gagcars.com"
-                    android:pathPrefix="/route" />
-                <data 
-                    android:scheme="http"
-                    android:host="gagcars.com"
-                    android:pathPrefix="/route" />
+                <data android:scheme="https" android:host="gagcars.com" android:pathPrefix="/route" />
+                <data android:scheme="http" android:host="gagcars.com" android:pathPrefix="/route" />
             </intent-filter>
 
-            <!-- 5. Universal Links for Special Offers on gagcars.com/route/specialoffer/ -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="https"
-                    android:host="gagcars.com"
-                    android:pathPrefix="/route/specialoffer/" />
-                <data 
-                    android:scheme="http"
-                    android:host="gagcars.com"
-                    android:pathPrefix="/route/specialoffer/" />
+                <data android:scheme="https" android:host="gagcars.com" android:pathPrefix="/route/specialoffer/" />
+                <data android:scheme="http" android:host="gagcars.com" android:pathPrefix="/route/specialoffer/" />
             </intent-filter>
 
-            <!-- 6. Universal Links for Main Domain (catch-all) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="https"
-                    android:host="www.gagcars.com" />
-                <data 
-                    android:scheme="https"
-                    android:host="gagcars.com" />
-                <data 
-                    android:scheme="http"
-                    android:host="www.gagcars.com" />
-                <data 
-                    android:scheme="http"
-                    android:host="gagcars.com" />
+                <data android:scheme="https" android:host="www.gagcars.com" />
+                <data android:scheme="https" android:host="gagcars.com" />
+                <data android:scheme="http" android:host="www.gagcars.com" />
+                <data android:scheme="http" android:host="gagcars.com" />
             </intent-filter>
 
-            <!-- 7. Paystack Payment Callback (Specific) -->
+            <!-- Paystack Callback -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data 
-                    android:scheme="gagcars"
-                    android:host="paystack" />
+                <data android:scheme="gagcars" android:host="paystack" />
             </intent-filter>
 
         </activity>
@@ -177,7 +148,7 @@
             android:name="android.webkit.WebView.EnableSafeBrowsing"
             android:value="true" />
 
-        <!-- Required for Flutter v2 embedding -->
+        <!-- Flutter embedding -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
