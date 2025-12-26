@@ -1,5 +1,5 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '15.5'
+platform :ios, '12.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -33,11 +33,11 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  
+
   # Add specific pods for better WebView and payment handling
   pod 'Stripe', '~> 23.0' # For potential future payment integrations
   pod 'Alamofire', '~> 5.0' # For better network handling
-  
+
   target 'RunnerTests' do
     inherit! :search_paths
   end
@@ -46,37 +46,37 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
-    
+
     # Add these lines for WebView and Paystack compatibility
     target.build_configurations.each do |config|
       # Set minimum deployment target
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-      
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
+
       # Disable bitcode (recommended for Flutter)
       config.build_settings['ENABLE_BITCODE'] = 'NO'
-      
+
       # Enable Swift for modern packages
       config.build_settings['SWIFT_VERSION'] = '5.0'
-      
+
       # Allow non-modular includes in framework modules
       config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
-      
+
       # Enable ARC (Automatic Reference Counting)
       config.build_settings['CLANG_ENABLE_OBJC_ARC'] = 'YES'
-      
+
       # Enable modules for better Swift/Obj-C interoperability
       config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
-      
+
       # Set Apple Clang language standard
       config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++14'
       config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
-      
+
       # Enable strict checking (optional but recommended)
       config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
-      
+
       # Enable exceptions for C++ (required by some Flutter dependencies)
       config.build_settings['GCC_ENABLE_CPP_EXCEPTIONS'] = 'YES'
-      
+
       # Set optimization level
       if config.name == 'Debug'
         config.build_settings['GCC_OPTIMIZATION_LEVEL'] = '0'
@@ -85,12 +85,12 @@ post_install do |installer|
       end
     end
   end
-  
+
   # Additional post-install setup for WebView
   installer.pods_project.build_configurations.each do |config|
     # Enable JavaScript for WebView
     config.build_settings['ENABLE_JAVASCRIPT'] = 'YES'
-    
+
     # Allow arbitrary loads for development
     if config.name == 'Debug'
       config.build_settings['NSAppTransportSecurity'] = {
