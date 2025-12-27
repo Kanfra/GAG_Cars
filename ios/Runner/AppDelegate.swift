@@ -25,13 +25,13 @@ import Flutter
   }
   
   // Handle custom URL schemes (gagcars://)
-  func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+  override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
     handleIncomingLink(url.absoluteString)
     return true
   }
   
   // Handle universal links (https://gagcars.com)
-  override func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+  func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
     if let url = userActivity.webpageURL {
       handleIncomingLink(url.absoluteString)
       return true
