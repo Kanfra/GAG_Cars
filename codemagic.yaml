@@ -3,53 +3,80 @@ workflows:
     name: Android Build
     instance_type: mac_mini_m1
     max_build_duration: 60
+
     environment:
       flutter: stable
       xcode: latest
       cocoapods: default
+
     scripts:
       - name: Get Flutter packages
         script: |
           flutter pub get
+
       - name: Build Android APK
         script: |
           flutter build apk --release
+
     artifacts:
       - build/app/outputs/apk/release/*.apk
+
     publishing:
       google_play:
         credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
         track: internal
 
   ios-workflow:
-    name: iOS Build
+    name: iOS App Store Build
     instance_type: mac_mini_m1
     max_build_duration: 60
+
     environment:
       groups:
         - iOS_AppStore_Keys
       flutter: stable
       xcode: latest
       cocoapods: default
+
     scripts:
       - name: Get Flutter packages
         script: |
           flutter pub get
+
       - name: Install CocoaPods
         script: |
-          cd ios && pod install
-      - name: Build iOS app
-        script: |
-          flutter build ios --release
-      - name: Archive IPA
+          cd ios
+          pod install
+          cd ..
+
+      # ⚠️ IMPORTANT:
+      # NO flutter build ios
+      # NO device signing
+      # ONLY archive for App Store
+      - name: Build iOS Archive (App Store Only)
         script: |
           cd ios
-          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -archivePath build/Runner.xcarchive archive
-          xcodebuild -exportArchive -archivePath build/Runner.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath build/ios/ipa
+          xcodebuild \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath build/Runner.xcarchive \
+            archive
+
+      - name: Export IPA
+        script: |
+          cd ios
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/Runner.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/ios/ipa
+
     artifacts:
-      - build/ios/ipa/*.ipa
+      - ios/build/ios/ipa/*.ipa
+
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY   # references the environment variable
-        key_id: FQCQY4FVSL                        # Your Key ID
-        issuer_id: a9e4a6f2-11cc-438c-accd-b7697d923db1  # Your Issuer ID
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: FQCQY4FVSL
+        issuer_id: a9e4a6f2-11cc-438c-accd-b7697d923db1
