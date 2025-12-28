@@ -45,7 +45,7 @@
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
-            <string>com.gagcars.gordonautogarage</string>
+            <string>com.gagcars.frontend</string>
             <key>CFBundleURLSchemes</key>
             <array>
                 <string>gagcars</string>
@@ -56,7 +56,7 @@
     <!-- For Universal Links -->
     <key>FlutterDeepLinkingEnabled</key>
     <true/>
-    
+
     <!-- ============ APP CONFIGURATION ============ -->
     <key>CFBundleDisplayName</key>
     <string>GAGcars</string>
@@ -83,27 +83,19 @@
     <!-- Enable embedded views for WebView -->
     <key>io.flutter.embedded_views_preview</key>
     <true/>
-    
-    <!-- Enhanced Transport Security for Paystack and PDF/Email -->
+
+    <!-- App Transport Security - Specific exceptions only -->
     <key>NSAppTransportSecurity</key>
     <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-        <key>NSAllowsArbitraryLoadsInWebContent</key>
-        <true/>
-        <key>NSAllowsArbitraryLoadsForMedia</key>
-        <true/>
-        <key>NSAllowsLocalNetworking</key>
-        <true/>
         <key>NSExceptionDomains</key>
         <dict>
-            <!-- Paystack Domains -->
+            <!-- Paystack Domains for payment processing -->
             <key>api.paystack.co</key>
             <dict>
                 <key>NSIncludesSubdomains</key>
                 <true/>
                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
+                <false/>
                 <key>NSExceptionMinimumTLSVersion</key>
                 <string>TLSv1.2</string>
             </dict>
@@ -112,7 +104,7 @@
                 <key>NSIncludesSubdomains</key>
                 <true/>
                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
+                <false/>
                 <key>NSExceptionMinimumTLSVersion</key>
                 <string>TLSv1.2</string>
             </dict>
@@ -121,7 +113,7 @@
                 <key>NSIncludesSubdomains</key>
                 <true/>
                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
+                <false/>
                 <key>NSExceptionMinimumTLSVersion</key>
                 <string>TLSv1.2</string>
             </dict>
@@ -130,64 +122,8 @@
                 <key>NSIncludesSubdomains</key>
                 <true/>
                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
+                <false/>
                 <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            
-            <!-- Your Domains -->
-            <key>gagcars.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            <key>www.gagcars.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            
-            <!-- Email SMTP Servers -->
-            <key>smtp.gmail.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            <key>smtp-mail.outlook.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            
-            <!-- Google Domains -->
-            <key>google.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSThirdPartyExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            <key>googleapis.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSThirdPartyExceptionMinimumTLSVersion</key>
                 <string>TLSv1.2</string>
             </dict>
         </dict>
@@ -226,11 +162,7 @@
     </array>
 
     <!-- ============ WEBVIEW & JAVASCRIPT CONFIGURATION ============ -->
-    <!-- Enable modern WebView features -->
-    <key>AllowArbitraryLoads</key>
-    <true/>
-    
-    <!-- Enable JavaScript for WebView -->
+    <!-- WebView configuration for secure payment processing -->
     <key>NSJavaScriptExceptionDomains</key>
     <dict>
         <key>paystack.com</key>
@@ -238,14 +170,18 @@
             <key>NSIncludesSubdomains</key>
             <true/>
             <key>NSExceptionAllowsInsecureHTTPLoads</key>
-            <true/>
+            <false/>
+            <key>NSExceptionMinimumTLSVersion</key>
+            <string>TLSv1.2</string>
         </dict>
         <key>paystack.co</key>
         <dict>
             <key>NSIncludesSubdomains</key>
             <true/>
             <key>NSExceptionAllowsInsecureHTTPLoads</key>
-            <true/>
+            <false/>
+            <key>NSExceptionMinimumTLSVersion</key>
+            <string>TLSv1.2</string>
         </dict>
     </dict>
 
