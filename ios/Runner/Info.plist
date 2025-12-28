@@ -45,7 +45,7 @@
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
-            <string>com.gagcars.frontend</string>
+            <string>com.gagcars.gordonautogarage</string>
             <key>CFBundleURLSchemes</key>
             <array>
                 <string>gagcars</string>

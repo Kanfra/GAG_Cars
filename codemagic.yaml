@@ -37,9 +37,8 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      # Enable automatic code signing
       vars:
-        BUNDLE_ID: "com.gagcars.frontend"
+        BUNDLE_ID: "com.gagcars.gordonautogarage"
 
     scripts:
       - name: Get Flutter packages
@@ -57,7 +56,10 @@ workflows:
         script: |
           flutter build ipa \
             --release \
-            --export-options-plist=ios/ExportOptions.plist
+            --export-options-plist=ios/ExportOptions.plist \
+            --build-name=$PROJECT_VERSION \
+            --build-number=$BUILD_NUMBER \
+            --build-config=Release
 
     artifacts:
       - build/ios/ipa/*.ipa
