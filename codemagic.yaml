@@ -37,6 +37,9 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+      # Enable automatic code signing
+      vars:
+        BUNDLE_ID: "com.gagcars.frontend"
 
     scripts:
       - name: Get Flutter packages
@@ -49,35 +52,15 @@ workflows:
           pod install
           cd ..
 
-      # ⚠️ IMPORTANT:
-      # NO flutter build ios
-      # NO device signing
-      # ONLY archive for App Store
-      # DISABLE code signing during archive - signing happens only during export
-      - name: Build iOS Archive (App Store Only)
+      # Use flutter build ipa with automatic code signing
+      - name: Build iOS IPA with automatic signing
         script: |
-          cd ios
-          xcodebuild \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath build/Runner.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            archive
-
-      - name: Export IPA
-        script: |
-          cd ios
-          xcodebuild \
-            -exportArchive \
-            -archivePath build/Runner.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath build/ios/ipa
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/ExportOptions.plist
 
     artifacts:
-      - ios/build/ios/ipa/*.ipa
+      - build/ios/ipa/*.ipa
 
     publishing:
       app_store_connect:
