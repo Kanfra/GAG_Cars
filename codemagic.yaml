@@ -53,6 +53,7 @@ workflows:
       # NO flutter build ios
       # NO device signing
       # ONLY archive for App Store
+      # DISABLE code signing during archive - signing happens only during export
       - name: Build iOS Archive (App Store Only)
         script: |
           cd ios
@@ -61,6 +62,9 @@ workflows:
             -scheme Runner \
             -configuration Release \
             -archivePath build/Runner.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
             archive
 
       - name: Export IPA
