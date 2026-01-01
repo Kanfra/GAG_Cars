@@ -29,7 +29,7 @@ workflows:
   ios-workflow:
     name: iOS App Store Build
     instance_type: mac_mini_m1
-    max_build_duration: 60
+    max_build_duration: 120
 
     environment:
       groups:
@@ -37,14 +37,14 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      # iOS SIGNING CONFIGURATION - FIXED
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.gagcars.gordonautogarage  # ADDED THIS LINE
+        bundle_identifier: com.gagcars.gordonautogarage
       vars:
         BUNDLE_ID: "com.gagcars.gordonautogarage"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
         XCODE_SCHEME: "Runner"
+        APPLE_TEAM_ID: "5NPA9TJU9H"  # Added as variable instead
 
     scripts:
       - name: Get Flutter packages
@@ -54,20 +54,35 @@ workflows:
       - name: Install CocoaPods
         script: |
           cd ios
-          pod install
+          pod install --repo-update
           cd ..
+
+      - name: Debug Apple connection
+        script: |
+          echo "=== DEBUG INFO ==="
+          echo "Bundle ID: com.gagcars.gordonautogarage"
+          echo "Team ID: $APPLE_TEAM_ID"
+          echo "Distribution: app_store"
+          
+          # List profiles with team ID
+          xcode-project list-profiles --team-id "$APPLE_TEAM_ID" || echo "Cannot list profiles"
 
       - name: Setup code signing
         script: |
-          # Configure signing with certificates
           keychain initialize
-          xcode-project use-profiles
+          
+          # Try to use profiles with explicit team ID
+          xcode-project use-profiles \
+            --bundle-id "com.gagcars.gordonautogarage" \
+            --team-id "$APPLE_TEAM_ID" \
+            --type ios_app_store || echo "Profile setup failed, continuing..."
 
       - name: Build iOS IPA
         script: |
           flutter build ipa \
             --release \
-            --export-options-plist=ios/ExportOptions.plist
+            --export-options-plist=ios/ExportOptions.plist \
+            --verbose
 
     artifacts:
       - build/ios/ipa/*.ipa
