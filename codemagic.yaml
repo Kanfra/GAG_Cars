@@ -37,9 +37,10 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      # REMOVE manual: true - use certificate credentials instead
+      # iOS SIGNING CONFIGURATION - FIXED
       ios_signing:
         distribution_type: app_store
+        bundle_identifier: com.gagcars.gordonautogarage  # ADDED THIS LINE
       vars:
         BUNDLE_ID: "com.gagcars.gordonautogarage"
         XCODE_WORKSPACE: "ios/Runner.xcworkspace"
