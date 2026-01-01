@@ -37,8 +37,13 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+      # REMOVE manual: true - use certificate credentials instead
+      ios_signing:
+        distribution_type: app_store
       vars:
         BUNDLE_ID: "com.gagcars.gordonautogarage"
+        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
 
     scripts:
       - name: Get Flutter packages
@@ -51,8 +56,13 @@ workflows:
           pod install
           cd ..
 
-      # Use flutter build ipa with automatic code signing
-      - name: Build iOS IPA with automatic signing
+      - name: Setup code signing
+        script: |
+          # Configure signing with certificates
+          keychain initialize
+          xcode-project use-profiles
+
+      - name: Build iOS IPA
         script: |
           flutter build ipa \
             --release \
@@ -66,3 +76,9 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: FQCQY4FVSL
         issuer_id: a9e4a6f2-11cc-438c-accd-b7697d923db1
+      email:
+        recipients:
+          - your-email@example.com
+        notify:
+          success: true
+          failure: true
