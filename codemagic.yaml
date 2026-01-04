@@ -1,26 +1,4 @@
 workflows:
-  android-workflow:
-    name: Android Build
-    instance_type: mac_mini_m1
-    max_build_duration: 60
-    environment:
-      flutter: stable
-      xcode: latest
-      cocoapods: default
-    scripts:
-      - name: Get Flutter packages
-        script: |
-          flutter pub get
-      - name: Build Android APK
-        script: |
-          flutter build apk --release
-    artifacts:
-      - build/app/outputs/apk/release/*.apk
-    publishing:
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: internal
-
   ios-workflow:
     name: iOS App Store Build
     instance_type: mac_mini_m1
@@ -31,6 +9,7 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+    
     scripts:
       - name: Get Flutter packages
         script: |
@@ -40,71 +19,32 @@ workflows:
           cd ios
           pod install --repo-update --verbose
           cd ..
-      - name: Setup ExportOptions.plist
+      - name: Create ExportOptions.plist
         script: |
           echo "Creating ExportOptions.plist..."
           cd ios
-          rm -f ExportOptions.plist
-          echo '<?xml version="1.0" encoding="UTF-8"?>' > ExportOptions.plist
-          echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> ExportOptions.plist
-          echo '<plist version="1.0">' >> ExportOptions.plist
-          echo '<dict>' >> ExportOptions.plist
-          echo '  <key>method</key>' >> ExportOptions.plist
-          echo '  <string>app-store</string>' >> ExportOptions.plist
-          echo '  <key>teamID</key>' >> ExportOptions.plist
-          echo '  <string>5NPA9TJU9H</string>' >> ExportOptions.plist
-          echo '</dict>' >> ExportOptions.plist
-          echo '</plist>' >> ExportOptions.plist
-          echo "ExportOptions.plist created successfully"
+          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ExportOptions.plist
+          echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> ExportOptions.plist
+          echo "<plist version=\"1.0\">" >> ExportOptions.plist
+          echo "<dict>" >> ExportOptions.plist
+          echo "    <key>method</key>" >> ExportOptions.plist
+          echo "    <string>app-store</string>" >> ExportOptions.plist
+          echo "    <key>teamID</key>" >> ExportOptions.plist
+          echo "    <string>5NPA9TJU9H</string>" >> ExportOptions.plist
+          echo "</dict>" >> ExportOptions.plist
+          echo "</plist>" >> ExportOptions.plist
           cd ..
-      - name: Check certificates
+      - name: Build with Flutter (no codesign)
         script: |
-          echo "=== CHECKING CERTIFICATES ==="
-          security find-identity -v -p codesigning || echo "No certificates found"
-      - name: Build iOS IPA
-        script: |
-          echo "Building iOS IPA with Xcode..."
-          cd ios
+          echo "=== BUILDING WITH --no-codesign ==="
+          # Build IPA without signing first
+          flutter build ipa --release --no-codesign --verbose
           
-          # Clean
-          xcodebuild clean -workspace Runner.xcworkspace -scheme Runner || true
-          
-          # Archive with team ID only (let Xcode auto-select profile)
-          xcodebuild archive \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath ../build/ios/Runner.xcarchive \
-            -destination "generic/platform=iOS" \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM=5NPA9TJU9H
-          
-          # Check if archive was created
-          if [ -d "../build/ios/Runner.xcarchive" ]; then
-            echo "✓ Archive created successfully"
-            
-            # Export IPA
-            xcodebuild -exportArchive \
-              -archivePath ../build/ios/Runner.xcarchive \
-              -exportOptionsPlist ExportOptions.plist \
-              -exportPath ../build/ios/ipa \
-              -allowProvisioningUpdates
-            
-            echo "✓ IPA exported successfully"
-          else
-            echo "✗ Archive failed"
-            # Try one more time with different approach
-            flutter build ipa --release --verbose || echo "Flutter build also failed"
-          fi
-          
-          cd ..
+          echo "✓ App built without signing"
+          echo "IPA will need manual signing before App Store upload"
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
       email:
         recipients:
           - edemkweku.jerrykanfra@gmail.com
