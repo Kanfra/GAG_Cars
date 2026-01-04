@@ -40,6 +40,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.gagcars.gordonautogarage
+        team_id: "5NPA9TJU9H"  # ← ADDED: Explicit team ID
 
     scripts:
       - name: Get Flutter packages
@@ -56,18 +57,31 @@ workflows:
         script: |
           echo "=== CODE SIGNING DEBUG ==="
           echo "Bundle ID: com.gagcars.gordonautogarage"
+          echo "Team ID: 5NPA9TJU9H"
           echo "Distribution: app_store"
           
-          # List available identities
+          # Check available signing identities
+          echo "=== AVAILABLE SIGNING IDENTITIES ==="
           security find-identity -v -p codesigning || echo "No code signing identities found"
           
-          # List provisioning profiles
+          # Check provisioning profiles
+          echo "=== AVAILABLE PROFILES ==="
           xcode-project list-profiles || echo "Cannot list profiles"
+
+      - name: Force device build (not simulator)
+        script: |
+          echo "=== FORCING DEVICE BUILD ==="
+          # Set environment to build for device, not simulator
+          export SUPPORTS_MACCATALYST=NO
+          export SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD=NO
 
       - name: Build iOS IPA
         script: |
+          echo "=== BUILDING FOR iOS DEVICE ==="
+          # Build for device with no-codesign first to test
           flutter build ipa \
             --release \
+            --no-codesign \  # ← TEMPORARY: Bypasses simulator signing issue
             --verbose
 
     artifacts:

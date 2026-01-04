@@ -6,5 +6,9 @@
     <string>app-store</string>
     <key>teamID</key>
     <string>5NPA9TJU9H</string>
+    <key>uploadBitcode</key>
+    <false/>
+    <key>uploadSymbols</key>
+    <true/>
 </dict>
 </plist>
