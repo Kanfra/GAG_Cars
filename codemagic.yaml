@@ -44,9 +44,9 @@ workflows:
         script: |
           echo "=== BUILDING WITH FLUTTER SIGNING ==="
           
-          # Create a simple ExportOptions.plist
+          # Create a simple ExportOptions.plist - FIXED EOF SYNTAX
           cd ios
-          cat > ExportOptions.plist << EOF
+          cat > ExportOptions.plist << 'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
