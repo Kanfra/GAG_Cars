@@ -40,7 +40,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.gagcars.gordonautogarage
-        team_id: "5NPA9TJU9H"  # ← ADDED: Explicit team ID
+        # team_id is NOT allowed here - removed
 
     scripts:
       - name: Get Flutter packages
@@ -68,12 +68,13 @@ workflows:
           echo "=== AVAILABLE PROFILES ==="
           xcode-project list-profiles || echo "Cannot list profiles"
 
-      - name: Force device build (not simulator)
+      - name: Set team ID for signing
         script: |
-          echo "=== FORCING DEVICE BUILD ==="
-          # Set environment to build for device, not simulator
-          export SUPPORTS_MACCATALYST=NO
-          export SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD=NO
+          echo "=== SETTING TEAM ID ==="
+          # Set team ID in Xcode project
+          cd ios
+          /usr/libexec/PlistBuddy -c "Set :teamID 5NPA9TJU9H" ExportOptions.plist 2>/dev/null || echo "Could not update ExportOptions.plist"
+          cd ..
 
       - name: Build iOS IPA
         script: |
@@ -94,7 +95,7 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
       email:
         recipients:
-          - edemkweku.jerrykanfra@gmail.com  # ← CHANGE TO YOUR EMAIL
+          - your-email@example.com  # ← CHANGE TO YOUR EMAIL
         notify:
           success: true
           failure: true
