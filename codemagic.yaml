@@ -1,27 +1,115 @@
 workflows:
-  ios-workflow:
-    name: iOS Build
+  ios-manual-signing:
+    name: iOS Manual Signing
     instance_type: mac_mini_m1
     max_build_duration: 120
     environment:
       groups:
         - iOS_AppStore_Keys
       flutter: stable
+      xcode: latest
+      cocoapods: default
+      vars:
+        TEAM_ID: 5NPA9TJU9H
+        BUNDLE_ID: com.gagcars.gordonautogarage
     
     scripts:
-      # ONLY 3 STEPS - minimal approach
+      # 1. Get Flutter packages FIRST
       - name: Get packages
         script: |
           flutter clean
           flutter pub get
       
-      - name: Build IPA
+      # 2. Install CocoaPods
+      - name: Install CocoaPods
         script: |
-          flutter build ipa --release --no-codesign
+          cd ios
+          pod install --repo-update
+          cd ..
       
-      - name: List output
+      # 3. Manual signing setup
+      - name: Manual signing setup
         script: |
-          ls -la build/ios/ipa/ 2>/dev/null || echo "Build directory not found"
+          echo "=== MANUAL SIGNING SETUP ==="
+          
+          # IMPORTANT: Create directories first
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
+          mkdir -p build/ios/ipa/
+          
+          echo "Team ID: $TEAM_ID"
+          echo "Bundle ID: $BUNDLE_ID"
+      
+      # 4. Build with Flutter (let Flutter handle signing)
+      - name: Build with Flutter signing
+        script: |
+          echo "=== BUILDING WITH FLUTTER SIGNING ==="
+          
+          # Create a simple ExportOptions.plist
+          cd ios
+          cat > ExportOptions.plist << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>method</key>
+    <string>app-store</string>
+    <key>teamID</key>
+    <string>$TEAM_ID</string>
+</dict>
+</plist>
+EOF
+          cd ..
+          
+          # Build with Flutter - let it use Codemagic's auto-signing
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/ExportOptions.plist \
+            --verbose
+      
+      # 5. Alternative: Direct xcodebuild if Flutter fails
+      - name: Alternative direct build
+        script: |
+          echo "=== ALTERNATIVE DIRECT BUILD ==="
+          
+          cd ios
+          
+          # Clean first
+          xcodebuild clean -workspace Runner.xcworkspace -scheme Runner
+          
+          # Try to build with automatic code signing
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath ../build/Runner.xcarchive \
+            -destination generic/platform=iOS \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="$TEAM_ID"
+          
+          # Export if archive succeeded
+          if [ -d "../build/Runner.xcarchive" ]; then
+            xcodebuild -exportArchive \
+              -archivePath ../build/Runner.xcarchive \
+              -exportOptionsPlist ExportOptions.plist \
+              -exportPath ../build/ios/ipa \
+              -allowProvisioningUpdates
+          else
+            echo "Archive failed, trying direct build..."
+            xcodebuild build \
+              -workspace Runner.xcworkspace \
+              -scheme Runner \
+              -configuration Release \
+              -destination generic/platform=iOS \
+              DEVELOPMENT_TEAM="$TEAM_ID"
+          fi
+          
+          cd ..
     
     artifacts:
       - build/ios/ipa/*.ipa
+      - build/Runner.xcarchive
+    
+    publishing:
+      email:
+        recipients:
+          - edemkweku.jerrykanfra@gmail.com
