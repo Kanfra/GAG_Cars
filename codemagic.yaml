@@ -1,65 +1,27 @@
 workflows:
   ios-workflow:
-    name: iOS App Store Build
+    name: iOS Build
     instance_type: mac_mini_m1
     max_build_duration: 120
     environment:
       groups:
         - iOS_AppStore_Keys
       flutter: stable
-      xcode: latest
-      cocoapods: default
-      # Try adding ios_signing with ONLY team_id
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.gagcars.gordonautogarage
     
     scripts:
-      - name: Get Flutter packages
+      # ONLY 3 STEPS - minimal approach
+      - name: Get packages
         script: |
+          flutter clean
           flutter pub get
       
-      - name: Install CocoaPods
+      - name: Build IPA
         script: |
-          cd ios
-          pod install --repo-update --verbose
-          cd ..
+          flutter build ipa --release --no-codesign
       
-      - name: Debug certificate setup
+      - name: List output
         script: |
-          echo "=== DEBUGGING CERTIFICATE SETUP ==="
-          echo "1. Checking available certificates:"
-          security find-identity -v -p codesigning || echo "No certificates found"
-          
-          echo "2. Checking if our certificate exists:"
-          CERT_NAME="iPhone Distribution"
-          security find-identity -v -p codesigning | grep "$CERT_NAME" || echo "Distribution certificate not found"
-          
-          echo "3. Checking environment groups:"
-          echo "iOS_AppStore_Keys group should contain certificate references"
-      
-      - name: Build iOS IPA WITH signing
-        script: |
-          echo "=== BUILDING WITH SIGNING ==="
-          echo "Using:"
-          echo "- Bundle ID: com.gagcars.gordonautogarage"
-          echo "- Team ID: 5NPA9TJU9H"
-          echo "- Distribution: app_store"
-          
-          # Build WITH signing
-          flutter build ipa \
-            --release \
-            --verbose
-          
-          echo "✓ Build attempted with signing"
+          ls -la build/ios/ipa/ 2>/dev/null || echo "Build directory not found"
     
     artifacts:
       - build/ios/ipa/*.ipa
-    
-    publishing:
-      email:
-        recipients:
-          - edemkweku.jerrykanfra@gmail.com
-        notify:
-          success: true
-          failure: true
