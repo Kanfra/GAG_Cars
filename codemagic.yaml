@@ -40,11 +40,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.gagcars.gordonautogarage
-      vars:
-        BUNDLE_ID: "com.gagcars.gordonautogarage"
-        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
-        XCODE_SCHEME: "Runner"
-        APPLE_TEAM_ID: "5NPA9TJU9H"  # Added as variable instead
 
     scripts:
       - name: Get Flutter packages
@@ -54,34 +49,25 @@ workflows:
       - name: Install CocoaPods
         script: |
           cd ios
-          pod install --repo-update
+          pod install --repo-update --verbose
           cd ..
 
-      - name: Debug Apple connection
+      - name: Debug code signing setup
         script: |
-          echo "=== DEBUG INFO ==="
+          echo "=== CODE SIGNING DEBUG ==="
           echo "Bundle ID: com.gagcars.gordonautogarage"
-          echo "Team ID: $APPLE_TEAM_ID"
           echo "Distribution: app_store"
           
-          # List profiles with team ID
-          xcode-project list-profiles --team-id "$APPLE_TEAM_ID" || echo "Cannot list profiles"
-
-      - name: Setup code signing
-        script: |
-          keychain initialize
+          # List available identities
+          security find-identity -v -p codesigning || echo "No code signing identities found"
           
-          # Try to use profiles with explicit team ID
-          xcode-project use-profiles \
-            --bundle-id "com.gagcars.gordonautogarage" \
-            --team-id "$APPLE_TEAM_ID" \
-            --type ios_app_store || echo "Profile setup failed, continuing..."
+          # List provisioning profiles
+          xcode-project list-profiles || echo "Cannot list profiles"
 
       - name: Build iOS IPA
         script: |
           flutter build ipa \
             --release \
-            --export-options-plist=ios/ExportOptions.plist \
             --verbose
 
     artifacts:
@@ -90,11 +76,11 @@ workflows:
     publishing:
       app_store_connect:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: FQCQY4FVSL
-        issuer_id: a9e4a6f2-11cc-438c-accd-b7697d923db1
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
       email:
         recipients:
-          - your-email@example.com
+          - edemkweku.jerrykanfra@gmail.com  # ← CHANGE TO YOUR EMAIL
         notify:
           success: true
           failure: true
