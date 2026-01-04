@@ -40,7 +40,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.gagcars.gordonautogarage
-        # team_id is NOT allowed here - removed
 
     scripts:
       - name: Get Flutter packages
@@ -80,10 +79,7 @@ workflows:
         script: |
           echo "=== BUILDING FOR iOS DEVICE ==="
           # Build for device with no-codesign first to test
-          flutter build ipa \
-            --release \
-            --no-codesign \  # ← TEMPORARY: Bypasses simulator signing issue
-            --verbose
+          flutter build ipa --release --no-codesign --verbose
 
     artifacts:
       - build/ios/ipa/*.ipa
@@ -95,7 +91,7 @@ workflows:
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
       email:
         recipients:
-          - your-email@example.com  # ← CHANGE TO YOUR EMAIL
+          - edemkweku.jerrykanfra@gmail.com  # ← CHANGE TO YOUR EMAIL
         notify:
           success: true
           failure: true
