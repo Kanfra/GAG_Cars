@@ -9,41 +9,53 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
+      # Try adding ios_signing with ONLY team_id
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.gagcars.gordonautogarage
     
     scripts:
       - name: Get Flutter packages
         script: |
           flutter pub get
+      
       - name: Install CocoaPods
         script: |
           cd ios
           pod install --repo-update --verbose
           cd ..
-      - name: Create ExportOptions.plist
+      
+      - name: Debug certificate setup
         script: |
-          echo "Creating ExportOptions.plist..."
-          cd ios
-          echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > ExportOptions.plist
-          echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> ExportOptions.plist
-          echo "<plist version=\"1.0\">" >> ExportOptions.plist
-          echo "<dict>" >> ExportOptions.plist
-          echo "    <key>method</key>" >> ExportOptions.plist
-          echo "    <string>app-store</string>" >> ExportOptions.plist
-          echo "    <key>teamID</key>" >> ExportOptions.plist
-          echo "    <string>5NPA9TJU9H</string>" >> ExportOptions.plist
-          echo "</dict>" >> ExportOptions.plist
-          echo "</plist>" >> ExportOptions.plist
-          cd ..
-      - name: Build with Flutter (no codesign)
-        script: |
-          echo "=== BUILDING WITH --no-codesign ==="
-          # Build IPA without signing first
-          flutter build ipa --release --no-codesign --verbose
+          echo "=== DEBUGGING CERTIFICATE SETUP ==="
+          echo "1. Checking available certificates:"
+          security find-identity -v -p codesigning || echo "No certificates found"
           
-          echo "✓ App built without signing"
-          echo "IPA will need manual signing before App Store upload"
+          echo "2. Checking if our certificate exists:"
+          CERT_NAME="iPhone Distribution"
+          security find-identity -v -p codesigning | grep "$CERT_NAME" || echo "Distribution certificate not found"
+          
+          echo "3. Checking environment groups:"
+          echo "iOS_AppStore_Keys group should contain certificate references"
+      
+      - name: Build iOS IPA WITH signing
+        script: |
+          echo "=== BUILDING WITH SIGNING ==="
+          echo "Using:"
+          echo "- Bundle ID: com.gagcars.gordonautogarage"
+          echo "- Team ID: 5NPA9TJU9H"
+          echo "- Distribution: app_store"
+          
+          # Build WITH signing
+          flutter build ipa \
+            --release \
+            --verbose
+          
+          echo "✓ Build attempted with signing"
+    
     artifacts:
       - build/ios/ipa/*.ipa
+    
     publishing:
       email:
         recipients:
