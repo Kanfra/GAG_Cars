@@ -1,77 +1,67 @@
 workflows:
-  ios-manual-signing:
-    name: iOS Manual Signing
+  ios-app-store:
+    name: iOS App Store Release
     instance_type: mac_mini_m1
     max_build_duration: 120
     environment:
       groups:
-        - iOS_AppStore_Keys
+        - iOS_AppStore_Keys  # This contains your APP_STORE_CONNECT_* keys
       flutter: stable
       xcode: latest
       cocoapods: default
-      vars:
-        TEAM_ID: 5NPA9TJU9H
-        BUNDLE_ID: com.gagcars.gordonautogarage
+      # TELL CODEMAGIC TO USE YOUR CERTIFICATES
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.gagcars.gordonautogarage
     
     scripts:
-      # 1. Get Flutter packages FIRST
-      - name: Get packages
+      # STEP 1: Get dependencies
+      - name: Get dependencies
         script: |
-          flutter clean
           flutter pub get
+          cd ios && pod install --repo-update && cd ..
       
-      # 2. Install CocoaPods
-      - name: Install CocoaPods
+      # STEP 2: Build the IPA
+      - name: Build IPA for App Store
         script: |
-          cd ios
-          pod install --repo-update
-          cd ..
+          echo "=== BUILDING FOR APP STORE ==="
+          flutter build ipa --release --verbose
       
-      # 3. Manual signing setup
-      - name: Manual signing setup
+      # STEP 3: Verify the build
+      - name: Verify build
         script: |
-          echo "=== MANUAL SIGNING SETUP ==="
+          echo "=== VERIFYING BUILD ==="
           
-          # IMPORTANT: Create directories first
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles/
-          mkdir -p build/ios/ipa/
-          
-          echo "Team ID: $TEAM_ID"
-          echo "Bundle ID: $BUNDLE_ID"
-      
-      # 4. Build with Flutter - FIXED YAML SYNTAX
-      - name: Build with Flutter signing
-        script: |
-          echo "=== BUILDING WITH FLUTTER SIGNING ==="
-          
-          # Create ExportOptions.plist using echo (no EOF issues)
-          cd ios
-          echo '<?xml version="1.0" encoding="UTF-8"?>' > ExportOptions.plist
-          echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> ExportOptions.plist
-          echo '<plist version="1.0">' >> ExportOptions.plist
-          echo '<dict>' >> ExportOptions.plist
-          echo '    <key>method</key>' >> ExportOptions.plist
-          echo '    <string>app-store</string>' >> ExportOptions.plist
-          echo '    <key>teamID</key>' >> ExportOptions.plist
-          echo '    <string>5NPA9TJU9H</string>' >> ExportOptions.plist
-          echo '</dict>' >> ExportOptions.plist
-          echo '</plist>' >> ExportOptions.plist
-          
-          echo "ExportOptions.plist created:"
-          cat ExportOptions.plist
-          
-          cd ..
-          
-          # Build with Flutter
-          flutter build ipa \
-            --release \
-            --export-options-plist=ios/ExportOptions.plist \
-            --verbose 2>&1 | tail -50
+          if [ -f "build/ios/ipa/Runner.ipa" ]; then
+            echo "✅ SUCCESS: IPA created at build/ios/ipa/Runner.ipa"
+            ls -lh build/ios/ipa/Runner.ipa
+            
+            # Check if it's signed
+            echo "Checking signature..."
+            codesign -dvvv build/ios/ipa/Runner.ipa 2>&1 | grep -i "signed|team|authority" || echo "Signature check completed"
+          else
+            echo "❌ FAILED: No IPA found"
+            echo "Looking for IPA files..."
+            find build -name "*.ipa" 2>/dev/null
+          fi
     
     artifacts:
       - build/ios/ipa/*.ipa
     
     publishing:
+      # AUTO PUBLISH TO APP STORE CONNECT
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        
+        submit_to_testflight: true  # Submit to TestFlight
+        beta_groups:              # Optional: Add beta groups
+          - "Internal Testers"
+      
       email:
         recipients:
           - edemkweku.jerrykanfra@gmail.com
+        notify:
+          success: true
+          failure: true
