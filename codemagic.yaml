@@ -78,8 +78,8 @@ workflows:
       - name: Build iOS IPA
         script: |
           echo "=== BUILDING FOR iOS DEVICE ==="
-          # Build for device with no-codesign first to test
-          flutter build ipa --release --no-codesign --verbose
+          # Build with actual code signing
+          flutter build ipa --release --verbose
 
     artifacts:
       - build/ios/ipa/*.ipa
