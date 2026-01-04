@@ -57,28 +57,10 @@ workflows:
           echo '</plist>' >> ExportOptions.plist
           echo "ExportOptions.plist created successfully"
           cd ..
-      - name: Import certificates manually
+      - name: Check certificates
         script: |
-          echo "=== IMPORTING CERTIFICATES MANUALLY ==="
-          
-          # List available identities BEFORE import
-          echo "Available signing identities:"
-          security find-identity -v -p codesigning || echo "No identities found"
-          
-          # Try to find and use the specific certificate
-          CERT_NAME="iPhone Distribution: Sendyfile LLC (5NPA9TJU9H)"
-          echo "Searching for: $CERT_NAME"
-          
-          # Check if certificate exists
-          if security find-identity -v -p codesigning | grep -q "$CERT_NAME"; then
-            echo "✓ Certificate found in keychain"
-            CERT_HASH=$(security find-identity -v -p codesigning | grep "$CERT_NAME" | awk '{print $2}' | head -1)
-            echo "Certificate hash: $CERT_HASH"
-          else
-            echo "✗ Certificate NOT found in keychain"
-            echo "Trying to list all identities:"
-            security find-identity -v -p codesigning
-          fi
+          echo "=== CHECKING CERTIFICATES ==="
+          security find-identity -v -p codesigning || echo "No certificates found"
       - name: Build iOS IPA
         script: |
           echo "Building iOS IPA with Xcode..."
@@ -87,7 +69,7 @@ workflows:
           # Clean
           xcodebuild clean -workspace Runner.xcworkspace -scheme Runner || true
           
-          # Archive with manual signing override
+          # Archive with team ID only (let Xcode auto-select profile)
           xcodebuild archive \
             -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -95,10 +77,7 @@ workflows:
             -archivePath ../build/ios/Runner.xcarchive \
             -destination "generic/platform=iOS" \
             -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM=5NPA9TJU9H \
-            PROVISIONING_PROFILE_SPECIFIER="GAGCar_AppStore_Profile" \
-            CODE_SIGN_STYLE="Manual" \
-            CODE_SIGN_IDENTITY="iPhone Distribution"
+            DEVELOPMENT_TEAM=5NPA9TJU9H
           
           # Check if archive was created
           if [ -d "../build/ios/Runner.xcarchive" ]; then
@@ -113,9 +92,9 @@ workflows:
             
             echo "✓ IPA exported successfully"
           else
-            echo "✗ Archive failed to create"
-            echo "Checking build directory:"
-            ls -la ../build/ios/
+            echo "✗ Archive failed"
+            # Try one more time with different approach
+            flutter build ipa --release --verbose || echo "Flutter build also failed"
           fi
           
           cd ..
