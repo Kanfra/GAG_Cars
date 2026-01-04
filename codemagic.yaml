@@ -1,67 +1,39 @@
 workflows:
-  ios-app-store:
-    name: iOS App Store Release
+  ios-working:
+    name: iOS Working Build
     instance_type: mac_mini_m1
     max_build_duration: 120
+
     environment:
       groups:
-        - iOS_AppStore_Keys  # This contains your APP_STORE_CONNECT_* keys
+        - iOS_AppStore_Keys   # Must contain App Store cert + API key
       flutter: stable
       xcode: latest
       cocoapods: default
-      # TELL CODEMAGIC TO USE YOUR CERTIFICATES
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.gagcars.gordonautogarage
-    
+      vars:
+        BUNDLE_ID: com.gagcars.gordonautogarage
+
     scripts:
-      # STEP 1: Get dependencies
-      - name: Get dependencies
+      - name: Get Flutter packages
         script: |
           flutter pub get
-          cd ios && pod install --repo-update && cd ..
-      
-      # STEP 2: Build the IPA
-      - name: Build IPA for App Store
+
+      - name: Install CocoaPods
         script: |
-          echo "=== BUILDING FOR APP STORE ==="
-          flutter build ipa --release --verbose
-      
-      # STEP 3: Verify the build
-      - name: Verify build
+          cd ios
+          pod install
+          cd ..
+
+      - name: Build iOS IPA (automatic signing)
         script: |
-          echo "=== VERIFYING BUILD ==="
-          
-          if [ -f "build/ios/ipa/Runner.ipa" ]; then
-            echo "✅ SUCCESS: IPA created at build/ios/ipa/Runner.ipa"
-            ls -lh build/ios/ipa/Runner.ipa
-            
-            # Check if it's signed
-            echo "Checking signature..."
-            codesign -dvvv build/ios/ipa/Runner.ipa 2>&1 | grep -i "signed|team|authority" || echo "Signature check completed"
-          else
-            echo "❌ FAILED: No IPA found"
-            echo "Looking for IPA files..."
-            find build -name "*.ipa" 2>/dev/null
-          fi
-    
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/ExportOptions.plist
+
     artifacts:
       - build/ios/ipa/*.ipa
-    
+
     publishing:
-      # AUTO PUBLISH TO APP STORE CONNECT
-      app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        
-        submit_to_testflight: true  # Submit to TestFlight
-        beta_groups:              # Optional: Add beta groups
-          - "Internal Testers"
-      
       email:
         recipients:
           - edemkweku.jerrykanfra@gmail.com
-        notify:
-          success: true
-          failure: true
