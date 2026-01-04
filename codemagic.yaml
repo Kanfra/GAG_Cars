@@ -24,7 +24,7 @@ workflows:
   ios-workflow:
     name: iOS App Store Build
     instance_type: mac_mini_m1
-    max_build_duration: 120  # ← CHANGED FROM 180 TO 120
+    max_build_duration: 120
     environment:
       groups:
         - iOS_AppStore_Keys
@@ -59,8 +59,30 @@ workflows:
           cd ..
       - name: Build iOS IPA
         script: |
-          echo "Building iOS IPA..."
-          flutter build ipa --release --verbose
+          echo "Building iOS IPA with Xcode..."
+          cd ios
+          
+          # Clean
+          xcodebuild clean -workspace Runner.xcworkspace -scheme Runner
+          
+          # Archive FOR DEVICE (not simulator)
+          xcodebuild archive \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -archivePath ../build/ios/Runner.xcarchive \
+            -destination "generic/platform=iOS" \
+            -allowProvisioningUpdates
+          
+          # Export IPA
+          xcodebuild -exportArchive \
+            -archivePath ../build/ios/Runner.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath ../build/ios/ipa \
+            -allowProvisioningUpdates
+          
+          cd ..
+          echo "✓ Build complete!"
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
