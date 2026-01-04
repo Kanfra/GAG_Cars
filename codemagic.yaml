@@ -39,75 +39,37 @@ workflows:
           echo "Team ID: $TEAM_ID"
           echo "Bundle ID: $BUNDLE_ID"
       
-      # 4. Build with Flutter (let Flutter handle signing)
+      # 4. Build with Flutter - FIXED YAML SYNTAX
       - name: Build with Flutter signing
         script: |
           echo "=== BUILDING WITH FLUTTER SIGNING ==="
           
-          # Create a simple ExportOptions.plist - FIXED EOF SYNTAX
+          # Create ExportOptions.plist using echo (no EOF issues)
           cd ios
-          cat > ExportOptions.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>app-store</string>
-    <key>teamID</key>
-    <string>$TEAM_ID</string>
-</dict>
-</plist>
-EOF
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > ExportOptions.plist
+          echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >> ExportOptions.plist
+          echo '<plist version="1.0">' >> ExportOptions.plist
+          echo '<dict>' >> ExportOptions.plist
+          echo '    <key>method</key>' >> ExportOptions.plist
+          echo '    <string>app-store</string>' >> ExportOptions.plist
+          echo '    <key>teamID</key>' >> ExportOptions.plist
+          echo '    <string>5NPA9TJU9H</string>' >> ExportOptions.plist
+          echo '</dict>' >> ExportOptions.plist
+          echo '</plist>' >> ExportOptions.plist
+          
+          echo "ExportOptions.plist created:"
+          cat ExportOptions.plist
+          
           cd ..
           
-          # Build with Flutter - let it use Codemagic's auto-signing
+          # Build with Flutter
           flutter build ipa \
             --release \
             --export-options-plist=ios/ExportOptions.plist \
-            --verbose
-      
-      # 5. Alternative: Direct xcodebuild if Flutter fails
-      - name: Alternative direct build
-        script: |
-          echo "=== ALTERNATIVE DIRECT BUILD ==="
-          
-          cd ios
-          
-          # Clean first
-          xcodebuild clean -workspace Runner.xcworkspace -scheme Runner
-          
-          # Try to build with automatic code signing
-          xcodebuild archive \
-            -workspace Runner.xcworkspace \
-            -scheme Runner \
-            -configuration Release \
-            -archivePath ../build/Runner.xcarchive \
-            -destination generic/platform=iOS \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM="$TEAM_ID"
-          
-          # Export if archive succeeded
-          if [ -d "../build/Runner.xcarchive" ]; then
-            xcodebuild -exportArchive \
-              -archivePath ../build/Runner.xcarchive \
-              -exportOptionsPlist ExportOptions.plist \
-              -exportPath ../build/ios/ipa \
-              -allowProvisioningUpdates
-          else
-            echo "Archive failed, trying direct build..."
-            xcodebuild build \
-              -workspace Runner.xcworkspace \
-              -scheme Runner \
-              -configuration Release \
-              -destination generic/platform=iOS \
-              DEVELOPMENT_TEAM="$TEAM_ID"
-          fi
-          
-          cd ..
+            --verbose 2>&1 | tail -50
     
     artifacts:
       - build/ios/ipa/*.ipa
-      - build/Runner.xcarchive
     
     publishing:
       email:
