@@ -2,313 +2,238 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- ============ PRIVACY PERMISSIONS ============ -->
-    <!-- Location Permissions -->
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>This app needs access to location when open to provide location-based services.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>This app needs access to your location to provide location-based services even when closed.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>This app needs access to your location to provide background location services.</string>
-    
-    <!-- Phone Call Permission -->
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Required for making phone calls to customer service</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleDisplayName</key>
+	<string>GAGcars</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF Document</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>LSHandlerRank</key>
+			<string>Default</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Public Data</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.data</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>GAGcars</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.0.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.gagcars.gordonautogarage</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gagcars</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>29</string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>telprompt</string>
+		<string>sms</string>
+		<string>mailto</string>
+		<string>http</string>
+		<string>https</string>
+		<string>whatsapp</string>
+		<string>fb</string>
+		<string>facebook</string>
+		<string>twitter</string>
+		<string>instagram</string>
+		<string>comgooglemaps</string>
+		<string>maps</string>
+		<string>paystack</string>
+		<string>banktransfer</string>
+		<string>file</string>
+		<string>sharedocuments</string>
+		<string>itms-services</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>api.paystack.co</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLSv1.2</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>checkout.paystack.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLSv1.2</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>js.paystack.co</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLSv1.2</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>standard.paystack.co</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSExceptionMinimumTLSVersion</key>
+				<string>TLSv1.2</string>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<key>NSApplePayUsageDescription</key>
+	<string>This app uses Apple Pay for secure payment processing</string>
+	<key>NSCameraUsageDescription</key>
+	<string>GAGcars app needs camera access to take photos for listings</string>
+	<key>NSJavaScriptExceptionDomains</key>
+	<dict>
+		<key>paystack.co</key>
+		<dict>
+			<key>NSExceptionAllowsInsecureHTTPLoads</key>
+			<false/>
+			<key>NSExceptionMinimumTLSVersion</key>
+			<string>TLSv1.2</string>
+			<key>NSIncludesSubdomains</key>
+			<true/>
+		</dict>
+		<key>paystack.com</key>
+		<dict>
+			<key>NSExceptionAllowsInsecureHTTPLoads</key>
+			<false/>
+			<key>NSExceptionMinimumTLSVersion</key>
+			<string>TLSv1.2</string>
+			<key>NSIncludesSubdomains</key>
+			<true/>
+		</dict>
+	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>GAGcars use your location to automatically suggest your city when creating a new entry. Location data is not stored or tracked in the background.</string>
 
-    <key>NSMicrophoneUsageDescription</key>
-    <string>This app uses the microphone to convert speech to text for searching brands</string>
-    <key>NSSpeechRecognitionUsageDescription</key>
-    <string>This app uses speech recognition to convert speech to text for searching brands</string>
-        
-    <!-- Photo Library Permissions for Image Sharing -->
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>This app needs permission to save photos to your gallery for sharing</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs permission to access your photos for sharing</string>
-    
-    <!-- Camera Permission -->
-    <key>NSCameraUsageDescription</key>
-    <string>This app needs camera access to take photos for listings</string>
-    
-    <!-- File Sharing & Document Access Permissions -->
-    <key>LSSupportsOpeningDocumentsInPlace</key>
-    <true/>
-    <key>UIFileSharingEnabled</key>
-    <true/>
-    <key>UISupportsDocumentBrowser</key>
-    <true/>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>GAGcars uses your location to suggest your city when creating listings. Location is only accessed while the app is in use and is not tracked in the background.</string>
 
-    <!-- ============ DEEP LINKING CONFIGURATION ============ -->
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>com.gagcars.gordonautogarage</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>gagcars</string>
-            </array>
-        </dict>
-    </array>
-
-    <!-- For Universal Links -->
-    <key>FlutterDeepLinkingEnabled</key>
-    <true/>
-
-    <!-- ============ APP CONFIGURATION ============ -->
-    <key>CFBundleDisplayName</key>
-    <string>GAGcars</string>
-    <key>CFBundleExecutable</key>
-    <string>$(EXECUTABLE_NAME)</string>
-    <key>CFBundleIdentifier</key>
-    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundleName</key>
-    <string>GAGcars</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>$(FLUTTER_BUILD_NAME)</string>
-    <key>CFBundleSignature</key>
-    <string>????</string>
-    <key>CFBundleVersion</key>
-    <string>$(FLUTTER_BUILD_NUMBER)</string>
-    <key>LSRequiresIPhoneOS</key>
-    <true/>
-
-    <!-- ============ PAYSTACK & WEBVIEW CONFIGURATION ============ -->
-    <!-- Enable embedded views for WebView -->
-    <key>io.flutter.embedded_views_preview</key>
-    <true/>
-
-    <!-- App Transport Security - Specific exceptions only -->
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSExceptionDomains</key>
-        <dict>
-            <!-- Paystack Domains for payment processing -->
-            <key>api.paystack.co</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <false/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            <key>standard.paystack.co</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <false/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            <key>js.paystack.co</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <false/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-            <key>checkout.paystack.com</key>
-            <dict>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <false/>
-                <key>NSExceptionMinimumTLSVersion</key>
-                <string>TLSv1.2</string>
-            </dict>
-        </dict>
-    </dict>
-
-    <!-- ============ URL SCHEMES & QUERIES ============ -->
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <!-- Core Schemes -->
-        <string>tel</string>
-        <string>telprompt</string>
-        <string>sms</string>
-        <string>mailto</string>
-        <string>http</string>
-        <string>https</string>
-        
-        <!-- Social Media Schemes -->
-        <string>whatsapp</string>
-        <string>fb</string>
-        <string>facebook</string>
-        <string>twitter</string>
-        <string>instagram</string>
-        
-        <!-- Maps & Navigation -->
-        <string>comgooglemaps</string>
-        <string>maps</string>
-        
-        <!-- Payment Schemes -->
-        <string>paystack</string>
-        <string>banktransfer</string>
-        
-        <!-- File & Document Schemes -->
-        <string>file</string>
-        <string>sharedocuments</string>
-        <string>itms-services</string>
-    </array>
-
-    <!-- ============ WEBVIEW & JAVASCRIPT CONFIGURATION ============ -->
-    <!-- WebView configuration for secure payment processing -->
-    <key>NSJavaScriptExceptionDomains</key>
-    <dict>
-        <key>paystack.com</key>
-        <dict>
-            <key>NSIncludesSubdomains</key>
-            <true/>
-            <key>NSExceptionAllowsInsecureHTTPLoads</key>
-            <false/>
-            <key>NSExceptionMinimumTLSVersion</key>
-            <string>TLSv1.2</string>
-        </dict>
-        <key>paystack.co</key>
-        <dict>
-            <key>NSIncludesSubdomains</key>
-            <true/>
-            <key>NSExceptionAllowsInsecureHTTPLoads</key>
-            <false/>
-            <key>NSExceptionMinimumTLSVersion</key>
-            <string>TLSv1.2</string>
-        </dict>
-    </dict>
-
-    <!-- ============ DOCUMENT TYPES FOR PDF SUPPORT ============ -->
-    <key>CFBundleDocumentTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeName</key>
-            <string>PDF Document</string>
-            <key>CFBundleTypeRole</key>
-            <string>Viewer</string>
-            <key>LSHandlerRank</key>
-            <string>Default</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>com.adobe.pdf</string>
-            </array>
-        </dict>
-        <dict>
-            <key>CFBundleTypeName</key>
-            <string>Public Data</string>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>LSHandlerRank</key>
-            <string>Alternate</string>
-            <key>LSItemContentTypes</key>
-            <array>
-                <string>public.data</string>
-            </array>
-        </dict>
-    </array>
-
-    <!-- ============ EXPORTED UTILITY TYPES ============ -->
-    <key>UTExportedTypeDeclarations</key>
-    <array>
-        <dict>
-            <key>UTTypeConformsTo</key>
-            <array>
-                <string>public.data</string>
-            </array>
-            <key>UTTypeDescription</key>
-            <string>PDF Document</string>
-            <key>UTTypeIdentifier</key>
-            <string>com.adobe.pdf</string>
-            <key>UTTypeTagSpecification</key>
-            <dict>
-                <key>public.filename-extension</key>
-                <array>
-                    <string>pdf</string>
-                </array>
-                <key>public.mime-type</key>
-                <array>
-                    <string>application/pdf</string>
-                </array>
-            </dict>
-        </dict>
-    </array>
-
-    <!-- ============ UI CONFIGURATION ============ -->
-    <key>UILaunchStoryboardName</key>
-    <string>LaunchScreen</string>
-    <key>UIMainStoryboardFile</key>
-    <string>Main</string>
-    
-    <!-- Orientation Settings -->
-    <key>UISupportedInterfaceOrientations</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    <key>UISupportedInterfaceOrientations~ipad</key>
-    <array>
-        <string>UIInterfaceOrientationPortrait</string>
-        <string>UIInterfaceOrientationPortraitUpsideDown</string>
-        <string>UIInterfaceOrientationLandscapeLeft</string>
-        <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    
-    <!-- Status Bar Configuration -->
-    <key>UIViewControllerBasedStatusBarAppearance</key>
-    <false/>
-    
-    <!-- Performance Optimizations -->
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    <key>UIApplicationSupportsIndirectInputEvents</key>
-    <true/>
-    
-    <!-- Background Modes -->
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>location</string>
-        <string>fetch</string>
-        <string>remote-notification</string>
-    </array>
-    
-    <!-- ============ PAYSTACK SPECIFIC SETTINGS ============ -->
-    <!-- Enable modern WebKit features -->
-    <key>WKAppBoundDomains</key>
-    <array>
-        <string>api.paystack.co</string>
-        <string>checkout.paystack.com</string>
-        <string>gagcars.com</string>
-        <string>smtp.gmail.com</string>
-    </array>
-    
-    <!-- Prevent App Store rejection for payment processing -->
-    <key>NSApplePayUsageDescription</key>
-    <string>This app uses Apple Pay for secure payment processing</string>
-    
-    <!-- External accessory communication -->
-    <key>UISupportedExternalAccessoryProtocols</key>
-    <array>
-        <string>com.apple.mfi</string>
-    </array>
-    
-    <!-- ============ MAIL & SHARING CAPABILITIES ============ -->
-    <key>MKDirectionsApplicationSupportedModes</key>
-    <array>
-        <string>MKDirectionsModeWalk</string>
-        <string>MKDirectionsModeCar</string>
-        <string>MKDirectionsModeTransit</string>
-    </array>
-    
-    <!-- Enable document interaction -->
-    <key>UIDocumentInteractionController</key>
-    <true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app uses the microphone to convert speech to text for searching brands</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>GAGcars app needs permission to save photos to your gallery for sharing</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>GAGcars app needs permission to access your photos for sharing</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app uses speech recognition to convert speech to text for searching brands</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>UIDocumentInteractionController</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>PDF Document</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.adobe.pdf</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>pdf</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/pdf</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>WKAppBoundDomains</key>
+	<array>
+		<string>api.paystack.co</string>
+		<string>checkout.paystack.com</string>
+		<string>gagcars.com</string>
+		<string>smtp.gmail.com</string>
+	</array>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>
