@@ -44,6 +44,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   late Animation<double> _profileImageFadeAnimation;
   bool _showProfilePopup = false;
 
+  // Full screen image viewer variables
+  late PageController _fullScreenPageController;
+  int _currentFullScreenIndex = 0;
+  bool _showLeftArrow = false;
+  bool _showRightArrow = false;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +92,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
       curve: Curves.easeInOut,
     ));
     
+    // Initialize full screen page controller
+    _fullScreenPageController = PageController(initialPage: selectedIndex);
+    _currentFullScreenIndex = selectedIndex;
+    
     _scrollController.addListener(() {
       if (mounted) {
         setState(() {
@@ -106,7 +116,246 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   void dispose() {
     _scrollController.dispose();
     _profileImageController.dispose();
+    _fullScreenPageController.dispose();
     super.dispose();
+  }
+
+  // ========== ENHANCED FULL SCREEN IMAGE VIEWER WITH SWIPE & ARROWS ==========
+
+  void _showFullScreenImage(int startIndex) {
+    logger.i('Opening full screen image viewer at index: $startIndex');
+    
+    setState(() {
+      _currentFullScreenIndex = startIndex;
+      _updateArrowVisibility(startIndex);
+    });
+    
+    // Update page controller to start at the selected index
+    _fullScreenPageController = PageController(initialPage: startIndex);
+    
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        final images = getListingImages();
+        
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Stack(
+                children: [
+                  // PageView for swipeable images
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: PageView.builder(
+                      controller: _fullScreenPageController,
+                      itemCount: images.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentFullScreenIndex = index;
+                          _updateArrowVisibility(index);
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        return InteractiveViewer(
+                          panEnabled: true,
+                          minScale: 0.5,
+                          maxScale: 4.0,
+                          child: _buildSafeImage(
+                            images[index],
+                            fit: BoxFit.contain,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  
+                  // Close button
+                  Positioned(
+                    top: 50,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Position indicator
+                  Positioned(
+                    top: 50,
+                    left: 20,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${_currentFullScreenIndex + 1}/${images.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Navigation instructions
+                  Positioned(
+                    bottom: 100,
+                    left: 0,
+                    right: 0,
+                    child: AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: const Duration(seconds: 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.touch_app, color: Colors.white70, size: 18),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Swipe or use arrow buttons',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // LEFT ARROW BUTTON - Shows when not on first image
+                  if (_showLeftArrow)
+                    Positioned(
+                      left: 20,
+                      top: MediaQuery.of(context).size.height / 2 - 25,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Go to previous image
+                          _fullScreenPageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.5),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_left,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // RIGHT ARROW BUTTON - Shows when not on last image
+                  if (_showRightArrow)
+                    Positioned(
+                      right: 20,
+                      top: MediaQuery.of(context).size.height / 2 - 25,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Go to next image
+                          _fullScreenPageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.5),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          ),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+    ).then((_) {
+      // When dialog closes, update the main selected index to match the last viewed image
+      if (mounted) {
+        setState(() {
+          selectedIndex = _currentFullScreenIndex;
+        });
+      }
+    });
+  }
+
+  // Helper method to update arrow visibility
+  void _updateArrowVisibility(int currentIndex) {
+    final images = getListingImages();
+    setState(() {
+      _showLeftArrow = currentIndex > 0;
+      _showRightArrow = currentIndex < images.length - 1;
+    });
   }
 
   // ========== PROFILE IMAGE POPUP ANIMATION METHODS ==========
@@ -635,92 +884,6 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     }
   }
 
-  // Image Zoom Dialog
-  void _showFullScreenImage(String imageUrl, int imageIndex) {
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      barrierDismissible: true,
-      barrierLabel: 'Close',
-      transitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Dialog(
-          backgroundColor: Colors.black,
-          insetPadding: EdgeInsets.zero,
-          child: Stack(
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: InteractiveViewer(
-                  panEnabled: true,
-                  minScale: 0.5,
-                  maxScale: 4.0,
-                  child: _buildSafeImage(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              
-              Positioned(
-                top: 50,
-                right: 20,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-              
-              Positioned(
-                top: 50,
-                left: 20,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${imageIndex + 1}/${getListingImages().length}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          ),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
   // ========== GALLERY ITEM ==========
 
   Widget _buildGalleryItem(String image, int index, ThemeData theme) {
@@ -808,7 +971,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   height: 28,
                   child: ElevatedButton(
                     onPressed: () {
-                      _showFullScreenImage(image, index);
+                      _showFullScreenImage(index);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorGlobalVariables.brownColor,
@@ -1670,7 +1833,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Text(
-                          "Tap image to set as main display • Tap 'View' to see full size",
+                          "Tap image to set as main display • Tap 'View' to see full size with swipe navigation",
                           style: TextStyle(
                             fontSize: 12.0,
                             color: theme.textTheme.bodyMedium?.color,

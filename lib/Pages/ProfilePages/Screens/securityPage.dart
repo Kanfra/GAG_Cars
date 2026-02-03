@@ -40,7 +40,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
       body: Column(
         children: [
-          // Header Section
+
+// Header Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
@@ -49,8 +50,8 @@ class _SecurityPageState extends State<SecurityPage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  ColorGlobalVariables.brownColor.withOpacity(0.9),
-                  ColorGlobalVariables.brownColor.withOpacity(0.7),
+                  Color(0xFF2E3A59).withOpacity(0.9), // Dark blue
+                  Color(0xFF4A6785).withOpacity(0.7), // Lighter blue
                 ],
               ),
               borderRadius: const BorderRadius.only(

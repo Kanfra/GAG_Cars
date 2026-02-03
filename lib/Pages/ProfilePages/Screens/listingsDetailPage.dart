@@ -42,6 +42,12 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   bool _isPromoted = false;
   bool _isActivatingPromotion = false;
   
+  // Full screen image viewer variables
+  late PageController _fullScreenPageController;
+  int _currentFullScreenIndex = 0;
+  bool _showLeftArrow = false;
+  bool _showRightArrow = false;
+  
   // New variable to control promotion flow
   bool canPromote = false; // Set to false initially to test payment flow
 
@@ -58,6 +64,10 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       logger.e('Error initializing listing: $e');
       listing = {};
     }
+    
+    // Initialize full screen page controller
+    _fullScreenPageController = PageController(initialPage: selectedIndex);
+    _currentFullScreenIndex = selectedIndex;
     
     _scrollController.addListener(() {
       if (mounted) {
@@ -78,7 +88,369 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _fullScreenPageController.dispose();
     super.dispose();
+  }
+
+  // ========== ENHANCED FULL SCREEN IMAGE VIEWER WITH SWIPE & ARROWS ==========
+
+  void _showFullScreenImage(int startIndex) {
+    logger.i('Opening full screen image viewer at index: $startIndex');
+    
+    setState(() {
+      _currentFullScreenIndex = startIndex;
+      _updateArrowVisibility(startIndex);
+    });
+    
+    // Update page controller to start at the selected index
+    _fullScreenPageController = PageController(initialPage: startIndex);
+    
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        final images = getListingImages();
+        
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Stack(
+                children: [
+                  // PageView for swipeable images
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: PageView.builder(
+                      controller: _fullScreenPageController,
+                      itemCount: images.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentFullScreenIndex = index;
+                          _updateArrowVisibility(index);
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        return InteractiveViewer(
+                          panEnabled: true,
+                          minScale: 0.5,
+                          maxScale: 4.0,
+                          child: _buildSafeImage(
+                            images[index],
+                            fit: BoxFit.contain,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  
+                  // Close button
+                  Positioned(
+                    top: 50,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Position indicator
+                  Positioned(
+                    top: 50,
+                    left: 20,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${_currentFullScreenIndex + 1}/${images.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Navigation instructions
+                  Positioned(
+                    bottom: 100,
+                    left: 0,
+                    right: 0,
+                    child: AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: const Duration(seconds: 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.touch_app, color: Colors.white70, size: 18),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Swipe or use arrow buttons',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // LEFT ARROW BUTTON - Shows when not on first image
+                  if (_showLeftArrow)
+                    Positioned(
+                      left: 20,
+                      top: MediaQuery.of(context).size.height / 2 - 25,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Go to previous image
+                          _fullScreenPageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.5),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_left,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // RIGHT ARROW BUTTON - Shows when not on last image
+                  if (_showRightArrow)
+                    Positioned(
+                      right: 20,
+                      top: MediaQuery.of(context).size.height / 2 - 25,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Go to next image
+                          _fullScreenPageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.5),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          ),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+    ).then((_) {
+      // When dialog closes, update the main selected index to match the last viewed image
+      if (mounted) {
+        setState(() {
+          selectedIndex = _currentFullScreenIndex;
+        });
+      }
+    });
+  }
+
+  // Helper method to update arrow visibility
+  void _updateArrowVisibility(int currentIndex) {
+    final images = getListingImages();
+    setState(() {
+      _showLeftArrow = currentIndex > 0;
+      _showRightArrow = currentIndex < images.length - 1;
+    });
+  }
+
+  // ========== ENHANCED IMAGE GALLERY METHODS ==========
+
+  Widget _buildGalleryItem(String image, int index, bool isDarkMode) {
+    return Container(
+      width: 120,
+      margin: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Image container
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                border: Border.all(
+                  color: index == selectedIndex 
+                      ? ColorGlobalVariables.brownColor 
+                      : Colors.transparent,
+                  width: 2,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                ),
+                child: Stack(
+                  children: [
+                    _buildSafeImage(
+                      image,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                    if (index == selectedIndex)
+                      Container(
+                        color: Colors.black.withOpacity(0.3),
+                        child: const Center(
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          
+          // View button section
+          Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Image ${index + 1}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                // View button
+                SizedBox(
+                  height: 28,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      _showFullScreenImage(index);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorGlobalVariables.brownColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.visibility, size: 12),
+                        SizedBox(width: 4),
+                        Text(
+                          'View',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   // ========== CUSTOM DIALOG METHODS ==========
@@ -516,217 +888,6 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  // ========== ENHANCED IMAGE GALLERY METHODS ==========
-
-  void _showFullScreenImage(String imageUrl, int imageIndex) {
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      barrierDismissible: true,
-      barrierLabel: 'Close',
-      transitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Dialog(
-          backgroundColor: Colors.black,
-          insetPadding: EdgeInsets.zero,
-          child: Stack(
-            children: [
-              // Full screen image with zoom capability
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: InteractiveViewer(
-                  panEnabled: true,
-                  minScale: 0.5,
-                  maxScale: 4.0,
-                  child: buildSafeImage(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              
-              // Close button with animation
-              Positioned(
-                top: 50,
-                right: 20,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Image counter with fade animation
-              Positioned(
-                top: 50,
-                left: 20,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${imageIndex + 1}/${getListingImages().length}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          ),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildGalleryItem(String image, int index, bool isDarkMode) {
-    return Container(
-      width: 120,
-      margin: const EdgeInsets.symmetric(horizontal: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: isDarkMode ? const Color(0xFF424242) : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Image container
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
-                ),
-                border: Border.all(
-                  color: index == selectedIndex 
-                      ? ColorGlobalVariables.brownColor 
-                      : Colors.transparent,
-                  width: 2,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                ),
-                child: Stack(
-                  children: [
-                    buildSafeImage(
-                      image,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-                    if (index == selectedIndex)
-                      Container(
-                        color: Colors.black.withOpacity(0.3),
-                        child: const Center(
-                          child: Icon(
-                            Icons.check_circle,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          
-          // View button section
-          Container(
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Image ${index + 1}',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                // View button
-                SizedBox(
-                  height: 28,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _showFullScreenImage(image, index);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorGlobalVariables.brownColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.visibility, size: 12),
-                        SizedBox(width: 4),
-                        Text(
-                          'View',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // ========== PROMOTION FLOW METHODS ==========
 
   Future<void> _navigateToPromotionsPageForPromotion() async {
@@ -894,9 +1055,125 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     );
   }
 
-  // ========== EXISTING METHODS (Keep all your existing functionality) ==========
+  // ========== IMAGE HANDLING METHODS ==========
 
-  // Safe data access methods
+  String _getCorrectImageUrl(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
+      return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    }
+
+    if (imagePath.startsWith("http")) {
+      return imagePath;
+    }
+
+    try {
+      String baseUrl = "https://dashboard.gagcars.com";
+      
+      String cleanImagePath;
+      if (imagePath.startsWith('/storage/')) {
+        cleanImagePath = imagePath;
+      } else if (imagePath.startsWith('storage/')) {
+        cleanImagePath = '/$imagePath';
+      } else {
+        cleanImagePath = '/storage/$imagePath';
+      }
+      
+      final fullUrl = '$baseUrl$cleanImagePath';
+      return fullUrl;
+    } catch (e) {
+      print('❌ Error constructing image URL: $e');
+      return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    }
+  }
+
+  Widget _buildImageErrorPlaceholder(double? width, double? height, ThemeData theme) {
+    return Container(
+      width: width,
+      height: height,
+      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image_not_supported,
+              size: (width ?? 45) * 0.4,
+              color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'No Image',
+              style: TextStyle(
+                fontSize: 10,
+                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
+    return Shimmer.fromColors(
+      baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+      highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+      child: Container(
+        width: width,
+        height: height,
+        color: theme.cardColor,
+      ),
+    );
+  }
+
+  Widget _buildSafeNetworkImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+    final theme = Theme.of(context);
+    final String imageUrl = _getCorrectImageUrl(imagePath);
+    
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      width: width,
+      height: height,
+      fit: fit,
+      progressIndicatorBuilder: (context, url, downloadProgress) {
+        return Center(
+          child: CircularProgressIndicator(
+            value: downloadProgress.progress,
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+          ),
+        );
+      },
+      errorWidget: (context, url, error) {
+        return _buildImageErrorPlaceholder(width, height, theme);
+      },
+    );
+  }
+
+  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+    final theme = Theme.of(context);
+    final String imageUrl = _getCorrectImageUrl(imagePath);
+    
+    final bool isAssetImage = imageUrl.contains('assets/') || 
+                             imageUrl.endsWith('car_placeholder.png');
+    
+    if (isAssetImage) {
+      return Image.asset(
+        imageUrl,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildImageErrorPlaceholder(width, height, theme);
+        },
+      );
+    } else {
+      return _buildSafeNetworkImage(imagePath, width: width, height: height, fit: fit);
+    }
+  }
+
+  // ========== DATA ACCESS METHODS ==========
+
   String getListingName() {
     try {
       final name = listing['name'];
@@ -1494,85 +1771,271 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     }
   }
 
-  Widget _buildShimmerPlaceholder(double? width, double? height) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
-    return Shimmer.fromColors(
-      baseColor: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-      highlightColor: isDarkMode ? Colors.grey[600]! : Colors.grey[100]!,
-      child: Container(
-        width: width,
-        height: height,
-        color: isDarkMode ? Colors.grey[800]! : Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildCustomErrorWidget(double? width, double? height) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildTag(String text, Color color) {
     return Container(
-      width: width,
-      height: height,
-      color: isDarkMode ? Colors.grey[700]! : Colors.grey[300],
-      child: Center(
-        child: Icon(
-          Icons.broken_image,
-          size: (width ?? 45) * 0.4,
-          color: isDarkMode ? Colors.grey[500]! : Colors.grey[400],
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 14.0,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
         ),
       ),
     );
   }
 
-  Widget buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
-    try {
-      if (imagePath.startsWith('http')) {
-        return Image.network(
-          imagePath,
-          width: width,
-          height: height,
-          fit: fit,
-          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return _buildShimmerPlaceholder(width, height);
-          },
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (wasSynchronouslyLoaded) return child;
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: frame != null ? child : _buildShimmerPlaceholder(width, height),
-            );
-          },
+  Widget _buildPromotedTag(bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.amber[800]!.withOpacity(0.3) : Colors.amber[100],
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.star, color: isDarkMode ? Colors.amber[300] : Colors.amber[700], size: 16),
+          const SizedBox(width: 6),
+          Text(
+            "Promoted",
+            style: TextStyle(
+              color: isDarkMode ? Colors.amber[300] : Colors.amber[800],
+              fontSize: 14.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerifiedSellerTag(bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.lightBlue[800]!.withOpacity(0.3) : Colors.lightBlue[100],
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            "Verified Seller",
+            style: TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500,
+              color: isDarkMode ? Colors.lightBlue[300] : Colors.black87,
+            ),
+          ),
+          const SizedBox(width: 6),
+          CircleAvatar(
+            radius: 10,
+            backgroundColor: isDarkMode ? Colors.lightBlue[300]! : Colors.blue,
+            child: Icon(Icons.check, size: 14, color: isDarkMode ? Colors.black87 : Colors.white),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text, bool isDarkMode) {
+    return Row(
+      children: [
+        Icon(icon, color: isDarkMode ? Colors.white70 : Colors.grey[600], size: 20),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white70 : Colors.grey[700],
+            fontSize: 15.0,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title, bool isDarkMode) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 20.0,
+        fontWeight: FontWeight.w600,
+        color: isDarkMode ? Colors.white : Colors.black87,
+      ),
+    );
+  }
+
+  Widget _buildWrapItems(List<Map<String, String>> items, bool isDarkMode, {bool isSpecification = false}) {
+    return Wrap(
+      spacing: 24.0,
+      runSpacing: 16.0,
+      children: items.map((item) {
+        return IntrinsicWidth(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                item["title"] ?? "N/A",
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: isDarkMode 
+                    ? (isSpecification ? Colors.white60 : Colors.white70)
+                    : (isSpecification ? Colors.black54 : Colors.black87),
+                  fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                item["value"] ?? "N/A",
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
         );
-      } else if (imagePath.startsWith('assets/')) {
-        return Image.asset(
-          imagePath,
-          width: width,
-          height: height,
-          fit: fit,
-          errorBuilder: (context, error, stackTrace) => _buildCustomErrorWidget(width, height),
-          frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-            if (wasSynchronouslyLoaded) return child;
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: frame != null ? child : _buildShimmerPlaceholder(width, height),
-            );
-          },
-        );
-      } else {
-        return _buildCustomErrorWidget(width, height);
-      }
-    } catch (e) {
-      logger.e('Error loading image: $e');
-      return _buildCustomErrorWidget(width, height);
-    }
+      }).toList(),
+    );
+  }
+
+  Widget _buildSoldButton(bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.green,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            "Sold",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 16.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPromotedButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.amber[700]!, Colors.orange[700]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withOpacity(0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.star, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            "Promoted",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 16.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSoldPromoteButton(bool isDarkMode) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: isDarkMode ? Colors.grey[700]! : Colors.grey[400]!,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.block, color: Colors.white, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            "Cannot Promote",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 14.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(String text, IconData icon, Color color, {
+    VoidCallback? onPressed,
+    bool isLoading = false,
+  }) {
+    return ElevatedButton(
+      onPressed: isLoading ? null : onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 2,
+      ),
+      child: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.0,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(icon, size: 20, color: Colors.white),
+              ],
+            ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     final carHighlights = getHighlights();
     final carSpecifications = getSpecifications();
     final images = getListingImages();
@@ -1621,7 +2084,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                 children: [
                   Opacity(
                     opacity: _imageOpacity,
-                    child: buildSafeImage(
+                    child: _buildSafeImage(
                       currentImage,
                       width: double.infinity,
                       height: double.infinity,
@@ -1827,7 +2290,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: Text(
-                      "Tap image to set as main display • Tap 'View' to see full size",
+                      "Tap image to set as main display • Tap 'View' to see full size with swipe navigation",
                       style: TextStyle(
                         fontSize: 12.0,
                         color: isDarkMode ? Colors.white60 : Colors.grey[600],
@@ -1918,265 +2381,4 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       ),
     );
   }
-
-  Widget _buildInfoRow(IconData icon, String text, bool isDarkMode) {
-    return Row(
-      children: [
-        Icon(icon, color: isDarkMode ? Colors.white70 : Colors.grey[600], size: 20),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: TextStyle(
-            color: isDarkMode ? Colors.white70 : Colors.grey[700],
-            fontSize: 15.0,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14.0,
-          fontWeight: FontWeight.w500,
-          color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPromotedTag(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.amber[800]!.withOpacity(0.3) : Colors.amber[100],
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.star, color: isDarkMode ? Colors.amber[300] : Colors.amber[700], size: 16),
-          const SizedBox(width: 6),
-          Text(
-            "Promoted",
-            style: TextStyle(
-              color: isDarkMode ? Colors.amber[300] : Colors.amber[800],
-              fontSize: 14.0,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVerifiedSellerTag(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.lightBlue[800]!.withOpacity(0.3) : Colors.lightBlue[100],
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "Verified Seller",
-            style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500,
-              color: isDarkMode ? Colors.lightBlue[300] : Colors.black87,
-            ),
-          ),
-          const SizedBox(width: 6),
-          CircleAvatar(
-            radius: 10,
-            backgroundColor: isDarkMode ? Colors.lightBlue[300]! : Colors.blue,
-            child: Icon(Icons.check, size: 14, color: isDarkMode ? Colors.black87 : Colors.white),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title, bool isDarkMode) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 20.0,
-        fontWeight: FontWeight.w600,
-        color: isDarkMode ? Colors.white : Colors.black87,
-      ),
-    );
-  }
-
-  Widget _buildWrapItems(List<Map<String, String>> items, bool isDarkMode, {bool isSpecification = false}) {
-    return Wrap(
-      spacing: 24.0,
-      runSpacing: 16.0,
-      children: items.map((item) {
-        return IntrinsicWidth(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                item["title"] ?? "N/A",
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: isDarkMode 
-                    ? (isSpecification ? Colors.white60 : Colors.white70)
-                    : (isSpecification ? Colors.black54 : Colors.black87),
-                  fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                item["value"] ?? "N/A",
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
-                  color: isDarkMode ? Colors.white : Colors.black87,
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildSoldButton(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.check_circle, color: Colors.white, size: 20),
-          SizedBox(width: 8),
-          Text(
-            "Sold",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 16.0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPromotedButton() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.amber[700]!, Colors.orange[700]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.amber.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.star, color: Colors.white, size: 20),
-          SizedBox(width: 8),
-          Text(
-            "Promoted",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 16.0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSoldPromoteButton(bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[700]! : Colors.grey[400]!,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.block, color: Colors.white, size: 20),
-          const SizedBox(width: 8),
-          Text(
-            "Cannot Promote",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-              fontSize: 14.0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton(String text, IconData icon, Color color, {
-    VoidCallback? onPressed,
-    bool isLoading = false,
-  }) {
-    return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 2,
-      ),
-      child: isLoading
-          ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  text,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Icon(icon, size: 20, color: Colors.white),
-              ],
-            ),
-    );
-  }
-}  
+}
