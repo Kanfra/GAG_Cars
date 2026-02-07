@@ -551,8 +551,8 @@ class _ListingItemGridWidget extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(Icons.calendar_today, size: 14, color: theme.iconTheme.color),
-                          SizedBox(width: 4),
+                          Icon(Icons.calendar_today, size: 20, color: theme.iconTheme.color),
+                          SizedBox(width: 8),
                           Text(
                             // FIXED: Null-safe year
                             listing.year ?? 'No Year',

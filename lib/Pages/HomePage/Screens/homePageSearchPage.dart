@@ -861,10 +861,10 @@ class _SearchResultItemWidget extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.speed, 
-                              size: 14, 
+                              size: 20, 
                               color: isDarkMode ? Colors.white60 : Colors.grey[600]
                             ),
-                            SizedBox(width: 4),
+                            SizedBox(width: 8),
                             Text(
                               "${_formatMileage(searchItem.mileage!)} km",
                               style: TextStyle(

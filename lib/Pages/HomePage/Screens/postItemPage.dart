@@ -2058,8 +2058,18 @@ class _PostItemPageState extends State<PostItemPage> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 56,
+        _buildDynamicHeightPriceField(userProvider),
+      ],
+    );
+  }
+
+  Widget _buildDynamicHeightPriceField(UserProvider userProvider) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          height: _calculatePriceFieldHeight(_priceController.text, constraints.maxWidth),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: _getInputBackgroundColor(),
@@ -2091,6 +2101,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 child: TextFormField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
+                  maxLines: null, // Allow multiple lines if needed
                   style: TextStyle(
                     color: _getTextColor(),
                     fontSize: 15,
@@ -2102,6 +2113,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     hintStyle: TextStyle(
                       color: _getHintTextColor(),
                     ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -2112,13 +2124,54 @@ class _PostItemPageState extends State<PostItemPage> {
                     }
                     return null;
                   },
+                  onChanged: (value) {
+                    // Trigger rebuild to update height
+                    setState(() {});
+                  },
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        );
+      },
     );
+  }
+
+  double _calculatePriceFieldHeight(String text, double maxWidth) {
+    if (text.isEmpty) {
+      return 56.0; // Default height
+    }
+
+    // Calculate approximate text width
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: _getTextColor(),
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    );
+    
+    textPainter.layout(maxWidth: double.infinity);
+
+    // Available width for text (total width - currency symbol - padding - margins)
+    final availableWidth = maxWidth - 60 - 40; // currency symbol area - padding
+    
+    // If text width exceeds available space, increase height
+    if (textPainter.width > availableWidth) {
+      // Calculate how many lines we need
+      final linesNeeded = (textPainter.width / availableWidth).ceil();
+      final newHeight = 56.0 + ((linesNeeded - 1) * 20.0); // Add 20px per extra line
+      
+      // Cap the maximum height
+      return newHeight.clamp(56.0, 120.0);
+    }
+    
+    return 56.0; // Default height if text fits
   }
 
   Widget _buildFeatures() {
@@ -2752,18 +2805,26 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   Future<void> _showMakeSelectionDialog(List<VehicleMake> makes) async {
+    // Debug: Check if makes are being passed correctly
+    logger.i("Make selection dialog called with ${makes.length} makes");
+    
+    if (makes.isEmpty) {
+      _showErrorSnackBar('No makes available. Please try again later.');
+      return;
+    }
+
     final selected = await showDialog<VehicleMake>(
       context: context,
-      builder: (context) => _buildSearchableDialog(
+      builder: (context) => _buildMakeSelectionDialogWithLazyLoading(
         title: 'Select Make',
         subtitle: 'Choose your vehicle manufacturer',
         icon: Icons.business_center_rounded,
-        items: makes,
-        itemBuilder: (make) => make.name,
+        makes: makes,
       ),
     );
 
     if (selected != null) {
+      logger.i("Selected make: ${selected.name} (ID: ${selected.id})");
       setState(() {
         selectedMake = {'id': selected.id, 'name': selected.name};
         selectedModel = null;
@@ -3116,6 +3177,649 @@ class _PostItemPageState extends State<PostItemPage> {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =============================================
+  // PAGINATED MAKE SELECTION DIALOG
+  // =============================================
+
+  Widget _buildPaginatedMakeSelectionDialog({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<VehicleMake> makes,
+  }) {
+    final searchController = TextEditingController();
+    final filteredMakes = ValueNotifier<List<VehicleMake>>(makes);
+    final currentPage = ValueNotifier<int>(1);
+    final itemsPerPage = 15; // Show 15 makes per page
+    final totalPages = ValueNotifier<int>(((makes.length - 1) / itemsPerPage).ceil());
+
+    return Dialog(
+      backgroundColor: _getDialogBackgroundColor(),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor.withOpacity(0.15),
+                    ColorGlobalVariables.brownColor.withOpacity(0.08),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: _getHintTextColor(),
+                      fontSize: 15,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            // Search Section
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _getInputBackgroundColor(),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search makes... (e.g., Toyota, BMW, Mercedes)',
+                    prefixIcon: Icon(Icons.search_rounded, color: ColorGlobalVariables.brownColor),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    hintStyle: TextStyle(
+                      color: _getHintTextColor(),
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: _getTextColor(),
+                  ),
+                  onChanged: (value) {
+                    filteredMakes.value = makes.where((make) {
+                      return make.name.toLowerCase().contains(value.toLowerCase());
+                    }).toList();
+                    currentPage.value = 1;
+                    totalPages.value = ((filteredMakes.value.length - 1) / itemsPerPage).ceil();
+                  },
+                ),
+              ),
+            ),
+
+            // Makes List with Pagination
+            Expanded(
+              child: ValueListenableBuilder<List<VehicleMake>>(
+                valueListenable: filteredMakes,
+                builder: (context, filteredMakes, child) {
+                  final totalMakes = filteredMakes.length;
+                  final totalPagesCount = ((totalMakes - 1) / itemsPerPage).ceil();
+                  final startIndex = (currentPage.value - 1) * itemsPerPage;
+                  final endIndex = startIndex + itemsPerPage;
+                  final currentMakes = filteredMakes.sublist(
+                    startIndex,
+                    endIndex > totalMakes ? totalMakes : endIndex,
+                  );
+
+                  return Column(
+                    children: [
+                      // Makes Grid
+                      Expanded(
+                        child: currentMakes.isEmpty
+                            ? _buildMakesEmptyState()
+                            : GridView.builder(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 16,
+                                  mainAxisSpacing: 16,
+                                  childAspectRatio: 1.2,
+                                ),
+                                itemCount: currentMakes.length,
+                                itemBuilder: (context, index) {
+                                  final make = currentMakes[index];
+                                  return _buildMakeGridItem(make);
+                                },
+                              ),
+                      ),
+
+                      // Pagination Controls
+                      if (totalPagesCount > 1)
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                          decoration: BoxDecoration(
+                            color: _getInputBackgroundColor(),
+                            border: Border(
+                              top: BorderSide(color: _getBorderColor(), width: 1),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Previous Button
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: currentPage.value == 1 ? _getBorderColor() : ColorGlobalVariables.brownColor,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: currentPage.value == 1
+                                        ? null
+                                        : () {
+                                            currentPage.value = currentPage.value - 1;
+                                          },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_back_ios_rounded,
+                                            size: 16,
+                                            color: currentPage.value == 1 ? _getHintTextColor() : ColorGlobalVariables.brownColor,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Previous',
+                                            style: TextStyle(
+                                              color: currentPage.value == 1 ? _getHintTextColor() : ColorGlobalVariables.brownColor,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Page Info
+                              ValueListenableBuilder<int>(
+                                valueListenable: currentPage,
+                                builder: (context, page, child) {
+                                  return Text(
+                                    'Page $page of $totalPagesCount',
+                                    style: TextStyle(
+                                      color: _getTextColor(),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              // Next Button
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: currentPage.value == totalPagesCount ? _getBorderColor() : ColorGlobalVariables.brownColor,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: currentPage.value == totalPagesCount
+                                        ? null
+                                        : () {
+                                            currentPage.value = currentPage.value + 1;
+                                          },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'Next',
+                                            style: TextStyle(
+                                              color: currentPage.value == totalPagesCount ? _getHintTextColor() : ColorGlobalVariables.brownColor,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            size: 16,
+                                            color: currentPage.value == totalPagesCount ? _getHintTextColor() : ColorGlobalVariables.brownColor,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // Footer Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: _getInputBackgroundColor(),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: _getHintTextColor(),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakeGridItem(VehicleMake make) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Navigator.pop(context, make),
+        child: Container(
+          decoration: BoxDecoration(
+            color: _getCardColor(),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _getBorderColor(), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withOpacity(0.15),
+                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.directions_car_rounded,
+                  color: ColorGlobalVariables.brownColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  make.name,
+                  style: TextStyle(
+                    color: _getTextColor(),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakesEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: _getInputBackgroundColor(),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.directions_car_rounded,
+                size: 40,
+                color: _getHintTextColor(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Makes Found',
+              style: TextStyle(
+                color: _getTextColor(),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Try searching with different keywords',
+              style: TextStyle(
+                color: _getHintTextColor(),
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =============================================
+  // LIST-BASED MAKE SELECTION DIALOG (FETCH ALL MAKES)
+  // =============================================
+
+  Widget _buildMakeSelectionDialogWithLazyLoading({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<VehicleMake> makes,
+  }) {
+    final searchController = TextEditingController();
+    final filteredMakes = ValueNotifier<List<VehicleMake>>(makes);
+
+    return Dialog(
+      backgroundColor: _getDialogBackgroundColor(),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor.withOpacity(0.15),
+                    ColorGlobalVariables.brownColor.withOpacity(0.08),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: _getHintTextColor(),
+                      fontSize: 15,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            // Search Section
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _getInputBackgroundColor(),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search makes... (e.g., Toyota, BMW, Mercedes)',
+                    prefixIcon: Icon(Icons.search_rounded, color: ColorGlobalVariables.brownColor),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                    hintStyle: TextStyle(
+                      color: _getHintTextColor(),
+                    ),
+                  ),
+                  style: TextStyle(
+                    color: _getTextColor(),
+                  ),
+                  onChanged: (value) {
+                    filteredMakes.value = makes.where((make) {
+                      return make.name.toLowerCase().contains(value.toLowerCase());
+                    }).toList();
+                  },
+                ),
+              ),
+            ),
+
+            // Makes List
+            Expanded(
+              child: ValueListenableBuilder<List<VehicleMake>>(
+                valueListenable: filteredMakes,
+                builder: (context, filteredMakes, child) {
+                  return filteredMakes.isEmpty
+                      ? _buildMakesEmptyState()
+                      : ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          itemCount: filteredMakes.length,
+                          separatorBuilder: (context, index) => Divider(
+                            height: 1,
+                            color: _getBorderColor(),
+                          ),
+                          itemBuilder: (context, index) {
+                            final make = filteredMakes[index];
+                            return _buildMakeListItem(make);
+                          },
+                        );
+                },
+              ),
+            ),
+
+            // Footer Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: _getInputBackgroundColor(),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: _getHintTextColor(),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakeListItem(VehicleMake make) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.pop(context, make),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withOpacity(0.15),
+                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.directions_car_rounded,
+                  color: ColorGlobalVariables.brownColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Text(
+                  make.name,
+                  style: TextStyle(
+                    color: _getTextColor(),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: _getHintTextColor(),
               ),
             ],
           ),

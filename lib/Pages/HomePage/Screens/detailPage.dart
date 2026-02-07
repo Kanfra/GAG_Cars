@@ -978,18 +978,20 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 6),
-                                  Consumer<UserProvider>(
-                                    builder: (context, userProvider, child) {
-                                      return Text(
-                                        '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                Consumer<UserProvider>(
+                                  builder: (context, userProvider, child) {
+                                    return Text(
+                                      '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    );
+                                  },
+                                ),
                                 ],
                               ),
                             ),
@@ -3059,8 +3061,8 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     if (widget.item.mileage != null)
                       Row(
                         children: [
-                          Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
-                          const SizedBox(width: 4),
+                            Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
+                            const SizedBox(width: 8),
                           Text(
                             "${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.mileage!) ?? 0)} km",
                             style: TextStyle(

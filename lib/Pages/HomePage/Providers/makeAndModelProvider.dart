@@ -55,4 +55,9 @@ class MakeAndModelProvider extends ChangeNotifier {
       return null;
     }
   }
+
+  // Method to fetch makes with pagination support
+  Future<MakeAndModelResponse> fetchMakesWithModelsForPagination() async {
+    return await _service.fetchMakesWithModels();
+  }
 }

@@ -400,6 +400,8 @@ class _SearchItemCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: ColorGlobalVariables.redColor,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 8),
 
@@ -451,8 +453,8 @@ class _SearchItemCard extends StatelessWidget {
                   if (item.mileage != null && item.transmission == null)
                     Row(
                       children: [
-                        Icon(Icons.speed, size: 14, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
+                            Icon(Icons.speed, size: 20, color: Colors.grey[600]),
+                            const SizedBox(width: 8),
                         Text(
                           "${formatNumber(shortenerRequired: true, number: int.tryParse(item.mileage!) ?? 0)} km",
                           style: const TextStyle(

@@ -751,12 +751,42 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    child: CustomImage(
-                      imagePath: getImageUrl(make.image, null),
-                      isAssetImage: false,
-                      isImageBorderRadiusRequired: false,
-                      imageWidth: 56,
-                      imageHeight: 56,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: CachedNetworkImage(
+                        imageUrl: getImageUrl(make.image, null),
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.contain,
+                        placeholder: (context, url) => Container(
+                          width: 56,
+                          height: 56,
+                          color: theme.brightness == Brightness.dark 
+                              ? Colors.grey[700] 
+                              : Colors.grey[100],
+                          child: Center(
+                            child: Icon(
+                              Icons.business,
+                              size: 24,
+                              color: theme.iconTheme.color,
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          width: 56,
+                          height: 56,
+                          color: theme.brightness == Brightness.dark 
+                              ? Colors.grey[700] 
+                              : Colors.grey[100],
+                          child: Center(
+                            child: Icon(
+                              Icons.error_outline,
+                              size: 24,
+                              color: theme.iconTheme.color,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 );
@@ -1643,12 +1673,16 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ColorGlobalVariables.redColor,
+                      Expanded(
+                        child: Text(
+                          '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: ColorGlobalVariables.redColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (widget.recommended.mileage != null)
@@ -1676,20 +1710,20 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     children: [
                       if (brandImage != null && !brandImage.contains('assets/'))
                         SizedBox(
-                          width: 24,
-                          height: 24,
+                          width: 32,
+                          height: 32,
                           child: CachedNetworkImage(
                             imageUrl: getImageUrl(brandImage, null),
                             fit: BoxFit.contain,
                             errorWidget: (context, url, error) => Icon(
                               Icons.business,
-                              size: 16,
+                              size: 20,
                               color: theme.iconTheme.color,
                             ),
                           ),
                         )
                       else
-                        SizedBox(width: 24),
+                        SizedBox(width: 32),
                       
                       if (widget.recommended.transmission != null)
                         Row(

@@ -884,8 +884,8 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                 if (_getMileage() != null)
                   Row(
                     children: [
-                      Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
-                      SizedBox(width: 4),
+                      Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
+                      SizedBox(width: 8),
                       Text(
                         "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
                         style: TextStyle(

@@ -1321,8 +1321,18 @@ class _EditItemPageState extends State<EditItemPage> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 56,
+        _buildDynamicHeightPriceField(),
+      ],
+    );
+  }
+
+  Widget _buildDynamicHeightPriceField() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          height: _calculatePriceFieldHeight(_priceController.text, constraints.maxWidth),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: _getInputBackgroundColor(),
@@ -1354,6 +1364,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 child: TextFormField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
+                  maxLines: null,
                   style: TextStyle(
                     color: _getTextColor(),
                     fontSize: 15,
@@ -1365,6 +1376,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     hintStyle: TextStyle(
                       color: _getHintTextColor(),
                     ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -1375,13 +1387,54 @@ class _EditItemPageState extends State<EditItemPage> {
                     }
                     return null;
                   },
+                  onChanged: (value) {
+                    // Trigger rebuild to update height
+                    setState(() {});
+                  },
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        );
+      },
     );
+  }
+
+  double _calculatePriceFieldHeight(String text, double maxWidth) {
+    if (text.isEmpty) {
+      return 56.0; // Default height
+    }
+
+    // Calculate approximate text width
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: _getTextColor(),
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    );
+    
+    textPainter.layout(maxWidth: double.infinity);
+
+    // Available width for text (total width - currency symbol - padding - margins)
+    final availableWidth = maxWidth - 60 - 40; // currency symbol area - padding
+    
+    // If text width exceeds available space, increase height
+    if (textPainter.width > availableWidth) {
+      // Calculate how many lines we need
+      final linesNeeded = (textPainter.width / availableWidth).ceil();
+      final newHeight = 56.0 + ((linesNeeded - 1) * 20.0); // Add 20px per extra line
+      
+      // Cap the maximum height
+      return newHeight.clamp(56.0, 120.0);
+    }
+    
+    return 56.0; // Default height if text fits
   }
 
   Widget _buildBeautifulFeatures() {

@@ -8,8 +8,10 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.da
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/makeAndModelModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:get/get.dart';
@@ -31,12 +33,21 @@ class AllMakesPage extends StatefulWidget {
 class _AllMakesPageState extends State<AllMakesPage> {
   final TextEditingController _searchEditingController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
+  
   late String _type;
   late List<TrendingMake> _brands;
   late List<TrendingMake> _filteredBrands;
   bool _isSearching = false;
   bool _showShimmer = true;
   String _currentLayout = 'grid';
+  
+  // Pagination state variables
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+  bool _hasMoreMakes = true;
+  bool _isInitialized = false;
+  
   final Logger logger = Logger();
 
   // Speech variables - Commented out since flutter_speech is problematic
@@ -57,6 +68,8 @@ class _AllMakesPageState extends State<AllMakesPage> {
     // Listen for keyboard visibility changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setupKeyboardListeners();
+      _setupScrollListener();
+      _initializePagination();
     });
   }
 
@@ -137,6 +150,109 @@ class _AllMakesPageState extends State<AllMakesPage> {
     if (newKeyboardVisible != _keyboardVisible) {
       setState(() {
         _keyboardVisible = newKeyboardVisible;
+      });
+    }
+  }
+
+  void _setupScrollListener() {
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _initializePagination() {
+    // Initialize pagination by fetching the first page if not already loaded
+    if (!_isInitialized && _brands.isEmpty) {
+      _isInitialized = true;
+      _loadMoreMakes();
+    }
+  }
+
+  void _scrollListener() {
+    if (_isLoadingMore || !_hasMoreMakes) return;
+
+    // Check if we're near the bottom of the list
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    final threshold = 100.0; // Load more when 100px from bottom
+
+    if (currentScroll >= maxScroll - threshold) {
+      _loadMoreMakes();
+    }
+  }
+
+  Future<void> _loadMoreMakes() async {
+    if (_isLoadingMore || !_hasMoreMakes) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    try {
+      final makeAndModelProvider = Provider.of<MakeAndModelProvider>(context, listen: false);
+      
+      // Fetch next page of makes using the public method
+      final response = await makeAndModelProvider.fetchMakesWithModelsForPagination();
+      
+      // Convert MakeAndModelResponse to TrendingMake list
+      final newMakes = response.data.map((vehicleMake) {
+        return TrendingMake(
+          id: vehicleMake.id,
+          userId: vehicleMake.userId?.toString(),
+          name: vehicleMake.name,
+          slug: vehicleMake.slug,
+          image: vehicleMake.image,
+          createdAt: vehicleMake.createdAt.toIso8601String(),
+          updatedAt: vehicleMake.updatedAt.toIso8601String(),
+          itemsCount: 0, // We don't have this info from MakeAndModelResponse
+          brandModels: vehicleMake.models.map((model) {
+            return BrandModel(
+              id: model.id,
+              brandId: model.makeId,
+              name: model.name,
+              slug: model.slug,
+              createdAt: model.createdAt.toIso8601String(),
+              updatedAt: model.updatedAt.toIso8601String(),
+            );
+          }).toList(),
+        );
+      }).toList();
+
+      if (newMakes.isNotEmpty) {
+        // Filter out any duplicates that might already exist in our list
+        final existingBrandIds = _brands.map((brand) => brand.id).toSet();
+        final uniqueNewMakes = newMakes.where((make) => !existingBrandIds.contains(make.id)).toList();
+        
+        if (uniqueNewMakes.isNotEmpty) {
+          setState(() {
+            _brands.addAll(uniqueNewMakes);
+            _filteredBrands = List.from(_brands);
+            _currentPage++;
+            
+            // Check if there are more pages
+            _hasMoreMakes = response.meta.currentPage < response.meta.lastPage;
+          });
+          
+          logger.i('✅ Loaded ${uniqueNewMakes.length} new makes. Total: ${_brands.length}');
+        } else {
+          setState(() {
+            // No new makes found, might be at the end
+            _hasMoreMakes = false;
+          });
+          logger.w('⚠️ No new makes found, might be at the end of pagination');
+        }
+      } else {
+        setState(() {
+          _hasMoreMakes = false;
+        });
+        logger.w('⚠️ No more makes available');
+      }
+    } catch (e) {
+      logger.e('❌ Failed to load more makes: $e');
+      setState(() {
+        _hasMoreMakes = false;
+      });
+    } finally {
+      setState(() {
+        _isLoadingMore = false;
       });
     }
   }
@@ -563,29 +679,47 @@ class _AllMakesPageState extends State<AllMakesPage> {
   }
 
   Widget _buildGridView() {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        childAspectRatio: 0.85,
-      ),
-      itemCount: _filteredBrands.length,
-      itemBuilder: (context, index) {
-        final brand = _filteredBrands[index];
-        return _buildBrandGridCard(brand, context);
-      },
+    return Stack(
+      children: [
+        GridView.builder(
+          controller: _scrollController,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+            childAspectRatio: 0.85,
+          ),
+          itemCount: _filteredBrands.length,
+          itemBuilder: (context, index) {
+            final brand = _filteredBrands[index];
+            return _buildBrandGridCard(brand, context);
+          },
+        ),
+        if (_isLoadingMore)
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: _buildLoadingIndicator(),
+          ),
+      ],
     );
   }
 
   Widget _buildListView() {
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      itemCount: _filteredBrands.length,
+      itemCount: _filteredBrands.length + (_isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
-        final brand = _filteredBrands[index];
-        return _buildBrandListCard(brand, context);
+        if (index < _filteredBrands.length) {
+          final brand = _filteredBrands[index];
+          return _buildBrandListCard(brand, context);
+        } else {
+          // Loading indicator at the bottom
+          return _buildLoadingIndicator();
+        }
       },
     );
   }
@@ -913,6 +1047,34 @@ class _AllMakesPageState extends State<AllMakesPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: ColorGlobalVariables.brownColor,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Text(
+            'Loading more brands...',
+            style: TextStyle(
+              fontSize: 14,
+              color: _getSecondaryTextColor(context),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

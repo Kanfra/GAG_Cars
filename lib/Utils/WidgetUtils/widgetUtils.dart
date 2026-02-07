@@ -21,11 +21,13 @@ String formatNumber({
     if(number >= 1000000){
       return '${NumberFormat("#,##0").format((number / 1000000))}M';
     }
-    else if(number >= 1000){
+    else if(number >= 100000){
+      // For 6-digit numbers and above, use K format
       return '${NumberFormat("#,##0").format(number / 1000)}K';
     }
     else {
-      return NumberFormat.decimalPattern().format(number);
+      // For numbers less than 100,000 (6 digits), show full number with commas
+      return NumberFormat("#,##0").format(number);
     }
   }
   return NumberFormat("#,##0.00").format(number);

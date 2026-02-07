@@ -739,21 +739,25 @@ class _ListingItemGridWidget extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${userProvider.user?.countryCurrencySymbol} ${_formatNumber(price)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: isLiveTab 
-                            ? ColorGlobalVariables.redColor 
-                            : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                      Expanded(
+                        child: Text(
+                          '${userProvider.user?.countryCurrencySymbol} ${_formatNumber(price)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isLiveTab 
+                              ? ColorGlobalVariables.redColor 
+                              : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (mileage > 0)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
-                            const SizedBox(width: 4),
+                            Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
+                            const SizedBox(width: 8),
                             Text(
                               "${_formatNumber(mileage)} km",
                               style: TextStyle(

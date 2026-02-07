@@ -915,19 +915,23 @@ class _BrandItemCardState extends State<BrandItemCard>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        formattedPrice,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                      Expanded(
+                        child: Text(
+                          formattedPrice,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (widget.item.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
-                            const SizedBox(width: 4),
+                            Icon(Icons.speed, size: 20, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
+                            const SizedBox(width: 8),
                             Text(
                               "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
                               style: TextStyle(
