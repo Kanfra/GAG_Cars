@@ -457,20 +457,6 @@ class _SearchItemCard extends StatelessWidget {
                     ],
                   ),
 
-<<<<<<< Updated upstream
-                  // Price
-                  Text(
-                    'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(item.price ?? '0') ?? 0)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: ColorGlobalVariables.redColor,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-=======
->>>>>>> Stashed changes
                   const SizedBox(height: 8),
 
                   // Price and Mileage - Enhanced with tooltip and formatting
@@ -630,25 +616,6 @@ class _SearchItemCard extends StatelessWidget {
                         ),
                     ],
                   ),
-<<<<<<< Updated upstream
-
-                  // Mileage (if available and space permits)
-                  if (item.mileage != null && item.transmission == null)
-                    Row(
-                      children: [
-                            Icon(Icons.speed, size: 20, color: Colors.grey[600]),
-                            const SizedBox(width: 8),
-                        Text(
-                          "${formatNumber(shortenerRequired: true, number: int.tryParse(item.mileage!) ?? 0)} km",
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-=======
->>>>>>> Stashed changes
                 ],
               ),
             ),

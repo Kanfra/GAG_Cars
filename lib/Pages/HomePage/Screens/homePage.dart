@@ -751,42 +751,12 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: CachedNetworkImage(
-                        imageUrl: getImageUrl(make.image, null),
-                        width: 56,
-                        height: 56,
-                        fit: BoxFit.contain,
-                        placeholder: (context, url) => Container(
-                          width: 56,
-                          height: 56,
-                          color: theme.brightness == Brightness.dark 
-                              ? Colors.grey[700] 
-                              : Colors.grey[100],
-                          child: Center(
-                            child: Icon(
-                              Icons.business,
-                              size: 24,
-                              color: theme.iconTheme.color,
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          width: 56,
-                          height: 56,
-                          color: theme.brightness == Brightness.dark 
-                              ? Colors.grey[700] 
-                              : Colors.grey[100],
-                          child: Center(
-                            child: Icon(
-                              Icons.error_outline,
-                              size: 24,
-                              color: theme.iconTheme.color,
-                            ),
-                          ),
-                        ),
-                      ),
+                    child: CustomImage(
+                      imagePath: getImageUrl(make.image, null),
+                      isAssetImage: false,
+                      isImageBorderRadiusRequired: false,
+                      imageWidth: 56,
+                      imageHeight: 56,
                     ),
                   ),
                 );
@@ -1717,17 +1687,6 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-<<<<<<< Updated upstream
-                        child: Text(
-                          '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: ColorGlobalVariables.redColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-=======
                         child: Tooltip(
                           message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
                           preferBelow: false,
@@ -1759,7 +1718,6 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
->>>>>>> Stashed changes
                         ),
                       ),
                       SizedBox(width: 5),
@@ -1788,20 +1746,20 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     children: [
                       if (brandImage != null && !brandImage.contains('assets/'))
                         SizedBox(
-                          width: 32,
-                          height: 32,
+                          width: 24,
+                          height: 24,
                           child: CachedNetworkImage(
                             imageUrl: getImageUrl(brandImage, null),
                             fit: BoxFit.contain,
                             errorWidget: (context, url, error) => Icon(
                               Icons.business,
-                              size: 20,
+                              size: 16,
                               color: theme.iconTheme.color,
                             ),
                           ),
                         )
                       else
-                        SizedBox(width: 32),
+                        SizedBox(width: 24),
                       
                       SizedBox(width: 4), // 4px spacing between logo and settings
                       

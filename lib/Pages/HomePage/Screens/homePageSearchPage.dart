@@ -857,21 +857,6 @@ class _SearchResultItemWidget extends StatelessWidget {
                           ],
                         ),
                       if (searchItem.mileage != null)
-<<<<<<< Updated upstream
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.speed, 
-                              size: 20, 
-                              color: isDarkMode ? Colors.white60 : Colors.grey[600]
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "${_formatMileage(searchItem.mileage!)} km",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
-=======
                         Tooltip(
                           message: '${searchItem.mileage} km',
                           preferBelow: false,
@@ -895,7 +880,6 @@ class _SearchResultItemWidget extends StatelessWidget {
                                 Icons.speed, 
                                 size: 14, 
                                 color: isDarkMode ? Colors.white60 : Colors.grey[600]
->>>>>>> Stashed changes
                               ),
                               SizedBox(width: 4),
                               Text(

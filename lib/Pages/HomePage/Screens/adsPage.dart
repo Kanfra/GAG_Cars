@@ -628,27 +628,9 @@ class _ListingItemGridWidget extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: ColorGlobalVariables.redColor,
                       ),
-<<<<<<< Updated upstream
-                      Row(
-                        children: [
-                          Icon(Icons.calendar_today, size: 20, color: theme.iconTheme.color),
-                          SizedBox(width: 8),
-                          Text(
-                            // FIXED: Null-safe year
-                            listing.year ?? 'No Year',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: theme.textTheme.bodyMedium?.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-=======
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
->>>>>>> Stashed changes
                   ),
 
                   SizedBox(height: 10), // Reduced from 12 to 10

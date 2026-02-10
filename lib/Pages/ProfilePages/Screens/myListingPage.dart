@@ -803,19 +803,6 @@ class _ListingItemGridWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-<<<<<<< Updated upstream
-                        child: Text(
-                          '${userProvider.user?.countryCurrencySymbol} ${_formatNumber(price)}',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isLiveTab 
-                              ? ColorGlobalVariables.redColor 
-                              : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-=======
                         child: Tooltip(
                           message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
                           preferBelow: false,
@@ -849,20 +836,14 @@ class _ListingItemGridWidget extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
->>>>>>> Stashed changes
                         ),
                       ),
                       SizedBox(width: 5), // 5px spacing between price and mileage
                       if (mileage > 0)
                         Row(
                           children: [
-<<<<<<< Updated upstream
-                            Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
-                            const SizedBox(width: 8),
-=======
                             Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
                             SizedBox(width: 4), // Reduced spacing between icon and text
->>>>>>> Stashed changes
                             Text(
                               "${_formatNumber(mileage)} km",
                               style: TextStyle(
