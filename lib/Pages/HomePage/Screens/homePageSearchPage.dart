@@ -518,8 +518,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
         Expanded(
           child: GridView.builder(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 220,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
               childAspectRatio: 0.72,
@@ -857,6 +857,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                           ],
                         ),
                       if (searchItem.mileage != null)
+<<<<<<< Updated upstream
                         Row(
                           children: [
                             Icon(
@@ -870,9 +871,42 @@ class _SearchResultItemWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 color: isDarkMode ? Colors.white60 : Colors.grey[600],
-                              ),
+=======
+                        Tooltip(
+                          message: '${searchItem.mileage} km',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!,
                             ),
-                          ],
+                          ),
+                          textStyle: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.speed, 
+                                size: 14, 
+                                color: isDarkMode ? Colors.white60 : Colors.grey[600]
+>>>>>>> Stashed changes
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                "${_formatMileage(searchItem.mileage!)} km",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                     ],
                   ),
@@ -962,13 +996,18 @@ class _SearchResultItemWidget extends StatelessWidget {
   String _formatPrice(String? price) {
     if (price == null || price.isEmpty) return '0';
     try {
-      final number = int.parse(price);
-      if (number >= 1000000) {
-        return '${(number / 1000000).toStringAsFixed(1)}M';
-      } else if (number >= 1000) {
-        return '${(number / 1000).toStringAsFixed(1)}K';
+      final int priceValue = int.parse(price);
+      final String priceStr = priceValue.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
       }
-      return number.toString();
+
+      return formattedPrice.toString();
     } catch (e) {
       return price;
     }

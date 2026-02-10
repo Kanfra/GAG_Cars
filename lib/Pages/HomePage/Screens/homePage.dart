@@ -1477,6 +1477,26 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
     super.dispose();
   }
 
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -1646,17 +1666,40 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          widget.recommended.name ?? 'Unnamed Vehicle',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: theme.textTheme.titleLarge?.color,
+                        child: Tooltip(
+                          message: widget.recommended.name ?? 'Unnamed Vehicle',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            widget.recommended.name ?? 'Unnamed Vehicle',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: theme.textTheme.titleLarge?.color,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                      SizedBox(width: 5),
                       Text(
                         widget.recommended.condition ?? 'Used',
                         style: TextStyle(
@@ -1674,6 +1717,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
+<<<<<<< Updated upstream
                         child: Text(
                           '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
                           style: TextStyle(
@@ -1683,8 +1727,42 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+=======
+                        child: Tooltip(
+                          message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorGlobalVariables.redColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+>>>>>>> Stashed changes
                         ),
                       ),
+                      SizedBox(width: 5),
                       if (widget.recommended.mileage != null)
                         Row(
                           children: [
@@ -1725,11 +1803,13 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                       else
                         SizedBox(width: 32),
                       
+                      SizedBox(width: 4), // 4px spacing between logo and settings
+                      
                       if (widget.recommended.transmission != null)
                         Row(
                           children: [
                             Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
-                            SizedBox(width: 4),
+                            SizedBox(width: 2), // Reduced spacing between icon and text
                             Text(
                               widget.recommended.transmission!,
                               style: TextStyle(
@@ -1740,21 +1820,45 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                           ],
                         ),
                       
+                      SizedBox(width: 4), // 4px spacing between settings and location
+                      
                       if (widget.recommended.location != null)
-                        Flexible(
+                        Expanded(
                           child: Row(
                             children: [
                               Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
-                              SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  widget.recommended.location!,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: theme.textTheme.bodyMedium?.color,
+                              SizedBox(width: 2), // Reduced spacing between icon and text
+                              Expanded(
+                                child: Tooltip(
+                                  message: widget.recommended.location!,
+                                  preferBelow: false,
+                                  margin: EdgeInsets.all(8),
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  textStyle: TextStyle(
+                                    color: theme.textTheme.titleLarge?.color,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  child: Text(
+                                    widget.recommended.location!,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1981,6 +2085,26 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
     super.dispose();
   }
 
+  // Helper method to format price with commas (same as grid view)
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -2168,15 +2292,37 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorGlobalVariables.redColor,
+                          child: Tooltip(
+                            message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                            preferBelow: false,
+                            margin: EdgeInsets.all(8),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            textStyle: TextStyle(
+                              color: theme.textTheme.titleLarge?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: ColorGlobalVariables.redColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -2227,14 +2373,14 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           ),
                         
                         if (widget.recommended.transmission != null)
-                          SizedBox(width: 8),
+                          SizedBox(width: 4), // 4px spacing between mileage and transmission
                         
                         if (widget.recommended.transmission != null)
                           Expanded(
                             child: Row(
                               children: [
                                 Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
-                                SizedBox(width: 2),
+                                SizedBox(width: 2), // Reduced spacing between icon and text
                                 Expanded(
                                   child: Text(
                                     widget.recommended.transmission!,
@@ -2262,16 +2408,38 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                             child: Row(
                               children: [
                                 Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
-                                SizedBox(width: 2),
+                                SizedBox(width: 2), // Reduced spacing between icon and text
                                 Expanded(
-                                  child: Text(
-                                    widget.recommended.location!,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: theme.textTheme.bodyMedium?.color,
+                                  child: Tooltip(
+                                    message: widget.recommended.location!,
+                                    preferBelow: false,
+                                    margin: EdgeInsets.all(8),
+                                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: theme.cardColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 8,
+                                          offset: Offset(0, 4),
+                                        ),
+                                      ],
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                    textStyle: TextStyle(
+                                      color: theme.textTheme.titleLarge?.color,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    child: Text(
+                                      widget.recommended.location!,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: theme.textTheme.bodyMedium?.color,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                               ],

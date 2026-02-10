@@ -331,6 +331,26 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
       : _buildListView(listings, provider, isLiveTab: isLiveTab, theme: theme);
   }
 
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   Widget _buildListView(List<MyListing> listings, MyListingsProvider provider, {required bool isLiveTab, required ThemeData theme}) {
     return CustomScrollView(
       controller: isLiveTab ? _scrollController : null,
@@ -569,6 +589,26 @@ class _ListingItemGridWidget extends StatelessWidget {
     required this.isLiveTab,
   });
 
+  // Helper method to format price with commas - moved to widget class
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -699,30 +739,53 @@ class _ListingItemGridWidget extends StatelessWidget {
               ],
             ),
 
-            // Content Section - Consistent with HomePage organization
+            // Content Section - Enhanced with tooltips and improved layout
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title and Condition - Consistent with HomePage
+                  // Title and Condition - Enhanced with tooltip and spacing
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          listing.name.isNotEmpty ? listing.name : 'Unnamed Vehicle',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isLiveTab 
-                              ? theme.textTheme.titleLarge?.color
-                              : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        child: Tooltip(
+                          message: listing.name.isNotEmpty ? listing.name : 'Unnamed Vehicle',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            listing.name.isNotEmpty ? listing.name : 'Unnamed Vehicle',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isLiveTab 
+                                ? theme.textTheme.titleLarge?.color
+                                : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                      SizedBox(width: 5), // 5px spacing between vehicle name and condition type
                       Text(
                         condition,
                         style: TextStyle(
@@ -735,11 +798,12 @@ class _ListingItemGridWidget extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  // Price and Mileage - Consistent with HomePage
+                  // Price and Mileage - Enhanced with tooltip and formatting
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
+<<<<<<< Updated upstream
                         child: Text(
                           '${userProvider.user?.countryCurrencySymbol} ${_formatNumber(price)}',
                           style: TextStyle(
@@ -751,13 +815,54 @@ class _ListingItemGridWidget extends StatelessWidget {
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+=======
+                        child: Tooltip(
+                          message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isLiveTab 
+                                ? ColorGlobalVariables.redColor 
+                                : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+>>>>>>> Stashed changes
                         ),
                       ),
+                      SizedBox(width: 5), // 5px spacing between price and mileage
                       if (mileage > 0)
                         Row(
                           children: [
+<<<<<<< Updated upstream
                             Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
                             const SizedBox(width: 8),
+=======
+                            Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
+                            SizedBox(width: 4), // Reduced spacing between icon and text
+>>>>>>> Stashed changes
                             Text(
                               "${_formatNumber(mileage)} km",
                               style: TextStyle(
@@ -772,16 +877,16 @@ class _ListingItemGridWidget extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Transmission and Location - Consistent with HomePage (without brand image)
+                  // Transmission and Location - Enhanced with spacing and location tooltip
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Transmission - Consistent with HomePage
+                      // Transmission - Enhanced with spacing
                       if (transmission.isNotEmpty)
                         Row(
                           children: [
                             Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 2), // Reduced spacing between icon and text
                             Text(
                               transmission,
                               style: TextStyle(
@@ -792,22 +897,46 @@ class _ListingItemGridWidget extends StatelessWidget {
                           ],
                         ),
                       
-                      // Location - Consistent with HomePage
+                      SizedBox(width: 4), // 4px spacing between transmission and location
+
+                      // Location - Enhanced with tooltip
                       if (location.isNotEmpty && location != "Unknown")
-                        Flexible(
+                        Expanded(
                           child: Row(
                             children: [
                               Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  location,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: theme.textTheme.bodyMedium?.color,
+                              SizedBox(width: 2), // Reduced spacing between icon and text
+                              Expanded(
+                                child: Tooltip(
+                                  message: location,
+                                  preferBelow: false,
+                                  margin: EdgeInsets.all(8),
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  textStyle: TextStyle(
+                                    color: theme.textTheme.titleLarge?.color,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  child: Text(
+                                    location,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
                             ],

@@ -83,6 +83,26 @@ class _AdsPageState extends State<AdsPage> {
     );
   }
 
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
@@ -407,6 +427,26 @@ class _ListingItemGridWidget extends StatelessWidget {
     required this.onTap,
   });
 
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -511,18 +551,41 @@ class _ListingItemGridWidget extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          // FIXED: Null-safe name
-                          listing.name ?? 'No Name',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: theme.textTheme.titleLarge?.color,
+                        child: Tooltip(
+                          message: listing.name ?? 'No Name',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            // FIXED: Null-safe name
+                            listing.name ?? 'No Name',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: theme.textTheme.titleLarge?.color,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                      SizedBox(width: 5), // 5px spacing between name and category
                       Text(
                         // FIXED: Null-safe category name
                         listing.category?.name ?? 'No Category',
@@ -534,21 +597,38 @@ class _ListingItemGridWidget extends StatelessWidget {
                     ],
                   ),
 
-                  SizedBox(height: 8),
+                  SizedBox(height: 5), // 5px spacing between name and category
 
-                  // Price and Year
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        // FIXED: Null-safe price parsing
-                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(listing.price ?? '0') ?? 0)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ColorGlobalVariables.redColor,
+                  // Price with Tooltip
+                  Tooltip(
+                    message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                    preferBelow: false,
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: theme.cardColor,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
                         ),
+                      ],
+                    ),
+                    textStyle: TextStyle(
+                      color: theme.textTheme.titleLarge?.color,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    child: Text(
+                      '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: ColorGlobalVariables.redColor,
                       ),
+<<<<<<< Updated upstream
                       Row(
                         children: [
                           Icon(Icons.calendar_today, size: 20, color: theme.iconTheme.color),
@@ -564,11 +644,16 @@ class _ListingItemGridWidget extends StatelessWidget {
                         ],
                       ),
                     ],
+=======
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+>>>>>>> Stashed changes
                   ),
 
-                  SizedBox(height: 12),
+                  SizedBox(height: 10), // Reduced from 12 to 10
 
-                  // Location and Steering
+                  // Location with Tooltip
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -578,15 +663,37 @@ class _ListingItemGridWidget extends StatelessWidget {
                             Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
                             SizedBox(width: 4),
                             Expanded(
-                              child: Text(
-                                // FIXED: Null-safe location
-                                listing.location ?? 'No Location',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: theme.textTheme.bodyMedium?.color,
+                              child: Tooltip(
+                                message: listing.location ?? 'No Location',
+                                preferBelow: false,
+                                margin: EdgeInsets.all(8),
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                textStyle: TextStyle(
+                                  color: theme.textTheme.titleLarge?.color,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                child: Text(
+                                  // FIXED: Null-safe location
+                                  listing.location ?? 'No Location',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                           ],
@@ -595,7 +702,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                     ],
                   ),
 
-                  SizedBox(height: 8),
+                  SizedBox(height: 6), // Reduced from 8 to 6
 
                   // Created Date
                   Row(
@@ -698,6 +805,26 @@ class _ListingItemListWidget extends StatelessWidget {
     required this.onTap,
   });
 
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -789,16 +916,40 @@ class _ListingItemListWidget extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          // FIXED: Null-safe name
-                          listing.name ?? 'No Name',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: theme.textTheme.titleLarge?.color,
+                        Expanded(
+                          child: Tooltip(
+                            message: listing.name ?? 'No Name',
+                            preferBelow: false,
+                            margin: EdgeInsets.all(8),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            textStyle: TextStyle(
+                              color: theme.textTheme.titleLarge?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              // FIXED: Null-safe name
+                              listing.name ?? 'No Name',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: theme.textTheme.titleLarge?.color,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 2),
                         Text(
@@ -812,139 +963,106 @@ class _ListingItemListWidget extends StatelessWidget {
                       ],
                     ),
 
-                    SizedBox(height: 8),
+                    SizedBox(height: 5), // 5px spacing between name and category
 
-                    // Price and Status
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            // FIXED: Null-safe price parsing
-                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(listing.price ?? '0') ?? 0)}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorGlobalVariables.redColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    // Price with Tooltip
+                    Tooltip(
+                      message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                      preferBelow: false,
+                      margin: EdgeInsets.all(8),
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
                           ),
+                        ],
+                      ),
+                      textStyle: TextStyle(
+                        color: theme.textTheme.titleLarge?.color,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      child: Text(
+                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: ColorGlobalVariables.redColor,
                         ),
-                        // SizedBox(width: 8),
-                        // Container(
-                        //   padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                        //   decoration: BoxDecoration(
-                        //     color: theme.brightness == Brightness.dark 
-                        //         ? Colors.grey[700] 
-                        //         : Colors.grey[100],
-                        //     borderRadius: BorderRadius.circular(6),
-                        //   ),
-                        //   child: Text(
-                        //     listing.status ?? 'Active',
-                        //     style: TextStyle(
-                        //       fontSize: 10,
-                        //       color: theme.textTheme.bodyMedium?.color,
-                        //       fontWeight: FontWeight.w500,
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
 
                     SizedBox(height: 6),
 
-                    // Details Row
+                    // Location with Tooltip
                     Row(
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Icon(Icons.calendar_today, size: 12, color: theme.iconTheme.color),
-                              SizedBox(width: 2),
-                              Expanded(
-                                child: Text(
-                                  // FIXED: Null-safe year
-                                  listing.year ?? 'No Year',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: theme.textTheme.bodyMedium?.color,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        // Expanded(
-                        //   child: Row(
-                        //     children: [
-                        //       Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
-                        //       SizedBox(width: 2),
-                        //       Expanded(
-                        //         child: Text(
-                        //           // FIXED: Null-safe steer position
-                        //           listing.steerPosition ?? 'Unknown',
-                        //           style: TextStyle(
-                        //             fontSize: 10,
-                        //             color: theme.textTheme.bodyMedium?.color,
-                        //           ),
-                        //           maxLines: 1,
-                        //           overflow: TextOverflow.ellipsis,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                      ],
-                    ),
-
-                    SizedBox(height: 4),
-
-                    // Location and Date
-                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: Row(
                             children: [
                               Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
-                              SizedBox(width: 2),
+                              SizedBox(width: 4), // 4px spacing between icon and text
                               Expanded(
-                                child: Text(
-                                  // FIXED: Null-safe location
-                                  listing.location ?? 'No Location',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: theme.textTheme.bodyMedium?.color,
+                                child: Tooltip(
+                                  message: listing.location ?? 'No Location',
+                                  preferBelow: false,
+                                  margin: EdgeInsets.all(8),
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  textStyle: TextStyle(
+                                    color: theme.textTheme.titleLarge?.color,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  child: Text(
+                                    // FIXED: Null-safe location
+                                    listing.location ?? 'No Location',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Icon(Icons.access_time, size: 12, color: theme.iconTheme.color),
-                              SizedBox(width: 2),
-                              Expanded(
-                                child: Text(
-                                  // FIXED: Null-safe date
-                                  _formatDate(listing.createdAt ?? DateTime.now()),
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: theme.textTheme.bodySmall?.color,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                      ],
+                    ),
+
+                    SizedBox(height: 4),
+
+                    // Created Date
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, size: 12, color: theme.iconTheme.color),
+                        SizedBox(width: 4),
+                        Text(
+                          // FIXED: Null-safe date
+                          _formatDate(listing.createdAt ?? DateTime.now()),
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: theme.textTheme.bodySmall?.color,
                           ),
                         ),
                       ],

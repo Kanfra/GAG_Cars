@@ -2902,6 +2902,26 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
     );
   }
 
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -2909,6 +2929,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
     final firstImage = widget.item.images?.isNotEmpty == true
         ? widget.item.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final brandImage = widget.item.brand?.image;
 
     return Container(
       decoration: BoxDecoration(
@@ -2916,48 +2937,52 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Image Section
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 child: Container(
                   height: 120,
                   width: double.infinity,
-                  color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
+                  color: theme.brightness == Brightness.dark 
+                      ? Colors.grey[800] 
+                      : Colors.grey[100],
                   child: _buildItemImage(firstImage, theme),
                 ),
               ),
               
-              if (widget.item.condition != null)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      widget.item.condition!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
+              // CATEGORY BADGE
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    widget.item.category?.name ?? 'Car',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
+              ),
               
+              // Animated Wishlist Button
               Positioned(
                 bottom: 8,
                 right: 8,
@@ -2966,21 +2991,20 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     if (_isLoading) return;
                     _toggleLike();
                   },
-                  behavior: HitTestBehavior.opaque,
                   child: MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: ScaleTransition(
                       scale: _scaleAnimation,
                       child: Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: theme.cardColor,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black12,
                               blurRadius: 4,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -3014,29 +3038,54 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
               ),
             ],
           ),
-    
+
+          // Content Section
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Title and Condition
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text(
-                        widget.item.name ?? 'Unnamed Item',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: theme.textTheme.titleLarge?.color,
+                      child: Tooltip(
+                        message: widget.item.name ?? 'Unnamed Vehicle',
+                        preferBelow: false,
+                        margin: EdgeInsets.all(8),
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        textStyle: TextStyle(
+                          color: theme.textTheme.titleLarge?.color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        child: Text(
+                          widget.item.name ?? 'Unnamed Vehicle',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
+                    SizedBox(width: 5),
                     Text(
-                      widget.item.year ?? '',
+                      widget.item.condition ?? 'Used',
                       style: TextStyle(
                         fontSize: 12,
                         color: theme.textTheme.bodyMedium?.color,
@@ -3044,27 +3093,60 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     ),
                   ],
                 ),
-    
-                const SizedBox(height: 8),
-    
+
+                SizedBox(height: 8),
+
+                // Price and Mileage
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                    Expanded(
+                      child: Tooltip(
+                        message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.item.price ?? '0')}',
+                        preferBelow: false,
+                        margin: EdgeInsets.all(8),
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        textStyle: TextStyle(
+                          color: theme.textTheme.titleLarge?.color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        child: Text(
+                          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.item.price ?? '0')}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: ColorGlobalVariables.redColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
+                    SizedBox(width: 5),
                     if (widget.item.mileage != null)
                       Row(
                         children: [
+<<<<<<< Updated upstream
                             Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
                             const SizedBox(width: 8),
+=======
+                          Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
+                          SizedBox(width: 4),
+>>>>>>> Stashed changes
                           Text(
-                            "${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.mileage!) ?? 0)} km",
+                            "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
                             style: TextStyle(
                               fontSize: 12,
                               color: theme.textTheme.bodyMedium?.color,
@@ -3074,19 +3156,37 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                       ),
                   ],
                 ),
-    
-                const SizedBox(height: 12),
-    
+
+                SizedBox(height: 12),
+
+                // Brand and Details
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 24),
+                    if (brandImage != null && !brandImage.contains('assets/'))
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CachedNetworkImage(
+                          imageUrl: getImageUrl(brandImage, null),
+                          fit: BoxFit.contain,
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.business,
+                            size: 16,
+                            color: theme.iconTheme.color,
+                          ),
+                        ),
+                      )
+                    else
+                      SizedBox(width: 24),
+                    
+                    SizedBox(width: 4), // 4px spacing between logo and settings
                     
                     if (widget.item.transmission != null)
                       Row(
                         children: [
                           Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 2), // Reduced spacing between icon and text
                           Text(
                             widget.item.transmission!,
                             style: TextStyle(
@@ -3097,28 +3197,52 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                         ],
                       ),
                     
+                    SizedBox(width: 4), // 4px spacing between settings and location
+                    
                     if (widget.item.location != null)
-                      Flexible(
+                      Expanded(
                         child: Row(
                           children: [
                             Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                widget.item.location!,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: theme.textTheme.bodyMedium?.color,
+                            SizedBox(width: 2), // Reduced spacing between icon and text
+                            Expanded(
+                              child: Tooltip(
+                                message: widget.item.location!,
+                                preferBelow: false,
+                                margin: EdgeInsets.all(8),
+                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 8,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                textStyle: TextStyle(
+                                  color: theme.textTheme.titleLarge?.color,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                child: Text(
+                                  widget.item.location!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                   ],
-                ), 
+                ),
               ],
             ),
           ),

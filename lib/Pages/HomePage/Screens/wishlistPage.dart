@@ -873,21 +873,44 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: ColorGlobalVariables.redColor,
+                Expanded(
+                  child: Tooltip(
+                    message: '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
+                    preferBelow: false,
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                      ),
+                    ),
+                    textStyle: TextStyle(
+                      color: theme.textTheme.bodyMedium?.color,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    child: Text(
+                      '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: ColorGlobalVariables.redColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
+                SizedBox(width: 5),
                 if (_getMileage() != null)
                   Row(
                     children: [
                       Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
                       SizedBox(width: 8),
                       Text(
-                        "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
+                        "${_formatMileage(_getMileage()!)} km",
                         style: TextStyle(
                           fontSize: 12,
                           color: theme.textTheme.bodyMedium?.color,
@@ -1069,12 +1092,44 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     try {
       if (_itemData is Map) {
         final price = _itemData['price'] ?? '0';
-        return formatNumber(shortenerRequired: true, number: int.parse(price));
+        return _formatPriceWithCommas(price);
       }
       final price = _itemData?.price ?? '0';
-      return formatNumber(shortenerRequired: true, number: int.parse(price));
+      return _formatPriceWithCommas(price);
     } catch (e) {
       return '0';
+    }
+  }
+
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String? price) {
+    if (price == null || price.isEmpty) return '0';
+    try {
+      final int priceValue = int.parse(price);
+      final String priceStr = priceValue.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return price;
+    }
+  }
+
+  // Helper method to format mileage with k value
+  String _formatMileage(String? mileage) {
+    if (mileage == null || mileage.isEmpty) return '0';
+    try {
+      final int mileageValue = int.parse(mileage);
+      return formatNumber(shortenerRequired: true, number: mileageValue);
+    } catch (e) {
+      return mileage;
     }
   }
 
@@ -1350,15 +1405,33 @@ class _WishlistListItemState extends State<_WishlistListItem>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorGlobalVariables.redColor,
+                          child: Tooltip(
+                            message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
+                            preferBelow: false,
+                            margin: EdgeInsets.all(8),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            textStyle: TextStyle(
+                              color: theme.textTheme.bodyMedium?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: ColorGlobalVariables.redColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/searchProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Utils/WidgetUtils/distanceUtils.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,6 +13,7 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/searchItemModel.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -24,7 +26,7 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
-  
+
   @override
   void initState() {
     super.initState();
@@ -67,7 +69,7 @@ class _SearchPageState extends State<SearchPage> {
         children: [
           // Search Bar
           _buildSearchBar(),
-          
+
           // Content Area
           Expanded(
             child: Consumer<SearchProvider>(
@@ -294,7 +296,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Grid view
         Expanded(
           child: GridView.builder(
@@ -316,6 +318,26 @@ class _SearchPageState extends State<SearchPage> {
       ],
     );
   }
+
+// Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
 }
 
 class _SearchItemCard extends StatelessWidget {
@@ -323,9 +345,30 @@ class _SearchItemCard extends StatelessWidget {
 
   const _SearchItemCard({required this.item});
 
+  // Helper method to format price with commas - moved to widget class
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final firstImage = item.images?.isNotEmpty == true ? item.images!.first : null;
+    final userProvider = Provider.of<UserProvider>(context);
 
     return GestureDetector(
       onTap: () {
@@ -358,28 +401,51 @@ class _SearchItemCard extends StatelessWidget {
               ),
             ),
 
-            // Content section
+            // Content section - Enhanced with tooltips and improved layout
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title and year
+                  // Title and Condition - Enhanced with tooltip and spacing
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          item.name ?? 'Unnamed Vehicle',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                        child: Tooltip(
+                          message: item.name ?? 'Unnamed Vehicle',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          textStyle: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            item.name ?? 'Unnamed Vehicle',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                      SizedBox(width: 5), // 5px spacing between vehicle name and condition type
                       if (item.year != null)
                         Text(
                           item.year!,
@@ -390,8 +456,8 @@ class _SearchItemCard extends StatelessWidget {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 6),
 
+<<<<<<< Updated upstream
                   // Price
                   Text(
                     'GH₵ ${formatNumber(shortenerRequired: true, number: int.tryParse(item.price ?? '0') ?? 0)}',
@@ -403,18 +469,110 @@ class _SearchItemCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+=======
+>>>>>>> Stashed changes
                   const SizedBox(height: 8),
 
-                  // Details row
+                  // Price and Mileage - Enhanced with tooltip and formatting
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Transmission
+                      Expanded(
+                        flex: 3, // Give price 3/4 of the space
+                        child: Tooltip(
+                          message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(item.price ?? '0')}',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          textStyle: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(item.price ?? '0')}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorGlobalVariables.redColor,
+                            ),
+                            maxLines: 1,
+                            overflow: _formatPriceWithCommas(item.price ?? '0').length > 6
+                                ? TextOverflow.ellipsis
+                                : null,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8), // Increased spacing between price and mileage
+                      if (item.mileage != null)
+                        Expanded(
+                          flex: 1, // Give mileage 1/4 of the space
+                          child: Tooltip(
+                            message: item.mileage != null
+                                ? "${DistanceUtils.formatDistance(item.mileage)} km"
+                                : "No mileage data",
+                            preferBelow: false,
+                            margin: EdgeInsets.all(8),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            textStyle: TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.speed, size: 14, color: Colors.grey[600]),
+                                SizedBox(width: 4), // Reduced spacing between icon and text
+                                Expanded(
+                                  child: DistanceUtils.buildDistanceText(
+                                    item.mileage,
+                                    textStyle: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Transmission and Location - Enhanced with spacing and location tooltip
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Transmission - Enhanced with spacing
                       if (item.transmission != null)
                         Row(
                           children: [
                             Icon(Icons.settings, size: 14, color: Colors.grey[600]),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 2), // Reduced spacing between icon and text
                             Text(
                               item.transmission!,
                               style: const TextStyle(
@@ -425,22 +583,46 @@ class _SearchItemCard extends StatelessWidget {
                           ],
                         ),
 
-                      // Location
+                      SizedBox(width: 4), // 4px spacing between transmission and location
+
+                      // Location - Enhanced with tooltip
                       if (item.location != null)
                         Expanded(
                           child: Row(
                             children: [
                               Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 2), // Reduced spacing between icon and text
                               Expanded(
-                                child: Text(
-                                  item.location!,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey,
+                                child: Tooltip(
+                                  message: item.location!,
+                                  preferBelow: false,
+                                  margin: EdgeInsets.all(8),
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  textStyle: TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  child: Text(
+                                    item.location!,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.grey,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
                             ],
@@ -448,6 +630,7 @@ class _SearchItemCard extends StatelessWidget {
                         ),
                     ],
                   ),
+<<<<<<< Updated upstream
 
                   // Mileage (if available and space permits)
                   if (item.mileage != null && item.transmission == null)
@@ -464,6 +647,8 @@ class _SearchItemCard extends StatelessWidget {
                         ),
                       ],
                     ),
+=======
+>>>>>>> Stashed changes
                 ],
               ),
             ),
@@ -476,7 +661,7 @@ class _SearchItemCard extends StatelessWidget {
   Widget _buildItemImage(String? imageUrl) {
     if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-      
+
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,
