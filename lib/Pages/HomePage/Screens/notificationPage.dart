@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/notificationModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Providers/getNotificationsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Models/broadcastModel.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBroadcastProvider.dart';
 import 'package:get/get.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:intl/intl.dart';
@@ -14,8 +14,6 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  bool _isMarkingAllAsRead = false;
-
   @override
   void initState() {
     super.initState();
@@ -25,28 +23,12 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _loadData() async {
-    final provider = Provider.of<NotificationProvider>(context, listen: false);
-    await provider.fetchNotifications();
+    final provider = Provider.of<BroadcastProvider>(context, listen: false);
+    await provider.fetchBroadcasts();
   }
 
   void _onRefresh() async {
     await _loadData();
-  }
-
-  Future<void> _markAllAsRead(NotificationProvider provider) async {
-    setState(() {
-      _isMarkingAllAsRead = true;
-    });
-    
-    try {
-      await provider.markAllAsRead();
-    } catch (e) {
-      // Error is already handled in the provider
-    } finally {
-      setState(() {
-        _isMarkingAllAsRead = false;
-      });
-    }
   }
 
   String _formatDate(String dateString) {
@@ -79,7 +61,7 @@ class _NotificationPageState extends State<NotificationPage> {
       backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
       appBar: AppBar(
         title: Text(
-          'Notifications',
+          'Broadcast Messages',
           style: TextStyle(
             color: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
             fontSize: 22,
@@ -96,60 +78,18 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
           onPressed: () => Get.back(),
         ),
-        actions: [
-          Consumer<NotificationProvider>(
-            builder: (context, provider, child) {
-              final hasUnread = provider.notifications.any((n) => !n.isRead);
-              
-              if (provider.notifications.isNotEmpty && hasUnread) {
-                return _isMarkingAllAsRead
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              isDarkMode ? Colors.white : ColorGlobalVariables.brownColor
-                            ),
-                          ),
-                        ),
-                      )
-                    : TextButton.icon(
-                        onPressed: () => _markAllAsRead(provider),
-                        icon: Icon(
-                          Icons.done_all, 
-                          size: 20,
-                          color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
-                        ),
-                        label: Text(
-                          'Mark all as read',
-                          style: TextStyle(
-                            color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          foregroundColor: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
-                        ),
-                      );
-              }
-              return SizedBox();
-            },
-          ),
-        ],
       ),
-      body: Consumer<NotificationProvider>(
+      body: Consumer<BroadcastProvider>(
         builder: (context, provider, child) {
-          if (provider.isLoading && provider.notifications.isEmpty) {
+          if (provider.isLoading && provider.broadcasts.isEmpty) {
             return _buildLoadingState(isDarkMode);
           }
 
-          if (provider.errorMessage.isNotEmpty && provider.notifications.isEmpty) {
+          if (provider.hasError && provider.broadcasts.isEmpty) {
             return _buildErrorState(provider, isDarkMode);
           }
 
-          if (provider.notifications.isEmpty) {
+          if (provider.broadcasts.isEmpty) {
             return _buildEmptyState(isDarkMode);
           }
 
@@ -158,16 +98,11 @@ class _NotificationPageState extends State<NotificationPage> {
             backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
             color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
             child: ListView.builder(
-              itemCount: provider.notifications.length,
+              itemCount: provider.broadcasts.length,
               itemBuilder: (context, index) {
-                final notification = provider.notifications[index];
-                return _NotificationItem(
-                  notification: notification,
-                  onTap: () async {
-                    // Show immediate visual feedback
-                    final currentProvider = Provider.of<NotificationProvider>(context, listen: false);
-                    await currentProvider.markAsRead(notification.id);
-                  },
+                final broadcast = provider.broadcasts[index];
+                return _BroadcastItem(
+                  broadcast: broadcast,
                   formatDate: _formatDate,
                   isDarkMode: isDarkMode,
                 );
@@ -191,7 +126,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
           SizedBox(height: 16),
           Text(
-            'Loading notifications...',
+            'Loading broadcast messages...',
             style: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 16,
@@ -202,7 +137,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget _buildErrorState(NotificationProvider provider, bool isDarkMode) {
+  Widget _buildErrorState(BroadcastProvider provider, bool isDarkMode) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -223,7 +158,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: provider.retryFailedRequest,
+            onPressed: provider.refreshBroadcasts,
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorGlobalVariables.brownColor,
               shape: RoundedRectangleBorder(
@@ -244,13 +179,13 @@ class _NotificationPageState extends State<NotificationPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.notifications_off, 
+            Icons.broadcast_on_personal, 
             size: 80, 
             color: isDarkMode ? Colors.grey[600] : Colors.grey[300]
           ),
           SizedBox(height: 16),
           Text(
-            'No notifications yet',
+            'No broadcast messages yet',
             style: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.grey[600],
               fontSize: 18,
@@ -259,7 +194,7 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
           SizedBox(height: 8),
           Text(
-            'We\'ll notify you when something arrives',
+            'Broadcast messages will appear here',
             style: TextStyle(
               color: isDarkMode ? Colors.white60 : Colors.grey[500],
               fontSize: 14,
@@ -271,15 +206,13 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 }
 
-class _NotificationItem extends StatelessWidget {
-  final NotificationModel notification;
-  final VoidCallback onTap;
+class _BroadcastItem extends StatelessWidget {
+  final BroadcastModel broadcast;
   final String Function(String) formatDate;
   final bool isDarkMode;
 
-  const _NotificationItem({
-    required this.notification,
-    required this.onTap,
+  const _BroadcastItem({
+    required this.broadcast,
     required this.formatDate,
     required this.isDarkMode,
   });
@@ -297,23 +230,21 @@ class _NotificationItem extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: _getNotificationColor(notification.notificationType).withOpacity(0.1),
+            color: _getBroadcastColor(broadcast.target).withOpacity(0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
-            _getNotificationIcon(notification.notificationType),
-            color: _getNotificationColor(notification.notificationType),
+            _getBroadcastIcon(broadcast.target),
+            color: _getBroadcastColor(broadcast.target),
             size: 20,
           ),
         ),
         title: Text(
-          notification.title,
+          broadcast.subject,
           style: TextStyle(
             fontSize: 16,
-            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-            color: notification.isRead 
-              ? (isDarkMode ? Colors.white70 : Colors.grey[700])
-              : (isDarkMode ? Colors.white : Colors.black87),
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
         subtitle: Column(
@@ -321,74 +252,235 @@ class _NotificationItem extends StatelessWidget {
           children: [
             SizedBox(height: 4),
             Text(
-              notification.message,
+              broadcast.message,
               style: TextStyle(
                 fontSize: 14,
-                color: notification.isRead 
-                  ? (isDarkMode ? Colors.white60 : Colors.grey[600])
-                  : (isDarkMode ? Colors.white70 : Colors.grey[800]),
+                color: isDarkMode ? Colors.white70 : Colors.grey[800],
               ),
-              maxLines: 2,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: 8),
-            Text(
-              formatDate(notification.createdAt),
-              style: TextStyle(
-                fontSize: 12,
-                color: isDarkMode ? Colors.white54 : Colors.grey[500],
-              ),
+            Row(
+              children: [
+                Text(
+                  formatDate(broadcast.createdAt.toIso8601String()),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                  ),
+                ),
+                SizedBox(width: 16),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _getBroadcastColor(broadcast.target).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    broadcast.target.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: _getBroadcastColor(broadcast.target),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-        trailing: notification.isRead
-            ? null
-            : Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-        onTap: onTap,
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: isDarkMode ? Colors.white54 : Colors.grey[500],
+        ),
+        onTap: () {
+          // Show broadcast details in a dialog
+          showDialog(
+            context: context,
+            builder: (context) => _BroadcastDetailDialog(
+              broadcast: broadcast,
+              formatDate: formatDate,
+              isDarkMode: isDarkMode,
+            ),
+          );
+        },
       ),
     );
   }
 
-  Color _getNotificationColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'promotion':
-      case 'offer':
-        return Colors.orange;
-      case 'alert':
-      case 'warning':
-        return Colors.red;
-      case 'info':
-      case 'information':
+  Color _getBroadcastColor(String target) {
+    switch (target.toLowerCase()) {
+      case 'all':
         return Colors.blue;
-      case 'success':
+      case 'users':
         return Colors.green;
+      case 'verified':
+        return Colors.orange;
       default:
         return ColorGlobalVariables.brownColor;
     }
   }
 
-  IconData _getNotificationIcon(String type) {
-    switch (type.toLowerCase()) {
-      case 'promotion':
-      case 'offer':
-        return Icons.local_offer;
-      case 'alert':
-      case 'warning':
-        return Icons.warning;
-      case 'info':
-      case 'information':
-        return Icons.info;
-      case 'success':
-        return Icons.check_circle;
+  IconData _getBroadcastIcon(String target) {
+    switch (target.toLowerCase()) {
+      case 'all':
+        return Icons.public;
+      case 'users':
+        return Icons.person;
+      case 'verified':
+        return Icons.verified;
       default:
-        return Icons.notifications;
+        return Icons.broadcast_on_personal;
+    }
+  }
+}
+
+class _BroadcastDetailDialog extends StatelessWidget {
+  final BroadcastModel broadcast;
+  final String Function(String) formatDate;
+  final bool isDarkMode;
+
+  const _BroadcastDetailDialog({
+    required this.broadcast,
+    required this.formatDate,
+    required this.isDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+      title: Row(
+        children: [
+          Icon(
+            _getBroadcastIcon(broadcast.target),
+            color: _getBroadcastColor(broadcast.target),
+            size: 24,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              broadcast.subject,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white : Colors.black87,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              broadcast.message,
+              style: TextStyle(
+                color: isDarkMode ? Colors.white70 : Colors.grey[800],
+                fontSize: 16,
+                height: 1.5,
+              ),
+            ),
+            SizedBox(height: 16),
+            Divider(
+              color: isDarkMode ? Colors.grey[600] : Colors.grey[300],
+            ),
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  size: 16,
+                  color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Sent: ${formatDate(broadcast.createdAt.toIso8601String())}',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  Icons.person,
+                  size: 16,
+                  color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'From: ${broadcast.user.name}',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 4),
+            Row(
+              children: [
+                Icon(
+                  Icons.location_city,
+                  size: 16,
+                  color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Country: ${broadcast.country.name}',
+                  style: TextStyle(
+                    color: isDarkMode ? Colors.white54 : Colors.grey[500],
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            'Close',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white70 : Colors.grey[700],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getBroadcastColor(String target) {
+    switch (target.toLowerCase()) {
+      case 'all':
+        return Colors.blue;
+      case 'users':
+        return Colors.green;
+      case 'verified':
+        return Colors.orange;
+      default:
+        return ColorGlobalVariables.brownColor;
+    }
+  }
+
+  IconData _getBroadcastIcon(String target) {
+    switch (target.toLowerCase()) {
+      case 'all':
+        return Icons.public;
+      case 'users':
+        return Icons.person;
+      case 'verified':
+        return Icons.verified;
+      default:
+        return Icons.broadcast_on_personal;
     }
   }
 }

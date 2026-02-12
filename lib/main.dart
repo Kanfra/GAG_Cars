@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBrandItemsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBroadcastProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getNotificationsProvider.dart';
@@ -98,6 +99,9 @@ void main() async {
         ), 
         ChangeNotifierProvider(
           create: (context) => BrandItemsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => BroadcastProvider(),
         ),
         ChangeNotifierProvider(
           create: (context) => NotificationProvider(),

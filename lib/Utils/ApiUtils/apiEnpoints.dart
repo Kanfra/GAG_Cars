@@ -25,6 +25,7 @@ class ApiEndpoint{
   static const String brandItems = "/app/brand-items";
   static const String searchItems = "/app/search-items";
   static const String notifications = "/my/notifications";
+  static const String broadcasts = "/broadcasts";
   
   static const String resetPassword = '/reset-password';
   static const String sendResetPasswordOtp = '/send-reset-password-otp';
