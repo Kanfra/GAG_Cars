@@ -230,7 +230,7 @@ class _BroadcastItem extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: _getBroadcastColor(broadcast.target).withOpacity(0.1),
+            color: _getBroadcastColor(broadcast.target).withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -274,7 +274,7 @@ class _BroadcastItem extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: _getBroadcastColor(broadcast.target).withOpacity(0.2),
+                    color: _getBroadcastColor(broadcast.target).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(

@@ -184,7 +184,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                       gradient: LinearGradient(
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -192,7 +192,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                       borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -530,7 +530,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
             Icon(
               Icons.car_repair, 
               size: 64, 
-              color: theme.iconTheme.color?.withOpacity(0.5)
+              color: theme.iconTheme.color?.withValues(alpha: 0.5)
             ),
             const SizedBox(height: 16),
             Text(
@@ -547,7 +547,7 @@ class _MyListingPageState extends State<MyListingPage> with SingleTickerProvider
                 ? 'Start by adding your first vehicle listing'
                 : 'Items you mark as sold will appear here',
               style: TextStyle(
-                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -672,7 +672,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -778,7 +778,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                               color: isLiveTab 
                                 ? theme.textTheme.titleLarge?.color
-                                : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                                : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -831,7 +831,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: isLiveTab 
                                 ? ColorGlobalVariables.redColor 
-                                : theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                                : theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

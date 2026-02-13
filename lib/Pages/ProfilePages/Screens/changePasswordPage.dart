@@ -230,7 +230,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -301,10 +301,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         margin: const EdgeInsets.only(top: 8),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue[50],
+                          color: isDarkMode ? Colors.blue.withValues(alpha: 0.1) : Colors.blue[50],
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue[100]!,
+                            color: isDarkMode ? Colors.blue.withValues(alpha: 0.3) : Colors.blue[100]!,
                           ),
                         ),
                         child: Column(

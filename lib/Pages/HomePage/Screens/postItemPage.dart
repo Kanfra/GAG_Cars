@@ -527,8 +527,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -547,13 +547,13 @@ class _PostItemPageState extends State<PostItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),
@@ -620,7 +620,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     ),
@@ -670,7 +670,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -805,12 +805,12 @@ class _PostItemPageState extends State<PostItemPage> {
                               end: Alignment.bottomRight,
                               colors: [
                                 ColorGlobalVariables.brownColor,
-                                ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -883,7 +883,7 @@ class _PostItemPageState extends State<PostItemPage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -904,7 +904,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -1016,8 +1016,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -1036,13 +1036,13 @@ class _PostItemPageState extends State<PostItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),
@@ -1110,7 +1110,7 @@ class _PostItemPageState extends State<PostItemPage> {
                                   padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                                   decoration: BoxDecoration(
                                     color: isSelected 
-                                        ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+                                        ? ColorGlobalVariables.brownColor.withValues(alpha: 0.1)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(12),
                                     border: isSelected
@@ -1220,12 +1220,12 @@ class _PostItemPageState extends State<PostItemPage> {
                               end: Alignment.bottomRight,
                               colors: [
                                 ColorGlobalVariables.brownColor,
-                                ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: const Offset(0, 6),
                               ),
@@ -1306,7 +1306,7 @@ class _PostItemPageState extends State<PostItemPage> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const SpinKitDoubleBounce(
@@ -1378,7 +1378,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1401,8 +1401,8 @@ class _PostItemPageState extends State<PostItemPage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        ColorGlobalVariables.brownColor.withOpacity(0.2),
-                        ColorGlobalVariables.brownColor.withOpacity(0.1),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(15),
@@ -1498,7 +1498,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1518,8 +1518,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1588,7 +1588,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1607,8 +1607,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1777,7 +1777,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1796,8 +1796,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1918,7 +1918,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1937,8 +1937,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -2184,7 +2184,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -2204,8 +2204,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -2256,7 +2256,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.8),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                     ],
                   )
                 : null,
@@ -2287,7 +2287,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -2307,8 +2307,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -2384,7 +2384,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                        color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: ColorGlobalVariables.redColor,
@@ -2516,7 +2516,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -2546,8 +2546,8 @@ class _PostItemPageState extends State<PostItemPage> {
             boxShadow: [
               BoxShadow(
                 color: (isProcessing || !hasEnoughImages) 
-                  ? Colors.grey.withOpacity(0.4)
-                  : ColorGlobalVariables.brownColor.withOpacity(0.4),
+                  ? Colors.grey.withValues(alpha: 0.4)
+                  : ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -2575,7 +2575,7 @@ class _PostItemPageState extends State<PostItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                   borderRadius: BorderRadius.circular(20),
@@ -2662,7 +2662,7 @@ class _PostItemPageState extends State<PostItemPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -2695,7 +2695,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                    color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
@@ -2714,7 +2714,7 @@ class _PostItemPageState extends State<PostItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -2879,8 +2879,8 @@ class _PostItemPageState extends State<PostItemPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ColorGlobalVariables.brownColor.withOpacity(0.15),
-                    ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -2899,7 +2899,7 @@ class _PostItemPageState extends State<PostItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -2991,8 +2991,8 @@ class _PostItemPageState extends State<PostItemPage> {
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        ColorGlobalVariables.brownColor.withOpacity(0.15),
-                                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                                        ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                                        ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(14),
@@ -3096,7 +3096,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -3220,8 +3220,8 @@ class _PostItemPageState extends State<PostItemPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ColorGlobalVariables.brownColor.withOpacity(0.15),
-                    ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -3240,7 +3240,7 @@ class _PostItemPageState extends State<PostItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -3509,7 +3509,7 @@ class _PostItemPageState extends State<PostItemPage> {
             border: Border.all(color: _getBorderColor(), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -3526,8 +3526,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -3636,8 +3636,8 @@ class _PostItemPageState extends State<PostItemPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ColorGlobalVariables.brownColor.withOpacity(0.15),
-                    ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -3656,7 +3656,7 @@ class _PostItemPageState extends State<PostItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                         ],
                       ),
                       shape: BoxShape.circle,
@@ -3793,8 +3793,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(14),

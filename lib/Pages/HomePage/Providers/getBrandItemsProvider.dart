@@ -48,7 +48,7 @@ class BrandItemsProvider with ChangeNotifier {
   Future<void> loadInitialItems(int brandId, {String? searchQuery, String? sortBy, bool sortAscending = true}) async {
     if (_isLoading) return;
     
-    print('🔄 [PROVIDER] Loading initial items for brand: $brandId');
+    debugPrint('🔄 [PROVIDER] Loading initial items for brand: $brandId');
     
     _items.clear();
     _hasMore = true;
@@ -73,11 +73,11 @@ class BrandItemsProvider with ChangeNotifier {
       _hasMore = false;
       
       _lastUpdated = DateTime.now();
-      print('✅ [PROVIDER] Loaded ${newItems.length} items. Has more: $_hasMore');
+      debugPrint('✅ [PROVIDER] Loaded ${newItems.length} items. Has more: $_hasMore');
       
     } catch (e) {
       _error = e.toString();
-      print('❌ [PROVIDER] Error loading initial items: $e');
+      debugPrint('❌ [PROVIDER] Error loading initial items: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -87,11 +87,11 @@ class BrandItemsProvider with ChangeNotifier {
   /// Load more items for lazy loading
   Future<void> loadMoreItems() async {
     if (!canLoadMore) {
-      print('⏸️ [PROVIDER] Cannot load more - Loading: $_isLoadingMore, HasMore: $_hasMore, BrandId: $_currentBrandId');
+      debugPrint('⏸️ [PROVIDER] Cannot load more - Loading: $_isLoadingMore, HasMore: $_hasMore, BrandId: $_currentBrandId');
       return;
     }
     
-    print('🔄 [PROVIDER] Loading more items - Page: ${_currentPage + 1}');
+    debugPrint('🔄 [PROVIDER] Loading more items - Page: ${_currentPage + 1}');
     
     _isLoadingMore = true;
     _error = null;
@@ -160,15 +160,15 @@ class BrandItemsProvider with ChangeNotifier {
         _hasMore = _currentPage < 3;
         
         _lastUpdated = DateTime.now();
-        print('✅ [PROVIDER] Loaded ${simulatedNewItems.length} more items. Total: $_totalItems, Has more: $_hasMore');
+        debugPrint('✅ [PROVIDER] Loaded ${simulatedNewItems.length} more items. Total: $_totalItems, Has more: $_hasMore');
       } else {
         _hasMore = false;
-        print('⚠️ [PROVIDER] No items to simulate loading more');
+        debugPrint('⚠️ [PROVIDER] No items to simulate loading more');
       }
       
     } catch (e) {
       _error = 'Failed to load more items: $e';
-      print('❌ [PROVIDER] Error loading more items: $e');
+      debugPrint('❌ [PROVIDER] Error loading more items: $e');
     } finally {
       _isLoadingMore = false;
       notifyListeners();
@@ -177,9 +177,9 @@ class BrandItemsProvider with ChangeNotifier {
 
   /// Refresh items (pull to refresh)
   Future<void> refresh() async {
-    print('🔄 [PROVIDER] Refreshing items');
+    debugPrint('🔄 [PROVIDER] Refreshing items');
     if (_currentBrandId == null) {
-      print('⚠️ [PROVIDER] Cannot refresh - no current brandId');
+      debugPrint('⚠️ [PROVIDER] Cannot refresh - no current brandId');
       return;
     }
     await loadInitialItems(
@@ -192,7 +192,7 @@ class BrandItemsProvider with ChangeNotifier {
 
   /// Clear all data
   void clear() {
-    print('🧹 [PROVIDER] Clearing all data');
+    debugPrint('🧹 [PROVIDER] Clearing all data');
     _items.clear();
     _isLoading = false;
     _isLoadingMore = false;
@@ -229,7 +229,7 @@ class BrandItemsProvider with ChangeNotifier {
       _items[index] = updatedItem;
       _lastUpdated = DateTime.now();
       notifyListeners();
-      print('✅ [PROVIDER] Updated item: ${updatedItem.id}');
+      debugPrint('✅ [PROVIDER] Updated item: ${updatedItem.id}');
     }
   }
 
@@ -241,7 +241,7 @@ class BrandItemsProvider with ChangeNotifier {
       _totalItems = _items.length;
       _lastUpdated = DateTime.now();
       notifyListeners();
-      print('🗑️ [PROVIDER] Removed item: $itemId');
+      debugPrint('🗑️ [PROVIDER] Removed item: $itemId');
     }
   }
 
@@ -293,7 +293,7 @@ class BrandItemsProvider with ChangeNotifier {
     
     _lastUpdated = DateTime.now();
     notifyListeners();
-    print('✅ [PROVIDER] Sorted items by $sortBy (${ascending ? 'asc' : 'desc'})');
+    debugPrint('✅ [PROVIDER] Sorted items by $sortBy (${ascending ? 'asc' : 'desc'})');
   }
 
   /// Get unique conditions from items
@@ -361,7 +361,7 @@ class BrandItemsProvider with ChangeNotifier {
     _sortBy = null;
     _sortAscending = true;
     notifyListeners();
-    print('🔄 [PROVIDER] Reset all filters');
+    debugPrint('🔄 [PROVIDER] Reset all filters');
   }
 
   /// Get statistics about the items
@@ -388,7 +388,7 @@ class BrandItemsProvider with ChangeNotifier {
   /// Force refresh if data is stale
   Future<void> refreshIfStale() async {
     if (isDataStale && _currentBrandId != null) {
-      print('🔄 [PROVIDER] Data is stale, refreshing...');
+      debugPrint('🔄 [PROVIDER] Data is stale, refreshing...');
       await refresh();
     }
   }

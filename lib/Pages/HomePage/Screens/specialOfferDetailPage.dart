@@ -1,13 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
@@ -320,10 +311,10 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -352,10 +343,10 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -445,7 +436,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
               animation: _profileImageFadeAnimation,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withOpacity(0.9 * _profileImageFadeAnimation.value),
+                  color: Colors.black.withValues(alpha: 0.9 * _profileImageFadeAnimation.value),
                 );
               },
             ),
@@ -469,7 +460,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -485,12 +476,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha: 0.3),
                           width: 3,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 10,
                             spreadRadius: 2,
                             offset: const Offset(0, 4),
@@ -605,7 +596,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -635,12 +626,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -760,14 +751,14 @@ Download GAGcars app for more amazing deals!''';
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              ColorGlobalVariables.redColor.withOpacity(0.9),
-              ColorGlobalVariables.redColor.withOpacity(0.7),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.9),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: ColorGlobalVariables.redColor.withOpacity(0.3),
+              color: ColorGlobalVariables.redColor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -811,7 +802,7 @@ Download GAGcars app for more amazing deals!''';
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -856,7 +847,7 @@ Download GAGcars app for more amazing deals!''';
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -875,7 +866,7 @@ Download GAGcars app for more amazing deals!''';
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withOpacity(0.8),
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1127,7 +1118,7 @@ Download GAGcars app for more amazing deals!''';
         return images.where((image) => image.isNotEmpty).toList();
       }
     } catch (e) {
-      print('Error getting item images: $e');
+      debugPrint('Error getting item images: $e');
     }
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
   }
@@ -1187,7 +1178,7 @@ Download GAGcars app for more amazing deals!''';
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -1477,7 +1468,7 @@ Download GAGcars app for more amazing deals!''';
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -1516,7 +1507,7 @@ Download GAGcars app for more amazing deals!''';
                     ),
                     if (index == selectedIndex)
                       Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         child: const Center(
                           child: Icon(
                             Icons.check_circle,
@@ -1688,7 +1679,7 @@ Download GAGcars app for more amazing deals!''';
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1814,9 +1805,9 @@ Download GAGcars app for more amazing deals!''';
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Colors.black.withOpacity(0.8),
+                                      Colors.black.withValues(alpha: 0.8),
                                       Colors.transparent,
-                                      Colors.black.withOpacity(0.3),
+                                      Colors.black.withValues(alpha: 0.3),
                                     ],
                                   ),
                                 ),
@@ -2045,7 +2036,7 @@ Download GAGcars app for more amazing deals!''';
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
                                           color: isActive 
-                                              ? (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]) 
+                                              ? (isDarkMode ? Colors.green[900]!.withValues(alpha: 0.3) : Colors.green[50]) 
                                               : (isDarkMode ? Colors.grey[800]! : Colors.grey[100]),
                                           borderRadius: BorderRadius.circular(12),
                                           border: Border.all(
@@ -2110,13 +2101,13 @@ Download GAGcars app for more amazing deals!''';
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
                                           color: isDarkMode 
-                                              ? ColorGlobalVariables.redColor.withOpacity(0.1)
-                                              : ColorGlobalVariables.redColor.withOpacity(0.05),
+                                              ? ColorGlobalVariables.redColor.withValues(alpha: 0.1)
+                                              : ColorGlobalVariables.redColor.withValues(alpha: 0.05),
                                           borderRadius: BorderRadius.circular(12),
                                           border: Border.all(
                                             color: isDarkMode
-                                                ? ColorGlobalVariables.redColor.withOpacity(0.3)
-                                                : ColorGlobalVariables.redColor.withOpacity(0.2)
+                                                ? ColorGlobalVariables.redColor.withValues(alpha: 0.3)
+                                                : ColorGlobalVariables.redColor.withValues(alpha: 0.2)
                                           ),
                                         ),
                                         child: Column(
@@ -2175,8 +2166,8 @@ Download GAGcars app for more amazing deals!''';
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
                                                 color: isDarkMode
-                                                    ? ColorGlobalVariables.redColor.withOpacity(0.2)
-                                                    : ColorGlobalVariables.redColor.withOpacity(0.1),
+                                                    ? ColorGlobalVariables.redColor.withValues(alpha: 0.2)
+                                                    : ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
                                               child: Row(
@@ -2231,7 +2222,7 @@ Download GAGcars app for more amazing deals!''';
                                           duration: const Duration(milliseconds: 500),
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                            color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                                             borderRadius: BorderRadius.circular(12),
                                             border: Border.all(
                                               color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
@@ -2270,7 +2261,7 @@ Download GAGcars app for more amazing deals!''';
                                         children: [
                                           _buildTag(
                                             "${_specialOffer.discount}% OFF", 
-                                            ColorGlobalVariables.redColor.withOpacity(0.9)
+                                            ColorGlobalVariables.redColor.withValues(alpha: 0.9)
                                           ),
                                           if(_item.warranty != null && _item.warranty! > 0)
                                             _buildTag(
@@ -2355,7 +2346,7 @@ Download GAGcars app for more amazing deals!''';
                                               duration: Duration(milliseconds: 300 + (index * 50)),
                                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                               decoration: BoxDecoration(
-                                                color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                                color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                                                 borderRadius: BorderRadius.circular(20),
                                                 border: Border.all(
                                                   color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!

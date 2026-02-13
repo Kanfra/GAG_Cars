@@ -231,7 +231,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -243,7 +243,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -287,7 +287,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -379,7 +379,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -391,7 +391,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: (_isCompanyDocCaptured ? Colors.green : Colors.teal)
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -434,7 +434,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -539,7 +539,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -551,7 +551,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: (_isSelfieCaptured ? Colors.green : Colors.blue)
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -592,7 +592,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -813,13 +813,13 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                                 Colors.grey[700]!,
                               ]
                             : [
-                                ColorGlobalVariables.brownColor.withOpacity(0.1),
-                                ColorGlobalVariables.maroonColor.withOpacity(0.05),
+                                ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+                                ColorGlobalVariables.maroonColor.withValues(alpha: 0.05),
                               ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isDarkMode ? Colors.grey[600]! : ColorGlobalVariables.brownColor.withOpacity(0.2),
+                        color: isDarkMode ? Colors.grey[600]! : ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Column(
@@ -1012,10 +1012,10 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.orange.withOpacity(0.1) : Colors.orange.withOpacity(0.05),
+                      color: isDarkMode ? Colors.orange.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.withOpacity(0.2)
+                        color: isDarkMode ? Colors.orange.withValues(alpha: 0.3) : Colors.orange.withValues(alpha: 0.2)
                       ),
                     ),
                     child: Row(
@@ -1062,10 +1062,10 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue.withOpacity(0.05),
+                      color: isDarkMode ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2)
+                        color: isDarkMode ? Colors.blue.withValues(alpha: 0.3) : Colors.blue.withValues(alpha: 0.2)
                       ),
                     ),
                     child: Row(
@@ -1106,7 +1106,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 2,
-                        shadowColor: Colors.black.withOpacity(0.1),
+                        shadowColor: Colors.black.withValues(alpha: 0.1),
                       ),
                       child: _isLoading
                           ? const SizedBox(
@@ -1136,7 +1136,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           // Loading overlay
           if (_isLoading)
             Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -1290,7 +1290,7 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -1313,7 +1313,7 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
                       : 'Ensure the back side is clearly visible',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -1398,7 +1398,7 @@ class FrameGuidePainter extends CustomPainter {
 
     // Draw alignment guides (grid lines)
     final guidePaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

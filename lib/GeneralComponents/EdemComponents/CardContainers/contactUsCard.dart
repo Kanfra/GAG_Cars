@@ -58,8 +58,8 @@ class ContactUsCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(
             borderRadius ?? SizeGlobalVariables.double_size_sixteen,
           ),
-          splashColor: splashColor ?? theme.primaryColor.withOpacity(0.1),
-          highlightColor: highlightColor ?? theme.primaryColor.withOpacity(0.05),
+          splashColor: splashColor ?? theme.primaryColor.withValues(alpha: 0.1),
+          highlightColor: highlightColor ?? theme.primaryColor.withValues(alpha: 0.05),
           child: AnimatedContainer(
             duration: animationDuration ?? const Duration(milliseconds: 200),
             curve: Curves.easeOutQuart,
@@ -70,7 +70,7 @@ class ContactUsCard extends StatelessWidget {
             width: cardWidth ?? double.infinity,
             decoration: BoxDecoration(
               color: isDarkMode 
-                  ? cardBackgroundColor.withOpacity(0.9)
+                  ? cardBackgroundColor.withValues(alpha: 0.9)
                   : cardBackgroundColor,
               borderRadius: BorderRadius.circular(
                 borderRadius ?? SizeGlobalVariables.double_size_sixteen,
@@ -79,8 +79,8 @@ class ContactUsCard extends StatelessWidget {
                   ? [
                       BoxShadow(
                         color: isDarkMode
-                            ? Colors.black.withOpacity(0.4)
-                            : ColorGlobalVariables.greyColor.withOpacity(0.2),
+                            ? Colors.black.withValues(alpha: 0.4)
+                            : ColorGlobalVariables.greyColor.withValues(alpha: 0.2),
                         spreadRadius: SizeGlobalVariables.point_two,
                         blurRadius: SizeGlobalVariables.double_size_twelve,
                         offset: const Offset(0, 4),
@@ -100,7 +100,7 @@ class ContactUsCard extends StatelessWidget {
                       end: Alignment.bottomRight,
                       colors: [
                         cardBackgroundColor,
-                        cardBackgroundColor.withOpacity(0.95),
+                        cardBackgroundColor.withValues(alpha: 0.95),
                       ],
                     )
                   : null,

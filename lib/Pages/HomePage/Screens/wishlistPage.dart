@@ -12,7 +12,6 @@ import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 
 class WishlistPage extends StatefulWidget {
@@ -286,7 +285,7 @@ class _WishlistPageState extends State<WishlistPage> {
           Center(
             child: Icon(
               Icons.favorite,
-              color: ColorGlobalVariables.redColor.withOpacity(0.8),
+              color: ColorGlobalVariables.redColor.withValues(alpha: 0.8),
               size: 24,
             ),
           ),
@@ -803,7 +802,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.3),
+            Colors.black.withValues(alpha: 0.3),
             Colors.transparent,
             Colors.transparent,
           ],
@@ -817,7 +816,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -1004,7 +1003,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -1611,7 +1610,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

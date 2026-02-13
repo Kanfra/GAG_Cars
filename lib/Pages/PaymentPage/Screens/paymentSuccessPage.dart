@@ -250,7 +250,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(statusIcon, color: statusColor, size: 60),

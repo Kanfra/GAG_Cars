@@ -142,7 +142,7 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 16,
             offset: const Offset(0, -2),
           ),
@@ -232,7 +232,7 @@ class _MainBottomNavigationPageState extends State<MainBottomNavigationPage>
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: isSelected 
-              ? ColorGlobalVariables.brownColor.withOpacity(isDarkMode ? 0.2 : 0.1)
+              ? ColorGlobalVariables.brownColor.withValues(alpha: isDarkMode ? 0.2 : 0.1)
               : Colors.transparent,
         ),
         child: Column(

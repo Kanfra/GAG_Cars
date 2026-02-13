@@ -43,7 +43,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
               ),
               child: Center(
                 child: CircularProgressIndicator(
@@ -73,13 +73,13 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
           end: Alignment.bottomRight,
           colors: [
             ColorGlobalVariables.brownColor,
-            ColorGlobalVariables.brownColor.withOpacity(0.7),
+            ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
           ],
         ),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -115,7 +115,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -137,7 +137,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'Are you sure you want to log out?',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -158,7 +158,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -175,12 +175,12 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                           end: Alignment.bottomRight,
                           colors: [
                             Colors.red,
-                            Colors.red.withOpacity(0.8),
+                            Colors.red.withValues(alpha: 0.8),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.red.withOpacity(0.3),
+                            color: Colors.red.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -255,7 +255,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -277,7 +277,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'This action cannot be undone! All your data will be permanently deleted.',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -286,9 +286,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.05),
+                  color: Colors.red.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.withOpacity(0.2)),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -302,7 +302,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'This will remove all your listings, favorites, and personal information.',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -326,7 +326,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -348,7 +348,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.red.withOpacity(0.3),
+                            color: Colors.red.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -481,13 +481,13 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                     ],
                   ),
                   shape: BoxShape.circle, 
                   boxShadow: [
                     BoxShadow(
-                      color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                      color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -512,7 +512,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'Version 1.0.0',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -531,7 +531,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -566,12 +566,12 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -622,7 +622,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.1),
+                  color: Colors.amber.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -644,7 +644,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'How would you rate your experience with GAGcars?',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 15,
                 ),
                 textAlign: TextAlign.center,
@@ -656,7 +656,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 children: List.generate(5, (index) {
                   return Icon(
                     Icons.star_rounded,
-                    color: index < 4 ? Colors.amber : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.3),
+                    color: index < 4 ? Colors.amber : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.3),
                     size: 40,
                   );
                 }),
@@ -673,7 +673,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: 'Tell us about your experience (optional)...',
-                    hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5)),
+                    hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.all(16),
                   ),
@@ -696,7 +696,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'Maybe Later',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -717,7 +717,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.amber.withOpacity(0.3),
+                            color: Colors.amber.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -816,7 +816,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       Text(
                         'This may take a few moments',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -837,11 +837,11 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+          color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -875,7 +875,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -904,14 +904,14 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   Text(
                     user?.email ?? 'No email provided',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
-                      color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Material(
@@ -964,7 +964,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1044,8 +1044,8 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(15),
@@ -1073,7 +1073,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -1086,7 +1086,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 Text(
                   valueText,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1094,13 +1094,13 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 const SizedBox(width: 8),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                   size: 24,
                 ),
               ] else ...[
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                   size: 24,
                 ),
               ],
@@ -1126,7 +1126,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   end: Alignment.bottomRight,
                   colors: [
                     ColorGlobalVariables.brownColor,
-                    ColorGlobalVariables.brownColor.withOpacity(0.8),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                   ],
                 )
               : LinearGradient(
@@ -1140,8 +1140,8 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
           boxShadow: [
             BoxShadow(
               color: value
-                  ? ColorGlobalVariables.brownColor.withOpacity(0.3)
-                  : Colors.grey.withOpacity(0.3),
+                  ? ColorGlobalVariables.brownColor.withValues(alpha: 0.3)
+                  : Colors.grey.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1159,7 +1159,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -1188,7 +1188,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1245,7 +1245,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 width: 50,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Icon(
@@ -1271,7 +1271,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -1280,7 +1280,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.4),
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                 size: 24,
               ),
             ],
@@ -1335,7 +1335,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1354,7 +1354,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: isLoading
@@ -1391,7 +1391,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       Text(
                         subtitle,
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -1401,7 +1401,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 if (!isLoading)
                   Icon(
                     Icons.chevron_right_rounded,
-                    color: color.withOpacity(0.6),
+                    color: color.withValues(alpha: 0.6),
                     size: 24,
                   ),
               ],

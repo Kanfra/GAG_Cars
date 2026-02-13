@@ -1,30 +1,17 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/similarItemsModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/userDetailsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:gag_cars_frontend/Utils/simple_deep_link_handler.dart';
 import 'package:get/get.dart';
@@ -36,16 +23,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 class DetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  const DetailPage({
-    super.key, 
-    required this.allJson,
-  });
+  const DetailPage({super.key, required this.allJson});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
-class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateMixin {
+class _DetailPageState extends State<DetailPage>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final _similarItemsScrollThreshold = 200.0;
   double _appBarHeight = 300;
@@ -56,7 +41,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   Map<String, dynamic>? item;
   Map<String, dynamic>? product;
   String? type;
-  
+
   late int _currentItemCategoryId;
   late String _currentItemId;
   String? _currentUserId;
@@ -78,33 +63,32 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize profile image animation controller
     _profileImageController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
-    _profileImageScaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.1), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _profileImageController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _profileImageFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _profileImageController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _profileImageScaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.1), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _profileImageController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _profileImageFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _profileImageController, curve: Curves.easeInOut),
+    );
+
     // Initialize full screen page controller
     _fullScreenPageController = PageController(initialPage: selectedIndex);
     _currentFullScreenIndex = selectedIndex;
-    
+
     _initializeData();
   }
 
@@ -120,15 +104,15 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   void _showFullScreenImage(int startIndex) {
     logger.i('Opening full screen image viewer at index: $startIndex');
-    
+
     setState(() {
       _currentFullScreenIndex = startIndex;
       _updateArrowVisibility(startIndex);
     });
-    
+
     // Update page controller to start at the selected index
     _fullScreenPageController = PageController(initialPage: startIndex);
-    
+
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black87,
@@ -137,7 +121,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) {
         final images = getItemImages();
-        
+
         return Dialog(
           backgroundColor: Colors.black,
           insetPadding: EdgeInsets.zero,
@@ -171,7 +155,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       },
                     ),
                   ),
-                  
+
                   // Close button
                   Positioned(
                     top: 50,
@@ -192,13 +176,16 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  
+
                   // Position indicator
                   Positioned(
                     top: 50,
                     left: 20,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(20),
@@ -213,7 +200,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  
+
                   // Navigation instructions
                   Positioned(
                     bottom: 100,
@@ -223,12 +210,18 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       opacity: 1.0,
                       duration: const Duration(seconds: 1),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.black54,
                                 borderRadius: BorderRadius.circular(20),
@@ -236,7 +229,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.touch_app, color: Colors.white70, size: 18),
+                                  Icon(
+                                    Icons.touch_app,
+                                    color: Colors.white70,
+                                    size: 18,
+                                  ),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Swipe or use arrow buttons',
@@ -253,7 +250,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  
+
                   // LEFT ARROW BUTTON - Shows when not on first image
                   if (_showLeftArrow)
                     Positioned(
@@ -270,10 +267,10 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -285,7 +282,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                         ),
                       ),
                     ),
-                  
+
                   // RIGHT ARROW BUTTON - Shows when not on last image
                   if (_showRightArrow)
                     Positioned(
@@ -302,10 +299,10 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -329,10 +326,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
             parent: animation,
             curve: Curves.fastOutSlowIn,
           ),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
+          child: FadeTransition(opacity: animation, child: child),
         );
       },
     ).then((_) {
@@ -381,7 +375,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     final profilePhoto = _getUserProfilePhoto();
     final userName = _getUserName();
     final hasProfilePhoto = profilePhoto != null;
-    
+
     logger.i('Building profile popup - Has photo: $hasProfilePhoto');
 
     return Material(
@@ -395,12 +389,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
               animation: _profileImageFadeAnimation,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withOpacity(0.9 * _profileImageFadeAnimation.value),
+                  color: Colors.black.withValues(
+                    alpha: 0.9 * _profileImageFadeAnimation.value,
+                  ),
                 );
               },
             ),
           ),
-          
+
           // Profile image content
           Center(
             child: AnimatedBuilder(
@@ -419,7 +415,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -435,12 +431,12 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha: 0.3),
                           width: 3,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 10,
                             spreadRadius: 2,
                             offset: const Offset(0, 4),
@@ -458,9 +454,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                             : _buildDefaultProfileAvatar(size: 200),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // User name
                     Text(
                       userName,
@@ -471,23 +467,23 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // User info
                     Text(
                       'Vehicle Seller',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
                     ),
 
                     // Info text when no profile photo
                     if (!hasProfilePhoto) ...[
                       const SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(12),
@@ -502,9 +498,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                         ),
                       ),
                     ],
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Close button
                     SizedBox(
                       width: double.infinity,
@@ -539,19 +535,22 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   void _initializeData() {
     final allJson = widget.allJson;
-    
+
     if (_hasValidData(allJson)) {
       _setupWithCompleteData(allJson);
     } else {
       _handleInvalidData();
     }
-    
+
     _scrollController.addListener(() {
       if (mounted) {
         setState(() {
           final scrollOffset = _scrollController.offset;
-          _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
-          
+          _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(
+            0.0,
+            1.0,
+          );
+
           if (scrollOffset > 0) {
             _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
           } else {
@@ -563,17 +562,17 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   }
 
   bool _hasValidData(Map<String, dynamic> allJson) {
-    return allJson['item'] is Map<String, dynamic> && 
-           (allJson['item']?['id'] != null || allJson['item']?['name'] != null);
+    return allJson['item'] is Map<String, dynamic> &&
+        (allJson['item']?['id'] != null || allJson['item']?['name'] != null);
   }
 
   void _setupWithCompleteData(Map<String, dynamic> allJson) {
     item = allJson['item'] as Map<String, dynamic>;
     product = allJson['product'] as Map<String, dynamic>?;
     type = allJson['type'] as String?;
-    
+
     _initializeItemData();
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _preloadCategoryDetails();
       _loadSimilarItems();
@@ -587,19 +586,20 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   void _initializeItemData() {
     if (item == null) return;
-    
-    _currentItemCategoryId = item!['category_id'] ?? _extractCategoryId(item!['category']) ?? 0;
+
+    _currentItemCategoryId =
+        item!['category_id'] ?? _extractCategoryId(item!['category']) ?? 0;
     _currentItemId = item!['id']?.toString() ?? '';
-    
+
     // Handle user object properly
     final dynamic userObj = item!['user'];
     user = _convertUserToMap(userObj);
-    
+
     logger.e('Posted User is: $user');
-    
+
     // Extract user ID safely
     _currentUserId = _extractUserId(userObj)?.toString();
-    
+
     logger.w('🔍 [DETAIL PAGE] Extracted user ID: $_currentUserId');
     logger.w('🔍 [DETAIL PAGE] Item user data: $user');
   }
@@ -607,7 +607,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   void _onScroll() {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
-    
+
     if (maxScroll - currentScroll <= _similarItemsScrollThreshold) {
       _loadMoreSimilarItems();
     }
@@ -615,10 +615,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   void _preloadCategoryDetails() {
     if (!mounted || item == null) return;
-    
-    final categoryId = item!['category_id'] ?? _extractCategoryId(item!['category']);
+
+    final categoryId =
+        item!['category_id'] ?? _extractCategoryId(item!['category']);
     if (categoryId != null) {
-      final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: false);
+      final categoryDetailProvider = Provider.of<CategoryDetailProvider>(
+        context,
+        listen: false,
+      );
       if (!categoryDetailProvider.categoryDetails.containsKey(categoryId)) {
         categoryDetailProvider.fetchCategoryDetail(categoryId);
       }
@@ -626,16 +630,26 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   }
 
   void _loadSimilarItems() {
-    if (!mounted || _currentItemCategoryId == 0 || _currentItemId.isEmpty) return;
-    
-    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
-    similarItemsProvider.loadInitialItems(_currentItemCategoryId, _currentItemId);
+    if (!mounted || _currentItemCategoryId == 0 || _currentItemId.isEmpty)
+      return;
+
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(
+      context,
+      listen: false,
+    );
+    similarItemsProvider.loadInitialItems(
+      _currentItemCategoryId,
+      _currentItemId,
+    );
   }
 
   Future<void> _loadMoreSimilarItems() async {
     if (!mounted) return;
-    
-    final similarItemsProvider = Provider.of<SimilarItemsProvider>(context, listen: false);
+
+    final similarItemsProvider = Provider.of<SimilarItemsProvider>(
+      context,
+      listen: false,
+    );
     if (similarItemsProvider.hasMore && !similarItemsProvider.isLoadingMore) {
       await similarItemsProvider.loadMoreItems();
     }
@@ -643,13 +657,18 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   void _fetchUserDetails() {
     if (!mounted || _currentUserId == null || _currentUserId!.isEmpty) return;
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userDetailsProvider = Provider.of<UserDetailsProvider>(context, listen: false);
-      
+      final userDetailsProvider = Provider.of<UserDetailsProvider>(
+        context,
+        listen: false,
+      );
+
       final logger = Logger();
-      logger.w('🔍 [DETAIL PAGE FETCH] Fetching details for user ID: $_currentUserId');
-      
+      logger.w(
+        '🔍 [DETAIL PAGE FETCH] Fetching details for user ID: $_currentUserId',
+      );
+
       if (!userDetailsProvider.hasUserDetails(_currentUserId!)) {
         userDetailsProvider.fetchUserDetails(_currentUserId!);
       }
@@ -660,11 +679,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   Map<String, dynamic> _convertUserToMap(dynamic userObj) {
     if (userObj == null) return {};
-    
+
     if (userObj is Map<String, dynamic>) {
       return userObj;
     }
-    
+
     try {
       if (userObj.toJson != null) {
         final jsonResult = userObj.toJson();
@@ -676,15 +695,16 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     } catch (e) {
       logger.e('Error using toJson() on user object: $e');
     }
-    
+
     try {
       final Map<String, dynamic> result = {};
-      
+
       if (_hasProperty(userObj, 'id')) result['id'] = userObj.id;
       if (_hasProperty(userObj, 'name')) result['name'] = userObj.name;
-      if (_hasProperty(userObj, 'username')) result['username'] = userObj.username;
+      if (_hasProperty(userObj, 'username'))
+        result['username'] = userObj.username;
       if (_hasProperty(userObj, 'email')) result['email'] = userObj.email;
-      
+
       if (_hasProperty(userObj, 'profilePhoto')) {
         result['profilePhoto'] = userObj.profilePhoto;
         result['profile_photo'] = userObj.profilePhoto;
@@ -693,7 +713,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         result['profile_photo'] = userObj.profile_photo;
         result['profilePhoto'] = userObj.profile_photo;
       }
-      
+
       if (_hasProperty(userObj, 'createdAt')) {
         result['createdAt'] = userObj.createdAt;
         result['created_at'] = userObj.createdAt;
@@ -702,7 +722,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         result['created_at'] = userObj.created_at;
         result['createdAt'] = userObj.created_at;
       }
-      
+
       if (_hasProperty(userObj, 'phone')) {
         result['phone'] = userObj.phone;
         result['phone_number'] = userObj.phone;
@@ -711,7 +731,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         result['phone_number'] = userObj.phone_number;
         result['phone'] = userObj.phone_number;
       }
-      
+
       logger.w('🔍 [USER CONVERSION] Converted user object: $result');
       return result;
     } catch (e) {
@@ -727,13 +747,15 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     if (user.containsKey('created_at') && user['created_at'] != null) {
       return user['created_at']?.toString();
     }
-    
+
     final dynamic userObj = item?['user'];
     if (userObj is Map<String, dynamic>) {
-      return userObj['createdAt']?.toString() ?? userObj['created_at']?.toString();
+      return userObj['createdAt']?.toString() ??
+          userObj['created_at']?.toString();
     } else {
       try {
-        return userObj?.createdAt?.toString() ?? userObj?.created_at?.toString();
+        return userObj?.createdAt?.toString() ??
+            userObj?.created_at?.toString();
       } catch (e) {
         return null;
       }
@@ -742,11 +764,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   String? _extractUserId(dynamic userObj) {
     if (userObj == null) return null;
-    
+
     if (userObj is Map<String, dynamic>) {
       return userObj['id']?.toString();
     }
-    
+
     try {
       return userObj.id?.toString();
     } catch (e) {
@@ -766,17 +788,28 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   dynamic _getProperty(dynamic obj, String propertyName) {
     try {
       switch (propertyName) {
-        case 'id': return obj.id;
-        case 'name': return obj.name;
-        case 'username': return obj.username;
-        case 'email': return obj.email;
-        case 'profilePhoto': return obj.profilePhoto;
-        case 'profile_photo': return obj.profile_photo;
-        case 'phone': return obj.phone;
-        case 'phone_number': return obj.phone_number;
-        case 'createdAt': return obj.createdAt;
-        case 'created_at': return obj.created_at;
-        default: return null;
+        case 'id':
+          return obj.id;
+        case 'name':
+          return obj.name;
+        case 'username':
+          return obj.username;
+        case 'email':
+          return obj.email;
+        case 'profilePhoto':
+          return obj.profilePhoto;
+        case 'profile_photo':
+          return obj.profile_photo;
+        case 'phone':
+          return obj.phone;
+        case 'phone_number':
+          return obj.phone_number;
+        case 'createdAt':
+          return obj.createdAt;
+        case 'created_at':
+          return obj.created_at;
+        default:
+          return null;
       }
     } catch (e) {
       return null;
@@ -785,7 +818,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   int? _extractCategoryId(dynamic category) {
     if (category == null) return null;
-    
+
     if (category is Map<String, dynamic>) {
       return category['id'] as int?;
     } else if (category is num) {
@@ -797,8 +830,54 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         return null;
       }
     }
-    
+
     return null;
+  }
+
+  // Helper method to format price with commas (same as homePage.dart)
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
+  Widget _buildPriceWidget(
+    String priceString,
+    String? currencySymbol,
+    TextStyle style,
+  ) {
+    final fullFormattedPrice = _formatPriceWithCommas(priceString);
+    final displaySymbol = currencySymbol ?? '';
+
+    if (priceString.length > 6) {
+      final truncatedDigits = priceString.substring(0, 6);
+      return Tooltip(
+        message: '$displaySymbol $fullFormattedPrice',
+        triggerMode: TooltipTriggerMode.tap,
+        showDuration: const Duration(seconds: 3),
+        child: Text('$displaySymbol $truncatedDigits...', style: style),
+      );
+    }
+
+    return Text(
+      '$displaySymbol $fullFormattedPrice',
+      style: style,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
   }
 
   // ========== UI BUILDING METHODS ==========
@@ -806,11 +885,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (item != null) {
       return _buildMainContent(theme);
     }
-    
+
     // Error state when data is invalid
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -863,8 +942,8 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
 
   Widget _buildMainContent(ThemeData theme) {
     final images = getItemImages();
-    final currentImage = images.isNotEmpty && selectedIndex < images.length 
-        ? images[selectedIndex] 
+    final currentImage = images.isNotEmpty && selectedIndex < images.length
+        ? images[selectedIndex]
         : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
 
     final highlights = getHighlights();
@@ -878,7 +957,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
             builder: (context, similarItemsProvider, userDetailsProvider, child) {
               return CustomScrollView(
                 controller: _scrollController,
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
                 slivers: [
                   // ========== SLIVER APP BAR ==========
                   SliverAppBar(
@@ -895,8 +976,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                              color: Colors.white, size: 18),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_outlined,
+                            color: Colors.white,
+                            size: 18,
+                          ),
                         ),
                         onPressed: () => Get.back(),
                       ),
@@ -926,7 +1010,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                               color: Colors.black54,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Icon(Icons.share, color: Colors.white, size: 20),
+                            child: const Icon(
+                              Icons.share,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ),
                       ),
@@ -943,21 +1031,21 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                               fit: BoxFit.cover,
                             ),
                           ),
-                          
+
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.bottomCenter,
                                 end: Alignment.topCenter,
                                 colors: [
-                                  Colors.black.withOpacity(0.8),
+                                  Colors.black.withValues(alpha: 0.8),
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.3),
+                                  Colors.black.withValues(alpha: 0.3),
                                 ],
                               ),
                             ),
                           ),
-                          
+
                           Positioned(
                             left: 20,
                             bottom: 80,
@@ -978,20 +1066,21 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 6),
-                                Consumer<UserProvider>(
-                                  builder: (context, userProvider, child) {
-                                    return Text(
-                                      '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    );
-                                  },
-                                ),
+                                  Consumer<UserProvider>(
+                                    builder: (context, userProvider, child) {
+                                      return _buildPriceWidget(
+                                        item!['price']?.toString() ?? '0',
+                                        userProvider
+                                            .user
+                                            ?.countryCurrencySymbol,
+                                        const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ),
@@ -1004,7 +1093,10 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                               opacity: _imageOpacity,
                               duration: const Duration(milliseconds: 200),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.black54,
                                   borderRadius: BorderRadius.circular(12),
@@ -1024,7 +1116,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  
+
                   // ========== IMAGE GALLERY ==========
                   SliverToBoxAdapter(
                     child: Container(
@@ -1038,9 +1130,13 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               itemCount: images.length,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               itemBuilder: (context, index) {
-                                final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                                final image = index < images.length
+                                    ? images[index]
+                                    : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
                                 return GestureDetector(
                                   onTap: () {
                                     if (mounted) {
@@ -1054,9 +1150,12 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                               },
                             ),
                           ),
-                          
+
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             child: Text(
                               "Tap image to set as main display • Tap 'View' to see full size with swipe navigation",
                               style: TextStyle(
@@ -1070,11 +1169,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  
+
                   // ========== ITEM DETAILS ==========
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -1095,12 +1197,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                 const SizedBox(height: 6),
                                 Consumer<UserProvider>(
                                   builder: (context, userProvider, child) {
-                                    return Text(
-                                      '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}',
-                                      style: TextStyle(
+                                    return _buildPriceWidget(
+                                      item!['price']?.toString() ?? '0',
+                                      userProvider.user?.countryCurrencySymbol,
+                                      TextStyle(
                                         fontSize: 18.0,
                                         fontWeight: FontWeight.w500,
-                                        color: theme.textTheme.titleLarge?.color,
+                                        color:
+                                            theme.textTheme.titleLarge?.color,
                                       ),
                                     );
                                   },
@@ -1118,32 +1222,41 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                   const SizedBox(height: 16),
                                 ],
                                 if (item!['location'] != null) ...[
-                                  _buildInfoRow(Icons.location_on_outlined, item!['location']),
+                                  _buildInfoRow(
+                                    Icons.location_on_outlined,
+                                    item!['location'],
+                                  ),
                                   const SizedBox(height: 8),
                                 ],
-                                _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(item!['created_at'] ?? '')),
+                                _buildInfoRow(
+                                  Icons.refresh_outlined,
+                                  formatTimeAgo(item!['created_at'] ?? ''),
+                                ),
                                 const SizedBox(height: 16),
-                                
+
                                 Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
                                   children: _buildVerificationBadges(),
                                 ),
-                                
+
                                 const SizedBox(height: 16),
-                                
+
                                 const SizedBox(height: 20),
                                 Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
                                   children: [
-                                    if(item!["warranty"] != null)
-                                    _buildTag(
-                                      "Warranty", 
-                                      theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!),
+                                    if (item!["warranty"] != null)
+                                      _buildTag(
+                                        "Warranty",
+                                        theme.brightness == Brightness.dark
+                                            ? Colors.grey[700]!
+                                            : Colors.grey[300]!,
+                                      ),
                                   ],
                                 ),
-                                
+
                                 // ========== HIGHLIGHTS SECTION ==========
                                 if (highlights.isNotEmpty) ...[
                                   const SizedBox(height: 20),
@@ -1160,7 +1273,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                     }).toList(),
                                   ),
                                 ],
-                                
+
                                 // ========== SPECIFICATIONS SECTION ==========
                                 if (specifications.isNotEmpty) ...[
                                   const SizedBox(height: 20),
@@ -1178,9 +1291,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                     }).toList(),
                                   ),
                                 ],
-                                
+
                                 const SizedBox(height: 16),
-                                
+
                                 Divider(
                                   color: theme.dividerColor,
                                   height: 12,
@@ -1193,7 +1306,8 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
@@ -1202,18 +1316,26 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                                 style: TextStyle(
                                                   fontSize: 16.0,
                                                   fontWeight: FontWeight.bold,
-                                                  color: theme.textTheme.titleLarge?.color,
+                                                  color: theme
+                                                      .textTheme
+                                                      .titleLarge
+                                                      ?.color,
                                                 ),
                                               ),
                                               const SizedBox(width: 6),
-                                              if (Provider.of<UserProvider>(context, listen: false).isFullyVerified)
+                                              if (Provider.of<UserProvider>(
+                                                context,
+                                                listen: false,
+                                              ).isFullyVerified)
                                                 CustomImage(
-                                                  imagePath: '${ImageStringGlobalVariables.iconPath}check.png',
+                                                  imagePath:
+                                                      '${ImageStringGlobalVariables.iconPath}check.png',
                                                   imageWidth: 16,
                                                   imageHeight: 16,
-                                                  fit: BoxFit.cover, 
-                                                  isAssetImage: true, 
-                                                  isImageBorderRadiusRequired: false,
+                                                  fit: BoxFit.cover,
+                                                  isAssetImage: true,
+                                                  isImageBorderRadiusRequired:
+                                                      false,
                                                 ),
                                             ],
                                           ),
@@ -1222,7 +1344,10 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                             "Joined: ${formatTimeAgo(_getUserCreatedAt() ?? '')}",
                                             style: TextStyle(
                                               fontSize: 13.0,
-                                              color: theme.textTheme.bodyMedium?.color,
+                                              color: theme
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.color,
                                             ),
                                           ),
                                           const SizedBox(height: 4),
@@ -1233,7 +1358,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-                                
+
                                 Row(
                                   children: [
                                     _buildChatButton(),
@@ -1244,7 +1369,7 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                               ],
                             ),
                           ),
-                          
+
                           Padding(
                             padding: const EdgeInsets.fromLTRB(0, 24, 0, 16),
                             child: Text(
@@ -1260,16 +1385,15 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                       ),
                     ),
                   ),
-                  
+
                   // ========== SIMILAR ITEMS ==========
                   _buildSimilarItemsSection(similarItemsProvider),
-                  
+
                   if (similarItemsProvider.isLoadingMore)
-                    SliverToBoxAdapter(
-                      child: _buildLoadingMoreIndicator(),
-                    ),
-                  
-                  if (!similarItemsProvider.hasMore && similarItemsProvider.items.isNotEmpty)
+                    SliverToBoxAdapter(child: _buildLoadingMoreIndicator()),
+
+                  if (!similarItemsProvider.hasMore &&
+                      similarItemsProvider.items.isNotEmpty)
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -1284,20 +1408,15 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
                         ),
                       ),
                     ),
-                  
-                  const SliverToBoxAdapter(
-                    child: SizedBox(height: 40),
-                  ),
+
+                  const SliverToBoxAdapter(child: SizedBox(height: 40)),
                 ],
               );
             },
           ),
-          
+
           // ========== PROFILE IMAGE POPUP OVERLAY ==========
-          if (_showProfilePopup)
-            Positioned.fill(
-              child: _buildProfilePopup(),
-            ),
+          if (_showProfilePopup) Positioned.fill(child: _buildProfilePopup()),
         ],
       ),
     );
@@ -1313,26 +1432,19 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade400,
-            Colors.purple.shade400,
-          ],
+          colors: [Colors.blue.shade400, Colors.purple.shade400],
         ),
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Center(
-        child: Icon(
-          Icons.person,
-          size: size * 0.5,
-          color: Colors.white,
-        ),
+        child: Icon(Icons.person, size: size * 0.5, color: Colors.white),
       ),
     );
   }
@@ -1340,10 +1452,11 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
   Widget _buildUserProfileImage() {
     final dynamic userObj = item!['user'];
     String? profilePhoto;
-    
+
     if (user.containsKey('profilePhoto') && user['profilePhoto'] != null) {
       profilePhoto = user['profilePhoto'];
-    } else if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
+    } else if (user.containsKey('profile_photo') &&
+        user['profile_photo'] != null) {
       profilePhoto = user['profile_photo'];
     } else {
       if (userObj is Map<String, dynamic>) {
@@ -1356,9 +1469,9 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
         }
       }
     }
-    
+
     logger.w('🔍 [PROFILE PHOTO] Final profile photo: $profilePhoto');
-    
+
     return GestureDetector(
       onTap: _openProfilePopup,
       child: MouseRegion(
@@ -1370,12 +1483,14 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.3),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -1403,19 +1518,24 @@ class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateM
     try {
       final String itemId = item!['id']?.toString() ?? '';
       final String itemName = item!['name'] ?? 'Amazing Vehicle';
-      final String itemPrice = '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}';
+      final String itemPrice =
+          '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.parse(item!['price']?.toString() ?? '0'))}';
       final String itemLocation = item!['location'] ?? 'Location not specified';
-      
+
       if (itemId.isEmpty) {
         _showErrorSnackbar('Cannot share: Item ID missing');
         return;
       }
-      
+
       // Use the fixed shareable link method
-      final String shareableLink = SimpleDeepLinkHandler.generateShareableLink(itemId, itemName);
-      
+      final String shareableLink = SimpleDeepLinkHandler.generateShareableLink(
+        itemId,
+        itemName,
+      );
+
       // Create the share text
-      final String shareText = '''
+      final String shareText =
+          '''
 🚗 Check out this vehicle on GAGcars!
 
 $itemName
@@ -1427,22 +1547,21 @@ $itemName
 Download GAGcars app for more amazing vehicles!''';
 
       logger.i("📝 Generated share link: $shareableLink");
-      
+
       final box = context.findRenderObject() as RenderBox?;
-      
+
       final result = await Share.share(
         shareText,
         subject: 'Check out this vehicle on GAGcars!',
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
       );
-      
+
       if (result.status == ShareResultStatus.success) {
         logger.i("✅ Share completed successfully");
         _showSuccessSnackbar('Listing shared successfully!');
       } else {
         logger.w("⚠️ Share dialog was dismissed");
       }
-      
     } catch (e, stackTrace) {
       logger.e("❌ Error sharing listing: $e");
       logger.e("❌ Stack trace: $stackTrace");
@@ -1487,7 +1606,7 @@ Download GAGcars app for more amazing vehicles!''';
 
     try {
       String baseUrl = "https://dashboard.gagcars.com";
-      
+
       String cleanImagePath;
       if (imagePath.startsWith('/storage/')) {
         cleanImagePath = imagePath;
@@ -1496,20 +1615,26 @@ Download GAGcars app for more amazing vehicles!''';
       } else {
         cleanImagePath = '/storage/$imagePath';
       }
-      
+
       final fullUrl = '$baseUrl$cleanImagePath';
       return fullUrl;
     } catch (e) {
-      print('❌ Error constructing image URL: $e');
+      debugPrint('❌ Error constructing image URL: $e');
       return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     }
   }
 
-  Widget _buildImageErrorPlaceholder(double? width, double? height, ThemeData theme) {
+  Widget _buildImageErrorPlaceholder(
+    double? width,
+    double? height,
+    ThemeData theme,
+  ) {
     return Container(
       width: width,
       height: height,
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1517,14 +1642,18 @@ Download GAGcars app for more amazing vehicles!''';
             Icon(
               Icons.image_not_supported,
               size: (width ?? 45) * 0.4,
-              color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
+              color: theme.brightness == Brightness.dark
+                  ? Colors.grey[500]
+                  : Colors.grey[400],
             ),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
+                color: theme.brightness == Brightness.dark
+                    ? Colors.grey[400]
+                    : Colors.grey[500],
               ),
             ),
           ],
@@ -1533,22 +1662,15 @@ Download GAGcars app for more amazing vehicles!''';
     );
   }
 
-  Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
-    return Shimmer.fromColors(
-      baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-      highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
-      child: Container(
-        width: width,
-        height: height,
-        color: theme.cardColor,
-      ),
-    );
-  }
-
-  Widget _buildSafeNetworkImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  Widget _buildSafeNetworkImage(
+    String imagePath, {
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+  }) {
     final theme = Theme.of(context);
     final String imageUrl = _getCorrectImageUrl(imagePath);
-    
+
     return CachedNetworkImage(
       imageUrl: imageUrl,
       width: width,
@@ -1559,7 +1681,9 @@ Download GAGcars app for more amazing vehicles!''';
           child: CircularProgressIndicator(
             value: downloadProgress.progress,
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              ColorGlobalVariables.brownColor,
+            ),
           ),
         );
       },
@@ -1569,13 +1693,19 @@ Download GAGcars app for more amazing vehicles!''';
     );
   }
 
-  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  Widget _buildSafeImage(
+    String imagePath, {
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+  }) {
     final theme = Theme.of(context);
     final String imageUrl = _getCorrectImageUrl(imagePath);
-    
-    final bool isAssetImage = imageUrl.contains('assets/') || 
-                             imageUrl.endsWith('car_placeholder.png');
-    
+
+    final bool isAssetImage =
+        imageUrl.contains('assets/') ||
+        imageUrl.endsWith('car_placeholder.png');
+
     if (isAssetImage) {
       return Image.asset(
         imageUrl,
@@ -1587,7 +1717,12 @@ Download GAGcars app for more amazing vehicles!''';
         },
       );
     } else {
-      return _buildSafeNetworkImage(imagePath, width: width, height: height, fit: fit);
+      return _buildSafeNetworkImage(
+        imagePath,
+        width: width,
+        height: height,
+        fit: fit,
+      );
     }
   }
 
@@ -1607,7 +1742,7 @@ Download GAGcars app for more amazing vehicles!''';
 
   Widget _buildGalleryItem(String image, int index, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       width: 120,
       margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -1616,7 +1751,7 @@ Download GAGcars app for more amazing vehicles!''';
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -1633,7 +1768,7 @@ Download GAGcars app for more amazing vehicles!''';
                   topRight: Radius.circular(12),
                 ),
                 border: Border.all(
-                  color: index == selectedIndex 
+                  color: index == selectedIndex
                       ? ColorGlobalVariables.brownColor
                       : Colors.transparent,
                   width: 2,
@@ -1654,7 +1789,7 @@ Download GAGcars app for more amazing vehicles!''';
                     ),
                     if (index == selectedIndex)
                       Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         child: const Center(
                           child: Icon(
                             Icons.check_circle,
@@ -1668,7 +1803,7 @@ Download GAGcars app for more amazing vehicles!''';
               ),
             ),
           ),
-          
+
           Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -1695,7 +1830,10 @@ Download GAGcars app for more amazing vehicles!''';
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorGlobalVariables.brownColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1735,25 +1873,25 @@ Download GAGcars app for more amazing vehicles!''';
       if (user.containsKey('phone_number') && user['phone_number'] != null) {
         return user['phone_number']?.toString();
       }
-      
+
       final dynamic userObj = item!['user'];
-      
+
       if (userObj is Map<String, dynamic>) {
-        return userObj['phone']?.toString() ?? 
-               userObj['phone_number']?.toString() ??
-               userObj['contact']?.toString() ??
-               userObj['mobile']?.toString();
+        return userObj['phone']?.toString() ??
+            userObj['phone_number']?.toString() ??
+            userObj['contact']?.toString() ??
+            userObj['mobile']?.toString();
       } else {
         try {
-          return userObj.phone?.toString() ?? 
-                 userObj.phone_number?.toString() ??
-                 userObj.contact?.toString() ??
-                 userObj.mobile?.toString();
+          return userObj.phone?.toString() ??
+              userObj.phone_number?.toString() ??
+              userObj.contact?.toString() ??
+              userObj.mobile?.toString();
         } catch (e) {
-          return item!['phone']?.toString() ?? 
-                 item!['phone_number']?.toString() ??
-                 item!['contact']?.toString() ??
-                 item!['mobile']?.toString();
+          return item!['phone']?.toString() ??
+              item!['phone_number']?.toString() ??
+              item!['contact']?.toString() ??
+              item!['mobile']?.toString();
         }
       }
     } catch (e) {
@@ -1768,7 +1906,7 @@ Download GAGcars app for more amazing vehicles!''';
     if (user.containsKey('profile_photo') && user['profile_photo'] != null) {
       return user['profile_photo'];
     }
-    
+
     final dynamic userObj = item!['user'];
     if (userObj is Map<String, dynamic>) {
       return userObj['profilePhoto'] ?? userObj['profile_photo'];
@@ -1788,19 +1926,19 @@ Download GAGcars app for more amazing vehicles!''';
     if (user.containsKey('username') && user['username'] != null) {
       return user['username']!.toString();
     }
-    
+
     try {
       final dynamic userObj = item!['user'];
       if (userObj is Map<String, dynamic>) {
-        return userObj['name']?.toString() ?? 
-               userObj['username']?.toString() ??
-               'Seller';
+        return userObj['name']?.toString() ??
+            userObj['username']?.toString() ??
+            'Seller';
       }
-      
+
       try {
-        return userObj.name?.toString() ?? 
-               userObj.username?.toString() ??
-               'Seller';
+        return userObj.name?.toString() ??
+            userObj.username?.toString() ??
+            'Seller';
       } catch (e) {
         return 'Seller';
       }
@@ -1813,7 +1951,7 @@ Download GAGcars app for more amazing vehicles!''';
 
   Widget _buildChatButton() {
     final theme = Theme.of(context);
-    
+
     return Expanded(
       child: Container(
         height: 56,
@@ -1822,14 +1960,14 @@ Download GAGcars app for more amazing vehicles!''';
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              ColorGlobalVariables.redColor.withOpacity(0.9),
-              ColorGlobalVariables.redColor.withOpacity(0.7),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.9),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: ColorGlobalVariables.redColor.withOpacity(0.3),
+              color: ColorGlobalVariables.redColor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1843,7 +1981,7 @@ Download GAGcars app for more amazing vehicles!''';
               final userName = _getUserName();
               final userProfilePhoto = _getUserProfilePhoto();
               final userPhone = _getUserPhoneNumber();
-              
+
               if (userId != null) {
                 logger.e("User id for detailPage is: $userId");
                 Get.toNamed(
@@ -1853,7 +1991,7 @@ Download GAGcars app for more amazing vehicles!''';
                     'contactName': userName,
                     'contactImage': userProfilePhoto,
                     'contactPhone': userPhone,
-                  }
+                  },
                 );
               } else {
                 Get.snackbar(
@@ -1873,7 +2011,7 @@ Download GAGcars app for more amazing vehicles!''';
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -1904,7 +2042,7 @@ Download GAGcars app for more amazing vehicles!''';
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final hasContact = _getUserPhoneNumber() != null;
-    
+
     return Expanded(
       child: Container(
         height: 56,
@@ -1917,7 +2055,7 @@ Download GAGcars app for more amazing vehicles!''';
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -1936,12 +2074,15 @@ Download GAGcars app for more amazing vehicles!''';
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withOpacity(0.8),
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!
+                          .withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.contact_phone_outlined,
-                      color: hasContact ? ColorGlobalVariables.greenColor : Colors.grey,
+                      color: hasContact
+                          ? ColorGlobalVariables.greenColor
+                          : Colors.grey,
                       size: 20,
                     ),
                   ),
@@ -1962,9 +2103,13 @@ Download GAGcars app for more amazing vehicles!''';
                         hasContact ? 'Show details' : 'No contact',
                         style: TextStyle(
                           fontSize: 12,
-                          color: hasContact ? 
-                            (isDarkMode ? Colors.green[300] : ColorGlobalVariables.greenColor) : 
-                            (isDarkMode ? Colors.grey[400] : Colors.grey[500]),
+                          color: hasContact
+                              ? (isDarkMode
+                                    ? Colors.green[300]
+                                    : ColorGlobalVariables.greenColor)
+                              : (isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[500]),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1981,7 +2126,7 @@ Download GAGcars app for more amazing vehicles!''';
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
-    
+
     try {
       if (await canLaunchUrl(phoneUri)) {
         await launchUrl(phoneUri);
@@ -2030,7 +2175,7 @@ Download GAGcars app for more amazing vehicles!''';
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Colors.blue.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -2052,9 +2197,9 @@ Download GAGcars app for more amazing vehicles!''';
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 Text(
                   "Seller: $userName",
                   style: TextStyle(
@@ -2063,9 +2208,9 @@ Download GAGcars app for more amazing vehicles!''';
                     color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
                   Column(
                     children: [
@@ -2081,9 +2226,15 @@ Download GAGcars app for more amazing vehicles!''';
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                          color: isDarkMode
+                              ? const Color(0xFF303030)
+                              : Colors.grey[50],
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+                          border: Border.all(
+                            color: isDarkMode
+                                ? const Color(0xFF616161)
+                                : Colors.grey[300]!,
+                          ),
                         ),
                         child: Text(
                           phoneNumber,
@@ -2136,9 +2287,9 @@ Download GAGcars app for more amazing vehicles!''';
                     ],
                   ),
                 ],
-                
+
                 const SizedBox(height: 24),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -2149,7 +2300,11 @@ Download GAGcars app for more amazing vehicles!''';
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: BorderSide(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+                          side: BorderSide(
+                            color: isDarkMode
+                                ? const Color(0xFF616161)
+                                : Colors.grey[300]!,
+                          ),
                         ),
                         child: Text(
                           "Close",
@@ -2210,15 +2365,17 @@ Download GAGcars app for more amazing vehicles!''';
   List<Widget> _buildVerificationBadges() {
     final List<Widget> badges = [];
     final theme = Theme.of(context);
-    
+
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    
+
     if (userProvider.isVerifiedDealer) {
       badges.add(
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
           decoration: BoxDecoration(
-            color: theme.brightness == Brightness.dark ? Colors.blue[900]! : Colors.lightBlue[100]!,
+            color: theme.brightness == Brightness.dark
+                ? Colors.blue[900]!
+                : Colors.lightBlue[100]!,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -2229,7 +2386,9 @@ Download GAGcars app for more amazing vehicles!''';
                 style: TextStyle(
                   fontSize: 12.0,
                   fontWeight: FontWeight.w500,
-                  color: theme.brightness == Brightness.dark ? Colors.blue[100] : Colors.blue[800],
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.blue[100]
+                      : Colors.blue[800],
                 ),
               ),
               const SizedBox(width: 4),
@@ -2237,19 +2396,21 @@ Download GAGcars app for more amazing vehicles!''';
                 radius: 8,
                 backgroundColor: Colors.blue,
                 child: Icon(Icons.check, size: 12, color: Colors.white),
-              )
+              ),
             ],
           ),
         ),
       );
     }
-    
+
     if (userProvider.isFullyVerified) {
       badges.add(
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
           decoration: BoxDecoration(
-            color: theme.brightness == Brightness.dark ? Colors.green[900]! : Colors.green[100]!,
+            color: theme.brightness == Brightness.dark
+                ? Colors.green[900]!
+                : Colors.green[100]!,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -2260,7 +2421,9 @@ Download GAGcars app for more amazing vehicles!''';
                 style: TextStyle(
                   fontSize: 12.0,
                   fontWeight: FontWeight.w500,
-                  color: theme.brightness == Brightness.dark ? Colors.green[100] : Colors.green[800],
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.green[100]
+                      : Colors.green[800],
                 ),
               ),
               const SizedBox(width: 4),
@@ -2268,25 +2431,29 @@ Download GAGcars app for more amazing vehicles!''';
                 radius: 8,
                 backgroundColor: Colors.green,
                 child: Icon(Icons.verified, size: 12, color: Colors.white),
-              )
+              ),
             ],
           ),
         ),
       );
     }
-    
+
     return badges;
   }
 
   // ========== HIGHLIGHTS AND SPECIFICATIONS ==========
 
   List<Map<String, String>> getHighlights() {
-    final categoryId = item!['category_id'] ?? _extractCategoryId(item!['category']);
+    final categoryId =
+        item!['category_id'] ?? _extractCategoryId(item!['category']);
     if (categoryId == null) {
       return _getDefaultHighlights();
     }
-    
-    final categoryDetailProvider = Provider.of<CategoryDetailProvider>(context, listen: true);
+
+    final categoryDetailProvider = Provider.of<CategoryDetailProvider>(
+      context,
+      listen: true,
+    );
     return categoryDetailProvider.buildHighlights(categoryId, item!);
   }
 
@@ -2297,26 +2464,37 @@ Download GAGcars app for more amazing vehicles!''';
 
   String? _safeGetString(dynamic obj, String key) {
     if (obj == null) return null;
-    
+
     if (obj is Map<String, dynamic>) {
       final value = obj[key];
       return value?.toString();
     }
-    
+
     try {
       switch (key) {
-        case 'id': return obj.id?.toString();
-        case 'name': return obj.name?.toString();
-        case 'username': return obj.username?.toString();
-        case 'email': return obj.email?.toString();
-        case 'profilePhoto': return obj.profilePhoto?.toString();
-        case 'profile_photo': return obj.profile_photo?.toString();
-        case 'phoneNumber': return obj.phoneNumber?.toString();
-        case 'phone_number': return obj.phone_number?.toString();
-        case 'createdAt': return obj.createdAt?.toString();
-        case 'created_at': return obj.created_at?.toString();
-        case 'label': return obj.label?.toString();
-        default: 
+        case 'id':
+          return obj.id?.toString();
+        case 'name':
+          return obj.name?.toString();
+        case 'username':
+          return obj.username?.toString();
+        case 'email':
+          return obj.email?.toString();
+        case 'profilePhoto':
+          return obj.profilePhoto?.toString();
+        case 'profile_photo':
+          return obj.profile_photo?.toString();
+        case 'phoneNumber':
+          return obj.phoneNumber?.toString();
+        case 'phone_number':
+          return obj.phone_number?.toString();
+        case 'createdAt':
+          return obj.createdAt?.toString();
+        case 'created_at':
+          return obj.created_at?.toString();
+        case 'label':
+          return obj.label?.toString();
+        default:
           try {
             final dynamic value = _getProperty(obj, key);
             return value?.toString();
@@ -2333,65 +2511,119 @@ Download GAGcars app for more amazing vehicles!''';
 
   List<Map<String, String>> _getDefaultHighlights() {
     final List<Map<String, String>> highlights = [];
-    
+
     // Filter out empty values - only add if value exists and is not empty/null
-    if (item!['year'] != null && item!['year'].toString().isNotEmpty && item!['year'].toString().toLowerCase() != 'null') {
-      highlights.add({'title': 'Model Year', 'value': item!['year'].toString()});
+    if (item!['year'] != null &&
+        item!['year'].toString().isNotEmpty &&
+        item!['year'].toString().toLowerCase() != 'null') {
+      highlights.add({
+        'title': 'Model Year',
+        'value': item!['year'].toString(),
+      });
     }
-    if (item!['mileage'] != null && item!['mileage'].toString().isNotEmpty && item!['mileage'].toString().toLowerCase() != 'null') {
-      highlights.add({'title': 'Mileage', 'value': '${item!['mileage']} km'});
+    if (item!['mileage'] != null &&
+        item!['mileage'].toString().isNotEmpty &&
+        item!['mileage'].toString().toLowerCase() != 'null') {
+      highlights.add({
+        'title': 'Mileage',
+        'value':
+            '${formatNumber(shortenerRequired: true, number: int.tryParse(item!['mileage'].toString()) ?? 0)} km',
+      });
     }
-    if (item!['engine_capacity'] != null && item!['engine_capacity'].toString().isNotEmpty && item!['engine_capacity'].toString().toLowerCase() != 'null') {
-      highlights.add({'title': 'Engine', 'value': '${item!['engine_capacity']} L'});
+    if (item!['engine_capacity'] != null &&
+        item!['engine_capacity'].toString().isNotEmpty &&
+        item!['engine_capacity'].toString().toLowerCase() != 'null') {
+      highlights.add({
+        'title': 'Engine',
+        'value': '${item!['engine_capacity']} L',
+      });
     }
-    if (item!['condition'] != null && item!['condition'].toString().isNotEmpty && item!['condition'].toString().toLowerCase() != 'null') {
-      highlights.add({'title': 'Condition', 'value': item!['condition'].toString()});
+    if (item!['condition'] != null &&
+        item!['condition'].toString().isNotEmpty &&
+        item!['condition'].toString().toLowerCase() != 'null') {
+      highlights.add({
+        'title': 'Condition',
+        'value': item!['condition'].toString(),
+      });
     }
-    
+
     return highlights; // Return only non-empty highlights
   }
 
   List<Map<String, String>> _getDefaultSpecifications() {
     final List<Map<String, String>> specifications = [];
-    
+
     // FIXED: Always use brand name for "Make" - this was the main issue
     final brandName = _safeGetString(item!['brand'], 'name');
-    if (brandName != null && brandName.isNotEmpty && brandName.toLowerCase() != 'null') {
+    if (brandName != null &&
+        brandName.isNotEmpty &&
+        brandName.toLowerCase() != 'null') {
       specifications.add({'title': 'Make', 'value': brandName});
     }
-    
+
     final modelName = _safeGetString(item!['brand_model'], 'name');
-    if (modelName != null && modelName.isNotEmpty && modelName.toLowerCase() != 'null') {
+    if (modelName != null &&
+        modelName.isNotEmpty &&
+        modelName.toLowerCase() != 'null') {
       specifications.add({'title': 'Model', 'value': modelName});
     }
-    
-    if (item!['color'] != null && item!['color'].toString().isNotEmpty && item!['color'].toString().toLowerCase() != 'null') {
-      specifications.add({'title': 'Color', 'value': item!['color'].toString()});
+
+    if (item!['color'] != null &&
+        item!['color'].toString().isNotEmpty &&
+        item!['color'].toString().toLowerCase() != 'null') {
+      specifications.add({
+        'title': 'Color',
+        'value': item!['color'].toString(),
+      });
     }
-    
-    if (item!['number_of_passengers'] != null && item!['number_of_passengers'].toString().isNotEmpty && item!['number_of_passengers'].toString().toLowerCase() != 'null') {
-      specifications.add({'title': 'Seats', 'value': '${item!['number_of_passengers']} seats'});
+
+    if (item!['number_of_passengers'] != null &&
+        item!['number_of_passengers'].toString().isNotEmpty &&
+        item!['number_of_passengers'].toString().toLowerCase() != 'null') {
+      specifications.add({
+        'title': 'Seats',
+        'value': '${item!['number_of_passengers']} seats',
+      });
     }
-    
-    if (item!['transmission'] != null && item!['transmission'].toString().isNotEmpty && item!['transmission'].toString().toLowerCase() != 'null') {
-      specifications.add({'title': 'Transmission', 'value': item!['transmission'].toString()});
+
+    if (item!['transmission'] != null &&
+        item!['transmission'].toString().isNotEmpty &&
+        item!['transmission'].toString().toLowerCase() != 'null') {
+      specifications.add({
+        'title': 'Transmission',
+        'value': item!['transmission'].toString(),
+      });
     }
-    
+
     // Add additional specifications if available and not empty
-    if (item!['engine_capacity'] != null && item!['engine_capacity'].toString().isNotEmpty && item!['engine_capacity'].toString().toLowerCase() != 'null') {
-      specifications.add({'title': 'Engine Capacity', 'value': '${item!['engine_capacity']} L'});
+    if (item!['engine_capacity'] != null &&
+        item!['engine_capacity'].toString().isNotEmpty &&
+        item!['engine_capacity'].toString().toLowerCase() != 'null') {
+      specifications.add({
+        'title': 'Engine Capacity',
+        'value': '${item!['engine_capacity']} L',
+      });
     }
-    
-    if (item!['steer_position'] != null && item!['steer_position'].toString().isNotEmpty && item!['steer_position'].toString().toLowerCase() != 'null') {
-      specifications.add({'title': 'Steering', 'value': item!['steer_position'].toString()});
+
+    if (item!['steer_position'] != null &&
+        item!['steer_position'].toString().isNotEmpty &&
+        item!['steer_position'].toString().toLowerCase() != 'null') {
+      specifications.add({
+        'title': 'Steering',
+        'value': item!['steer_position'].toString(),
+      });
     }
-    
+
     return specifications; // Return only non-empty specifications
   }
 
   // ========== UI COMPONENTS ==========
 
-  Widget _buildInfoItem(String title, String value, {bool isSpecification = false}) {
+  Widget _buildInfoItem(
+    String title,
+    String value, {
+    bool isSpecification = false,
+  }) {
     final theme = Theme.of(context);
     return IntrinsicWidth(
       child: Column(
@@ -2401,7 +2633,9 @@ Download GAGcars app for more amazing vehicles!''';
             title,
             style: TextStyle(
               fontSize: 14.0,
-              color: isSpecification ? theme.textTheme.bodyMedium?.color : theme.textTheme.titleLarge?.color,
+              color: isSpecification
+                  ? theme.textTheme.bodyMedium?.color
+                  : theme.textTheme.titleLarge?.color,
               fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
             ),
           ),
@@ -2455,7 +2689,9 @@ Download GAGcars app for more amazing vehicles!''';
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark ? color.withOpacity(0.3) : color,
+        color: theme.brightness == Brightness.dark
+            ? color.withValues(alpha: 0.3)
+            : color,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
@@ -2463,24 +2699,23 @@ Download GAGcars app for more amazing vehicles!''';
         style: TextStyle(
           fontSize: 13.0,
           fontWeight: FontWeight.w500,
-          color: theme.brightness == Brightness.dark ? Colors.white70 : Colors.black87,
+          color: theme.brightness == Brightness.dark
+              ? Colors.white70
+              : Colors.black87,
         ),
       ),
     );
   }
 
   Widget _buildSimilarItem(SimilarItem similarItem, Size screenSize) {
-    return _SimilarItemWidget(
-      item: similarItem,
-      screenSize: screenSize,
-    );
+    return _SimilarItemWidget(item: similarItem, screenSize: screenSize);
   }
 
   // ========== SIMILAR ITEMS SECTION ==========
 
   Widget _buildSimilarItemsSection(SimilarItemsProvider similarItemsProvider) {
     final theme = Theme.of(context);
-    
+
     if (similarItemsProvider.isLoading && similarItemsProvider.items.isEmpty) {
       return _buildSimilarItemsShimmer();
     }
@@ -2516,15 +2751,21 @@ Download GAGcars app for more amazing vehicles!''';
             if (index >= similarItemsProvider.items.length) {
               return _buildLoadingMoreGridItem();
             }
-            
+
             final similarItem = similarItemsProvider.items[index];
-            
+
             return GestureDetector(
               onTap: () {
-                logger.e('🔍 [SIMILAR ITEM TAP] User data: ${similarItem.user?.toJson()}');
-                logger.e('🔍 [SIMILAR ITEM TAP] Profile photo: ${similarItem.user?.profilePhoto}');
-                logger.e('🔍 [SIMILAR ITEM TAP] Created at: ${similarItem.user?.createdAt}');
-                
+                logger.e(
+                  '🔍 [SIMILAR ITEM TAP] User data: ${similarItem.user?.toJson()}',
+                );
+                logger.e(
+                  '🔍 [SIMILAR ITEM TAP] Profile photo: ${similarItem.user?.profilePhoto}',
+                );
+                logger.e(
+                  '🔍 [SIMILAR ITEM TAP] Created at: ${similarItem.user?.createdAt}',
+                );
+
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
                     builder: (context) => DetailPage(
@@ -2537,10 +2778,15 @@ Download GAGcars app for more amazing vehicles!''';
                   ),
                 );
               },
-              child: _buildSimilarItem(similarItem, MediaQuery.of(context).size),
+              child: _buildSimilarItem(
+                similarItem,
+                MediaQuery.of(context).size,
+              ),
             );
           },
-          childCount: similarItemsProvider.items.length + (similarItemsProvider.isLoadingMore ? 1 : 0),
+          childCount:
+              similarItemsProvider.items.length +
+              (similarItemsProvider.isLoadingMore ? 1 : 0),
         ),
       ),
     );
@@ -2576,8 +2822,12 @@ Download GAGcars app for more amazing vehicles!''';
             ),
             itemBuilder: (context, index) {
               return Shimmer.fromColors(
-                baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-                highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+                baseColor: theme.brightness == Brightness.dark
+                    ? Colors.grey[700]!
+                    : Colors.grey[300]!,
+                highlightColor: theme.brightness == Brightness.dark
+                    ? Colors.grey[600]!
+                    : Colors.grey[100]!,
                 child: Container(
                   decoration: BoxDecoration(
                     color: theme.cardColor,
@@ -2601,7 +2851,9 @@ Download GAGcars app for more amazing vehicles!''';
       ),
       child: Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            ColorGlobalVariables.brownColor,
+          ),
         ),
       ),
     );
@@ -2612,7 +2864,9 @@ Download GAGcars app for more amazing vehicles!''';
       padding: EdgeInsets.all(16),
       child: Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            ColorGlobalVariables.brownColor,
+          ),
         ),
       ),
     );
@@ -2622,16 +2876,16 @@ Download GAGcars app for more amazing vehicles!''';
     return Consumer<UserDetailsProvider>(
       builder: (context, userDetailsProvider, child) {
         final formattedAdsCount = userDetailsProvider.formattedAdsCount;
-        
+
         return GestureDetector(
-          onTap: (){
+          onTap: () {
             Get.toNamed(
               RouteClass.getAdsPage(),
               arguments: {
                 'user': user,
                 'phoneNumber': _getUserPhoneNumber(),
-                'type': 'adsPage' 
-              }
+                'type': 'adsPage',
+              },
             );
           },
           child: Text(
@@ -2655,10 +2909,7 @@ class _SimilarItemWidget extends StatefulWidget {
   final SimilarItem item;
   final Size screenSize;
 
-  const _SimilarItemWidget({
-    required this.item,
-    required this.screenSize,
-  });
+  const _SimilarItemWidget({required this.item, required this.screenSize});
 
   @override
   __SimilarItemWidgetState createState() => __SimilarItemWidgetState();
@@ -2669,34 +2920,37 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<Color?> _colorAnimation;
-  
+
   bool _isLiked = false;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _colorAnimation = ColorTween(
-      begin: Colors.grey[400],
-      end: Colors.red,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _scaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _colorAnimation = ColorTween(begin: Colors.grey[400], end: Colors.red)
+        .animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     _initializeLikeStatus();
   }
@@ -2709,9 +2963,12 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
 
   void _checkWishlistStatus() {
     try {
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(
+        context,
+        listen: false,
+      );
       final isInWishlist = wishlistManager.isLiked(widget.item.id);
-      
+
       setState(() {
         _isLiked = isInWishlist;
         if (_isLiked) {
@@ -2719,13 +2976,13 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         }
       });
     } catch (e) {
-      print('Error checking wishlist status: $e');
+      debugPrint('Error checking wishlist status: $e');
     }
   }
 
   Future<void> _toggleLike() async {
     if (_isLoading) return;
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -2737,11 +2994,13 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         _animationController.forward();
       }
 
-      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
-      
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(
+        context,
+        listen: false,
+      );
+
       final result = await wishlistProvider.toggleWishlistItem(
-        itemId: widget.item.id, 
+        itemId: widget.item.id,
         context: context,
       );
 
@@ -2749,7 +3008,11 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         setState(() {
           _isLiked = !_isLiked;
         });
-        
+
+        if (!context.mounted) return;
+        if (!context.mounted) return;
+        if (!context.mounted) return;
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -2770,7 +3033,11 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         } else {
           _animationController.reverse();
         }
-        
+
+        if (!context.mounted) return;
+        if (!context.mounted) return;
+        if (!context.mounted) return;
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -2783,13 +3050,15 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         );
       }
     } catch (e) {
-      print('Wishlist error: $e');
+      debugPrint('Wishlist error: $e');
       if (_isLiked) {
         _animationController.forward();
       } else {
         _animationController.reverse();
       }
-      
+
+      if (!context.mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -2813,6 +3082,26 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
     super.dispose();
   }
 
+  // Helper method to format price with commas (same as homePage.dart)
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
+  }
+
   String _getCorrectImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
       return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
@@ -2824,7 +3113,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
 
     try {
       String baseUrl = "https://dashboard.gagcars.com";
-      
+
       String cleanImagePath;
       if (imagePath.startsWith('/storage/')) {
         cleanImagePath = imagePath;
@@ -2833,21 +3122,22 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
       } else {
         cleanImagePath = '/storage/$imagePath';
       }
-      
+
       final fullUrl = '$baseUrl$cleanImagePath';
       return fullUrl;
     } catch (e) {
-      print('❌ Error constructing similar item image URL: $e');
+      debugPrint('❌ Error constructing similar item image URL: $e');
       return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     }
   }
 
   Widget _buildItemImage(String imageUrl, ThemeData theme) {
     final String fullImageUrl = _getCorrectImageUrl(imageUrl);
-    
-    final bool isAssetImage = fullImageUrl.contains('assets/') || 
-                             fullImageUrl.endsWith('car_placeholder.png');
-    
+
+    final bool isAssetImage =
+        fullImageUrl.contains('assets/') ||
+        fullImageUrl.endsWith('car_placeholder.png');
+
     if (isAssetImage) {
       return Image.asset(
         fullImageUrl,
@@ -2865,7 +3155,9 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
             child: CircularProgressIndicator(
               value: downloadProgress.progress,
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ColorGlobalVariables.brownColor,
+              ),
             ),
           );
         },
@@ -2878,22 +3170,28 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.image_not_supported, 
-              size: 32, 
-              color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
+              Icons.image_not_supported,
+              size: 32,
+              color: theme.brightness == Brightness.dark
+                  ? Colors.grey[500]
+                  : Colors.grey[400],
             ),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
-                fontSize: 10, 
-                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
+                fontSize: 10,
+                color: theme.brightness == Brightness.dark
+                    ? Colors.grey[400]
+                    : Colors.grey[500],
               ),
             ),
           ],
@@ -2909,6 +3207,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
     final firstImage = widget.item.images?.isNotEmpty == true
         ? widget.item.images!.first
         : "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final brandImage = widget.item.brand?.image;
 
     return Container(
       decoration: BoxDecoration(
@@ -2916,7 +3215,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -2928,27 +3227,35 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
                 child: Container(
                   height: 120,
                   width: double.infinity,
-                  color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
+                  color: theme.brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Colors.grey[100],
                   child: _buildItemImage(firstImage, theme),
                 ),
               ),
-              
-              if (widget.item.condition != null)
+
+              // CATEGORY BADGE (replacing condition badge)
+              if (widget.item.category?.name != null)
                 Positioned(
                   top: 8,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      widget.item.condition!,
+                      widget.item.category!.name!,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 10,
@@ -2957,7 +3264,8 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     ),
                   ),
                 ),
-              
+
+              // Animated Wishlist Button
               Positioned(
                 bottom: 8,
                 right: 8,
@@ -2978,7 +3286,7 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -2999,10 +3307,12 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                                 animation: _colorAnimation,
                                 builder: (context, child) {
                                   return Icon(
-                                    _isLiked ? Icons.favorite : Icons.favorite_border,
+                                    _isLiked
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
                                     size: 18,
-                                    color: _isLiked 
-                                        ? _colorAnimation.value 
+                                    color: _isLiked
+                                        ? _colorAnimation.value
                                         : theme.iconTheme.color,
                                   );
                                 },
@@ -3014,29 +3324,56 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
               ),
             ],
           ),
-    
+
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ========== ROW 1: Vehicle Name and Condition ==========
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: Text(
-                        widget.item.name ?? 'Unnamed Item',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: theme.textTheme.titleLarge?.color,
+                      child: Tooltip(
+                        message: widget.item.name ?? 'Unnamed Vehicle',
+                        preferBelow: false,
+                        margin: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        textStyle: TextStyle(
+                          color: theme.textTheme.titleLarge?.color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        child: Text(
+                          widget.item.name ?? 'Unnamed Vehicle',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: theme.textTheme.titleLarge?.color,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 5),
                     Text(
-                      widget.item.year ?? '',
+                      widget.item.condition ?? 'Used',
                       style: TextStyle(
                         fontSize: 12,
                         color: theme.textTheme.bodyMedium?.color,
@@ -3044,25 +3381,61 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                     ),
                   ],
                 ),
-    
+
                 const SizedBox(height: 8),
-    
+
+                // ========== ROW 2: Price and Mileage ==========
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.price ?? '0') ?? 0)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                    Expanded(
+                      child: Tooltip(
+                        message:
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.item.price ?? '0')}',
+                        preferBelow: false,
+                        margin: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.cardColor,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        textStyle: TextStyle(
+                          color: theme.textTheme.titleLarge?.color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        child: Text(
+                          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.item.price ?? '0')}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 5),
                     if (widget.item.mileage != null)
                       Row(
                         children: [
-                            Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
-                            const SizedBox(width: 8),
+                          Icon(
+                            Icons.speed,
+                            size: 14,
+                            color: theme.iconTheme.color,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
                             "${formatNumber(shortenerRequired: true, number: int.tryParse(widget.item.mileage!) ?? 0)} km",
                             style: TextStyle(
@@ -3074,19 +3447,45 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                       ),
                   ],
                 ),
-    
+
                 const SizedBox(height: 12),
-    
+
+                // ========== ROW 3: Brand Logo and Location ==========
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const SizedBox(width: 24),
-                    
+                    if (brandImage != null && !brandImage.contains('assets/'))
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CachedNetworkImage(
+                          imageUrl: _getCorrectImageUrl(brandImage),
+                          fit: BoxFit.contain,
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.business,
+                            size: 16,
+                            color: theme.iconTheme.color,
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 24),
+
+                    const SizedBox(
+                      width: 4,
+                    ), // 4px spacing between logo and settings
+
                     if (widget.item.transmission != null)
                       Row(
                         children: [
-                          Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
-                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.settings,
+                            size: 14,
+                            color: theme.iconTheme.color,
+                          ),
+                          const SizedBox(
+                            width: 2,
+                          ), // Reduced spacing between icon and text
                           Text(
                             widget.item.transmission!,
                             style: TextStyle(
@@ -3096,29 +3495,64 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                           ),
                         ],
                       ),
-                    
+
+                    const SizedBox(
+                      width: 4,
+                    ), // 4px spacing between settings and location
+
                     if (widget.item.location != null)
-                      Flexible(
+                      Expanded(
                         child: Row(
                           children: [
-                            Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                widget.item.location!,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: theme.textTheme.bodyMedium?.color,
+                            Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: theme.iconTheme.color,
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ), // Reduced spacing between icon and text
+                            Expanded(
+                              child: Tooltip(
+                                message: widget.item.location!,
+                                preferBelow: false,
+                                margin: const EdgeInsets.all(8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                                decoration: BoxDecoration(
+                                  color: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                textStyle: TextStyle(
+                                  color: theme.textTheme.titleLarge?.color,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                child: Text(
+                                  widget.item.location!,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                   ],
-                ), 
+                ),
               ],
             ),
           ),

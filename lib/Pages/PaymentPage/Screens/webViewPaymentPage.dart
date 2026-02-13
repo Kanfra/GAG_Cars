@@ -951,7 +951,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.1),
+              color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -1037,7 +1037,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Stack(
@@ -1049,7 +1049,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
                       strokeWidth: 3,
-                      backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                      backgroundColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
                     ),
                   ),
                   Icon(
@@ -1098,7 +1098,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               ElevatedButton(
                 onPressed: _manualVerifyPayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                  backgroundColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                   foregroundColor: ColorGlobalVariables.brownColor,
                 ),
                 child: const Text('Check Payment Status'),
@@ -1188,7 +1188,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.greenColor.withOpacity(0.1),
+                color: ColorGlobalVariables.greenColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -1258,7 +1258,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                  color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -1361,7 +1361,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               ElevatedButton(
                 onPressed: _manualVerifyPayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                  backgroundColor: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                   foregroundColor: isDarkMode ? Colors.blue[200] : Colors.blue[700],
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(

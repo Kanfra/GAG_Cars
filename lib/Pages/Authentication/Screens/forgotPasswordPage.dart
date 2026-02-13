@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/buttons/custom_button.dart';
-import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart' as AppIcons;
+import 'package:gag_cars_frontend/GeneralComponents/KwekuComponents/inputs/app_icons.dart'
+    as AppIcons;
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Services/authService.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Models/countryModel.dart';
@@ -20,7 +21,8 @@ class ForgotPasswordPage extends StatefulWidget {
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTickerProviderStateMixin {
+class _ForgotPasswordPageState extends State<ForgotPasswordPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
@@ -30,14 +32,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
   Country? _selectedCountry;
   bool _initializedCountries = false;
   List<Country> _filteredCountries = [];
-  
+
   // Animation controllers
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _iconScaleAnimation;
-  
+
   // Form key for validation
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -52,9 +54,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
 
   void _initializeCountries() {
     if (_initializedCountries) return;
-    
-    final countryProvider = Provider.of<CountryProvider>(context, listen: false);
-    
+
+    final countryProvider = Provider.of<CountryProvider>(
+      context,
+      listen: false,
+    );
+
     countryProvider.ensureCountriesLoaded().then((_) {
       if (_selectedCountry == null) {
         final providerCountry = countryProvider.selectedCountry;
@@ -72,7 +77,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
         }
       }
     });
-    
+
     _initializedCountries = true;
   }
 
@@ -141,13 +146,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
     }
 
     if (!_isValidPhoneNumber(_phoneController.text)) {
-      setState(() => _errorMessage = "Please enter a valid phone number (9-15 digits)");
+      setState(
+        () => _errorMessage = "Please enter a valid phone number (9-15 digits)",
+      );
       return;
     }
 
     final email = _emailController.text.trim();
     // Combine country code with phone number
-    final fullPhoneNumber = "+${_selectedCountry!.phoneCode}${_phoneController.text}";
+    final fullPhoneNumber =
+        "+${_selectedCountry!.phoneCode}${_phoneController.text}";
 
     setState(() {
       _isLoading = true;
@@ -159,25 +167,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
         phone: fullPhoneNumber,
         email: email,
       );
-      
+
       logger.i("SendPasswordResetEmail done.. now show snackbar");
-      
+
       await _successAnimation();
-      
+
       showCustomSnackBar(
         title: "Success",
         message: 'Password reset instructions sent to your email and phone',
         backgroundColor: ColorGlobalVariables.greenColor,
         textColor: ColorGlobalVariables.whiteColor,
       );
-      
+
       // Navigate to the enter OTP page
       Get.toNamed(
         RouteClass.getEnterOtpPage(),
-        arguments: {
-          'email': email, 
-          'phone': fullPhoneNumber,
-        },
+        arguments: {'email': email, 'phone': fullPhoneNumber},
       );
     } catch (e) {
       String errorMessage = "An error occurred";
@@ -219,12 +224,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
 
   void _showCountrySelectionDialog() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final countryProvider = Provider.of<CountryProvider>(context, listen: false);
-    
+    final countryProvider = Provider.of<CountryProvider>(
+      context,
+      listen: false,
+    );
+
     countryProvider.ensureCountriesLoaded().then((_) {
       if (countryProvider.hasError) {
         showCustomSnackBar(
-          message: countryProvider.errorMessage ?? 'Failed to load countries'
+          message: countryProvider.errorMessage ?? 'Failed to load countries',
         );
         return;
       }
@@ -243,7 +251,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -281,7 +289,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                       IconButton(
                         icon: Icon(
                           Icons.close_rounded,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           size: 24,
                         ),
                         onPressed: () => Get.back(),
@@ -294,10 +302,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                   padding: const EdgeInsets.all(16),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                      color: isDarkMode
+                          ? const Color(0xFF303030)
+                          : Colors.grey[50],
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                        color: isDarkMode
+                            ? Colors.grey[700]!
+                            : Colors.grey[300]!,
                       ),
                     ),
                     child: TextField(
@@ -322,7 +334,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                             ? IconButton(
                                 icon: Icon(
                                   Icons.clear_rounded,
-                                  color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                                  color: isDarkMode
+                                      ? Colors.white60
+                                      : Colors.grey[500],
                                   size: 20,
                                 ),
                                 onPressed: () {
@@ -342,7 +356,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                           if (value.isEmpty) {
                             _filteredCountries = countries;
                           } else {
-                            _filteredCountries = countryProvider.searchCountries(value);
+                            _filteredCountries = countryProvider
+                                .searchCountries(value);
                           }
                         });
                       },
@@ -354,157 +369,187 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                   child: countryProvider.isLoading
                       ? const Center(
                           child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              ColorGlobalVariables.brownColor,
+                            ),
                           ),
                         )
                       : countryProvider.hasError
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.error_outline_rounded,
-                                  color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
-                                  size: 48,
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.error_outline_rounded,
+                              color: isDarkMode
+                                  ? Colors.grey[500]
+                                  : Colors.grey[400],
+                              size: 48,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              countryProvider.errorMessage ??
+                                  'Failed to load countries',
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () {
+                                countryProvider.refreshCountries();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    ColorGlobalVariables.brownColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  countryProvider.errorMessage ?? 'Failed to load countries',
-                                  style: TextStyle(
-                                    color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                                    fontSize: 16,
+                              ),
+                              child: const Text(
+                                'Try Again',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        )
+                      : _filteredCountries.isEmpty
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.search_off_rounded,
+                              color: isDarkMode
+                                  ? Colors.grey[500]
+                                  : Colors.grey[400],
+                              size: 48,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No countries found',
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Try a different search term',
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.white60
+                                    : Colors.grey[500],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          itemCount: _filteredCountries.length,
+                          itemBuilder: (context, index) {
+                            final country = _filteredCountries[index];
+                            final isSelected =
+                                _selectedCountry?.id == country.id;
+
+                            return Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedCountry = country;
+                                  });
+                                  Get.back();
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 4,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 16),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    countryProvider.refreshCountries();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ColorGlobalVariables.brownColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? ColorGlobalVariables.brownColor
+                                              .withValues(alpha: 0.1)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? ColorGlobalVariables.brownColor
+                                                .withValues(alpha: 0.3)
+                                          : Colors.transparent,
+                                      width: 1.5,
                                     ),
                                   ),
-                                  child: const Text(
-                                    'Try Again',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ],
-                            )
-                          : _filteredCountries.isEmpty
-                              ? Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.search_off_rounded,
-                                      color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
-                                      size: 48,
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'No countries found',
-                                      style: TextStyle(
-                                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Try a different search term',
-                                      style: TextStyle(
-                                        color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : ListView.builder(
-                                  padding: const EdgeInsets.only(bottom: 16),
-                                  itemCount: _filteredCountries.length,
-                                  itemBuilder: (context, index) {
-                                    final country = _filteredCountries[index];
-                                    final isSelected = _selectedCountry?.id == country.id;
-                                    
-                                    return Material(
-                                      color: Colors.transparent,
-                                      child: InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _selectedCountry = country;
-                                          });
-                                          Get.back();
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                                          padding: const EdgeInsets.all(16),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? ColorGlobalVariables.brownColor.withOpacity(0.1)
-                                                : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? ColorGlobalVariables.brownColor.withOpacity(0.3)
-                                                  : Colors.transparent,
-                                              width: 1.5,
-                                            ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            6,
                                           ),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: 32,
-                                                height: 32,
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(6),
-                                                  color: isDarkMode ? Colors.grey[700] : Colors.grey[100],
-                                                ),
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  _getFlagEmoji(country.iso2),
-                                                  style: const TextStyle(fontSize: 18),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 16),
-                                              
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      country.name,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w500,
-                                                        color: isDarkMode ? Colors.white : Colors.grey[800],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      '+${country.phoneCode} • ${country.iso2} • ${country.currency}',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: isDarkMode ? Colors.white60 : Colors.grey[600],
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              
-                                              if (isSelected)
-                                                Icon(
-                                                  Icons.check_circle_rounded,
-                                                  color: ColorGlobalVariables.brownColor,
-                                                  size: 24,
-                                                ),
-                                            ],
-                                          ),
+                                          color: isDarkMode
+                                              ? Colors.grey[700]
+                                              : Colors.grey[100],
+                                        ),
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          _getFlagEmoji(country.iso2),
+                                          style: const TextStyle(fontSize: 18),
                                         ),
                                       ),
-                                    );
-                                  },
+                                      const SizedBox(width: 16),
+
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              country.name,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                                color: isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.grey[800],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '+${country.phoneCode} • ${country.iso2} • ${country.currency}',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: isDarkMode
+                                                    ? Colors.white60
+                                                    : Colors.grey[600],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      if (isSelected)
+                                        Icon(
+                                          Icons.check_circle_rounded,
+                                          color:
+                                              ColorGlobalVariables.brownColor,
+                                          size: 24,
+                                        ),
+                                    ],
+                                  ),
                                 ),
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
@@ -515,7 +560,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
   }
 
   String _getFlagEmoji(String countryCode) {
-    final codePoints = countryCode.toUpperCase().codeUnits.map((codeUnit) => codeUnit + 127397).toList();
+    final codePoints = countryCode
+        .toUpperCase()
+        .codeUnits
+        .map((codeUnit) => codeUnit + 127397)
+        .toList();
     return String.fromCharCodes(codePoints);
   }
 
@@ -534,7 +583,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -582,26 +631,30 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                         size: 16,
                         color: isDarkMode ? Colors.white60 : Colors.grey[500],
                       ),
-                    
+
                     const SizedBox(width: 6),
-                    
+
                     Flexible(
                       child: Text(
-                        hasSelectedCountry ? '+${_selectedCountry!.phoneCode}' : 'Code',
+                        hasSelectedCountry
+                            ? '+${_selectedCountry!.phoneCode}'
+                            : 'Code',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: hasSelectedCountry 
+                          color: hasSelectedCountry
                               ? ColorGlobalVariables.brownColor
-                              : (isDarkMode ? Colors.white60 : Colors.grey[500]),
+                              : (isDarkMode
+                                    ? Colors.white60
+                                    : Colors.grey[500]),
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ),
-                    
+
                     const SizedBox(width: 2),
-                    
+
                     Icon(
                       Icons.arrow_drop_down_rounded,
                       size: 18,
@@ -612,7 +665,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
               ),
             ),
           ),
-          
+
           Expanded(
             child: Container(
               height: 56,
@@ -689,7 +742,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                     builder: (context, child) {
                       return Transform(
                         transform: Matrix4.identity()
-                          ..scale(_scaleAnimation.value),
+                          ..scale(
+                            _scaleAnimation.value,
+                            _scaleAnimation.value,
+                            1.0,
+                          ),
                         alignment: Alignment.center,
                         child: Opacity(
                           opacity: _fadeAnimation.value,
@@ -701,7 +758,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                                 // Header Section with Icon
                                 _buildHeaderSection(isDark),
                                 const SizedBox(height: 40),
-                                
+
                                 // Input Fields Section
                                 Transform.translate(
                                   offset: Offset(0, _slideAnimation.value),
@@ -711,7 +768,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
 
                                 // Reset Button
                                 Transform.translate(
-                                  offset: Offset(0, _slideAnimation.value * 0.5),
+                                  offset: Offset(
+                                    0,
+                                    _slideAnimation.value * 0.5,
+                                  ),
                                   child: _buildResetButton(isDark),
                                 ),
                               ],
@@ -723,7 +783,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                   ),
                 ),
               ),
-              
+
               // Back Button
               Positioned(
                 top: 60,
@@ -753,7 +813,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: (ColorGlobalVariables.brownColor ?? const Color(0xFF8B4513)).withOpacity(0.1),
+              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -764,7 +824,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
           ),
         ),
         const SizedBox(height: 24),
-        
+
         // Title with slide animation
         Transform.translate(
           offset: Offset(-_slideAnimation.value, 0),
@@ -780,7 +840,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
           ),
         ),
         const SizedBox(height: 12),
-        
+
         // Description with slide animation
         Transform.translate(
           offset: Offset(_slideAnimation.value, 0),
@@ -808,14 +868,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
         boxShadow: isDark
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
               ]
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 ),
@@ -833,7 +893,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
             child: _buildEmailField(isDark),
           ),
           const SizedBox(height: 20),
-          
+
           // Phone Field with fade animation
           FadeTransition(
             opacity: _fadeAnimation,
@@ -867,7 +927,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -887,7 +947,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                 fontSize: 16,
               ),
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: Image.asset(
@@ -922,9 +985,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
           ),
         ),
         const SizedBox(height: 8),
-        
+
         // Error message display
-        if (_errorMessage != null) 
+        if (_errorMessage != null)
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             child: Padding(
@@ -939,10 +1002,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
               ),
             ),
           ),
-        
+
         // Updated phone number field with country selector
         _buildPhoneNumberField(),
-        
+
         // Helper text below the phone field
         Padding(
           padding: const EdgeInsets.only(top: 8),
@@ -1001,7 +1064,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: ColorGlobalVariables.brownColor ?? const Color(0xFF8B4513),
+                    color: ColorGlobalVariables.brownColor,
                   ),
                 ),
               ),
@@ -1037,7 +1100,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> with SingleTick
                 'We will send verification codes to both your email and phone for security. Your phone number should include the country code.',
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDark ? const Color(0xFFE3F2FD) : Colors.blue.shade800,
+                  color: isDark
+                      ? const Color(0xFFE3F2FD)
+                      : Colors.blue.shade800,
                   height: 1.4,
                 ),
               ),

@@ -306,7 +306,7 @@ class _ChatPageState extends State<ChatPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: Offset(0, 10),
               ),
@@ -328,7 +328,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      backgroundColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                       child: Icon(
                         Icons.chat,
                         color: ColorGlobalVariables.brownColor,
@@ -368,7 +368,7 @@ class _ChatPageState extends State<ChatPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.phone, color: Colors.green, size: 20),
@@ -407,7 +407,7 @@ class _ChatPageState extends State<ChatPage> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(Icons.message, color: Colors.blue, size: 20),
@@ -1550,7 +1550,7 @@ class _EnhancedImageViewState extends State<EnhancedImageView> {
       final position = _doubleTapDetails?.localPosition ?? Offset.zero;
       _transformationController.value = Matrix4.identity()
         ..translate(-position.dx * 2, -position.dy * 2)
-        ..scale(3.0);
+        ..scale(3.0, 3.0, 1.0);
     }
   }
 

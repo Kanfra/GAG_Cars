@@ -372,7 +372,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
                 blurRadius: 6,
                 offset: Offset(0, 2),
               ),
@@ -391,7 +391,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: _getCategoryColor(category.name).withOpacity(0.1),
+                    color: _getCategoryColor(category.name).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: _buildCategoryImage(category),
@@ -756,7 +756,7 @@ class _SearchResultItemWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.12),
+              color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.12),
               blurRadius: 6,
               offset: Offset(0, 2),
             ),
@@ -782,7 +782,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

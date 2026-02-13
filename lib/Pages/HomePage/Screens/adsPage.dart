@@ -6,7 +6,6 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserListingsProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
-import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
@@ -336,7 +335,7 @@ class _AdsPageState extends State<AdsPage> {
         Icon(
           Icons.car_rental_outlined,
           size: 80,
-          color: theme.iconTheme.color?.withOpacity(0.5),
+          color: theme.iconTheme.color?.withValues(alpha: 0.5),
         ),
         SizedBox(height: 16),
         Text(
@@ -495,7 +494,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

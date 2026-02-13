@@ -517,7 +517,7 @@ class _EditItemPageState extends State<EditItemPage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -547,11 +547,11 @@ class _EditItemPageState extends State<EditItemPage> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
                   blurRadius: 15,
                   offset: const Offset(0, 4),
                 ),
@@ -634,7 +634,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -657,8 +657,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        ColorGlobalVariables.brownColor.withOpacity(0.2),
-                        ColorGlobalVariables.brownColor.withOpacity(0.1),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(15),
@@ -762,7 +762,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -782,8 +782,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -852,7 +852,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -871,8 +871,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1041,7 +1041,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1060,8 +1060,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1182,7 +1182,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1201,8 +1201,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1447,7 +1447,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1467,8 +1467,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1519,7 +1519,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.8),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                     ],
                   )
                 : null,
@@ -1532,13 +1532,13 @@ class _EditItemPageState extends State<EditItemPage> {
             boxShadow: [
               if (isSelected)
                 BoxShadow(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 )
               else
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -1564,7 +1564,7 @@ class _EditItemPageState extends State<EditItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1584,8 +1584,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1662,7 +1662,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                        color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: ColorGlobalVariables.redColor,
@@ -1759,7 +1759,7 @@ class _EditItemPageState extends State<EditItemPage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -1811,11 +1811,11 @@ class _EditItemPageState extends State<EditItemPage> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -1838,7 +1838,7 @@ class _EditItemPageState extends State<EditItemPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -1870,8 +1870,8 @@ class _EditItemPageState extends State<EditItemPage> {
             boxShadow: [
               BoxShadow(
                 color: (isProcessing || !hasEnoughImages) 
-                  ? Colors.grey.withOpacity(0.4)
-                  : ColorGlobalVariables.brownColor.withOpacity(0.4),
+                  ? Colors.grey.withValues(alpha: 0.4)
+                  : ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -1899,7 +1899,7 @@ class _EditItemPageState extends State<EditItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                   borderRadius: BorderRadius.circular(20),
@@ -1970,11 +1970,11 @@ class _EditItemPageState extends State<EditItemPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -2010,7 +2010,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                    color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
@@ -2029,7 +2029,7 @@ class _EditItemPageState extends State<EditItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -2088,8 +2088,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        ColorGlobalVariables.brownColor.withOpacity(0.15),
-                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                       ],
                     ),
                     borderRadius: const BorderRadius.only(
@@ -2108,13 +2108,13 @@ class _EditItemPageState extends State<EditItemPage> {
                             end: Alignment.bottomRight,
                             colors: [
                               ColorGlobalVariables.brownColor,
-                              ColorGlobalVariables.brownColor.withOpacity(0.7),
+                              ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                             ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
                             ),
@@ -2139,7 +2139,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       Text(
                         'Choose from common color names',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
@@ -2181,7 +2181,7 @@ class _EditItemPageState extends State<EditItemPage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
+                                        color: Colors.black.withValues(alpha: 0.1),
                                         blurRadius: 6,
                                         offset: const Offset(0, 3),
                                       ),
@@ -2196,7 +2196,7 @@ class _EditItemPageState extends State<EditItemPage> {
                                       Text(
                                         'Selected Color',
                                         style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -2231,7 +2231,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
+                          color: Colors.black.withValues(alpha: 0.08),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -2252,7 +2252,7 @@ class _EditItemPageState extends State<EditItemPage> {
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                         hintStyle: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                           fontSize: 14,
                         ),
                       ),
@@ -2345,7 +2345,7 @@ class _EditItemPageState extends State<EditItemPage> {
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -2366,12 +2366,12 @@ class _EditItemPageState extends State<EditItemPage> {
                                 end: Alignment.bottomRight,
                                 colors: [
                                   ColorGlobalVariables.brownColor,
-                                  ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                  ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
@@ -2446,7 +2446,7 @@ class _EditItemPageState extends State<EditItemPage> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -2467,7 +2467,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -2520,14 +2520,14 @@ class _EditItemPageState extends State<EditItemPage> {
               child: Icon(
                 Icons.color_lens_rounded,
                 size: 35,
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               'No colors found',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -2536,7 +2536,7 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -2581,8 +2581,8 @@ class _EditItemPageState extends State<EditItemPage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        ColorGlobalVariables.brownColor.withOpacity(0.15),
-                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                       ],
                     ),
                     borderRadius: const BorderRadius.only(
@@ -2601,13 +2601,13 @@ class _EditItemPageState extends State<EditItemPage> {
                             end: Alignment.bottomRight,
                             colors: [
                               ColorGlobalVariables.brownColor,
-                              ColorGlobalVariables.brownColor.withOpacity(0.7),
+                              ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                             ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
                             ),
@@ -2632,7 +2632,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       Text(
                         'Choose the manufacturing year of your vehicle',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                           fontSize: 15,
                         ),
                         textAlign: TextAlign.center,
@@ -2675,7 +2675,7 @@ class _EditItemPageState extends State<EditItemPage> {
                                     padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                                     decoration: BoxDecoration(
                                       color: isSelected 
-                                          ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+                                          ? ColorGlobalVariables.brownColor.withValues(alpha: 0.1)
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(12),
                                       border: isSelected
@@ -2698,7 +2698,7 @@ class _EditItemPageState extends State<EditItemPage> {
                                           ),
                                           child: Icon(
                                             isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
-                                            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                                            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                                             size: 20,
                                           ),
                                         ),
@@ -2764,7 +2764,7 @@ class _EditItemPageState extends State<EditItemPage> {
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
                                 ),
@@ -2785,12 +2785,12 @@ class _EditItemPageState extends State<EditItemPage> {
                                 end: Alignment.bottomRight,
                                 colors: [
                                   ColorGlobalVariables.brownColor,
-                                  ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                  ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
@@ -2946,8 +2946,8 @@ class _EditItemPageState extends State<EditItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -2966,13 +2966,13 @@ class _EditItemPageState extends State<EditItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),
@@ -2997,7 +2997,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                        color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                         fontSize: 15,
                       ),
                       textAlign: TextAlign.center,
@@ -3014,7 +3014,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -3035,7 +3035,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                       hintStyle: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                        color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                         fontSize: 16,
                       ),
                     ),
@@ -3097,8 +3097,8 @@ class _EditItemPageState extends State<EditItemPage> {
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
-                                            ColorGlobalVariables.brownColor.withOpacity(0.15),
-                                            ColorGlobalVariables.brownColor.withOpacity(0.08),
+                                            ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                                            ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(14),
@@ -3122,7 +3122,7 @@ class _EditItemPageState extends State<EditItemPage> {
                                     ),
                                     Icon(
                                       Icons.chevron_right_rounded,
-                                      color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                                      color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                                       size: 24,
                                     ),
                                   ],
@@ -3167,7 +3167,7 @@ class _EditItemPageState extends State<EditItemPage> {
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
@@ -3203,14 +3203,14 @@ class _EditItemPageState extends State<EditItemPage> {
               child: Icon(
                 Icons.search_off_rounded,
                 size: 50,
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'No results found',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -3219,7 +3219,7 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -3280,13 +3280,13 @@ class _EditItemPageState extends State<EditItemPage> {
                       end: Alignment.bottomRight,
                       colors: [
                         ColorGlobalVariables.brownColor,
-                        ColorGlobalVariables.brownColor.withOpacity(0.7),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                       ],
                     ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                        color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -3311,7 +3311,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 Text(
                   'Please provide the $fieldLabel details',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                    color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                     fontSize: 15,
                   ),
                   textAlign: TextAlign.center,
@@ -3328,7 +3328,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -3347,7 +3347,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                       hintStyle: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.5),
+                        color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                         fontSize: 16,
                       ),
                     ),
@@ -3377,7 +3377,7 @@ class _EditItemPageState extends State<EditItemPage> {
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.bodyMedium!.color!.withOpacity(0.7),
+                                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
@@ -3395,12 +3395,12 @@ class _EditItemPageState extends State<EditItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.8),
+                            ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),

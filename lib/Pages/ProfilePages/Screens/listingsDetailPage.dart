@@ -10,7 +10,6 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/MyListingsService/myLi
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Services/PromotionService/promotionService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
@@ -246,10 +245,10 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -278,10 +277,10 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -341,7 +340,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -380,7 +379,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                     ),
                     if (index == selectedIndex)
                       Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         child: const Center(
                           child: Icon(
                             Icons.check_circle,
@@ -487,7 +486,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: confirmColor.withOpacity(0.1),
+                        color: confirmColor.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -607,7 +606,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
+                    color: Colors.green.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -701,7 +700,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -794,7 +793,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -1081,7 +1080,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
       final fullUrl = '$baseUrl$cleanImagePath';
       return fullUrl;
     } catch (e) {
-      print('❌ Error constructing image URL: $e');
+      debugPrint('❌ Error constructing image URL: $e');
       return "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     }
   }
@@ -1611,7 +1610,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.orange.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -1793,7 +1792,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.amber[800]!.withOpacity(0.3) : Colors.amber[100],
+        color: isDarkMode ? Colors.amber[800]!.withValues(alpha: 0.3) : Colors.amber[100],
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -1818,7 +1817,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.lightBlue[800]!.withOpacity(0.3) : Colors.lightBlue[100],
+        color: isDarkMode ? Colors.lightBlue[800]!.withValues(alpha: 0.3) : Colors.lightBlue[100],
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -1942,7 +1941,7 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.amber.withOpacity(0.3),
+            color: Colors.amber.withValues(alpha: 0.3),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -2098,9 +2097,9 @@ class _ListingsDetailPageState extends State<ListingsDetailPage> {
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withOpacity(0.8),
+                          Colors.black.withValues(alpha: 0.8),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.3),
+                          Colors.black.withValues(alpha: 0.3),
                         ],
                       ),
                     ),

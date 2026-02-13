@@ -22,7 +22,7 @@ class CustomRoundIconButton extends StatelessWidget {
     this.toolTipText,
     required this.isBorderSlightlyCurved,
     this.paddingAll,
-    this.backgroundColor, 
+    this.backgroundColor,
     required this.onIconButtonClickFunction,
     super.key,
   });
@@ -43,8 +43,7 @@ class CustomRoundIconButton extends StatelessWidget {
         child: IconButton(
           onPressed: onIconButtonClickFunction,
           tooltip: toolTipText,
-          //iconSize: SizeGlobalVariables.double_size_forty.sp,
-          //padding: EdgeInsets.all(SizeGlobalVariables.double_size_ten.w),
+
           icon: Icon(
             iconData,
             color: iconDataColor ?? ColorGlobalVariables.fadedBlackColor,

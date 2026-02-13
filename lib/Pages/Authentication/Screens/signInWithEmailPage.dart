@@ -146,7 +146,7 @@ class _SignInWithEmailPageState extends State<SignInWithEmailPage> with SingleTi
                   builder: (context, child) {
                     return Transform(
                       transform: Matrix4.identity()
-                        ..scale(_scaleAnimation.value),
+                        ..scale(_scaleAnimation.value, _scaleAnimation.value, 1.0),
                       alignment: Alignment.center,
                       child: Opacity(
                         opacity: _fadeAnimation.value,

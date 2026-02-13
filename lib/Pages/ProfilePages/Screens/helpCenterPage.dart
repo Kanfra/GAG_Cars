@@ -56,7 +56,7 @@ class _HelpCenterPageState extends State<HelpCenterPage>
               color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(isDarkMode ? 0.1 : 0.05),
+                  color: Colors.black.withValues(alpha: isDarkMode ? 0.1 : 0.05),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),

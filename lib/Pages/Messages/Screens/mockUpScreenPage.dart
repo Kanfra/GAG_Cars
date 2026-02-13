@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import '../../../GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -144,7 +143,7 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMe = message.isMe;
     final bgColor =
-    isMe ? Colors.black54.withOpacity(0.7) : Colors.grey[300];
+    isMe ? Colors.black54.withValues(alpha: 0.7) : Colors.grey[300];
     final align = isMe ? Alignment.centerRight : Alignment.centerLeft;
     final radius = isMe
         ?  BorderRadius.circular(18)
@@ -193,7 +192,6 @@ class _MessageInputField extends StatelessWidget {
   final VoidCallback onSend;
 
   const _MessageInputField({
-    super.key,
     required this.controller,
     required this.onSend,
   });
@@ -246,7 +244,7 @@ class _MessageInputField extends StatelessWidget {
 class _DateHeader extends StatelessWidget {
   final DateTime date;
 
-  const _DateHeader({super.key, required this.date});
+  const _DateHeader({required this.date});
 
   @override
   Widget build(BuildContext context) {

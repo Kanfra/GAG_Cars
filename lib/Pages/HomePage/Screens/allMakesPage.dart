@@ -1,14 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Models/makeAndModelModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/trendingMakeModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/makeAndModelProvider.dart';
@@ -77,10 +69,10 @@ class _AllMakesPageState extends State<AllMakesPage> {
     final Map<String, dynamic> args = widget.allJson;
 
     // DEBUG: Print all arguments to see what's actually being passed
-    print('=== DEBUG: AllMakesPage Arguments ===');
-    print('All arguments keys: ${args.keys}');
-    print('Arguments: $args');
-    print('=====================================');
+    debugPrint('=== DEBUG: AllMakesPage Arguments ===');
+    debugPrint('All arguments keys: ${args.keys}');
+    debugPrint('Arguments: $args');
+    debugPrint('=====================================');
 
     // Handle type
     _type = args['type'] as String? ?? 'brands';
@@ -554,7 +546,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
           color: _getSearchContainerColor(context),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 4),
             ),
@@ -616,12 +608,12 @@ class _AllMakesPageState extends State<AllMakesPage> {
         icon: AnimatedContainer(
           duration: Duration(milliseconds: 300),
           decoration: BoxDecoration(
-            color: _isListening ? Colors.red.withOpacity(0.1) : Colors.transparent,
+            color: _isListening ? Colors.red.withValues(alpha: 0.1) : Colors.transparent,
             shape: BoxShape.circle,
           ),
           child: Icon(
             _isListening ? Icons.mic_rounded : Icons.mic_rounded,
-            color: _isListening ? Colors.red : ColorGlobalVariables.brownColor.withOpacity(0.7),
+            color: _isListening ? Colors.red : ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
             size: _isListening ? 26 : 24,
           ),
         ),
@@ -741,7 +733,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 25,
                 offset: const Offset(0, 8),
               ),
@@ -804,8 +796,8 @@ class _AllMakesPageState extends State<AllMakesPage> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              ColorGlobalVariables.brownColor.withOpacity(0.15),
-                              ColorGlobalVariables.brownColor.withOpacity(0.08),
+                              ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                              ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(14),
@@ -830,8 +822,8 @@ class _AllMakesPageState extends State<AllMakesPage> {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
                     onTap: () => _navigateToSelectedBrand(brand),
-                    splashColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
-                    highlightColor: ColorGlobalVariables.brownColor.withOpacity(0.05),
+                    splashColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+                    highlightColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.05),
                   ),
                 ),
               ),
@@ -860,7 +852,7 @@ class _AllMakesPageState extends State<AllMakesPage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06),
+                color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 15,
                 offset: const Offset(0, 4),
               ),
@@ -871,8 +863,8 @@ class _AllMakesPageState extends State<AllMakesPage> {
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
               onTap: () => _navigateToSelectedBrand(brand),
-              splashColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
-              highlightColor: ColorGlobalVariables.brownColor.withOpacity(0.05),
+              splashColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+              highlightColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.05),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(

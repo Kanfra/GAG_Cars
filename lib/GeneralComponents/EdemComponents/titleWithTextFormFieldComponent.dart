@@ -125,7 +125,7 @@ class TitleWithTextformfieldComponent extends StatelessWidget {
                       vertical: fieldHeight ?? 15
                       ),
                     decoration: BoxDecoration(
-                      color: backgroundColor ??ColorGlobalVariables.textFieldColor.withOpacity(0.99),
+                      color: backgroundColor ??ColorGlobalVariables.textFieldColor.withValues(alpha: 0.99),
                       borderRadius: BorderRadius.circular( borderRadius ?? 8),
                       border: Border.all(
                         color: borderColor ?? ColorGlobalVariables.greenColor,

@@ -259,14 +259,14 @@ class BlogPostProvider with ChangeNotifier {
   // Debug method to check categories
   void debugCategories() {
     final categories = posts.map((post) => post.category.name).toSet();
-    print('=== DEBUG CATEGORIES ===');
-    print('Available categories: $categories');
-    print('Total posts: ${posts.length}');
+    debugPrint('=== DEBUG CATEGORIES ===');
+    debugPrint('Available categories: $categories');
+    debugPrint('Total posts: ${posts.length}');
     
     for (final category in categories) {
       final filtered = getPostsByCategoryNameFromCache(category);
-      print('Category "$category": ${filtered.length} posts');
+      debugPrint('Category "$category": ${filtered.length} posts');
     }
-    print('=======================');
+    debugPrint('=======================');
   }
 }

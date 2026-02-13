@@ -91,13 +91,13 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
             boxShadow: isDark 
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     offset: const Offset(0, 3),
                     blurRadius: 8,
                     spreadRadius: -1,
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withValues(alpha: 0.4),
                     offset: const Offset(0, 0),
                     blurRadius: 1,
                     spreadRadius: 0,
@@ -205,13 +205,13 @@ class _CountryCodeTextFieldState extends State<CountryCodeTextField> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: isDark ? const Color(0xFF616161) : const Color(0xFF8C98A8).withOpacity(0.2),
+                            color: isDark ? const Color(0xFF616161) : const Color(0xFF8C98A8).withValues(alpha: 0.2),
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(
-                            color: isDark ? const Color(0xFF616161) : const Color(0xFF8C98A8).withOpacity(0.2),
+                            color: isDark ? const Color(0xFF616161) : const Color(0xFF8C98A8).withValues(alpha: 0.2),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(

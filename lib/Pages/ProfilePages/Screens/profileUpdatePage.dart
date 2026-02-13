@@ -203,11 +203,11 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
     }
     
     return Container(
-      color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+      color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
       child: Icon(
         Icons.person,
         size: 60,
-        color: ColorGlobalVariables.brownColor.withOpacity(0.6),
+        color: ColorGlobalVariables.brownColor.withValues(alpha: 0.6),
       ),
     );
   }
@@ -236,7 +236,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               _buildProfileForm(userProvider, displayName, displayEmail, displayPhone, hasCountry, countryName, countryCode, isDarkMode),
               if(userProvider.isLoading)
               Container(
-                color: ColorGlobalVariables.blackColor.withOpacity(0.3),
+                color: ColorGlobalVariables.blackColor.withValues(alpha: 0.3),
                 child: const Center(
                   child: CircularProgressIndicator(),
                 ),
@@ -332,7 +332,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -387,7 +387,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                 countryName,
                 style: TextStyle(
                   fontSize: 12,
-                  color: isDarkMode ? Colors.white70 : ColorGlobalVariables.blackColor.withOpacity(0.6),
+                  color: isDarkMode ? Colors.white70 : ColorGlobalVariables.blackColor.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -398,7 +398,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
             : "Not available",
           style: TextStyle(
             fontSize: 12,
-            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
+            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -420,7 +420,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -436,7 +436,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                     label,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
+                      color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -470,7 +470,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -488,7 +488,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                       "Country",
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
+                        color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withValues(alpha: 0.6),
                       ),
                     ),
                     if (hasCountry)
@@ -497,7 +497,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: ColorGlobalVariables.greenColor.withOpacity(0.1),
+                            color: ColorGlobalVariables.greenColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -551,14 +551,14 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.6),
+                            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withValues(alpha: 0.6),
                           ),
                         ),
                         Text(
                           "Country information not available",
                           style: TextStyle(
                             fontSize: 12,
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -569,7 +569,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
           Icon(
             Icons.lock_outline,
             size: 20,
-            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withOpacity(0.4),
+            color: isDarkMode ? Colors.white60 : ColorGlobalVariables.blackColor.withValues(alpha: 0.4),
           ),
         ],
       ),
@@ -588,7 +588,7 @@ class _ProfileUpdatePageState extends State<ProfileUpdatePage> {
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 2,
-          shadowColor: ColorGlobalVariables.brownColor.withOpacity(0.3),
+          shadowColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
         ),
         child: userProvider.isLoading 
         ? const SizedBox(

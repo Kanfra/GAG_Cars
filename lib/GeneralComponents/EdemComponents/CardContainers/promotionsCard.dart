@@ -27,7 +27,7 @@ class PromotionCard extends StatelessWidget {
           border: Border.all(color: Colors.white),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               offset: const Offset(0, 4), // bottom shadow
               blurRadius: 3,
             ),

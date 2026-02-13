@@ -380,7 +380,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -444,8 +444,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: _packageType == 'upload' 
-                              ? (isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50]) 
-                              : (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]),
+                              ? (isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50]) 
+                              : (isDarkMode ? Colors.green[900]!.withValues(alpha: 0.3) : Colors.green[50]),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -469,9 +469,9 @@ class _PromotionsPageState extends State<PromotionsPage> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: (promotion['gradient'] as List<Color>)[0].withOpacity(isDarkMode ? 0.2 : 0.1),
+                color: (promotion['gradient'] as List<Color>)[0].withValues(alpha: isDarkMode ? 0.2 : 0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: (promotion['gradient'] as List<Color>)[0].withOpacity(isDarkMode ? 0.4 : 0.3)),
+                border: Border.all(color: (promotion['gradient'] as List<Color>)[0].withValues(alpha: isDarkMode ? 0.4 : 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -589,7 +589,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: gradientColors[0].withOpacity(0.3),
+                    color: gradientColors[0].withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -611,7 +611,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: gradientColors[0].withOpacity(0.1),
+                            color: gradientColors[0].withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(promotion['icon'], size: 20, color: gradientColors[0]),
@@ -661,8 +661,8 @@ class _PromotionsPageState extends State<PromotionsPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: _packageType == 'upload' 
-                            ? (isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50]) 
-                            : (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]),
+                            ? (isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50]) 
+                            : (isDarkMode ? Colors.green[900]!.withValues(alpha: 0.3) : Colors.green[50]),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -745,7 +745,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         ...(promotion['features'] as List<dynamic>).take(2).map((feature) => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: gradientColors[0].withOpacity(isDarkMode ? 0.2 : 0.1),
+                            color: gradientColors[0].withValues(alpha: isDarkMode ? 0.2 : 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -783,7 +783,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: gradientColors[0].withOpacity(0.8),
+                    color: gradientColors[0].withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Center(
@@ -839,7 +839,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                   color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.12),
+                      color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.12),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -890,7 +890,7 @@ class _PromotionsPageState extends State<PromotionsPage> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                            color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                             shape: BoxShape.circle,
                           ),
                           child: Icon(Icons.help_outline, size: 20, color: isDarkMode ? Colors.blue[200] : Colors.blue),

@@ -26,10 +26,13 @@ class SpecialOffer with _$SpecialOffer {
     @JsonKey(name: 'end_at', fromJson: _parseString) required String endAt,
     @JsonKey(fromJson: _parseString) required String status,
     @JsonKey(fromJson: _parseInt) required int discount,
-    @JsonKey(name: 'discount_type', fromJson: _parseString) required String discountType,
+    @JsonKey(name: 'discount_type', fromJson: _parseString)
+    required String discountType,
     String? description,
-    @JsonKey(name: 'created_at', fromJson: _parseString) required String createdAt,
-    @JsonKey(name: 'updated_at', fromJson: _parseString) required String updatedAt,
+    @JsonKey(name: 'created_at', fromJson: _parseString)
+    required String createdAt,
+    @JsonKey(name: 'updated_at', fromJson: _parseString)
+    required String updatedAt,
     Item? item,
   }) = _SpecialOffer;
 
@@ -52,20 +55,25 @@ class Item with _$Item {
     @JsonKey(fromJson: _parseString) String? description,
     List<String>? images,
     @JsonKey(fromJson: _parseString) String? location,
-    @JsonKey(name: 'serial_number', fromJson: _parseString) String? serialNumber, // Added converter
+    @JsonKey(name: 'serial_number', fromJson: _parseString)
+    String? serialNumber, // Added converter
     @JsonKey(fromJson: _parseString) String? condition, // Added converter
-    @JsonKey(name: 'steer_position', fromJson: _parseString) String? steerPosition,
-    @JsonKey(name: 'engine_capacity', fromJson: _parseString) String? engineCapacity,
+    @JsonKey(name: 'steer_position', fromJson: _parseString)
+    String? steerPosition,
+    @JsonKey(name: 'engine_capacity', fromJson: _parseString)
+    String? engineCapacity,
     @JsonKey(fromJson: _parseString) String? transmission,
     @JsonKey(fromJson: _parseString) String? color,
     @JsonKey(name: 'build_type', fromJson: _parseString) String? buildType,
-    @JsonKey(name: 'number_of_passengers', fromJson: _parseInt) int? numberOfPassengers,
+    @JsonKey(name: 'number_of_passengers', fromJson: _parseInt)
+    int? numberOfPassengers,
     List<String>? features,
     @JsonKey(fromJson: _parseString) String? status, // Added converter
     @JsonKey(fromJson: _parseString) String? price,
     @JsonKey(fromJson: _parseString) String? mileage,
     @JsonKey(fromJson: _parseInt) int? warranty,
-    @JsonKey(name: 'warranty_expiration', fromJson: _parseString) String? warrantyExpiration,
+    @JsonKey(name: 'warranty_expiration', fromJson: _parseString)
+    String? warrantyExpiration,
     @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
     @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
     @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
@@ -88,19 +96,22 @@ class User with _$User {
     @JsonKey(fromJson: _parseString) required String name,
     @JsonKey(fromJson: _parseString) required String email,
     @JsonKey(fromJson: _parseString) String? phone,
-    @JsonKey(name: 'email_verified_at', fromJson: _parseString) String? emailVerifiedAt,
+    @JsonKey(name: 'email_verified_at', fromJson: _parseString)
+    String? emailVerifiedAt,
     @JsonKey(name: 'paid_seller', fromJson: _parseInt) int? paidSeller,
     @JsonKey(name: 'deleted_at', fromJson: _parseString) String? deletedAt,
     @JsonKey(name: 'created_at', fromJson: _parseString) String? createdAt,
     @JsonKey(name: 'updated_at', fromJson: _parseString) String? updatedAt,
     @JsonKey(name: 'country_id', fromJson: _parseInt) int? countryId,
     @JsonKey(name: 'state_id', fromJson: _parseInt) int? stateId,
-    @JsonKey(name: 'profile_photo', fromJson: _parseString) String? profilePhoto,
+    @JsonKey(name: 'profile_photo', fromJson: _parseString)
+    String? profilePhoto,
     @JsonKey(name: 'uploads_left', fromJson: _parseInt) int? uploadsLeft,
     @JsonKey(name: 'active_status', fromJson: _parseInt) int? activeStatus,
     @JsonKey(fromJson: _parseString) String? avatar,
     @JsonKey(name: 'dark_mode', fromJson: _parseInt) int? darkMode,
-    @JsonKey(name: 'messenger_color', fromJson: _parseString) String? messengerColor,
+    @JsonKey(name: 'messenger_color', fromJson: _parseString)
+    String? messengerColor,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -171,7 +182,8 @@ class PaginationLinks with _$PaginationLinks {
 @freezed
 class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
-    @JsonKey(name: 'current_page', fromJson: _parseInt) required int currentPage,
+    @JsonKey(name: 'current_page', fromJson: _parseInt)
+    required int currentPage,
     @JsonKey(fromJson: _parseInt) int? from,
     @JsonKey(name: 'last_page', fromJson: _parseInt) int? lastPage,
     List<PaginationMetaLink>? links,
@@ -187,11 +199,8 @@ class PaginationMeta with _$PaginationMeta {
 
 @freezed
 class PaginationMetaLink with _$PaginationMetaLink {
-  const factory PaginationMetaLink({
-    String? url,
-    String? label,
-    bool? active,
-  }) = _PaginationMetaLink;
+  const factory PaginationMetaLink({String? url, String? label, bool? active}) =
+      _PaginationMetaLink;
 
   factory PaginationMetaLink.fromJson(Map<String, dynamic> json) =>
       _$PaginationMetaLinkFromJson(json);
@@ -209,12 +218,4 @@ String _parseString(dynamic value) {
   if (value == null) return '';
   if (value is String) return value;
   return value.toString();
-}
-
-double _parseDouble(dynamic value) {
-  if (value == null) return 0.0;
-  if (value is double) return value;
-  if (value is int) return value.toDouble();
-  if (value is String) return double.tryParse(value) ?? 0.0;
-  return 0.0;
 }

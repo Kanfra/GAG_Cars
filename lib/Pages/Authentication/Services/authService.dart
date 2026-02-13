@@ -11,12 +11,10 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudin
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:http/http.dart' as http;
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logger/logger.dart';
 
 class AuthService {
   static String get _tokenKey => dotenv.get('TOKEN_KEY');
-  static String get _userKey => dotenv.get("USER_KEY");
 
   static final _storage = FlutterSecureStorage();
   static final Logger _logger = Logger();
@@ -77,20 +75,6 @@ class AuthService {
     }
   }
 
-  // Check if token is valid and not expired
-  static bool _isTokenValid(String token) {
-    try {
-      if (JwtDecoder.isExpired(token)) {
-        _logger.e("Token is expired");
-        return false;
-      }
-      return true;
-    } catch (e) {
-      _logger.e("Token validation error: $e");
-      return false;
-    }
-  }
-
   // Authentication check
   static Future<bool> isAuthenticated(UserProvider userProvider) async {
     final uri = Uri.parse("$baseApiUrl${ApiEndpoint.authenticateUser}");
@@ -104,7 +88,7 @@ class AuthService {
         headers: {
           "Authorization": "Bearer $token",
           "Accept": "application/json",
-        }
+        },
       );
 
       if (response.statusCode == 200) {
@@ -126,24 +110,20 @@ class AuthService {
 
   // Sign in with Phone
   static Future<AuthResponseModel> signInWithPhone({
-    required String phone
+    required String phone,
   }) async {
     const endpoint = ApiEndpoint.sendOtp;
     final url = Uri.parse('$baseApiUrl$endpoint');
-    
+
     try {
-      final body = jsonEncode({
-        "phone": phone,
-      });
+      final body = jsonEncode({"phone": phone});
 
       _logger.i('Sending request to $url');
       _logger.t('Request body: $body');
 
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: body
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(url, headers: {"Content-Type": "application/json"}, body: body)
+          .timeout(const Duration(seconds: 10));
 
       _logger.i("Response status: ${response.statusCode}");
       _logger.t("Response body: ${response.body}");
@@ -197,14 +177,16 @@ class AuthService {
       _logger.i('Sending request to $url');
       _logger.t('Request body: $body');
 
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-        body: body,
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .post(
+            url,
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+            },
+            body: body,
+          )
+          .timeout(const Duration(seconds: 10));
 
       _logger.i('Response status: ${response.statusCode}');
       _logger.t('Response body: ${response.body}');
@@ -216,7 +198,9 @@ class AuthService {
         return authResponse;
       } else {
         final errorData = jsonDecode(response.body);
-        _logger.e("Failed to sign up: ${response.statusCode}, response body: ${response.body}");
+        _logger.e(
+          "Failed to sign up: ${response.statusCode}, response body: ${response.body}",
+        );
         throw Exception(
           errorData['message'] ?? 'Failed to sign up: ${response.statusCode}',
         );
@@ -241,18 +225,18 @@ class AuthService {
   }) async {
     final deviceName = await _getDeviceName();
     final url = Uri.parse('$baseApiUrl${ApiEndpoint.logInWithEmail}');
-    
+
     _logger.i('📧 Email: $email');
     _logger.i('📱 Device name: $deviceName');
     _logger.i('🔗 API URL: $url');
-    
+
     try {
       final body = jsonEncode({
         'email': email,
         'password': password,
         'device_name': deviceName,
       });
-      
+
       _logger.i('📦 Request body: $body');
 
       final response = await http.post(
@@ -278,7 +262,7 @@ class AuthService {
         }
 
         _logger.w('Success for token: $token and message: $message');
-        
+
         final authResponse = AuthResponseModel.fromJson(responseBody);
 
         // Secure storage of token
@@ -288,7 +272,6 @@ class AuthService {
         // ✅ CRITICAL FIX: Use the passed UserProvider instance
         await userProvider.setUserFromAuth(authResponse);
         _logger.i('✅ User data updated in provider successfully');
-        
       } else {
         final errorData = jsonDecode(response.body);
         _logger.e('🔍 Validation errors: $errorData');
@@ -297,7 +280,9 @@ class AuthService {
       }
     } on SocketException catch (e) {
       _logger.e('🌐 Network error: $e');
-      throw Exception('No internet connection. Please check your network and try again.');
+      throw Exception(
+        'No internet connection. Please check your network and try again.',
+      );
     } on TimeoutException catch (e) {
       _logger.e('⏰ Request timeout: $e');
       throw Exception('Request timeout. Please try again.');
@@ -315,19 +300,13 @@ class AuthService {
   }
 
   // Send OTP
-  static Future<bool> sendOtp(
-    String phone, 
-    String email,
-  ) async {
+  static Future<bool> sendOtp(String phone, String email) async {
     const endpoint = ApiEndpoint.sendOtp;
     final url = Uri.parse('$baseApiUrl$endpoint');
-    
+
     try {
-      final body = jsonEncode({
-        'phone': phone,
-        'email': email
-      });
-      
+      final body = jsonEncode({'phone': phone, 'email': email});
+
       _logger.i("body: $body");
 
       final response = await http.post(
@@ -360,13 +339,10 @@ class AuthService {
   }) async {
     const endpoint = ApiEndpoint.verifyOtp;
     final url = Uri.parse('$baseApiUrl$endpoint');
-    
+
     try {
-      final body = jsonEncode({
-        'phone': phone,
-        'otp': otp
-      });
-      
+      final body = jsonEncode({'phone': phone, 'otp': otp});
+
       _logger.i("body: $body");
 
       final response = await http.post(
@@ -382,8 +358,10 @@ class AuthService {
         final responseBody = jsonDecode(response.body);
         final token = responseBody['token'];
         final message = responseBody['message'];
-        
-        _logger.w("Response body for successful verification of otp: $responseBody");
+
+        _logger.w(
+          "Response body for successful verification of otp: $responseBody",
+        );
         _logger.i('test success response: $message and token: $token');
 
         // Store token securely
@@ -391,7 +369,7 @@ class AuthService {
           await saveToken(token);
           _logger.i("Auth token stored securely");
         }
-        
+
         // Store data in provider
         final authResponse = AuthResponseModel.fromJson(responseBody);
         await userProvider.setUserFromAuth(authResponse);
@@ -414,11 +392,8 @@ class AuthService {
     try {
       await postApiData<void>(
         endpoint: ApiEndpoint.sendResetPasswordOtp,
-        body: {
-          "phone": phone,
-          "email": email,
-        },
-        fromJson: (_){},
+        body: {"phone": phone, "email": email},
+        fromJson: (_) {},
       );
     } catch (e) {
       _logger.e("Error sending password reset email: $e");
@@ -438,11 +413,11 @@ class AuthService {
       if (token == null) {
         throw Exception("User not authenticated");
       }
-      
+
       _logger.i("token: $token");
-      
+
       await postApiData(
-        endpoint: ApiEndpoint.resetPassword, 
+        endpoint: ApiEndpoint.resetPassword,
         body: {
           'phone': phone,
           'email': email,
@@ -453,8 +428,8 @@ class AuthService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'Accept': 'application/json',
-        }, 
-        fromJson: (_){},
+        },
+        fromJson: (_) {},
       );
     } catch (e) {
       rethrow;
@@ -464,24 +439,24 @@ class AuthService {
   // Get user profile
   static Future<Map<String, dynamic>> getUserProfile() async {
     final uri = Uri.parse("$baseApiUrl${ApiEndpoint.authenticateUser}");
-    
+
     try {
       final token = await getToken();
       if (token == null) {
         throw Exception("User not authenticated");
       }
-      
+
       final response = await http.get(
         uri,
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "Authorization": "Bearer $token",
-        }
+        },
       );
-      
+
       final responseBody = jsonDecode(response.body);
-      
+
       if (response.statusCode == 200) {
         _logger.i("User profile fetched successfully: ${response.body}");
         return responseBody;
@@ -504,7 +479,7 @@ class AuthService {
   // Logout
   static Future<Map<String, dynamic>> logoutUser() async {
     final uri = Uri.parse("$baseApiUrl${ApiEndpoint.logoutUser}");
-    
+
     try {
       final token = await getToken();
       final response = await http.post(
@@ -512,44 +487,40 @@ class AuthService {
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
-        }
+        },
       );
-      
+
       if (response.statusCode == 200) {
         try {
           await deleteToken();
           _logger.i("Token deleted successfully");
           return {
             "success": true,
-            "message": json.decode(response.body)['message'] ?? 'Logged out successfully'
+            "message":
+                json.decode(response.body)['message'] ??
+                'Logged out successfully',
           };
         } catch (e) {
           _logger.e("Logout API succeeded but token deletion failed: $e");
           return {
             "success": false,
-            "message": "Logged out but failed to clear local data"
+            "message": "Logged out but failed to clear local data",
           };
-        } 
+        }
       } else if (response.statusCode == 401) {
         await deleteToken().catchError((e) {
           _logger.e("Failed to delete invalid token: $e");
         });
         return {
           "success": false,
-          "message": json.decode(response.body)['message'] ?? 'Session expired'
+          "message": json.decode(response.body)['message'] ?? 'Session expired',
         };
       } else {
-        return {
-          "success": false,
-          "message": "Server error during logout",
-        };
+        return {"success": false, "message": "Server error during logout"};
       }
     } catch (e) {
       _logger.e("Logout process failed: $e");
-      return {
-        "success": false,
-        "message": "Network error: ${e.toString()}"
-      };
+      return {"success": false, "message": "Network error: ${e.toString()}"};
     }
   }
 
@@ -564,7 +535,7 @@ class AuthService {
   }) async {
     const endpoint = ApiEndpoint.updateProfile;
     final url = Uri.parse('$baseApiUrl$endpoint');
-    
+
     try {
       // Upload to Cloudinary if new image exists
       String? profileImageUrl;
@@ -573,13 +544,13 @@ class AuthService {
         profileImageUrl = await CloudinaryService.uploadImage(
           profileImage,
           oldImageUrl: oldImageUrl,
-        ); 
+        );
       }
-      
+
       // Get auth token
       final token = await getToken();
       _logger.w('Token upon update user profile: $token');
-      
+
       if (token == null) {
         throw Exception('User not authenticated');
       }
@@ -589,25 +560,25 @@ class AuthService {
       if (userName != null) requestBody['name'] = userName;
       if (phoneNumber != null) requestBody['phone'] = phoneNumber;
       if (email != null) requestBody['email'] = email;
-      
+
       // Preserve existing profile image if no new image is uploaded
       if (profileImageUrl != null) {
         requestBody['profile_photo'] = profileImageUrl;
       } else {
         requestBody['profile_photo'] = currentUser.profileImage;
       }
-      
+
       if (countryId != null) requestBody["country_id"] = countryId;
-      
+
       _logger.w("requestBody before api request: $requestBody");
-      
+
       // Make API request
       final response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode(requestBody),
       );
@@ -632,14 +603,14 @@ class AuthService {
     try {
       final token = await getToken();
       final uri = Uri.parse("$baseApiUrl${ApiEndpoint.deleteUser}");
-      
+
       final response = await http.delete(
         uri,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
-        }
+        },
       );
 
       if (response.statusCode == 200) {

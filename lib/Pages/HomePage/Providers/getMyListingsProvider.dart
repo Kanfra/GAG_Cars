@@ -40,13 +40,13 @@ class MyListingsProvider with ChangeNotifier {
       _error = null;
       
       if (kDebugMode) {
-        print('Initial load complete: ${_listings.length} items, hasMore: $_hasMore');
+        debugPrint('Initial load complete: ${_listings.length} items, hasMore: $_hasMore');
       }
       
     } catch (e) {
       _error = e.toString();
       if (kDebugMode) {
-        print('Initial load error: $_error');
+        debugPrint('Initial load error: $_error');
       }
     } finally {
       _isLoading = false;
@@ -73,11 +73,11 @@ class MyListingsProvider with ChangeNotifier {
       if (newListings.isNotEmpty) {
         _listings.addAll(newListings);
         if (kDebugMode) {
-          print('Added ${newListings.length} new listings');
+          debugPrint('Added ${newListings.length} new listings');
         }
       } else {
         if (kDebugMode) {
-          print('No new listings found on page $_currentPage - possible duplicates');
+          debugPrint('No new listings found on page $_currentPage - possible duplicates');
         }
       }
       
@@ -86,13 +86,13 @@ class MyListingsProvider with ChangeNotifier {
       _error = null;
       
       if (kDebugMode) {
-        print('Load more complete: total ${_listings.length} items, hasMore: $_hasMore');
+        debugPrint('Load more complete: total ${_listings.length} items, hasMore: $_hasMore');
       }
       
     } catch (e) {
       _error = e.toString();
       if (kDebugMode) {
-        print('Load more error: $_error');
+        debugPrint('Load more error: $_error');
       }
       // For load more, we might not want to show the error as prominently
       // since it doesn't break the existing data
@@ -105,7 +105,7 @@ class MyListingsProvider with ChangeNotifier {
   /// Refresh all listings (pull-to-refresh)
   Future<void> refreshListings() async {
     if (kDebugMode) {
-      print('Refreshing listings...');
+      debugPrint('Refreshing listings...');
     }
     
     // Save current state for potential restoration

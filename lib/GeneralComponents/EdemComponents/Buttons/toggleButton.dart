@@ -2,16 +2,15 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../GlobalVariables/colorGlobalVariables.dart';
 
-
 class ToggleButton extends StatelessWidget {
-  bool? isToggleOn;
+  final bool? isToggleOn;
   final ValueChanged<bool> onChangeFunction;
-  Color? activeColor;
-  ToggleButton({
+  final Color? activeColor;
+  const ToggleButton({
     this.isToggleOn,
     required this.onChangeFunction,
     this.activeColor,
-    super.key
+    super.key,
   });
 
   @override
@@ -19,7 +18,7 @@ class ToggleButton extends StatelessWidget {
     return CupertinoSwitch(
       value: isToggleOn ?? ColorGlobalVariables.falseValue,
       activeTrackColor: activeColor ?? ColorGlobalVariables.buttonColor,
-      onChanged: onChangeFunction
+      onChanged: onChangeFunction,
     );
   }
 }

@@ -11,7 +11,6 @@ class DeviceInfoUtils {
   static Future<Map<String, dynamic>> getDeviceInfo() async {
     try {
       final deviceInfo = DeviceInfoPlugin();
-      final packageInfo = await PackageInfo.fromPlatform();
 
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;

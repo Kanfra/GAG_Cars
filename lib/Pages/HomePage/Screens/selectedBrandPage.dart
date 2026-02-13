@@ -61,16 +61,16 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   void _initializeFromArguments() {
     final Map<String, dynamic> args = widget.allJson;
 
-    print('=== DEBUG: SelectedBrandPage Arguments ===');
-    print('All arguments keys: ${args.keys}');
-    print('Arguments: $args');
-    print('=====================================');
+    debugPrint('=== DEBUG: SelectedBrandPage Arguments ===');
+    debugPrint('All arguments keys: ${args.keys}');
+    debugPrint('Arguments: $args');
+    debugPrint('=====================================');
 
     if (args.containsKey('selectedBrand')) {
       _selectedBrand = args['selectedBrand'] as Map<String, dynamic>;
       _brandId = _selectedBrand['id'] as int;
-      print('Selected Brand Data: $_selectedBrand');
-      print('Brand ID: $_brandId');
+      debugPrint('Selected Brand Data: $_selectedBrand');
+      debugPrint('Brand ID: $_brandId');
     } else {
       throw Exception('selectedBrand is required in arguments');
     }
@@ -115,7 +115,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
     
     if (!provider.isLoading && !_initialLoadCompleted) {
-      print('🔄 Loading vehicles for brand: $_brandId');
+      debugPrint('🔄 Loading vehicles for brand: $_brandId');
       provider.loadInitialItems(_brandId);
       _initialLoadCompleted = true;
     }
@@ -124,7 +124,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
   void _loadMoreItems() {
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
     if (provider.canLoadMore) {
-      print('🔄 Loading more items...');
+      debugPrint('🔄 Loading more items...');
       provider.loadMoreItems();
     }
   }
@@ -231,7 +231,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
             color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -245,13 +245,13 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ],
                 border: Border.all(
-                  color: isDarkMode ? const Color(0xFF616161) : Colors.grey.withOpacity(0.2),
+                  color: isDarkMode ? const Color(0xFF616161) : Colors.grey.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -278,7 +278,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.blueColor.withOpacity(0.1),
+                        color: ColorGlobalVariables.blueColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -717,7 +717,7 @@ class _BrandItemCardState extends State<BrandItemCard>
         if (_isLiked) _animationController.value = 1.0;
       });
     } catch (e) {
-      print('Error checking wishlist status: $e');
+      debugPrint('Error checking wishlist status: $e');
     }
   }
 
@@ -750,7 +750,7 @@ class _BrandItemCardState extends State<BrandItemCard>
         );
       }
     } catch (e) {
-      print('Wishlist error: $e');
+      debugPrint('Wishlist error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to update wishlist: $e'),
@@ -822,7 +822,7 @@ class _BrandItemCardState extends State<BrandItemCard>
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

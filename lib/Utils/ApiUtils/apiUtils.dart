@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +19,8 @@ String get baseApiUrl {
 String getImageUrl(String? imagePath, String? defaultImagePath) {
   // Handle null or empty string cases
   if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
-    return defaultImagePath ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    return defaultImagePath ??
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
   }
 
   // Handle already complete URLs - return as is
@@ -29,40 +31,41 @@ String getImageUrl(String? imagePath, String? defaultImagePath) {
   // Handle relative paths - CORRECTED: Use proper storage path
   try {
     // Get base URL without /api endpoint
-    String baseUrl = dotenv.env['BASE_IMAGE_URL'] ?? 
-                    baseApiUrl.replaceAll('/api', '');
-    
+    String baseUrl =
+        dotenv.env['BASE_IMAGE_URL'] ?? baseApiUrl.replaceAll('/api', '');
+
     // Clean up base URL
-    baseUrl = baseUrl.endsWith('/') 
-        ? baseUrl.substring(0, baseUrl.length - 1) 
+    baseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
         : baseUrl;
 
     // Handle image path - ensure it points to storage
     String cleanImagePath;
-    
+
     // If image path already contains storage, use it as is
     if (imagePath.contains('storage/')) {
       cleanImagePath = imagePath.startsWith('/') ? imagePath : '/$imagePath';
     } else {
       // Otherwise, prepend /storage/ to the path
-      cleanImagePath = imagePath.startsWith('/') 
+      cleanImagePath = imagePath.startsWith('/')
           ? '/storage$imagePath'
           : '/storage/$imagePath';
     }
 
     final fullUrl = '$baseUrl$cleanImagePath';
     return fullUrl;
-    
   } catch (e) {
-    print('❌ Error constructing image URL for "$imagePath": $e');
-    return defaultImagePath ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    debugPrint('❌ Error constructing image URL for "$imagePath": $e');
+    return defaultImagePath ??
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
   }
 }
 
 // Enhanced version with multiple fallback strategies
 String getImageUrlWithFallback(String? imagePath, String? defaultImagePath) {
   if (imagePath == null || imagePath.isEmpty || imagePath == "null") {
-    return defaultImagePath ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    return defaultImagePath ??
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
   }
 
   // If it's already a full URL, return it
@@ -71,24 +74,26 @@ String getImageUrlWithFallback(String? imagePath, String? defaultImagePath) {
   }
 
   // Get base URL
-  String baseUrl = dotenv.env['BASE_IMAGE_URL'] ?? 
-                  baseApiUrl.replaceAll('/api', '');
-  baseUrl = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+  String baseUrl =
+      dotenv.env['BASE_IMAGE_URL'] ?? baseApiUrl.replaceAll('/api', '');
+  baseUrl = baseUrl.endsWith('/')
+      ? baseUrl.substring(0, baseUrl.length - 1)
+      : baseUrl;
 
   // Try multiple possible URL combinations
   final List<String> possibleUrls = [];
-  
+
   // Option 1: Direct path (if image already has full path)
   if (imagePath.startsWith('/')) {
     possibleUrls.add('$baseUrl$imagePath');
   }
-  
+
   // Option 2: With storage prefix (most common)
   possibleUrls.add('$baseUrl/storage/$imagePath');
-  
+
   // Option 3: Direct without storage (some APIs might work this way)
   possibleUrls.add('$baseUrl/$imagePath');
-  
+
   // Option 4: Handle if image path already contains storage
   if (imagePath.contains('storage/')) {
     final cleanPath = imagePath.startsWith('/') ? imagePath : '/$imagePath';
@@ -101,14 +106,18 @@ String getImageUrlWithFallback(String? imagePath, String? defaultImagePath) {
       return url;
     }
   }
-  
+
   // Final fallback
-  return defaultImagePath ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+  return defaultImagePath ??
+      "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
 }
 
 // Optimized version for similar items
 String getSimilarItemImageUrl(String? imagePath) {
-  return getImageUrlWithFallback(imagePath, "${ImageStringGlobalVariables.imagePath}car_placeholder.png");
+  return getImageUrlWithFallback(
+    imagePath,
+    "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+  );
 }
 
 // Status code response handler
@@ -122,7 +131,7 @@ dynamic statusCodeResponse<T>({
   String Function()? function500,
   String Function(int statusCode)? fallbackFunction,
 }) {
-  switch(response.statusCode) {
+  switch (response.statusCode) {
     case 200:
       return successFunction200();
     case 201:
@@ -136,8 +145,8 @@ dynamic statusCodeResponse<T>({
     case 500:
       return function500?.call() ?? 'Internal Server Error (500)';
     default:
-      return fallbackFunction?.call(response.statusCode) ?? 
-             'Unexpected status code: ${response.statusCode}';
+      return fallbackFunction?.call(response.statusCode) ??
+          'Unexpected status code: ${response.statusCode}';
   }
 }
 
@@ -151,35 +160,36 @@ Future<T> postApiData<T>({
 }) async {
   final logger = Logger();
   final uri = Uri.parse('$baseApiUrl$endpoint');
-  
+
   try {
     logger.i('Sending POST request to $uri');
     logger.t('Request body: $body');
 
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        ...?headers,
-      },
-      body: jsonEncode(body),
-    ).timeout(timeout);
+    final response = await http
+        .post(
+          uri,
+          headers: {'Content-Type': 'application/json', ...?headers},
+          body: jsonEncode(body),
+        )
+        .timeout(timeout);
 
     logger.i('Response status: ${response.statusCode}');
     logger.t('Response body: ${response.body}');
 
     final responseData = jsonDecode(response.body);
-    
+
     final result = statusCodeResponse<T>(
       response: response,
       successFunction200: () {
         try {
           // Handle both bool and normal responses
-          if(T == bool){
+          if (T == bool) {
             logger.i("Status code: ${response.statusCode}");
             return true as T;
           }
-          logger.i("Success response from $uri, and status code: ${response.statusCode}");
+          logger.i(
+            "Success response from $uri, and status code: ${response.statusCode}",
+          );
           return fromJson(responseData as Map<String, dynamic>);
         } catch (e) {
           logger.e('Failed to parse success response from $uri: $e');
@@ -188,7 +198,7 @@ Future<T> postApiData<T>({
       },
       successFunction201: () {
         try {
-          if(T == bool){
+          if (T == bool) {
             logger.i("Status code: ${response.statusCode}");
             return false as T;
           }
@@ -199,24 +209,27 @@ Future<T> postApiData<T>({
         }
       },
       function400: () => throw http.ClientException(
-        (responseData is Map ? responseData['message'] : null) ?? 'Bad Request', 
-        uri
+        (responseData is Map ? responseData['message'] : null) ?? 'Bad Request',
+        uri,
       ),
       function401: () => throw http.ClientException(
-        (responseData is Map ? responseData['message'] : null) ?? 'Unauthorized', 
-        uri
+        (responseData is Map ? responseData['message'] : null) ??
+            'Unauthorized',
+        uri,
       ),
       function404: () => throw http.ClientException(
-        (responseData is Map ? responseData['message'] : null) ?? 'Not Found', 
-        uri
+        (responseData is Map ? responseData['message'] : null) ?? 'Not Found',
+        uri,
       ),
       function500: () => throw http.ClientException(
-        (responseData is Map ? responseData['message'] : null) ?? 'Server Error', 
-        uri
+        (responseData is Map ? responseData['message'] : null) ??
+            'Server Error',
+        uri,
       ),
       fallbackFunction: (code) => throw http.ClientException(
-        (responseData is Map ? responseData['message'] : null) ?? 'Request failed with status: $code', 
-        uri
+        (responseData is Map ? responseData['message'] : null) ??
+            'Request failed with status: $code',
+        uri,
       ),
     );
 
@@ -250,7 +263,7 @@ Future<T> fetchApiData<T>({
     // Get auth token from secure storage
     final token = await storage.read(key: 'auth_token');
     logger.i("Your secured token: $token");
-    
+
     final requestHeaders = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -261,7 +274,7 @@ Future<T> fetchApiData<T>({
     final response = await http.get(uri, headers: requestHeaders);
     logger.i("Response status: ${response.statusCode}");
     logger.i("Response body: ${response.body}");
-    
+
     if (response.statusCode >= 200 && response.statusCode < 300) {
       try {
         final responseBody = response.body;
@@ -270,27 +283,35 @@ Future<T> fetchApiData<T>({
         }
 
         final decodedJson = json.decode(responseBody);
-        
+
         // Handle different response formats properly
         Map<String, dynamic> jsonData;
-        
+
         if (decodedJson is Map<String, dynamic>) {
           jsonData = decodedJson;
         } else if (decodedJson is List) {
           jsonData = {'data': decodedJson};
         } else {
-          throw FormatException('Unexpected response format: ${decodedJson.runtimeType}');
+          throw FormatException(
+            'Unexpected response format: ${decodedJson.runtimeType}',
+          );
         }
 
         logger.i("Successfully parsed response from $uri");
         return fromJson(jsonData);
       } catch (e, stackTrace) {
-        logger.e("Failed to parse response from $uri", error: e, stackTrace: stackTrace);
+        logger.e(
+          "Failed to parse response from $uri",
+          error: e,
+          stackTrace: stackTrace,
+        );
         throw ApiParsingException('Failed to parse response: $e');
       }
     } else {
-      logger.e("API request failed: ${response.statusCode} - $uri\nBody: ${response.body}");
-      
+      logger.e(
+        "API request failed: ${response.statusCode} - $uri\nBody: ${response.body}",
+      );
+
       if (response.statusCode >= 500) {
         throw ServerException('Server error occurred', response.statusCode);
       } else {
@@ -306,7 +327,11 @@ Future<T> fetchApiData<T>({
     logger.e("Network error: ${e.message}");
     throw NetworkException(e.message);
   } catch (e, stackTrace) {
-    logger.e("Unexpected error in API call to $uri", error: e, stackTrace: stackTrace);
+    logger.e(
+      "Unexpected error in API call to $uri",
+      error: e,
+      stackTrace: stackTrace,
+    );
     throw ApiException('Failed to complete API request: $e');
   }
 }
@@ -315,14 +340,14 @@ Future<T> fetchApiData<T>({
 class ApiException implements Exception {
   final String message;
   ApiException(this.message);
-  
+
   @override
   String toString() => 'ApiException: $message';
 }
 
 class ApiParsingException extends ApiException {
   ApiParsingException(super.message);
-  
+
   @override
   String toString() => 'ApiParsingException: $message';
 }
@@ -331,28 +356,28 @@ class ApiRequestException extends ApiException {
   final int statusCode;
   final Uri? uri;
   final String? responseBody;
-  
+
   ApiRequestException(
     super.message,
     this.statusCode, {
     this.uri,
     this.responseBody,
   });
-  
+
   @override
   String toString() => 'ApiRequestException: $message (Status: $statusCode)';
 }
 
 class ServerException extends ApiRequestException {
   ServerException(super.message, super.statusCode);
-  
+
   @override
   String toString() => 'ServerException: $message (Status: $statusCode)';
 }
 
 class NetworkException extends ApiException {
   NetworkException(super.message);
-  
+
   @override
   String toString() => 'NetworkException: $message';
 }
@@ -360,10 +385,10 @@ class NetworkException extends ApiException {
 // Image URL debug utility
 void debugImageUrl(String? imagePath, {String tag = 'DEBUG'}) {
   if (imagePath == null) {
-    print('$tag: Image path is null');
+    debugPrint('$tag: Image path is null');
     return;
   }
-  
+
   final url = getImageUrlWithFallback(imagePath, null);
-  print('$tag: "$imagePath" -> "$url"');
+  debugPrint('$tag: "$imagePath" -> "$url"');
 }

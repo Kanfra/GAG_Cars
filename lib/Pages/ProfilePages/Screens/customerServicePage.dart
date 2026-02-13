@@ -146,7 +146,7 @@ class ChatBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMe = message.isMe;
     final bgColor =
-    isMe ? Colors.black54.withOpacity(0.7) : Colors.grey[300];
+    isMe ? Colors.black54.withValues(alpha: 0.7) : Colors.grey[300];
     final align = isMe ? Alignment.centerRight : Alignment.centerLeft;
     final radius = isMe
         ? const BorderRadius.only(

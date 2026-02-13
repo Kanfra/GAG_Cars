@@ -14,7 +14,8 @@ class SplashPage extends StatefulWidget {
   State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
+class _SplashPageState extends State<SplashPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
@@ -35,29 +36,20 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       duration: const Duration(seconds: 2),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.elasticOut,
-      ),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInCubic,
-      ),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInCubic));
 
     _slideUpAnimation = Tween<Offset>(
       begin: const Offset(0, 0.5),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutQuad,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutQuad));
 
     _controller.forward();
   }
@@ -65,19 +57,23 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   Future<void> _checkAuthAndNavigate() async {
     await Future.delayed(const Duration(seconds: 3));
     // wait for widget to be mounted
-    if(!mounted) return;
+    if (!mounted) return;
 
     // now you can access user data if needed
-    final  userProvider = Provider.of<UserProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     final isAuthenticated = await AuthService.isAuthenticated(userProvider);
-    if(!mounted) return;
+    if (!mounted) return;
     final currentUser = userProvider.user;
-    if(currentUser != null){
+    if (currentUser != null) {
       logger.i("User email: ${currentUser.email}");
       logger.i("Is paid seller: ${userProvider.isPaidSeller}");
     }
-    Get.offNamed(isAuthenticated ? RouteClass.mainBottomNavigationPage : RouteClass.signInWithPhonePage);
+    Get.offNamed(
+      isAuthenticated
+          ? RouteClass.mainBottomNavigationPage
+          : RouteClass.signInWithPhonePage,
+    );
   }
 
   @override
@@ -101,7 +97,12 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                   scale: _scaleAnimation,
                   child: FadeTransition(
                     opacity: _fadeAnimation,
-                    child: Image.asset(AppIcons.splashIcon, width: 329),
+                    child: Image.asset(
+                      AppIcons.splashIcon,
+                      width: 329,
+                      color: Colors.white,
+                      colorBlendMode: BlendMode.srcIn,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),

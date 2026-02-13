@@ -49,7 +49,7 @@ void main() async {
   
   // Set system UI overlay style before running app
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.black.withOpacity(0.77),
+    statusBarColor: Colors.black.withValues(alpha: 0.77),
     statusBarBrightness: Brightness.light,
     statusBarIconBrightness: Brightness.light,
   ));
@@ -194,8 +194,8 @@ class _NotFoundScreen extends StatelessWidget {
                     Colors.grey[800]!,
                   ]
                 : [
-                    brownColor.withOpacity(0.08),
-                    brownColor.withOpacity(0.04),
+                    brownColor.withValues(alpha: 0.08),
+                    brownColor.withValues(alpha: 0.04),
                     Colors.white,
                   ],
           ),
@@ -209,11 +209,11 @@ class _NotFoundScreen extends StatelessWidget {
                 width: 140,
                 height: 140,
                 decoration: BoxDecoration(
-                  color: brownColor.withOpacity(0.1),
+                  color: brownColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: brownColor.withOpacity(0.2),
+                      color: brownColor.withValues(alpha: 0.2),
                       blurRadius: 15,
                       spreadRadius: 2,
                     ),
@@ -303,7 +303,7 @@ class _NotFoundScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 4,
-                          shadowColor: brownColor.withOpacity(0.4),
+                          shadowColor: brownColor.withValues(alpha: 0.4),
                         ),
                         child: const Text(
                           'Go to Home',
@@ -326,10 +326,10 @@ class _NotFoundScreen extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : brownColor.withOpacity(0.05),
+                  color: isDark ? Colors.grey[800] : brownColor.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: brownColor.withOpacity(0.2),
+                    color: brownColor.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(

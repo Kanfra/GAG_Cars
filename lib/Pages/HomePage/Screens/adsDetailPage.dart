@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/userListingsModel.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserListingsProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
-import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
@@ -274,10 +272,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -306,10 +304,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
+                            color: Colors.black.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                               width: 2,
                             ),
                           ),
@@ -399,7 +397,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
               animation: _profileImageFadeAnimation,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withOpacity(0.9 * _profileImageFadeAnimation.value),
+                  color: Colors.black.withValues(alpha: 0.9 * _profileImageFadeAnimation.value),
                 );
               },
             ),
@@ -423,7 +421,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -439,12 +437,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha: 0.3),
                           width: 3,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 10,
                             spreadRadius: 2,
                             offset: const Offset(0, 4),
@@ -897,7 +895,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -935,7 +933,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                     ),
                     if (index == selectedIndex)
                       Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         child: const Center(
                           child: Icon(
                             Icons.check_circle,
@@ -1024,7 +1022,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1054,12 +1052,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -1133,7 +1131,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Colors.blue.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -1319,14 +1317,14 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              ColorGlobalVariables.redColor.withOpacity(0.9),
-              ColorGlobalVariables.redColor.withOpacity(0.7),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.9),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: ColorGlobalVariables.redColor.withOpacity(0.3),
+              color: ColorGlobalVariables.redColor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1369,7 +1367,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -1413,7 +1411,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -1432,7 +1430,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withOpacity(0.8),
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -1524,7 +1522,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.amber[800]!.withOpacity(0.3) : Colors.amber[100],
+        color: isDarkMode ? Colors.amber[800]!.withValues(alpha: 0.3) : Colors.amber[100],
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
@@ -1682,9 +1680,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                              Colors.black.withOpacity(0.8),
+                              Colors.black.withValues(alpha: 0.8),
                               Colors.transparent,
-                              Colors.black.withOpacity(0.3),
+                              Colors.black.withValues(alpha: 0.3),
                             ],
                           ),
                         ),

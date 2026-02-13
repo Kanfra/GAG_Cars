@@ -53,7 +53,7 @@ class NotificationProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       // Silently fail for unread count updates but log it
-      print('Error refreshing unread count: $e');
+      debugPrint('Error refreshing unread count: $e');
       // Fallback to local calculation
       _updateUnreadCount();
     }
@@ -73,7 +73,7 @@ class NotificationProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      print('Error marking notification as read: $e');
+      debugPrint('Error marking notification as read: $e');
       // Fallback to local update even if API call fails
       final index = _notifications.indexWhere((n) => n.id == notificationId);
       if (index != -1) {
@@ -101,7 +101,7 @@ class NotificationProvider with ChangeNotifier {
       _unreadCount = 0;
       notifyListeners();
     } catch (e) {
-      print('Error marking all as read: $e');
+      debugPrint('Error marking all as read: $e');
       // Fallback to local update
       _notifications = _notifications.map((notification) {
         return notification.copyWith(isRead: true);
@@ -123,7 +123,7 @@ class NotificationProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error clearing all notifications: $e');
+      debugPrint('Error clearing all notifications: $e');
       // Fallback to local clear
       _notifications = [];
       _unreadCount = 0;
@@ -153,7 +153,7 @@ class NotificationProvider with ChangeNotifier {
       
       return null;
     } catch (e) {
-      print('Error getting notification by ID: $e');
+      debugPrint('Error getting notification by ID: $e');
       return null;
     }
   }

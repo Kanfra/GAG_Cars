@@ -330,7 +330,7 @@ class _SearchItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         // Navigate to detail page
-        print('Tapped on: ${item.name}');
+        debugPrint('Tapped on: ${item.name}');
       },
       child: Container(
         decoration: BoxDecoration(
@@ -338,7 +338,7 @@ class _SearchItemCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

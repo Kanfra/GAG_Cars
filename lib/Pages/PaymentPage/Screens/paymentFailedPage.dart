@@ -33,7 +33,7 @@ class PaymentFailedPage extends StatelessWidget {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
+                  color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -60,7 +60,7 @@ class PaymentFailedPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.red[900]!.withOpacity(0.3) : Colors.red[50],
+                  color: isDarkMode ? Colors.red[900]!.withValues(alpha: 0.3) : Colors.red[50],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isDarkMode ? Colors.red[700]! : Colors.red[100]!
@@ -188,7 +188,7 @@ class PaymentFailedPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                  color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(

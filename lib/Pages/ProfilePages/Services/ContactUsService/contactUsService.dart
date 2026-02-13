@@ -56,35 +56,41 @@ class ContactUsService {
   // Make a call to customer service - opens phone dialer with number pre-filled
   static Future<void> makeCustomerServiceCall(BuildContext context) async {
     final logger = Logger();
-    
-    logger.i('Make customer service call button pressed for phone: $_customerServicePhone');
-    
+
+    logger.i(
+      'Make customer service call button pressed for phone: $_customerServicePhone',
+    );
+
     if (_customerServicePhone.isEmpty) {
       _showError(context, 'Customer service phone number not available');
       return;
     }
 
     // Clean the phone number - remove any non-digit characters except +
-    final cleanPhoneNumber = _customerServicePhone.replaceAll(RegExp(r'[^\d+]'), '');
-    
+    final cleanPhoneNumber = _customerServicePhone.replaceAll(
+      RegExp(r'[^\d+]'),
+      '',
+    );
+
     if (cleanPhoneNumber.isEmpty) {
       _showError(context, 'Invalid customer service phone number format');
       return;
     }
 
     final phoneUrl = 'tel:$cleanPhoneNumber';
-    
+
     try {
       logger.i('Launching phone dialer with URL: $phoneUrl');
-      
+
       if (await canLaunchUrl(Uri.parse(phoneUrl))) {
         await launchUrl(Uri.parse(phoneUrl));
         logger.i('Phone dialer launched successfully for customer service');
-        
+
         // Show success message
+        if (!context.mounted) return;
         _showSuccess(
-          context, 
-          'Opening phone dialer for $_customerServiceName...'
+          context,
+          'Opening phone dialer for $_customerServiceName...',
         );
       } else {
         throw 'Could not launch phone dialer';
@@ -92,8 +98,8 @@ class ContactUsService {
     } catch (e) {
       logger.e('Error launching phone dialer for customer service: $e');
       _showError(
-        context, 
-        'Could not make a call. Please check if your device supports phone calls.'
+        context,
+        'Could not make a call. Please check if your device supports phone calls.',
       );
     }
   }
@@ -103,18 +109,21 @@ class ContactUsService {
     try {
       // Clean the phone number for WhatsApp
       final cleanWhatsapp = _whatsappNumber.replaceAll(RegExp(r'[^\d]'), '');
-      
+
       // Try both URL formats
       final url1 = Uri.parse('https://wa.me/$cleanWhatsapp');
       final url2 = Uri.parse('whatsapp://send?phone=$cleanWhatsapp');
-      
+
       if (await canLaunchUrl(url1)) {
         await launchUrl(url1, mode: LaunchMode.externalApplication);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening WhatsApp...');
       } else if (await canLaunchUrl(url2)) {
         await launchUrl(url2, mode: LaunchMode.externalApplication);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening WhatsApp...');
       } else {
+        if (!context.mounted) return;
         _showError(context, 'WhatsApp not installed');
       }
     } catch (e) {
@@ -134,6 +143,7 @@ class ContactUsService {
           enableDomStorage: true,
         ),
       );
+      if (!context.mounted) return;
       _showInfo(context, 'Opening website...');
     } catch (e) {
       _showError(context, 'Could not open website');
@@ -145,12 +155,14 @@ class ContactUsService {
       // Try native app first
       final appUrl = Uri.parse('fb://page/$_facebookPageId');
       final webUrl = Uri.parse('https://www.facebook.com/$_facebookPageId');
-      
+
       if (await canLaunchUrl(appUrl)) {
         await launchUrl(appUrl);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening Facebook...');
       } else {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening Facebook...');
       }
     } catch (e) {
@@ -163,12 +175,14 @@ class ContactUsService {
       // Try native app first
       final appUrl = Uri.parse('twitter://user?screen_name=$_twitterHandle');
       final webUrl = Uri.parse('https://twitter.com/$_twitterHandle');
-      
+
       if (await canLaunchUrl(appUrl)) {
         await launchUrl(appUrl);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening Twitter...');
       } else {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening Twitter...');
       }
     } catch (e) {
@@ -181,12 +195,14 @@ class ContactUsService {
       // Try native app first
       final appUrl = Uri.parse('instagram://user?username=$_instagramUsername');
       final webUrl = Uri.parse('https://instagram.com/$_instagramUsername');
-      
+
       if (await canLaunchUrl(appUrl)) {
         await launchUrl(appUrl);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening Instagram...');
       } else {
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+        if (!context.mounted) return;
         _showInfo(context, 'Opening Instagram...');
       }
     } catch (e) {
@@ -238,9 +254,7 @@ class ContactUsService {
               Navigator.pop(context);
               makeCustomerServiceCall(context);
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -262,12 +276,7 @@ class ContactUsService {
         children: [
           Icon(icon, size: 16, color: Colors.grey[600]),
           SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 14),
-            ),
-          ),
+          Expanded(child: Text(text, style: TextStyle(fontSize: 14))),
         ],
       ),
     );

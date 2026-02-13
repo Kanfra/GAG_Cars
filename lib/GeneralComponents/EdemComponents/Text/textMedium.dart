@@ -7,13 +7,13 @@ import '../../../GlobalVariables/sizeGlobalVariables.dart';
 class TextMedium extends StatelessWidget {
   final String title;
   final FontWeight fontWeight;
-  TextOverflow? overflow;
+  final TextOverflow? overflow;
   final Color textColor;
   final TextAlign? textAlign;
   final TextDecoration? textDecoration;
   final Color? textDecorationColor;
-  double? textSize;
-  TextMedium({
+  final double? textSize;
+  const TextMedium({
     required this.title,
     required this.fontWeight,
     this.overflow,
@@ -22,7 +22,7 @@ class TextMedium extends StatelessWidget {
     this.textDecoration,
     this.textDecorationColor,
     this.textSize,
-    super.key
+    super.key,
   });
 
   @override
