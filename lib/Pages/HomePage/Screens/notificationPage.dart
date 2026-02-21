@@ -149,10 +149,20 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
           SizedBox(height: 16),
           Text(
-            provider.errorMessage,
+            _getUserFriendlyErrorMessage(provider.errorMessage),
             style: TextStyle(
               color: isDarkMode ? Colors.white70 : Colors.grey[600], 
-              fontSize: 16
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Please check your internet connection and try again.',
+            style: TextStyle(
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
+              fontSize: 14,
             ),
             textAlign: TextAlign.center,
           ),
@@ -171,6 +181,28 @@ class _NotificationPageState extends State<NotificationPage> {
         ],
       ),
     );
+  }
+
+  String _getUserFriendlyErrorMessage(String error) {
+    final errorLower = error.toLowerCase();
+    
+    if (errorLower.contains('network') || errorLower.contains('connection')) {
+      return 'Unable to connect to the server';
+    } else if (errorLower.contains('timeout')) {
+      return 'Request timed out';
+    } else if (errorLower.contains('token') || errorLower.contains('authentication')) {
+      return 'Authentication failed';
+    } else if (errorLower.contains('401') || errorLower.contains('unauthorized')) {
+      return 'Access denied';
+    } else if (errorLower.contains('404') || errorLower.contains('not found')) {
+      return 'Server not found';
+    } else if (errorLower.contains('500') || errorLower.contains('server')) {
+      return 'Server is temporarily unavailable';
+    } else if (errorLower.contains('format') || errorLower.contains('json')) {
+      return 'Data format error';
+    } else {
+      return 'Something went wrong';
+    }
   }
 
   Widget _buildEmptyState(bool isDarkMode) {
@@ -423,24 +455,24 @@ class _BroadcastDetailDialog extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(
-                  Icons.location_city,
-                  size: 16,
-                  color: isDarkMode ? Colors.white54 : Colors.grey[500],
-                ),
-                SizedBox(width: 8),
-                Text(
-                  'Country: ${broadcast.country.name}',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white54 : Colors.grey[500],
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+            // SizedBox(height: 4),
+            // Row(
+            //   children: [
+            //     Icon(
+            //       Icons.location_city,
+            //       size: 16,
+            //       color: isDarkMode ? Colors.white54 : Colors.grey[500],
+            //     ),
+            //     SizedBox(width: 8),
+            //     Text(
+            //       'Country: ${broadcast.country.name}',
+            //       style: TextStyle(
+            //         color: isDarkMode ? Colors.white54 : Colors.grey[500],
+            //         fontSize: 12,
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),

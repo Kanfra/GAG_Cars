@@ -413,16 +413,16 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  '${_getCategoryCount(category.name)} items',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                    fontSize: 10,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                // SizedBox(height: 2),
+                // Text(
+                //   '${_getCategoryCount(category.name)} items',
+                //   style: TextStyle(
+                //     color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                //     fontSize: 10,
+                //   ),
+                //   maxLines: 1,
+                //   overflow: TextOverflow.ellipsis,
+                // ),
               ],
             ),
           ),

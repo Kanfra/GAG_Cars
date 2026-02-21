@@ -8,18 +8,17 @@ import 'package:gag_cars_frontend/Pages/Messages/Services/ChatService/chatServic
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Providers/chatSettingsProvider.dart';
 import 'package:logger/Logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:async';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChatPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
 
-  const ChatPage({
-    super.key,
-    required this.allJson,
-  });
+  const ChatPage({super.key, required this.allJson});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -43,15 +42,16 @@ class _ChatPageState extends State<ChatPage> {
   bool _isFirstLoad = true;
   bool _showEmojiPicker = false;
   File? _selectedImage;
+  Timer? _pollingTimer;
 
   @override
   void initState() {
     super.initState();
     _logger.i('ChatPage initialized with contact: $_contactName ($_contactId)');
-    
+
     _messageController.addListener(_onMessageTextChanged);
     _scrollController.addListener(_onScroll);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_contactId.isNotEmpty) {
         _logger.i('Loading messages for contact: $_contactId');
@@ -66,26 +66,39 @@ class _ChatPageState extends State<ChatPage> {
       } else {
         _logger.e('No contact ID provided!');
       }
+
+      // Start polling for new messages
+      _startPolling();
+    });
+  }
+
+  void _startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (mounted && _contactId.isNotEmpty) {
+        context.read<MessagesProvider>().syncMessages(_contactId);
+      }
     });
   }
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
 
-    final shouldShowScrollToBottom = 
-        _scrollController.offset < _scrollController.position.maxScrollExtent - _scrollThreshold;
-    
+    final shouldShowScrollToBottom =
+        _scrollController.offset > _scrollThreshold;
+
     if (shouldShowScrollToBottom != _showScrollToBottom) {
       setState(() {
         _showScrollToBottom = shouldShowScrollToBottom;
       });
     }
 
-    // Auto-load more messages when scrolling near the top
-    if (_scrollController.offset <= _scrollController.position.minScrollExtent + 100 &&
+    // Auto-load more messages when scrolling near the top (history)
+    if (_scrollController.offset >=
+            _scrollController.position.maxScrollExtent - 100 &&
         !context.read<MessagesProvider>().isLoading(_contactId) &&
         context.read<MessagesProvider>().hasMore(_contactId)) {
-      _logger.d('Near top, auto-loading older messages');
+      _logger.d('Near top (history), auto-loading older messages');
       _loadMoreMessages();
     }
   }
@@ -109,7 +122,7 @@ class _ChatPageState extends State<ChatPage> {
           _showEmojiPicker = false;
         });
         _messageFocusNode.unfocus();
-        
+
         _logger.i('Image selected: ${pickedFile.path}');
       }
     } catch (e) {
@@ -131,14 +144,16 @@ class _ChatPageState extends State<ChatPage> {
 
   void _sendMessage() async {
     final messageText = _messageController.text.trim();
-    
-    _logger.i('Send button pressed. Message: "$messageText", Contact ID: "$_contactId", Has Image: ${_selectedImage != null}');
-    
+
+    _logger.i(
+      'Send button pressed. Message: "$messageText", Contact ID: "$_contactId", Has Image: ${_selectedImage != null}',
+    );
+
     if (messageText.isEmpty && _selectedImage == null) {
       _logger.w('Send attempted with empty message and no image');
       return;
     }
-    
+
     if (_contactId.isEmpty) {
       _logger.e('Cannot send message: No contact ID');
       Get.snackbar(
@@ -153,59 +168,80 @@ class _ChatPageState extends State<ChatPage> {
     // Clear input fields
     _messageController.clear();
     final tempImage = _selectedImage;
-    setState(() { 
+    setState(() {
       _isSending = true;
       _showEmojiPicker = false;
       _selectedImage = null;
     });
     _messageFocusNode.unfocus();
 
+    final temporaryMsgId = DateTime.now().millisecondsSinceEpoch.toString();
+    final currentUserId = context.read<UserProvider>().user?.id ?? '';
+
+    // Optimistic UI update
+    if (currentUserId.isNotEmpty) {
+      final optimisticMessage = ChatMessage(
+        id: temporaryMsgId,
+        fromId: currentUserId,
+        toId: _contactId,
+        body: messageText,
+        attachment: tempImage?.path, // local path for preview
+        seen: 0,
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+      );
+      context.read<MessagesProvider>().addNewMessage(
+        _contactId,
+        optimisticMessage,
+      );
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToBottom();
+      });
+    }
+
     try {
       _logger.i('Starting to send message...');
-      
-      final temporaryMsgId = DateTime.now().millisecondsSinceEpoch.toString();
-      
+
       await ChatService.sendMessage(
         toId: _contactId,
         message: messageText,
         temporaryMsgId: temporaryMsgId,
         imageFile: tempImage,
       );
-      
+
       _logger.i('Message sent successfully, refreshing messages...');
-      await context.read<MessagesProvider>().refreshMessages(_contactId);
-      
+      // Sync to get real ID and server data
+      await context.read<MessagesProvider>().syncMessages(_contactId);
+
       _logger.i('Messages refreshed successfully');
-      
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottom();
-      });
-      
     } catch (e) {
       _logger.e('Error sending message: $e', error: e);
-      
+
       // Restore the message and image if sending failed
       _messageController.text = messageText;
       setState(() {
         _selectedImage = tempImage;
       });
-      
+
       Get.snackbar(
         'Error',
         'Failed to send message: ${e.toString()}',
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        duration: Duration(seconds: 4),
+        duration: const Duration(seconds: 4),
       );
     } finally {
-      setState(() { _isSending = false; });
+      setState(() {
+        _isSending = false;
+      });
     }
   }
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+        0.0,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
@@ -244,7 +280,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _makeCall() async {
     _logger.i('Make call button pressed for phone: $_contactPhone');
-    
+
     if (_contactPhone.isEmpty) {
       Get.snackbar(
         'Error',
@@ -256,7 +292,7 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     final cleanPhoneNumber = _contactPhone.replaceAll(RegExp(r'[^\d+]'), '');
-    
+
     if (cleanPhoneNumber.isEmpty) {
       Get.snackbar(
         'Error',
@@ -268,10 +304,10 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     final phoneUrl = 'tel:$cleanPhoneNumber';
-    
+
     try {
       _logger.i('Launching phone dialer with URL: $phoneUrl');
-      
+
       if (await canLaunchUrl(Uri.parse(phoneUrl))) {
         await launchUrl(Uri.parse(phoneUrl));
         _logger.i('Phone dialer launched successfully');
@@ -294,13 +330,17 @@ class _ChatPageState extends State<ChatPage> {
     _logger.i('Options menu opened');
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
           margin: EdgeInsets.all(16),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
           decoration: BoxDecoration(
             color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -312,155 +352,257 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200]!,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
-                      child: Icon(
-                        Icons.chat,
-                        color: ColorGlobalVariables.brownColor,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: isDarkMode
+                            ? const Color(0xFF616161)
+                            : Colors.grey[200]!,
+                        width: 1,
                       ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Chat Options',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Additional chat actions',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                            ),
-                          ),
-                        ],
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: ColorGlobalVariables.brownColor
+                            .withValues(alpha: 0.1),
+                        child: Icon(
+                          Icons.chat,
+                          color: ColorGlobalVariables.brownColor,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Make a Call option
-              ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.phone, color: Colors.green, size: 20),
-                ),
-                title: Text(
-                  'Make a Call',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                ),
-                subtitle: _contactPhone.isNotEmpty 
-                    ? Text(
-                        _contactPhone,
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.green[200] : Colors.green[600],
-                          fontSize: 12,
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Chat Options',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : Colors.black87,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Additional chat actions',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                          ],
                         ),
-                      )
-                    : null,
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: isDarkMode ? Colors.white70 : Colors.grey[400],
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _makeCall();
-                },
-              ),
-              
-              // Send Message option
-              ListTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.message, color: Colors.blue, size: 20),
-                ),
-                title: Text(
-                  'Send Message',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                    ],
                   ),
                 ),
-                subtitle: _contactPhone.isNotEmpty 
-                    ? Text(
-                        'SMS to $_contactPhone',
-                        style: TextStyle(
-                          color: isDarkMode ? Colors.blue[200] : Colors.blue[600],
-                          fontSize: 12,
-                        ),
-                      )
-                    : null,
-                trailing: Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: isDarkMode ? Colors.white70 : Colors.grey[400],
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _sendSMS();
-                },
-              ),
-              
-              Padding(
-                padding: EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _logger.i('Options menu closed');
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? const Color(0xFF616161) : Colors.grey[100],
-                      foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[700],
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: EdgeInsets.symmetric(vertical: 12),
+
+                // Make a Call option
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.green.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Text('Close'),
+                    child: Icon(Icons.phone, color: Colors.green, size: 20),
+                  ),
+                  title: Text(
+                    'Make a Call',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  subtitle: _contactPhone.isNotEmpty
+                      ? Text(
+                          _contactPhone,
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? Colors.green[200]
+                                : Colors.green[600],
+                            fontSize: 12,
+                          ),
+                        )
+                      : null,
+                  trailing: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.grey[400],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _makeCall();
+                  },
+                ),
+
+                // Send Message option
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.message, color: Colors.blue, size: 20),
+                  ),
+                  title: Text(
+                    'Send Message',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  subtitle: _contactPhone.isNotEmpty
+                      ? Text(
+                          'SMS to $_contactPhone',
+                          style: TextStyle(
+                            color: isDarkMode
+                                ? Colors.blue[200]
+                                : Colors.blue[600],
+                            fontSize: 12,
+                          ),
+                        )
+                      : null,
+                  trailing: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.grey[400],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _sendSMS();
+                  },
+                ),
+
+                Divider(
+                  height: 1,
+                  color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                ),
+
+                // Wallpaper option
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: ColorGlobalVariables.brownColor.withValues(
+                        alpha: 0.1,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.wallpaper_rounded,
+                      color: ColorGlobalVariables.brownColor,
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(
+                    'Chat Wallpapers',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Choose a background image',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.grey[400],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showWallpaperSelectionSheet();
+                  },
+                ),
+
+                // Background Color option
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.color_lens_rounded,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(
+                    'Background Color',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Choose a solid background color',
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: isDarkMode ? Colors.white70 : Colors.grey[400],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _showColorSelectionSheet();
+                  },
+                ),
+
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _logger.i('Options menu closed');
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDarkMode
+                            ? const Color(0xFF616161)
+                            : Colors.grey[100],
+                        foregroundColor: isDarkMode
+                            ? Colors.white70
+                            : Colors.grey[700],
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text('Close'),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -480,7 +622,7 @@ class _ChatPageState extends State<ChatPage> {
 
     final cleanPhoneNumber = _contactPhone.replaceAll(RegExp(r'[^\d+]'), '');
     final smsUrl = 'sms:$cleanPhoneNumber';
-    
+
     try {
       if (await canLaunchUrl(Uri.parse(smsUrl))) {
         await launchUrl(Uri.parse(smsUrl));
@@ -503,7 +645,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
       appBar: _buildAppBar(isDarkMode),
@@ -521,15 +663,14 @@ class _ChatPageState extends State<ChatPage> {
             Column(
               children: [
                 Expanded(
-                  child: _contactId.isEmpty 
+                  child: _contactId.isEmpty
                       ? _buildNoContactSelected(isDarkMode)
                       : _buildChatMessages(isDarkMode),
                 ),
-                
+
                 // Selected image preview
-                if (_selectedImage != null)
-                  _buildImagePreview(isDarkMode),
-                
+                if (_selectedImage != null) _buildImagePreview(isDarkMode),
+
                 if (_showEmojiPicker)
                   SizedBox(
                     height: 250,
@@ -538,11 +679,11 @@ class _ChatPageState extends State<ChatPage> {
                       config: Config(
                         height: 256,
                         checkPlatformCompatibility: true,
-                        emojiViewConfig: EmojiViewConfig(
-                          emojiSizeMax: 32.0,
-                        ),
+                        emojiViewConfig: EmojiViewConfig(emojiSizeMax: 32.0),
                         categoryViewConfig: CategoryViewConfig(
-                          backgroundColor: isDarkMode ? const Color(0xFF424242) : const Color(0xFFF0F0F0),
+                          backgroundColor: isDarkMode
+                              ? const Color(0xFF424242)
+                              : const Color(0xFFF0F0F0),
                           indicatorColor: ColorGlobalVariables.brownColor,
                           iconColor: Colors.grey,
                           iconColorSelected: ColorGlobalVariables.brownColor,
@@ -550,7 +691,9 @@ class _ChatPageState extends State<ChatPage> {
                           categoryIcons: const CategoryIcons(),
                         ),
                         bottomActionBarConfig: BottomActionBarConfig(
-                          backgroundColor: isDarkMode ? const Color(0xFF424242) : const Color(0xFFF0F0F0),
+                          backgroundColor: isDarkMode
+                              ? const Color(0xFF424242)
+                              : const Color(0xFFF0F0F0),
                         ),
                       ),
                     ),
@@ -558,7 +701,7 @@ class _ChatPageState extends State<ChatPage> {
                 _buildMessageInput(isDarkMode),
               ],
             ),
-            
+
             // Custom scroll to bottom button - No Hero widget
             if (_showScrollToBottom)
               Positioned(
@@ -583,9 +726,7 @@ class _ChatPageState extends State<ChatPage> {
         child: Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
           child: Icon(
             Icons.arrow_downward_rounded,
             color: Colors.white,
@@ -655,7 +796,10 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.close, color: isDarkMode ? Colors.white70 : Colors.grey[600]),
+            icon: Icon(
+              Icons.close,
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
+            ),
             onPressed: _removeSelectedImage,
           ),
         ],
@@ -668,7 +812,10 @@ class _ChatPageState extends State<ChatPage> {
       backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
       elevation: 1,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: isDarkMode ? Colors.white : Colors.black87),
+        icon: Icon(
+          Icons.arrow_back,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
         onPressed: () {
           _logger.i('Back button pressed');
           Get.back();
@@ -709,7 +856,7 @@ class _ChatPageState extends State<ChatPage> {
                   _contactPhone.isNotEmpty ? _contactPhone : 'No phone number',
                   style: TextStyle(
                     fontSize: 12,
-                    color: _contactPhone.isNotEmpty 
+                    color: _contactPhone.isNotEmpty
                         ? (isDarkMode ? Colors.green[400]! : Colors.green[600]!)
                         : (isDarkMode ? Colors.grey[400]! : Colors.grey),
                     fontWeight: FontWeight.w500,
@@ -725,16 +872,21 @@ class _ChatPageState extends State<ChatPage> {
         IconButton(
           icon: Icon(
             Icons.phone,
-            color: _contactPhone.isNotEmpty 
-                ? ColorGlobalVariables.brownColor 
+            color: _contactPhone.isNotEmpty
+                ? ColorGlobalVariables.brownColor
                 : (isDarkMode ? Colors.grey[600]! : Colors.grey[400]!),
           ),
           onPressed: _contactPhone.isNotEmpty ? _makeCall : null,
-          tooltip: _contactPhone.isNotEmpty ? 'Call $_contactPhone' : 'No phone number',
+          tooltip: _contactPhone.isNotEmpty
+              ? 'Call $_contactPhone'
+              : 'No phone number',
         ),
         // Options menu button
         IconButton(
-          icon: Icon(Icons.more_vert, color: isDarkMode ? Colors.white70 : Colors.black54),
+          icon: Icon(
+            Icons.more_vert,
+            color: isDarkMode ? Colors.white70 : Colors.black54,
+          ),
           onPressed: _showOptionsMenu,
         ),
       ],
@@ -748,17 +900,27 @@ class _ChatPageState extends State<ChatPage> {
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
           color: isDarkMode ? const Color(0xFF424242) : Colors.grey[200],
-          child: Icon(Icons.person, color: isDarkMode ? Colors.grey[400] : Colors.grey[400]),
+          child: Icon(
+            Icons.person,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[400],
+          ),
         ),
         errorWidget: (context, url, error) => Container(
           color: isDarkMode ? const Color(0xFF424242) : Colors.grey[200],
-          child: Icon(Icons.person, color: isDarkMode ? Colors.grey[400] : Colors.grey[400]),
+          child: Icon(
+            Icons.person,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[400],
+          ),
         ),
       );
     } else {
       return Container(
         color: isDarkMode ? const Color(0xFF424242) : Colors.grey[200],
-        child: Icon(Icons.person, color: isDarkMode ? Colors.grey[400] : Colors.grey[400], size: 24),
+        child: Icon(
+          Icons.person,
+          color: isDarkMode ? Colors.grey[400] : Colors.grey[400],
+          size: 24,
+        ),
       );
     }
   }
@@ -796,107 +958,155 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildChatMessages(bool isDarkMode) {
-    return Consumer2<UserProvider, MessagesProvider>(
-      builder: (context, userProvider, messagesProvider, child) {
-        final currentUser = userProvider.user;
-        final currentUserId = currentUser?.id;
-        
-        final messages = messagesProvider.getMessages(_contactId);
-        final isLoading = messagesProvider.isLoading(_contactId);
-        final error = messagesProvider.getError(_contactId);
-        final hasMore = messagesProvider.hasMore(_contactId);
+    return Consumer3<UserProvider, MessagesProvider, ChatSettingsProvider>(
+      builder:
+          (
+            context,
+            userProvider,
+            messagesProvider,
+            chatSettingsProvider,
+            child,
+          ) {
+            final currentUser = userProvider.user;
+            final currentUserId = currentUser?.id;
 
-        if (currentUserId == null) {
-          return _buildUserNotLoggedIn(isDarkMode);
-        }
+            final messages = messagesProvider.getMessages(_contactId);
+            final isLoading = messagesProvider.isLoading(_contactId);
+            final error = messagesProvider.getError(_contactId);
+            final hasMore = messagesProvider.hasMore(_contactId);
 
-        if (isLoading && messages.isEmpty) {
-          return _buildLoadingState(isDarkMode);
-        }
+            if (currentUserId == null) {
+              return _buildUserNotLoggedIn(isDarkMode);
+            }
 
-        if (error != null && messages.isEmpty) {
-          return _buildErrorState(error, isDarkMode);
-        }
+            if (isLoading && messages.isEmpty) {
+              return _buildLoadingState(isDarkMode);
+            }
 
-        if (messages.isEmpty) {
-          return _buildEmptyChatState(isDarkMode);
-        }
+            if (error != null && messages.isEmpty) {
+              return _buildErrorState(error, isDarkMode);
+            }
 
-        final sortedMessages = List<ChatMessage>.from(messages)
-          ..sort((a, b) => DateTime.parse(a.createdAt).compareTo(DateTime.parse(b.createdAt)));
+            if (messages.isEmpty) {
+              return _buildEmptyChatState(isDarkMode);
+            }
 
-        return Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: isDarkMode
-                  ? [const Color(0xFF424242), const Color(0xFF303030)]
-                  : [Colors.grey[50]!, Colors.grey[100]!],
-            ),
-          ),
-          child: Stack(
-            children: [
-              if (isLoading && messages.isNotEmpty)
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    color: isDarkMode ? Colors.black26 : Colors.white54,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            final sortedMessages = List<ChatMessage>.from(messages)
+              ..sort(
+                (a, b) => DateTime.parse(
+                  b.createdAt,
+                ).compareTo(DateTime.parse(a.createdAt)),
+              );
+
+            final hasImage =
+                chatSettingsProvider.isImageMode &&
+                chatSettingsProvider.backgroundImageSource != null;
+            final imageSource = chatSettingsProvider.backgroundImageSource;
+            final isNetworkImage =
+                imageSource != null && imageSource.startsWith('http');
+
+            return Container(
+              decoration: BoxDecoration(
+                color: hasImage
+                    ? Colors.black
+                    : chatSettingsProvider.backgroundColor,
+                image: hasImage
+                    ? DecorationImage(
+                        image: isNetworkImage
+                            ? CachedNetworkImageProvider(imageSource!)
+                            : FileImage(File(imageSource!)) as ImageProvider,
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withValues(
+                            alpha: isDarkMode ? 0.4 : 0.1,
                           ),
+                          BlendMode.darken,
                         ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Loading older messages...',
-                          style: TextStyle(
-                            color: isDarkMode ? Colors.white70 : Colors.grey[600],
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-              ListView.builder(
-                controller: _scrollController,
-                reverse: false,
-                padding: EdgeInsets.only(
-                  top: (isLoading && messages.isNotEmpty) ? 40 : 16,
-                  bottom: 16,
-                  left: 16,
-                  right: 16,
-                ),
-                itemCount: sortedMessages.length,
-                itemBuilder: (context, index) {
-                  final message = sortedMessages[index];
-                  final isSentByMe = message.fromId == currentUserId;
-                  
-                  return ChatBubble(
-                    message: message,
-                    isSentByMe: isSentByMe,
-                    showAvatar: _shouldShowAvatar(sortedMessages, index, isSentByMe),
-                    isDarkMode: isDarkMode,
-                    contactImage: _contactImage,
-                    currentUserImage: currentUser?.profileImage ?? currentUser?.avatar,
-                  );
-                },
+                      )
+                    : null,
+                gradient:
+                    !hasImage &&
+                        chatSettingsProvider.backgroundColor == Colors.white
+                    ? LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: isDarkMode
+                            ? [const Color(0xFF424242), const Color(0xFF303030)]
+                            : [Colors.grey[50]!, Colors.grey[100]!],
+                      )
+                    : null,
               ),
-            ],
-          ),
-        );
-      },
+              child: Stack(
+                children: [
+                  if (isLoading && messages.isNotEmpty)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        color: isDarkMode ? Colors.black26 : Colors.white54,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  ColorGlobalVariables.brownColor,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Loading older messages...',
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  ListView.builder(
+                    controller: _scrollController,
+                    reverse: true,
+                    padding: EdgeInsets.only(
+                      top: (isLoading && messages.isNotEmpty) ? 40 : 16,
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
+                    ),
+                    itemCount: sortedMessages.length,
+                    itemBuilder: (context, index) {
+                      final message = sortedMessages[index];
+                      final isSentByMe = message.fromId == currentUserId;
+
+                      return ChatBubble(
+                        message: message,
+                        isSentByMe: isSentByMe,
+                        showAvatar: _shouldShowAvatar(
+                          sortedMessages,
+                          index,
+                          isSentByMe,
+                        ),
+                        isDarkMode: isDarkMode,
+                        contactImage: _contactImage,
+                        currentUserImage:
+                            currentUser?.profileImage ?? currentUser?.avatar,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
     );
   }
 
@@ -1011,26 +1221,33 @@ class _ChatPageState extends State<ChatPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorGlobalVariables.brownColor,
             ),
-            child: Text(
-              'Go to Login',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('Go to Login', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  bool _shouldShowAvatar(List<ChatMessage> messages, int index, bool isCurrentMessageSentByMe) {
-    if (index == messages.length - 1) return true;
-    
+  bool _shouldShowAvatar(
+    List<ChatMessage> messages,
+    int index,
+    bool isCurrentMessageSentByMe,
+  ) {
+    // In a reversed list, index 0 is the newest message.
+    // We show the avatar for the newest message in a group.
+    if (index == 0) return true;
+
     final currentMessage = messages[index];
-    final nextMessage = messages[index + 1];
-    
-    final isNextMessageSentByMe = nextMessage.fromId == _getCurrentUserId();
-    
-    return isCurrentMessageSentByMe != isNextMessageSentByMe ||
-        DateTime.parse(nextMessage.createdAt).difference(DateTime.parse(currentMessage.createdAt)).inMinutes > 5;
+    final newerMessage =
+        messages[index - 1]; // message chronologically after this one
+
+    final isNewerMessageSentByMe = newerMessage.fromId == _getCurrentUserId();
+
+    return isCurrentMessageSentByMe != isNewerMessageSentByMe ||
+        DateTime.parse(
+              newerMessage.createdAt,
+            ).difference(DateTime.parse(currentMessage.createdAt)).inMinutes >
+            5;
   }
 
   String? _getCurrentUserId() {
@@ -1048,7 +1265,9 @@ class _ChatPageState extends State<ChatPage> {
             height: 40,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ColorGlobalVariables.brownColor,
+              ),
             ),
           ),
           SizedBox(height: 16),
@@ -1103,10 +1322,7 @@ class _ChatPageState extends State<ChatPage> {
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorGlobalVariables.brownColor,
             ),
-            child: Text(
-              'Try Again',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('Try Again', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -1116,14 +1332,17 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildMessageInput(bool isDarkMode) {
     final hasText = _messageController.text.trim().isNotEmpty;
     final hasImage = _selectedImage != null;
-    final canSend = (hasText || hasImage) && !_isSending && _contactId.isNotEmpty;
+    final canSend =
+        (hasText || hasImage) && !_isSending && _contactId.isNotEmpty;
 
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         border: Border(
-          top: BorderSide(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200]!),
+          top: BorderSide(
+            color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200]!,
+          ),
         ),
         boxShadow: [
           BoxShadow(
@@ -1138,12 +1357,12 @@ class _ChatPageState extends State<ChatPage> {
           // Image picker button
           IconButton(
             icon: Icon(
-              Icons.photo_library, 
-              color: isDarkMode ? Colors.white70 : Colors.grey[600]
+              Icons.photo_library,
+              color: isDarkMode ? Colors.white70 : Colors.grey[600],
             ),
             onPressed: _pickImage,
           ),
-          
+
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -1156,8 +1375,13 @@ class _ChatPageState extends State<ChatPage> {
                 decoration: InputDecoration(
                   hintText: hasImage ? 'Add a caption...' : 'Type a message...',
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  hintStyle: TextStyle(color: isDarkMode ? Colors.white60 : Colors.grey[500]),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  hintStyle: TextStyle(
+                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                  ),
                 ),
                 style: TextStyle(
                   color: isDarkMode ? Colors.white : Colors.black87,
@@ -1171,27 +1395,29 @@ class _ChatPageState extends State<ChatPage> {
               ),
             ),
           ),
-          
+
           SizedBox(width: 8),
-          
+
           // Emoji button
           IconButton(
             icon: Icon(
               _showEmojiPicker ? Icons.keyboard : Icons.emoji_emotions_outlined,
-              color: _showEmojiPicker 
-                  ? ColorGlobalVariables.brownColor 
+              color: _showEmojiPicker
+                  ? ColorGlobalVariables.brownColor
                   : (isDarkMode ? Colors.white70 : Colors.grey[600]),
             ),
             onPressed: _toggleEmojiPicker,
           ),
-          
+
           SizedBox(width: 4),
-          
+
           // Send button
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: canSend ? ColorGlobalVariables.brownColor : (isDarkMode ? const Color(0xFF616161) : Colors.grey[300]),
+              color: canSend
+                  ? ColorGlobalVariables.brownColor
+                  : (isDarkMode ? const Color(0xFF616161) : Colors.grey[300]),
             ),
             child: IconButton(
               icon: _isSending
@@ -1214,12 +1440,304 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   void dispose() {
+    _pollingTimer?.cancel();
     _messageController.removeListener(_onMessageTextChanged);
     _scrollController.removeListener(_onScroll);
     _messageController.dispose();
     _scrollController.dispose();
     _messageFocusNode.dispose();
     super.dispose();
+  }
+
+  void _showWallpaperSelectionSheet() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final wallpapers = [
+      {
+        'name': 'Soft Purple',
+        'url':
+            'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600',
+      },
+      {
+        'name': 'Abstract Dark',
+        'url':
+            'https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=600',
+      },
+      {
+        'name': 'Minimal Studio',
+        'url':
+            'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=600',
+      },
+      {
+        'name': 'Deep Ocean',
+        'url':
+            'https://images.unsplash.com/photo-1518481612222-68bbe828eba1?q=80&w=600',
+      },
+      {
+        'name': 'Mountain Mist',
+        'url':
+            'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=600',
+      },
+      {
+        'name': 'Cosmic Night',
+        'url':
+            'https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?q=80&w=600',
+      },
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select Wallpaper',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              SizedBox(height: 16),
+              // Pick from Gallery button
+              ListTile(
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.photo_library_rounded,
+                    color: Colors.blue,
+                    size: 20,
+                  ),
+                ),
+                title: Text(
+                  'Pick from Gallery',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                subtitle: Text(
+                  'Choose a photo from your device',
+                  style: TextStyle(color: Colors.grey, fontSize: 12),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickWallpaperFromGallery();
+                },
+              ),
+              SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+                child: Text(
+                  'Preset Wallpapers',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 200,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: wallpapers.length,
+                  itemBuilder: (context, index) {
+                    final wallpaper = wallpapers[index];
+                    return GestureDetector(
+                      onTap: () {
+                        context.read<ChatSettingsProvider>().setBackgroundImage(
+                          wallpaper['url']!,
+                        );
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: 120,
+                        margin: EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: CachedNetworkImageProvider(
+                              wallpaper['url']!,
+                            ),
+                            fit: BoxFit.cover,
+                          ),
+                          border: Border.all(
+                            color: Colors.grey.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.black54,
+                              borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              wallpaper['name']!,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    context.read<ChatSettingsProvider>().resetToDefault();
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    'Reset to Default',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showColorSelectionSheet() {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final colors = [
+      {'name': 'Classic White', 'color': Colors.white},
+      {'name': 'Sage Green', 'color': Color(0xFFE8F5E9)},
+      {'name': 'Soft Blue', 'color': Color(0xFFE3F2FD)},
+      {'name': 'Warm Sand', 'color': Color(0xFFFFF8E1)},
+      {'name': 'Deep Teal', 'color': Color(0xFF006064)},
+      {'name': 'Charcoal', 'color': Color(0xFF263238)},
+      {'name': 'Midnight', 'color': Color(0xFF1A237E)},
+      {'name': 'Aubergine', 'color': Color(0xFF311B92)},
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDarkMode ? const Color(0xFF303030) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select Background Color',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              SizedBox(height: 16),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: colors.map((c) {
+                  final color = c['color'] as Color;
+                  return GestureDetector(
+                    onTap: () {
+                      context.read<ChatSettingsProvider>().setBackgroundColor(
+                        color,
+                      );
+                      Navigator.pop(context);
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.grey.withValues(alpha: 0.3),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          c['name'] as String,
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: isDarkMode
+                                ? Colors.white70
+                                : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickWallpaperFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        if (mounted) {
+          context.read<ChatSettingsProvider>().setBackgroundImage(image.path);
+          _logger.i('Custom wallpaper set from gallery: ${image.path}');
+        }
+      }
+    } catch (e) {
+      _logger.e('Error picking wallpaper from gallery: $e');
+      Get.snackbar(
+        'Error',
+        'Could not pick image from gallery',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }
 
@@ -1254,7 +1772,9 @@ class _ChatBubbleState extends State<ChatBubble> {
       margin: EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: widget.isSentByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: widget.isSentByMe
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           if (!widget.isSentByMe && widget.showAvatar)
             Container(
@@ -1265,10 +1785,12 @@ class _ChatBubbleState extends State<ChatBubble> {
             )
           else if (!widget.isSentByMe)
             SizedBox(width: 40),
-          
+
           Flexible(
             child: Column(
-              crossAxisAlignment: widget.isSentByMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: widget.isSentByMe
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Container(
                   constraints: BoxConstraints(
@@ -1276,14 +1798,20 @@ class _ChatBubbleState extends State<ChatBubble> {
                   ),
                   padding: EdgeInsets.all(_isImageMessage ? 8 : 16),
                   decoration: BoxDecoration(
-                    color: widget.isSentByMe 
+                    color: widget.isSentByMe
                         ? ColorGlobalVariables.brownColor
-                        : (widget.isDarkMode ? const Color(0xFF424242) : Colors.white),
+                        : (widget.isDarkMode
+                              ? const Color(0xFF424242)
+                              : Colors.white),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
-                      bottomLeft: widget.isSentByMe ? Radius.circular(20) : Radius.circular(4),
-                      bottomRight: widget.isSentByMe ? Radius.circular(4) : Radius.circular(20),
+                      bottomLeft: widget.isSentByMe
+                          ? Radius.circular(20)
+                          : Radius.circular(4),
+                      bottomRight: widget.isSentByMe
+                          ? Radius.circular(4)
+                          : Radius.circular(20),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -1304,30 +1832,44 @@ class _ChatBubbleState extends State<ChatBubble> {
                         Text(
                           widget.message.body,
                           style: TextStyle(
-                            color: widget.isSentByMe ? Colors.white : (widget.isDarkMode ? Colors.white : Colors.black87),
+                            color: widget.isSentByMe
+                                ? Colors.white
+                                : (widget.isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87),
                             fontSize: 14,
                             height: 1.4,
                           ),
                         ),
-                      
+
                       SizedBox(height: 4),
-                      
+
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            _formatTime(DateTime.parse(widget.message.createdAt)),
+                            _formatTime(
+                              DateTime.parse(widget.message.createdAt),
+                            ),
                             style: TextStyle(
-                              color: widget.isSentByMe ? Colors.white70 : (widget.isDarkMode ? Colors.white60 : Colors.grey[500]),
+                              color: widget.isSentByMe
+                                  ? Colors.white70
+                                  : (widget.isDarkMode
+                                        ? Colors.white60
+                                        : Colors.grey[500]),
                               fontSize: 10,
                             ),
                           ),
                           if (widget.isSentByMe) ...[
                             SizedBox(width: 4),
                             Icon(
-                              widget.message.seen == 1 ? Icons.done_all : Icons.done,
+                              widget.message.seen == 1
+                                  ? Icons.done_all
+                                  : Icons.done,
                               size: 12,
-                              color: widget.message.seen == 1 ? Colors.blue[200] : Colors.white70,
+                              color: widget.message.seen == 1
+                                  ? Colors.blue[200]
+                                  : Colors.white70,
                             ),
                           ],
                         ],
@@ -1338,7 +1880,7 @@ class _ChatBubbleState extends State<ChatBubble> {
               ],
             ),
           ),
-          
+
           if (widget.isSentByMe && widget.showAvatar)
             Container(
               width: 32,
@@ -1384,7 +1926,9 @@ class _ChatBubbleState extends State<ChatBubble> {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          widget.isDarkMode ? Colors.white60 : Colors.grey[400]!,
+                          widget.isDarkMode
+                              ? Colors.white60
+                              : Colors.grey[400]!,
                         ),
                       ),
                     ),
@@ -1398,14 +1942,18 @@ class _ChatBubbleState extends State<ChatBubble> {
                       children: [
                         Icon(
                           Icons.broken_image_rounded,
-                          color: widget.isDarkMode ? Colors.white60 : Colors.grey[400]!,
+                          color: widget.isDarkMode
+                              ? Colors.white60
+                              : Colors.grey[400]!,
                           size: 40,
                         ),
                         SizedBox(height: 4),
                         Text(
                           'Failed to load',
                           style: TextStyle(
-                            color: widget.isDarkMode ? Colors.white60 : Colors.grey[400]!,
+                            color: widget.isDarkMode
+                                ? Colors.white60
+                                : Colors.grey[400]!,
                             fontSize: 10,
                           ),
                         ),
@@ -1415,7 +1963,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 ),
               ),
             ),
-            
+
             // Image overlay with icon
             Positioned(
               top: 4,
@@ -1426,11 +1974,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                   color: Colors.black54,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.photo,
-                  color: Colors.white,
-                  size: 12,
-                ),
+                child: Icon(Icons.photo, color: Colors.white, size: 12),
               ),
             ),
           ],
@@ -1457,9 +2001,10 @@ class _ChatBubbleState extends State<ChatBubble> {
           opacity: animation,
           child: ScaleTransition(
             scale: animation.drive(
-              Tween<double>(begin: 0.8, end: 1.0).chain(
-                CurveTween(curve: Curves.easeOutBack),
-              ),
+              Tween<double>(
+                begin: 0.8,
+                end: 1.0,
+              ).chain(CurveTween(curve: Curves.easeOutBack)),
             ),
             child: child,
           ),
@@ -1469,7 +2014,8 @@ class _ChatBubbleState extends State<ChatBubble> {
   }
 
   Widget _buildContactAvatar() {
-    if (widget.contactImage.isNotEmpty && widget.contactImage.startsWith('http')) {
+    if (widget.contactImage.isNotEmpty &&
+        widget.contactImage.startsWith('http')) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: CachedNetworkImage(
@@ -1485,7 +2031,9 @@ class _ChatBubbleState extends State<ChatBubble> {
   }
 
   Widget _buildMyAvatar() {
-    if (widget.currentUserImage != null && widget.currentUserImage!.isNotEmpty && widget.currentUserImage!.startsWith('http')) {
+    if (widget.currentUserImage != null &&
+        widget.currentUserImage!.isNotEmpty &&
+        widget.currentUserImage!.startsWith('http')) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: CachedNetworkImage(
@@ -1506,15 +2054,23 @@ class _ChatBubbleState extends State<ChatBubble> {
         shape: BoxShape.circle,
         color: widget.isDarkMode ? const Color(0xFF616161) : Colors.grey[300],
       ),
-      child: Icon(Icons.person, size: 18, color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600]),
+      child: Icon(
+        Icons.person,
+        size: 18,
+        color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+      ),
     );
   }
 
   String _formatTime(DateTime timestamp) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final messageDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
-    
+    final messageDate = DateTime(
+      timestamp.year,
+      timestamp.month,
+      timestamp.day,
+    );
+
     if (messageDate == today) {
       return '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
     } else if (messageDate == today.subtract(Duration(days: 1))) {
@@ -1540,7 +2096,8 @@ class EnhancedImageView extends StatefulWidget {
 }
 
 class _EnhancedImageViewState extends State<EnhancedImageView> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   TapDownDetails? _doubleTapDetails;
 
   void _handleDoubleTap() {
@@ -1564,9 +2121,7 @@ class _EnhancedImageViewState extends State<EnhancedImageView> {
       body: Stack(
         children: [
           // Background with blur effect
-          Container(
-            color: Colors.black87,
-          ),
+          Container(color: Colors.black87),
 
           // Interactive image viewer
           Center(
@@ -1608,7 +2163,9 @@ class _EnhancedImageViewState extends State<EnhancedImageView> {
                                 height: 40,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 3,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 16),

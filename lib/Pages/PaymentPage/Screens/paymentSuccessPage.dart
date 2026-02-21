@@ -17,10 +17,7 @@ import 'package:provider/provider.dart';
 class PaymentSuccessPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
 
-  const PaymentSuccessPage({
-    super.key,
-    required this.allJson,
-  });
+  const PaymentSuccessPage({super.key, required this.allJson});
 
   @override
   State<PaymentSuccessPage> createState() => _PaymentSuccessPageState();
@@ -34,7 +31,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   void initState() {
     super.initState();
     logger.i('✅ Payment success initialized: ${widget.allJson}');
-    
+
     // Show appropriate message based on upload status
     if (widget.allJson['uploadError'] != null) {
       _showUploadErrorSnackbar();
@@ -48,7 +45,8 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
       showCustomSnackBar(
         backgroundColor: ColorGlobalVariables.redColor,
         title: "Upload Failed",
-        message: "Payment was successful but vehicle upload failed. Please try uploading again from My Listings.",
+        message:
+            "Payment was successful but vehicle upload failed. Please try uploading again from My Listings.",
         duration: Duration(seconds: 5),
       );
     });
@@ -58,8 +56,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showCustomSnackBar(
         backgroundColor: ColorGlobalVariables.redColor,
-        title: "Promotion Failed", 
-        message: "Payment was successful but promotion activation failed. Please contact support.",
+        title: "Promotion Failed",
+        message:
+            "Payment was successful but promotion activation failed. Please contact support.",
         duration: Duration(seconds: 5),
       );
     });
@@ -67,7 +66,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
   double _getAmountInGhs() {
     final dynamic amountValue = widget.allJson['amount'];
-    
+
     double amountDouble;
     if (amountValue is int) {
       amountDouble = amountValue.toDouble();
@@ -78,9 +77,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     } else {
       amountDouble = 0.0;
     }
-    
-    // Convert from kobo to GHS
-    return amountDouble / 100;
+
+    // Amount is already in base currency (e.g. 5.0)
+    return amountDouble;
   }
 
   // FIXED: Added listen: false for async context
@@ -110,15 +109,30 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                 pw.Divider(),
                 pw.SizedBox(height: 20),
 
-                _buildPdfRow('Reference:', widget.allJson['transactionReference']?.toString() ?? 'N/A'),
+                _buildPdfRow(
+                  'Reference:',
+                  widget.allJson['transactionReference']?.toString() ?? 'N/A',
+                ),
                 pw.SizedBox(height: 10),
-                _buildPdfRow('Date:', DateTime.now().toString().split('.').first),
+                _buildPdfRow(
+                  'Date:',
+                  DateTime.now().toString().split('.').first,
+                ),
                 pw.SizedBox(height: 10),
-                _buildPdfRow('Amount:', '${userProvider.user?.countryCurrencySymbol ?? ''} ${amountInGhs.toStringAsFixed(2)}'),
+                _buildPdfRow(
+                  'Amount:',
+                  '${userProvider.user?.countryCurrencySymbol ?? ''} ${amountInGhs.toStringAsFixed(2)}',
+                ),
                 pw.SizedBox(height: 10),
-                _buildPdfRow('Package:', widget.allJson['packageName']?.toString() ?? 'Unknown'),
+                _buildPdfRow(
+                  'Package:',
+                  widget.allJson['packageName']?.toString() ?? 'Unknown',
+                ),
                 pw.SizedBox(height: 10),
-                _buildPdfRow('Listing:', widget.allJson['listingName']?.toString() ?? 'Unknown'),
+                _buildPdfRow(
+                  'Listing:',
+                  widget.allJson['listingName']?.toString() ?? 'Unknown',
+                ),
                 pw.SizedBox(height: 30),
 
                 pw.Center(
@@ -158,7 +172,8 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
       final pdfBytes = await _generatePdfReceipt();
       await Printing.sharePdf(
         bytes: pdfBytes,
-        filename: 'receipt-${widget.allJson['transactionReference'] ?? 'payment'}.pdf',
+        filename:
+            'receipt-${widget.allJson['transactionReference'] ?? 'payment'}.pdf',
       );
     } catch (e) {
       logger.e('Share error: $e');
@@ -177,7 +192,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     final type = widget.allJson['type'] ?? 'upload';
     final uploadError = widget.allJson['uploadError'];
     final promotionError = widget.allJson['promotionError'];
-    
+
     if (uploadError != null) {
       return 'Payment successful but upload failed';
     } else if (promotionError != null) {
@@ -193,7 +208,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     final type = widget.allJson['type'] ?? 'upload';
     final uploadError = widget.allJson['uploadError'];
     final promotionError = widget.allJson['promotionError'];
-    
+
     if (uploadError != null) {
       return 'Please try uploading again from My Listings';
     } else if (promotionError != null) {
@@ -208,7 +223,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   Color _getStatusColor() {
     final uploadError = widget.allJson['uploadError'];
     final promotionError = widget.allJson['promotionError'];
-    
+
     if (uploadError != null || promotionError != null) {
       return Colors.orange;
     }
@@ -218,7 +233,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   IconData _getStatusIcon() {
     final uploadError = widget.allJson['uploadError'];
     final promotionError = widget.allJson['promotionError'];
-    
+
     if (uploadError != null || promotionError != null) {
       return Icons.warning_amber_rounded;
     }
@@ -230,7 +245,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     final userProvider = Provider.of<UserProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
-    
+
     final amountInGhs = _getAmountInGhs();
     final statusColor = _getStatusColor();
     final statusIcon = _getStatusIcon();
@@ -281,17 +296,17 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               Text(
                 widget.allJson['packageName']?.toString() ?? 'Unknown Package',
                 style: TextStyle(
-                  fontSize: 18, 
-                  color: isDarkMode ? Colors.white70 : Colors.grey
-                )
+                  fontSize: 18,
+                  color: isDarkMode ? Colors.white70 : Colors.grey,
+                ),
               ),
               const SizedBox(height: 4),
 
               Text(
                 widget.allJson['listingName']?.toString() ?? 'Unknown Listing',
                 style: TextStyle(
-                  fontSize: 14, 
-                  color: isDarkMode ? Colors.white60 : Colors.grey
+                  fontSize: 14,
+                  color: isDarkMode ? Colors.white60 : Colors.grey,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -303,23 +318,25 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                   color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200]!
+                    color: isDarkMode
+                        ? const Color(0xFF616161)
+                        : Colors.grey[200]!,
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.receipt, 
-                      size: 16, 
-                      color: isDarkMode ? Colors.white60 : Colors.grey
+                      Icons.receipt,
+                      size: 16,
+                      color: isDarkMode ? Colors.white60 : Colors.grey,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Ref: ${widget.allJson['transactionReference']?.toString() ?? 'N/A'}',
                       style: TextStyle(
-                        fontSize: 12, 
-                        color: isDarkMode ? Colors.white60 : Colors.grey
+                        fontSize: 12,
+                        color: isDarkMode ? Colors.white60 : Colors.grey,
                       ),
                     ),
                   ],
@@ -358,7 +375,9 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         side: BorderSide(
-                          color: isDarkMode ? Colors.white60 : Colors.grey[400]!
+                          color: isDarkMode
+                              ? Colors.white60
+                              : Colors.grey[400]!,
                         ),
                       ),
                       child: _isSharing
@@ -367,22 +386,28 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                color: isDarkMode
+                                    ? Colors.white60
+                                    : Colors.grey[600],
                               ),
                             )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.share, 
+                                  Icons.share,
                                   size: 20,
-                                  color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey[700],
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Share Receipt',
                                   style: TextStyle(
-                                    color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : Colors.grey[700],
                                   ),
                                 ),
                               ],
@@ -395,10 +420,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
               Text(
                 subMessage,
-                style: TextStyle(
-                  color: statusColor, 
-                  fontSize: 14
-                ),
+                style: TextStyle(color: statusColor, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
             ],

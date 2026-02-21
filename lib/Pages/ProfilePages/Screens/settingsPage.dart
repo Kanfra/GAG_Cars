@@ -183,6 +183,18 @@ class _SettingsState extends State<SettingsPage> {
     bool isUserVerified = userProvider.isVerified;
     bool isDealerVerified = userProvider.isVerifiedDealer;
     
+    // Refresh user data to get latest dealer verification status when page is accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (userProvider.isLoggedIn) {
+        try {
+          userProvider.fetchUserProfile();
+        } catch (e) {
+          // Silently handle errors, user data will remain as is
+          debugPrint('Failed to refresh user profile: $e');
+        }
+      }
+    });
+    
     // Format the joined date
     String joinedDate = "Not available";
     if (user?.createdAt != null) {
@@ -267,34 +279,65 @@ class _SettingsState extends State<SettingsPage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Get Verified Button
-                          if (user != null && !userProvider.isPaidSeller && !isUserVerified)
-                            ElevatedButton(
-                              onPressed: () {
-                                Get.toNamed(
-                                  RouteClass.getGetVerifiedPage(),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: ColorGlobalVariables.brownColor,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Get Verified', 
-                                    style: TextStyle(color: Colors.white),
+                          // Get Verified Button / Verified Status
+                          if (user != null && !userProvider.isPaidSeller)
+                            isUserVerified 
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: ColorGlobalVariables.lemonGreenColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.1),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.verified, color: Colors.white, size: 18),
-                                ],
-                              ),
-                            ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.verified, color: Colors.white, size: 18),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Verified', 
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ElevatedButton(
+                                  onPressed: () {
+                                    Get.toNamed(
+                                      RouteClass.getGetVerifiedPage(),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: ColorGlobalVariables.brownColor,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Get Verified', 
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Icon(Icons.verified, color: Colors.white, size: 18),
+                                    ],
+                                  ),
+                                ),
                         ],
                       ),
                     ),

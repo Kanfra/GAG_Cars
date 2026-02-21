@@ -1237,7 +1237,9 @@ class _DetailPageState extends State<DetailPage>
                                 Wrap(
                                   spacing: 8,
                                   runSpacing: 8,
-                                  children: _buildVerificationBadges(),
+                                  children: _buildVerificationBadges(
+                                    userDetailsProvider,
+                                  ),
                                 ),
 
                                 const SizedBox(height: 16),
@@ -1323,10 +1325,8 @@ class _DetailPageState extends State<DetailPage>
                                                 ),
                                               ),
                                               const SizedBox(width: 6),
-                                              if (Provider.of<UserProvider>(
-                                                context,
-                                                listen: false,
-                                              ).isFullyVerified)
+                                              if (userDetailsProvider
+                                                  .isVerified)
                                                 CustomImage(
                                                   imagePath:
                                                       '${ImageStringGlobalVariables.iconPath}check.png',
@@ -2362,13 +2362,13 @@ Download GAGcars app for more amazing vehicles!''';
 
   // ========== VERIFICATION AND BADGES ==========
 
-  List<Widget> _buildVerificationBadges() {
+  List<Widget> _buildVerificationBadges(
+    UserDetailsProvider userDetailsProvider,
+  ) {
     final List<Widget> badges = [];
     final theme = Theme.of(context);
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    if (userProvider.isVerifiedDealer) {
+    if (userDetailsProvider.isVerifiedDealer) {
       badges.add(
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
@@ -2392,7 +2392,7 @@ Download GAGcars app for more amazing vehicles!''';
                 ),
               ),
               const SizedBox(width: 4),
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 8,
                 backgroundColor: Colors.blue,
                 child: Icon(Icons.check, size: 12, color: Colors.white),
@@ -2403,7 +2403,7 @@ Download GAGcars app for more amazing vehicles!''';
       );
     }
 
-    if (userProvider.isFullyVerified) {
+    if (userDetailsProvider.isVerified) {
       badges.add(
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
@@ -2427,7 +2427,7 @@ Download GAGcars app for more amazing vehicles!''';
                 ),
               ),
               const SizedBox(width: 4),
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 8,
                 backgroundColor: Colors.green,
                 child: Icon(Icons.verified, size: 12, color: Colors.white),

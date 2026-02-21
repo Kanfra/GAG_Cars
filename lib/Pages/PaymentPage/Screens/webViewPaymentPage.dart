@@ -11,6 +11,8 @@ import 'package:gag_cars_frontend/Pages/PaymentPage/Services/PaystackService/pay
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/vehicleService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Models/uploadPromotionTransactionModel.dart';
+import 'package:gag_cars_frontend/Pages/PaymentPage/Services/uploadPromotionTransactionService.dart';
 import 'package:logger/Logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +45,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   // Payment data from arguments
   late String _authorizationUrl;
   late String _reference;
-  late int _amount;
+  late num _amount;
   late String _packageName;
   late String _listingName;
   late String _listingId;
@@ -66,7 +68,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       _startAutoVerificationTimer();
       _startStatusUpdates();
     } catch (e, stackTrace) {
-      _handleCriticalError('Initialization failed: ${e.toString()}', stackTrace.toString());
+      _handleCriticalError(
+        'Initialization failed: ${e.toString()}',
+        stackTrace.toString(),
+      );
     }
   }
 
@@ -129,14 +134,14 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   void _initializeFromArguments() {
     try {
       final arguments = Get.arguments as Map<String, dynamic>?;
-      
+
       if (arguments == null) {
         throw Exception('No arguments provided to WebViewPaymentPage');
       }
-      
+
       _authorizationUrl = arguments['authorizationUrl']?.toString() ?? '';
       _reference = arguments['reference']?.toString() ?? '';
-      _amount = (arguments['amount'] as int?) ?? 0;
+      _amount = (arguments['amount'] as num?) ?? 0;
       _packageName = arguments['packageName']?.toString() ?? 'Unknown Package';
       _listingName = arguments['listingName']?.toString() ?? 'Unknown Listing';
       _listingId = arguments['listingId']?.toString() ?? 'unknown';
@@ -152,13 +157,15 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       if (_authorizationUrl.isEmpty) {
         throw Exception('Authorization URL is empty or missing');
       }
-      
+
       if (_reference.isEmpty) {
         throw Exception('Payment reference is empty or missing');
       }
-
     } catch (e, stackTrace) {
-      _handleCriticalError('Failed to initialize payment data: ${e.toString()}', stackTrace.toString());
+      _handleCriticalError(
+        'Failed to initialize payment data: ${e.toString()}',
+        stackTrace.toString(),
+      );
       rethrow;
     }
   }
@@ -201,7 +208,8 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                   _isLoading = false;
                   _paymentFailed = true;
                   _errorMessage = 'Payment page failed to load';
-                  _detailedError = 'WebView Error: ${error.errorCode} - ${error.description}';
+                  _detailedError =
+                      'WebView Error: ${error.errorCode} - ${error.description}';
                   _currentStatus = 'Payment page failed to load';
                 });
               }
@@ -218,9 +226,11 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
           ),
         )
         ..loadRequest(Uri.parse(_authorizationUrl));
-
     } catch (e, stackTrace) {
-      _handleCriticalError('Failed to initialize WebView: ${e.toString()}', stackTrace.toString());
+      _handleCriticalError(
+        'Failed to initialize WebView: ${e.toString()}',
+        stackTrace.toString(),
+      );
     }
   }
 
@@ -231,27 +241,50 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       }
 
       final successPatterns = [
-        'success', 'transaction', 'trxref=', 'reference=', 'status=success',
-        'verified', 'approved', 'completed', 'thank', 'gag-cars', 'return', 
-        'redirect', 'callback', 'paystack.com/success', 'paystack.co/success',
-        'charge.success', 'transaction/success', 'payment/verify', 'callback',
+        'success',
+        'transaction',
+        'trxref=',
+        'reference=',
+        'status=success',
+        'verified',
+        'approved',
+        'completed',
+        'thank',
+        'gag-cars',
+        'return',
+        'redirect',
+        'callback',
+        'paystack.com/success',
+        'paystack.co/success',
+        'charge.success',
+        'transaction/success',
+        'payment/verify',
+        'callback',
       ];
-      
+
       final excludePatterns = [
         'checkout.paystack.com/viff3zgs61lrnka',
-        '/charge/authorize', '/pay/authorize', 'checkout.paystack.com/#',
-        'checkout.paystack.com/pay', 'processing', 'pending', 'waiting'
+        '/charge/authorize',
+        '/pay/authorize',
+        'checkout.paystack.com/#',
+        'checkout.paystack.com/pay',
+        'processing',
+        'pending',
+        'waiting',
       ];
-      
-      final hasSuccessIndicator = successPatterns.any((pattern) => 
-          url.toLowerCase().contains(pattern.toLowerCase()));
-      final isExcludedPage = excludePatterns.any((pattern) => 
-          url.toLowerCase().contains(pattern.toLowerCase()));
 
-      final shouldVerify = (hasSuccessIndicator && !isExcludedPage) || 
-                          (!url.contains('checkout.paystack.com') && 
-                           !url.contains('viff3zgs61lrnka') && 
-                           url.isNotEmpty);
+      final hasSuccessIndicator = successPatterns.any(
+        (pattern) => url.toLowerCase().contains(pattern.toLowerCase()),
+      );
+      final isExcludedPage = excludePatterns.any(
+        (pattern) => url.toLowerCase().contains(pattern.toLowerCase()),
+      );
+
+      final shouldVerify =
+          (hasSuccessIndicator && !isExcludedPage) ||
+          (!url.contains('checkout.paystack.com') &&
+              !url.contains('viff3zgs61lrnka') &&
+              url.isNotEmpty);
 
       if (shouldVerify && !_paymentVerified && !_isProcessing) {
         _updateStatus('Payment detected - verifying...');
@@ -266,7 +299,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     if (_paymentVerified) {
       return;
     }
-    
+
     if (_isProcessing) {
       return;
     }
@@ -281,19 +314,41 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
 
     try {
       _updateStatus('Contacting payment gateway...');
-      
-      final result = await LegacyPaystackService.verifyTransaction(
-        reference: _reference,
-      ).timeout(const Duration(seconds: 30), onTimeout: () {
-        throw TimeoutException('Payment verification timed out after 30 seconds');
-      });
+
+      final result =
+          await LegacyPaystackService.verifyTransaction(
+            reference: _reference,
+          ).timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw TimeoutException(
+                'Payment verification timed out after 30 seconds',
+              );
+            },
+          );
 
       if (result['status'] == true) {
         _updateStatus('Payment verified successfully!');
-        
+
+        // Save successful transaction to database - MUST succeed to proceed
+        final bool dbSaveSuccess = await _saveTransactionToDatabase(
+          status: 'success',
+          paystackData: result['data'],
+        );
+
+        if (!dbSaveSuccess) {
+          _navigateToPaymentFailedPage(
+            errorMessage:
+                'Payment was successful, but we failed to record the transaction on our server. '
+                'Please contact support with your reference: $_reference',
+            transactionReference: _reference,
+          );
+          return;
+        }
+
         try {
           await _storePaymentSuccess();
-          
+
           if (_type == 'upload') {
             await _uploadVehicleAndNavigate();
           } else if (_type == 'promotion') {
@@ -301,30 +356,99 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
           } else {
             throw Exception('Unknown payment type: $_type');
           }
-          
         } catch (storageError) {
           _navigateToPaymentFailedPage(
-            errorMessage: 'Payment successful but failed to process: $storageError',
+            errorMessage:
+                'Payment successful but failed to process: $storageError',
             transactionReference: _reference,
           );
         }
-        
       } else {
+        // Log failure to database (optional, doesn't block failure navigation)
+        await _saveTransactionToDatabase(
+          status: 'failed',
+          paystackData: result['data'],
+        );
+
         _navigateToPaymentFailedPage(
-          errorMessage: result['message']?.toString() ?? 'Payment verification failed',
+          errorMessage:
+              result['message']?.toString() ?? 'Payment verification failed',
           transactionReference: _reference,
         );
       }
     } on TimeoutException {
+      // Record failure on timeout if possible
+      await _saveTransactionToDatabase(status: 'failed');
+
       _navigateToPaymentFailedPage(
         errorMessage: 'Payment verification timed out',
         transactionReference: _reference,
       );
     } catch (e) {
+      // Record failure on unexpected error
+      await _saveTransactionToDatabase(status: 'failed');
+
       _navigateToPaymentFailedPage(
         errorMessage: 'Failed to verify payment: ${e.toString()}',
         transactionReference: _reference,
       );
+    }
+  }
+
+  Future<bool> _saveTransactionToDatabase({
+    required String status,
+    Map<String, dynamic>? paystackData,
+  }) async {
+    try {
+      final transactionService = UploadPromotionTransactionService();
+
+      // Use dynamic IDs: parse to int if possible, otherwise keep as string
+      // This handles both auto-incrementing IDs and UUIDs correctly
+      dynamic parsedPackageId =
+          int.tryParse(_packageId.toString()) ?? _packageId;
+
+      // For uploads, if itemId is '0' or 'unknown', try setting it to null
+      // as many backends don't like '0' as a foreign key but accept null
+      dynamic parsedItemId;
+      if (_type == 'upload') {
+        parsedItemId = null;
+      } else {
+        parsedItemId = int.tryParse(_listingId.toString()) ?? _listingId;
+      }
+
+      // Extract payment channel from Paystack data or default to 'paystack'
+      final String paymentChannel =
+          paystackData?['channel']?.toString() ?? 'paystack';
+
+      final transaction = UploadPromotionTransactionModel(
+        packageId: parsedPackageId,
+        itemId: parsedItemId,
+        amount: _amount,
+        paymentChannel: paymentChannel,
+        status: status,
+      );
+
+      _logger.i('🚀 [DATABASE_SAVE] Preparing to send transaction data:');
+      _logger.i(
+        '   - Package ID: $parsedPackageId (${parsedPackageId.runtimeType})',
+      );
+      _logger.i('   - Item ID: $parsedItemId (${parsedItemId.runtimeType})');
+      _logger.i('''
+  {
+    "package_id": ${parsedPackageId is String ? '"$parsedPackageId"' : parsedPackageId},
+    "item_id": ${parsedItemId == null ? null : (parsedItemId is String ? '"$parsedItemId"' : parsedItemId)},
+    "amount": $_amount,
+    "payment_channel": "$paymentChannel",
+    "status": "$status"
+  }
+''');
+
+      await transactionService.postTransaction(transaction);
+      _logger.i('✅ Transaction saved to database successfully');
+      return true;
+    } catch (e) {
+      _logger.e('❌ Failed to save transaction to database: $e');
+      return false;
     }
   }
 
@@ -334,17 +458,19 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final storedDataString = prefs.getString('pending_promotion_data');
-      
+
       if (storedDataString != null) {
         _logger.i('🔍 PROMOTION DATA DEBUG:');
         _logger.i('   - Raw JSON: $storedDataString');
-        
+
         final promotionData = json.decode(storedDataString);
         _logger.i('   - Decoded Data Type: ${promotionData.runtimeType}');
         _logger.i('   - All Keys: ${promotionData.keys.toList()}');
-        
+
         // Check critical fields
-        _logger.i('   - item_id: ${promotionData['item_id']} (type: ${promotionData['item_id']?.runtimeType})');
+        _logger.i(
+          '   - item_id: ${promotionData['item_id']} (type: ${promotionData['item_id']?.runtimeType})',
+        );
         _logger.i('   - listing_name: ${promotionData['listing_name']}');
         _logger.i('   - listing_id: ${promotionData['listing_id']}');
       } else {
@@ -356,56 +482,59 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     }
   }
 
-  Future<void> _validatePromotionData(Map<String, dynamic> promotionData) async {
+  Future<void> _validatePromotionData(
+    Map<String, dynamic> promotionData,
+  ) async {
     _logger.i('🔍 VALIDATING PROMOTION DATA...');
-    
+
     final requiredFields = ['item_id', 'listing_id'];
-    
+
     for (final field in requiredFields) {
-      if (promotionData[field] == null || promotionData[field].toString().isEmpty) {
+      if (promotionData[field] == null ||
+          promotionData[field].toString().isEmpty) {
         throw Exception('Missing required field: $field');
       }
       _logger.i('   ✅ $field: ${promotionData[field]}');
     }
-    
+
     // Validate item_id
     final itemId = promotionData['item_id'];
     if (itemId is String) {
       _logger.i('   ✅ item_id is valid string: $itemId');
     }
-    
+
     // Validate listing_id
     final listingId = promotionData['listing_id'];
     if (listingId is String) {
       _logger.i('   ✅ listing_id is valid string: $listingId');
     }
-    
+
     _logger.i('✅ PROMOTION DATA VALIDATION COMPLETED SUCCESSFULLY');
   }
 
   Future<Map<String, dynamic>> _loadPromotionDataFromStorage() async {
     try {
       _updateStatus('Loading promotion data...');
-      
+
       final prefs = await SharedPreferences.getInstance();
       final storedDataString = prefs.getString('pending_promotion_data');
-      
+
       if (storedDataString == null || storedDataString.isEmpty) {
         throw Exception('No promotion data found in storage');
       }
-      
+
       final promotionData = json.decode(storedDataString);
-      
+
       _logger.i('🎯 PROMOTION DATA LOADED FROM STORAGE:');
       _logger.i('   - Item ID: ${promotionData['item_id']}');
       _logger.i('   - Listing Name: ${promotionData['listing_name']}');
       _logger.i('   - Listing ID: ${promotionData['listing_id']}');
-      
+
       // Run debug to see exact data structure
       await _debugPromotionData();
-      
+
       _updateStatus('Promotion data loaded successfully');
-      
+
       return promotionData;
     } catch (e, stackTrace) {
       _logger.e('❌ ERROR loading promotion data: $e');
@@ -420,7 +549,9 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('pending_promotion_data');
       await prefs.remove('pending_promotion');
-      _logger.i('✅ Promotion data cleared from storage after successful activation');
+      _logger.i(
+        '✅ Promotion data cleared from storage after successful activation',
+      );
     } catch (e) {
       _logger.e('❌ ERROR clearing promotion data: $e');
       // Don't rethrow - we don't want to fail the whole process due to cleanup error
@@ -439,7 +570,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       // ✅ STEP 1: Load complete promotion data from SharedPreferences
       _updateStatus('Loading promotion data...');
       final completePromotionData = await _loadPromotionDataFromStorage();
-      
+
       _logger.i('🎯 PROMOTION DATA FOR ACTIVATION:');
       _logger.i('   - Item ID: ${completePromotionData['item_id']}');
       _logger.i('   - Listing Name: ${completePromotionData['listing_name']}');
@@ -453,7 +584,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       // ✅ STEP 3: Calculate promotion dates based on package duration
       _updateStatus('Setting up promotion period...');
       final dates = PromotionService.calculatePromotionDates(_durationDays);
-      
+
       _logger.i('📅 PROMOTION DATES:');
       _logger.i('   - Start: ${dates['start_at']}');
       _logger.i('   - End: ${dates['end_at']}');
@@ -462,7 +593,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       // ✅ STEP 4: Activate promotion using the service
       _updateStatus('Activating promotion...');
       _logger.i('🚀 ACTIVATING PROMOTION...');
-      
+
       final result = await PromotionService.activatePromotion(
         itemId: completePromotionData['item_id'],
         startAt: dates['start_at']!,
@@ -473,38 +604,38 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       if (result['success'] == true) {
         _logger.i('✅ PROMOTION ACTIVATED SUCCESSFULLY');
         _updateStatus('Promotion activated successfully!');
-        
+
         // ✅ STEP 5: Wait for backend to process the promotion
         _updateStatus('Processing your promotion...');
         await Future.delayed(const Duration(seconds: 2));
-        
+
         // ✅ STEP 6: Clear stored data only after successful activation
         _updateStatus('Finalizing promotion...');
         await _clearPromotionDataFromStorage();
-        
+
         // ✅ STEP 7: Mark promotion as complete
         if (mounted) {
           setState(() {
             _promotionComplete = true;
           });
         }
-        
+
         // ✅ STEP 8: Wait a moment to show completion state
         _updateStatus('Promotion completed successfully!');
         await Future.delayed(const Duration(seconds: 1));
-        
+
         // ✅ STEP 9: Navigate to success page
         await _navigateToPaymentSuccessPage();
-        
       } else {
         throw Exception('Failed to activate promotion: ${result['message']}');
       }
-      
     } catch (e, stackTrace) {
       _logger.e('❌ PROMOTION ACTIVATION FAILED: $e');
       _logger.e('❌ STACK TRACE: $stackTrace');
       _updateStatus('Promotion activation failed - navigating with error...');
-      await _navigateToPaymentSuccessPage(promotionError: 'Promotion activation failed: $e');
+      await _navigateToPaymentSuccessPage(
+        promotionError: 'Promotion activation failed: $e',
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -520,23 +651,29 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final storedDataString = prefs.getString('pending_vehicle_data');
-      
+
       if (storedDataString != null) {
         _logger.i('🔍 STORED DATA DEBUG:');
         _logger.i('   - Raw JSON: $storedDataString');
-        
+
         final vehicleData = json.decode(storedDataString);
         _logger.i('   - Decoded Data Type: ${vehicleData.runtimeType}');
         _logger.i('   - All Keys: ${vehicleData.keys.toList()}');
-        
+
         // Check critical fields
-        _logger.i('   - brand_id: ${vehicleData['brand_id']} (type: ${vehicleData['brand_id']?.runtimeType})');
-        _logger.i('   - brand_model_id: ${vehicleData['brand_model_id']} (type: ${vehicleData['brand_model_id']?.runtimeType})');
-        _logger.i('   - category_id: ${vehicleData['category_id']} (type: ${vehicleData['category_id']?.runtimeType})');
+        _logger.i(
+          '   - brand_id: ${vehicleData['brand_id']} (type: ${vehicleData['brand_id']?.runtimeType})',
+        );
+        _logger.i(
+          '   - brand_model_id: ${vehicleData['brand_model_id']} (type: ${vehicleData['brand_model_id']?.runtimeType})',
+        );
+        _logger.i(
+          '   - category_id: ${vehicleData['category_id']} (type: ${vehicleData['category_id']?.runtimeType})',
+        );
         _logger.i('   - name: ${vehicleData['name']}');
         _logger.i('   - price: ${vehicleData['price']}');
         _logger.i('   - location: ${vehicleData['location']}');
-        
+
         // Check images
         final images = vehicleData['images'];
         _logger.i('   - Images: $images (type: ${images.runtimeType})');
@@ -559,16 +696,23 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
 
   Future<void> _validateVehicleData(Map<String, dynamic> vehicleData) async {
     _logger.i('🔍 VALIDATING VEHICLE DATA...');
-    
-    final requiredFields = ['category_id', 'brand_id', 'brand_model_id', 'name', 'price', 'location'];
-    
+
+    final requiredFields = [
+      'category_id',
+      'brand_id',
+      'brand_model_id',
+      'name',
+      'price',
+      'location',
+    ];
+
     for (final field in requiredFields) {
       if (vehicleData[field] == null || vehicleData[field].toString().isEmpty) {
         throw Exception('Missing required field: $field');
       }
       _logger.i('   ✅ $field: ${vehicleData[field]}');
     }
-    
+
     // Validate and fix brand_id structure
     final brandId = vehicleData['brand_id'];
     if (brandId is Map) {
@@ -581,7 +725,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         vehicleData['brand_id'] = parsed;
       }
     }
-    
+
     // Validate brand_model_id
     final brandModelId = vehicleData['brand_model_id'];
     if (brandModelId is String) {
@@ -591,7 +735,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         vehicleData['brand_model_id'] = parsed;
       }
     }
-    
+
     // Validate category_id
     final categoryId = vehicleData['category_id'];
     if (categoryId is String) {
@@ -601,15 +745,15 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         vehicleData['category_id'] = parsed;
       }
     }
-    
+
     // Validate images
     final images = vehicleData['images'];
     if (images is! List || images.isEmpty) {
       throw Exception('No valid images found in stored data');
     }
-    
+
     _logger.i('   ✅ Images count: ${images.length}');
-    
+
     // Check if image files exist and convert paths
     final validImageFiles = <File>[];
     for (var imagePath in images) {
@@ -623,30 +767,32 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         throw Exception('Image file not found: $filePath');
       }
     }
-    
+
     if (validImageFiles.length < 4) {
-      throw Exception('At least 4 valid images are required. Found: ${validImageFiles.length}');
+      throw Exception(
+        'At least 4 valid images are required. Found: ${validImageFiles.length}',
+      );
     }
-    
+
     // Update vehicle data with validated images
     vehicleData['images'] = validImageFiles;
-    
+
     _logger.i('✅ VEHICLE DATA VALIDATION COMPLETED SUCCESSFULLY');
   }
 
   Future<Map<String, dynamic>> _loadVehicleDataFromStorage() async {
     try {
       _updateStatus('Loading vehicle data...');
-      
+
       final prefs = await SharedPreferences.getInstance();
       final storedDataString = prefs.getString('pending_vehicle_data');
-      
+
       if (storedDataString == null || storedDataString.isEmpty) {
         throw Exception('No vehicle data found in storage');
       }
-      
+
       final vehicleData = json.decode(storedDataString);
-      
+
       _logger.i('🚗 VEHICLE DATA LOADED FROM STORAGE:');
       _logger.i('   - Vehicle name: ${vehicleData['name']}');
       _logger.i('   - Category ID: ${vehicleData['category_id']}');
@@ -655,12 +801,12 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       _logger.i('   - Price: ${vehicleData['price']}');
       _logger.i('   - Location: ${vehicleData['location']}');
       _logger.i('   - Images count: ${vehicleData['images']?.length ?? 0}');
-      
+
       // Run debug to see exact data structure
       await _debugStoredData();
-      
+
       _updateStatus('Vehicle data loaded successfully');
-      
+
       return vehicleData;
     } catch (e, stackTrace) {
       _logger.e('❌ ERROR loading vehicle data: $e');
@@ -698,7 +844,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       // ✅ STEP 1: Load complete vehicle data from SharedPreferences
       _updateStatus('Loading vehicle data...');
       final completeVehicleData = await _loadVehicleDataFromStorage();
-      
+
       _logger.i('🚗 VEHICLE DATA FOR UPLOAD:');
       _logger.i('   - Name: ${completeVehicleData['name']}');
       _logger.i('   - Category: ${completeVehicleData['category_id']}');
@@ -706,7 +852,9 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       _logger.i('   - Model: ${completeVehicleData['brand_model_id']}');
       _logger.i('   - Price: ${completeVehicleData['price']}');
       _logger.i('   - Location: ${completeVehicleData['location']}');
-      _logger.i('   - Images count: ${completeVehicleData['images']?.length ?? 0}');
+      _logger.i(
+        '   - Images count: ${completeVehicleData['images']?.length ?? 0}',
+      );
       _logger.i('   - All keys: ${completeVehicleData.keys.toList()}');
 
       // ✅ STEP 2: Validate and fix data structure
@@ -722,9 +870,11 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       final requestBody = {
         'category_id': completeVehicleData['category_id'],
         'brand_id': completeVehicleData['brand_id'],
-        'brand_model_id': completeVehicleData['brand_model_id'], 
+        'brand_model_id': completeVehicleData['brand_model_id'],
         'name': completeVehicleData['name'],
-        'slug': completeVehicleData['slug'] ?? _createSlug(completeVehicleData['name']),
+        'slug':
+            completeVehicleData['slug'] ??
+            _createSlug(completeVehicleData['name']),
         'location': completeVehicleData['location'],
         'price': completeVehicleData['price'],
         'description': completeVehicleData['description'] ?? '',
@@ -734,16 +884,16 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
 
       // Add additional fields (excluding duplicates)
       completeVehicleData.forEach((key, value) {
-        if (!requestBody.containsKey(key) && 
-            key != 'images' && 
-            key != 'category_id' && 
-            key != 'brand_id' && 
-            key != 'brand_model_id' && 
-            key != 'name' && 
-            key != 'slug' && 
-            key != 'location' && 
-            key != 'price' && 
-            key != 'description' && 
+        if (!requestBody.containsKey(key) &&
+            key != 'images' &&
+            key != 'category_id' &&
+            key != 'brand_id' &&
+            key != 'brand_model_id' &&
+            key != 'name' &&
+            key != 'slug' &&
+            key != 'location' &&
+            key != 'price' &&
+            key != 'description' &&
             key != 'features') {
           requestBody[key] = value;
         }
@@ -752,45 +902,52 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       _logger.i('📤 FINAL UPLOAD REQUEST BODY:');
       _logger.i('   - Keys: ${requestBody.keys.toList()}');
       _logger.i('   - Images count: ${imageFiles.length}');
-      _logger.i('   - Category ID: ${requestBody['category_id']} (type: ${requestBody['category_id']?.runtimeType})');
-      _logger.i('   - Brand ID: ${requestBody['brand_id']} (type: ${requestBody['brand_id']?.runtimeType})');
-      _logger.i('   - Model ID: ${requestBody['brand_model_id']} (type: ${requestBody['brand_model_id']?.runtimeType})');
+      _logger.i(
+        '   - Category ID: ${requestBody['category_id']} (type: ${requestBody['category_id']?.runtimeType})',
+      );
+      _logger.i(
+        '   - Brand ID: ${requestBody['brand_id']} (type: ${requestBody['brand_id']?.runtimeType})',
+      );
+      _logger.i(
+        '   - Model ID: ${requestBody['brand_model_id']} (type: ${requestBody['brand_model_id']?.runtimeType})',
+      );
 
       // ✅ STEP 5: Upload vehicle to server
       _updateStatus('Uploading vehicle to server...');
       _logger.i('📤 UPLOADING VEHICLE TO SERVER...');
-      
+
       await VehicleService.uploadVehicle(requestBody: requestBody);
       _logger.i('✅ VEHICLE UPLOADED SUCCESSFULLY');
       _updateStatus('Vehicle uploaded successfully!');
-      
+
       // ✅ STEP 6: Wait for backend to process the upload
       _updateStatus('Processing your vehicle listing...');
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // ✅ STEP 7: Clear stored data only after successful upload and processing
       _updateStatus('Finalizing upload...');
       await _clearVehicleDataFromStorage();
-      
+
       // ✅ STEP 8: Mark upload as complete
       if (mounted) {
         setState(() {
           _uploadComplete = true;
         });
       }
-      
+
       // ✅ STEP 9: Wait a moment to show completion state
       _updateStatus('Upload completed successfully!');
       await Future.delayed(const Duration(seconds: 1));
-      
+
       // ✅ STEP 10: Navigate to success page
       await _navigateToPaymentSuccessPage();
-      
     } catch (e, stackTrace) {
       _logger.e('❌ VEHICLE UPLOAD FAILED: $e');
       _logger.e('❌ STACK TRACE: $stackTrace');
       _updateStatus('Upload failed - navigating with error...');
-      await _navigateToPaymentSuccessPage(uploadError: 'Vehicle upload failed: $e');
+      await _navigateToPaymentSuccessPage(
+        uploadError: 'Vehicle upload failed: $e',
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -800,7 +957,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     }
   }
 
-  Future<void> _navigateToPaymentSuccessPage({String? uploadError, String? promotionError}) async {
+  Future<void> _navigateToPaymentSuccessPage({
+    String? uploadError,
+    String? promotionError,
+  }) async {
     try {
       final successData = {
         'transactionReference': _reference,
@@ -815,12 +975,11 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       };
 
       _updateStatus('Navigation to success page...');
-      
+
       Get.offAllNamed(
         RouteClass.getPaymentSuccessPage(),
         arguments: successData,
       );
-      
     } catch (e, stackTrace) {
       try {
         _updateStatus('Navigation failed, using fallback...');
@@ -828,13 +987,16 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       } catch (fallbackError) {
         _handleCriticalError(
           'Navigation failed: ${e.toString()}',
-          stackTrace.toString()
+          stackTrace.toString(),
         );
       }
     }
   }
 
-  void _navigateToPaymentFailedPage({required String errorMessage, required String transactionReference}) {
+  void _navigateToPaymentFailedPage({
+    required String errorMessage,
+    required String transactionReference,
+  }) {
     try {
       final failedData = {
         'errorMessage': errorMessage,
@@ -843,10 +1005,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         'amount': _amount,
       };
 
-      Get.offAllNamed(
-        RouteClass.getPaymentFailedPage(),
-        arguments: failedData,
-      );
+      Get.offAllNamed(RouteClass.getPaymentFailedPage(), arguments: failedData);
     } catch (e) {
       Get.offAllNamed(RouteClass.getMainBottomNavigationPage());
     }
@@ -856,16 +1015,16 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     showCustomSnackBar(
       backgroundColor: ColorGlobalVariables.brownColor,
       title: 'Processing',
-      message: 'Checking payment status and proceeding...'
+      message: 'Checking payment status and proceeding...',
     );
-    
+
     _verifyPayment();
   }
 
   Future<void> _storePaymentSuccess() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       final paymentData = {
         'reference': _reference,
         'amount': _amount,
@@ -877,7 +1036,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         'type': _type,
         'timestamp': DateTime.now().toIso8601String(),
       };
-      
+
       await prefs.setString('last_payment_data', json.encode(paymentData));
     } catch (e) {
       rethrow;
@@ -900,13 +1059,13 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     if (_isProcessing) {
       return;
     }
-    
+
     showCustomSnackBar(
       backgroundColor: ColorGlobalVariables.brownColor,
       title: 'Checking Payment',
-      message: 'Verifying payment status...'
+      message: 'Verifying payment status...',
     );
-    
+
     await _verifyPayment();
   }
 
@@ -920,7 +1079,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         _currentStatus = 'Retrying payment...';
       });
     }
-    
+
     _webViewController.reload();
   }
 
@@ -998,10 +1157,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                 ),
                 child: const Text(
                   'PROCEED TO RECEIPT',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -1014,7 +1170,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   Widget _buildLoadingIndicator(bool isDarkMode) {
     String statusText = _currentStatus;
     String subText = '';
-    
+
     if (_isProcessing) {
       subText = 'Please wait while we process your payment...';
     } else if (_isUploading) {
@@ -1047,9 +1203,12 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                     width: 80,
                     height: 80,
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        ColorGlobalVariables.brownColor,
+                      ),
                       strokeWidth: 3,
-                      backgroundColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      backgroundColor: ColorGlobalVariables.brownColor
+                          .withValues(alpha: 0.2),
                     ),
                   ),
                   Icon(
@@ -1061,7 +1220,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               child: Column(
@@ -1087,18 +1246,23 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                 ],
               ),
             ),
-            
+
             if (_isUploading || _isPromoting) ...[
               const SizedBox(height: 24),
               _buildProgressSteps(isDarkMode),
             ],
-            
-            if (!_paymentVerified && !_isProcessing && !_isUploading && !_isPromoting) ...[
+
+            if (!_paymentVerified &&
+                !_isProcessing &&
+                !_isUploading &&
+                !_isPromoting) ...[
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _manualVerifyPayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+                  backgroundColor: ColorGlobalVariables.brownColor.withValues(
+                    alpha: 0.1,
+                  ),
                   foregroundColor: ColorGlobalVariables.brownColor,
                 ),
                 child: const Text('Check Payment Status'),
@@ -1111,19 +1275,31 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   }
 
   Widget _buildProgressSteps(bool isDarkMode) {
-    final steps = _type == 'upload' 
+    final steps = _type == 'upload'
         ? [
             _buildProgressStep('Payment Verified', true, isDarkMode),
-            _buildProgressStep('Loading Vehicle Data', _isUploading, isDarkMode),
+            _buildProgressStep(
+              'Loading Vehicle Data',
+              _isUploading,
+              isDarkMode,
+            ),
             _buildProgressStep('Validating Data', _isUploading, isDarkMode),
             _buildProgressStep('Uploading to Server', _isUploading, isDarkMode),
             _buildProgressStep('Complete', _uploadComplete, isDarkMode),
           ]
         : [
             _buildProgressStep('Payment Verified', true, isDarkMode),
-            _buildProgressStep('Loading Promotion Data', _isPromoting, isDarkMode),
+            _buildProgressStep(
+              'Loading Promotion Data',
+              _isPromoting,
+              isDarkMode,
+            ),
             _buildProgressStep('Validating Data', _isPromoting, isDarkMode),
-            _buildProgressStep('Activating Promotion', _isPromoting, isDarkMode),
+            _buildProgressStep(
+              'Activating Promotion',
+              _isPromoting,
+              isDarkMode,
+            ),
             _buildProgressStep('Complete', _promotionComplete, isDarkMode),
           ];
 
@@ -1132,11 +1308,11 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+        border: Border.all(
+          color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!,
+        ),
       ),
-      child: Column(
-        children: steps,
-      ),
+      child: Column(children: steps),
     );
   }
 
@@ -1149,10 +1325,12 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             width: 20,
             height: 20,
             decoration: BoxDecoration(
-              color: isActive ? ColorGlobalVariables.greenColor : (isDarkMode ? Colors.grey[600] : Colors.grey[300]),
+              color: isActive
+                  ? ColorGlobalVariables.greenColor
+                  : (isDarkMode ? Colors.grey[600] : Colors.grey[300]),
               shape: BoxShape.circle,
             ),
-            child: isActive 
+            child: isActive
                 ? const Icon(Icons.check, size: 14, color: Colors.white)
                 : null,
           ),
@@ -1160,7 +1338,9 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
           Text(
             text,
             style: TextStyle(
-              color: isActive ? (isDarkMode ? Colors.white : Colors.black87) : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+              color: isActive
+                  ? (isDarkMode ? Colors.white : Colors.black87)
+                  : (isDarkMode ? Colors.white60 : Colors.grey[600]),
               fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
             ),
           ),
@@ -1208,7 +1388,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              _type == 'upload' 
+              _type == 'upload'
                   ? 'Your vehicle has been uploaded successfully!'
                   : 'Your promotion has been activated successfully!',
               style: TextStyle(
@@ -1228,11 +1408,15 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             const SizedBox(height: 32),
             if (_isUploading || _isPromoting) ...[
               CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.greenColor),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  ColorGlobalVariables.greenColor,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
-                _isUploading ? 'Finalizing vehicle upload...' : 'Finalizing promotion...',
+                _isUploading
+                    ? 'Finalizing vehicle upload...'
+                    : 'Finalizing promotion...',
                 style: TextStyle(
                   color: isDarkMode ? Colors.white70 : Colors.grey[600],
                   fontSize: 14,
@@ -1290,7 +1474,9 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? const Color(0xFF424242) : Colors.grey[100],
+                    color: isDarkMode
+                        ? const Color(0xFF424242)
+                        : Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -1305,8 +1491,8 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _detailedError.length > 200 
-                            ? '${_detailedError.substring(0, 200)}...' 
+                        _detailedError.length > 200
+                            ? '${_detailedError.substring(0, 200)}...'
                             : _detailedError,
                         style: TextStyle(
                           color: isDarkMode ? Colors.white60 : Colors.grey[600],
@@ -1333,9 +1519,16 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                   ElevatedButton(
                     onPressed: _handleCancelPayment,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? const Color(0xFF616161) : Colors.grey[300],
-                      foregroundColor: isDarkMode ? Colors.white70 : Colors.grey[700],
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      backgroundColor: isDarkMode
+                          ? const Color(0xFF616161)
+                          : Colors.grey[300],
+                      foregroundColor: isDarkMode
+                          ? Colors.white70
+                          : Colors.grey[700],
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -1348,7 +1541,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorGlobalVariables.brownColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -1361,9 +1557,16 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
               ElevatedButton(
                 onPressed: _manualVerifyPayment,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
-                  foregroundColor: isDarkMode ? Colors.blue[200] : Colors.blue[700],
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  backgroundColor: isDarkMode
+                      ? Colors.blue[900]!.withValues(alpha: 0.3)
+                      : Colors.blue[50],
+                  foregroundColor: isDarkMode
+                      ? Colors.blue[200]
+                      : Colors.blue[700],
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1386,7 +1589,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
             color: isDarkMode ? const Color(0xFF303030) : Colors.white,
             child: _buildLoadingIndicator(isDarkMode),
           ),
-        if (_showManualNavigationButton && !_paymentVerified && !_paymentFailed && !_isProcessing)
+        if (_showManualNavigationButton &&
+            !_paymentVerified &&
+            !_paymentFailed &&
+            !_isProcessing)
           _buildManualNavigationButton(isDarkMode),
       ],
     );
@@ -1403,7 +1609,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: isDarkMode ? Colors.white : Colors.black87),
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: isDarkMode ? Colors.white : Colors.black87,
+          ),
           onPressed: _handleCancelPayment,
         ),
         title: Text(
@@ -1418,7 +1627,10 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         actions: [
           if (!_paymentVerified && !_paymentFailed)
             IconButton(
-              icon: Icon(Icons.refresh, color: isDarkMode ? Colors.white : Colors.black),
+              icon: Icon(
+                Icons.refresh,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
               onPressed: _manualVerifyPayment,
               tooltip: 'Check Payment Status',
             ),
@@ -1427,8 +1639,8 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
       body: _paymentVerified
           ? _buildPaymentSuccess(isDarkMode)
           : _paymentFailed
-              ? _buildPaymentFailed(isDarkMode)
-              : _buildWebView(isDarkMode),
+          ? _buildPaymentFailed(isDarkMode)
+          : _buildWebView(isDarkMode),
     );
   }
 }

@@ -4,15 +4,13 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dar
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/myListingPage.dart';
 import 'package:get/get.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:provider/provider.dart';
 
 class PaymentFailedPage extends StatelessWidget {
   final Map<String, dynamic> allJson;
 
-  const PaymentFailedPage({
-    super.key,
-    required this.allJson,
-  });
+  const PaymentFailedPage({super.key, required this.allJson});
 
   @override
   Widget build(BuildContext context) {
@@ -56,22 +54,35 @@ class PaymentFailedPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
+              // Amount
+              Text(
+                '${Provider.of<UserProvider>(context, listen: false).user?.countryCurrencySymbol ?? ''} ${(allJson['amount'] as num?)?.toStringAsFixed(2) ?? '0.00'}',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 16),
+
               // Error Details
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.red[900]!.withValues(alpha: 0.3) : Colors.red[50],
+                  color: isDarkMode
+                      ? Colors.red[900]!.withValues(alpha: 0.3)
+                      : Colors.red[50],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDarkMode ? Colors.red[700]! : Colors.red[100]!
+                    color: isDarkMode ? Colors.red[700]! : Colors.red[100]!,
                   ),
                 ),
                 child: Column(
                   children: [
                     Icon(
-                      Icons.warning_amber, 
-                      color: isDarkMode ? Colors.red[300] : Colors.red, 
-                      size: 24
+                      Icons.warning_amber,
+                      color: isDarkMode ? Colors.red[300] : Colors.red,
+                      size: 24,
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -95,16 +106,18 @@ class PaymentFailedPage extends StatelessWidget {
                   color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey[200]!
+                    color: isDarkMode
+                        ? const Color(0xFF616161)
+                        : Colors.grey[200]!,
                   ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.receipt, 
-                      size: 16, 
-                      color: isDarkMode ? Colors.white60 : Colors.grey
+                      Icons.receipt,
+                      size: 16,
+                      color: isDarkMode ? Colors.white60 : Colors.grey,
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -167,7 +180,9 @@ class PaymentFailedPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         side: BorderSide(
-                          color: isDarkMode ? Colors.white60 : Colors.grey[300]!
+                          color: isDarkMode
+                              ? Colors.white60
+                              : Colors.grey[300]!,
                         ),
                       ),
                       child: Text(
@@ -188,7 +203,9 @@ class PaymentFailedPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
+                  color: isDarkMode
+                      ? Colors.blue[900]!.withValues(alpha: 0.3)
+                      : Colors.blue[50],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
