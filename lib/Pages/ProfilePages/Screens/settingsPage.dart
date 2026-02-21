@@ -34,8 +34,10 @@ class _SettingsState extends State<SettingsPage> {
       builder: (context) => AlertDialog(
         backgroundColor: theme.cardColor,
         title: Text('Logout', style: theme.textTheme.titleMedium),
-        content: Text('Are you sure you want to logout?', 
-               style: theme.textTheme.bodyMedium),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: theme.textTheme.bodyMedium,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -43,8 +45,10 @@ class _SettingsState extends State<SettingsPage> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Logout', 
-                   style: theme.textTheme.bodyMedium?.copyWith(color: Colors.red)),
+            child: Text(
+              'Logout',
+              style: theme.textTheme.bodyMedium?.copyWith(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -62,7 +66,7 @@ class _SettingsState extends State<SettingsPage> {
           showCustomSnackBar(
             title: "Error",
             message: "${result['message']}",
-            backgroundColor: ColorGlobalVariables.redColor
+            backgroundColor: ColorGlobalVariables.redColor,
           );
         }
       } finally {
@@ -76,19 +80,19 @@ class _SettingsState extends State<SettingsPage> {
   // Enhanced URL validation method
   bool _isValidImageUrl(String url) {
     if (url.isEmpty) return false;
-    
+
     try {
       final uri = Uri.parse(url);
       // Check if it's a properly formatted HTTP/HTTPS URL
       if (!uri.hasScheme || (uri.scheme != 'http' && uri.scheme != 'https')) {
         return false;
       }
-      
+
       // Check if it has a valid host
       if (uri.host.isEmpty) {
         return false;
       }
-      
+
       return true;
     } catch (e) {
       debugPrint('Invalid image URL: $url, error: $e');
@@ -104,14 +108,16 @@ class _SettingsState extends State<SettingsPage> {
       _showDefaultImageZoomDialog();
       return;
     }
-    
+
     Navigator.of(context).push(
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (context) => ImageViewerScreen(
           imageUrl: imageUrl,
           isAssetImage: isAssetImage,
-          userName: Provider.of<UserProvider>(context, listen: false).user?.name ?? "User",
+          userName:
+              Provider.of<UserProvider>(context, listen: false).user?.name ??
+              "User",
         ),
       ),
     );
@@ -125,7 +131,9 @@ class _SettingsState extends State<SettingsPage> {
         builder: (context) => ImageViewerScreen(
           imageUrl: "",
           isAssetImage: true, // Treat as asset image to show default
-          userName: Provider.of<UserProvider>(context, listen: false).user?.name ?? "User",
+          userName:
+              Provider.of<UserProvider>(context, listen: false).user?.name ??
+              "User",
         ),
       ),
     );
@@ -135,18 +143,22 @@ class _SettingsState extends State<SettingsPage> {
   Widget _buildDefaultProfileImage() {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       width: 100,
       height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: ColorGlobalVariables.brownColor.withValues(alpha: isDarkMode ? 0.2 : 0.1),
+        color: ColorGlobalVariables.brownColor.withValues(
+          alpha: isDarkMode ? 0.2 : 0.1,
+        ),
       ),
       child: Icon(
         Icons.person,
         size: 50,
-        color: ColorGlobalVariables.brownColor.withValues(alpha: isDarkMode ? 0.4 : 0.6),
+        color: ColorGlobalVariables.brownColor.withValues(
+          alpha: isDarkMode ? 0.4 : 0.6,
+        ),
       ),
     );
   }
@@ -156,7 +168,7 @@ class _SettingsState extends State<SettingsPage> {
     // Priority 1: User's existing profile image from server (with validation)
     if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
       final String imageUrl = getImageUrl(user.profileImage!, "");
-      
+
       // Validate if the URL is properly formatted
       if (_isValidImageUrl(imageUrl)) {
         return CustomImage(
@@ -169,9 +181,25 @@ class _SettingsState extends State<SettingsPage> {
         );
       }
     }
-    
+
     // Priority 2: Default profile image
     return _buildDefaultProfileImage();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Refresh user data to get latest dealer verification status when page is accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.isLoggedIn) {
+        try {
+          userProvider.fetchUserProfile();
+        } catch (e) {
+          debugPrint('Failed to refresh user profile: $e');
+        }
+      }
+    });
   }
 
   @override
@@ -182,23 +210,12 @@ class _SettingsState extends State<SettingsPage> {
     final UserModel? user = userProvider.user;
     bool isUserVerified = userProvider.isVerified;
     bool isDealerVerified = userProvider.isVerifiedDealer;
-    
-    // Refresh user data to get latest dealer verification status when page is accessed
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (userProvider.isLoggedIn) {
-        try {
-          userProvider.fetchUserProfile();
-        } catch (e) {
-          // Silently handle errors, user data will remain as is
-          debugPrint('Failed to refresh user profile: $e');
-        }
-      }
-    });
-    
+
     // Format the joined date
     String joinedDate = "Not available";
     if (user?.createdAt != null) {
-      joinedDate = "Joined ${user!.createdAt!.toLocal().toString().split(' ')[0]}";
+      joinedDate =
+          "Joined ${user!.createdAt!.toLocal().toString().split(' ')[0]}";
     }
 
     return Scaffold(
@@ -206,12 +223,16 @@ class _SettingsState extends State<SettingsPage> {
       appBar: CustomAppbar(
         onLeadingIconClickFunction: () => Get.back(),
         isLeadingWidgetExist: false,
-        appbarBackgroundColor: theme.appBarTheme.backgroundColor ?? ColorGlobalVariables.whiteColor,
+        appbarBackgroundColor:
+            theme.appBarTheme.backgroundColor ??
+            ColorGlobalVariables.whiteColor,
         titleTextSize: 22,
         leadingIconData: Icons.arrow_back_ios_new_outlined,
         titleText: "Settings",
         titleFontWeight: FontWeight.bold,
-        titleTextColor: theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
+        titleTextColor:
+            theme.appBarTheme.foregroundColor ??
+            ColorGlobalVariables.brownColor,
         centerTitle: true,
         actions: [
           IconButton(
@@ -246,11 +267,17 @@ class _SettingsState extends State<SettingsPage> {
                           // Profile Image with zoom on tap
                           GestureDetector(
                             onTap: () {
-                              if (user?.profileImage != null && user!.profileImage!.isNotEmpty) {
-                                final String imageUrl = getImageUrl(user.profileImage!, "");
+                              if (user?.profileImage != null &&
+                                  user!.profileImage!.isNotEmpty) {
+                                final String imageUrl = getImageUrl(
+                                  user.profileImage!,
+                                  "",
+                                );
                                 _showImageZoomDialog(
                                   imageUrl,
-                                  !_isValidImageUrl(imageUrl), // If URL is invalid, treat as asset
+                                  !_isValidImageUrl(
+                                    imageUrl,
+                                  ), // If URL is invalid, treat as asset
                                 );
                               } else {
                                 _showDefaultImageZoomDialog();
@@ -281,63 +308,79 @@ class _SettingsState extends State<SettingsPage> {
                           const SizedBox(height: 16),
                           // Get Verified Button / Verified Status
                           if (user != null && !userProvider.isPaidSeller)
-                            isUserVerified 
-                              ? Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: ColorGlobalVariables.lemonGreenColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
-                                        blurRadius: 4,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.verified, color: Colors.white, size: 18),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Verified', 
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : ElevatedButton(
-                                  onPressed: () {
-                                    Get.toNamed(
-                                      RouteClass.getGetVerifiedPage(),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: ColorGlobalVariables.brownColor,
+                            isUserVerified
+                                ? Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 12),
-                                    shape: RoundedRectangleBorder(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          ColorGlobalVariables.lemonGreenColor,
                                       borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          blurRadius: 4,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.verified,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Verified',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () {
+                                      Get.toNamed(
+                                        RouteClass.getGetVerifiedPage(),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          ColorGlobalVariables.brownColor,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Get Verified',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Icon(
+                                          Icons.verified,
+                                          color: Colors.white,
+                                          size: 18,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Get Verified', 
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      SizedBox(width: 8),
-                                      Icon(Icons.verified, color: Colors.white, size: 18),
-                                    ],
-                                  ),
-                                ),
                         ],
                       ),
                     ),
@@ -353,7 +396,8 @@ class _SettingsState extends State<SettingsPage> {
                         context,
                         icon: Icons.person_outline,
                         title: "Profile",
-                        onTap: () => Get.toNamed(RouteClass.getProfileUpdatePage()),
+                        onTap: () =>
+                            Get.toNamed(RouteClass.getProfileUpdatePage()),
                       ),
                       _buildSettingsItem(
                         context,
@@ -378,32 +422,34 @@ class _SettingsState extends State<SettingsPage> {
                       _buildSettingsItem(
                         context,
                         icon: Icons.business_center_outlined,
-                        title: isDealerVerified ? "Dealer Dashboard" : "Dealer Login",
-                        onTap: (){
-                          if(isDealerVerified){
+                        title: isDealerVerified
+                            ? "Dealer Dashboard"
+                            : "Dealer Login",
+                        onTap: () {
+                          if (isDealerVerified) {
                             // dealer dashboard
-                            Get.toNamed(
-                              RouteClass.getDealerDashboardPage(),
-                            );
+                            Get.toNamed(RouteClass.getDealerDashboardPage());
                           } else {
                             Get.toNamed(
-                          RouteClass.getDealerLoginPage(),
-                          arguments: user?.toJson(),
-                          );
+                              RouteClass.getDealerLoginPage(),
+                              arguments: user?.toJson(),
+                            );
                           }
-                        }
+                        },
                       ),
                       _buildSettingsItem(
                         context,
                         icon: Icons.help_outline,
                         title: "Help Center",
-                        onTap: () => Get.toNamed(RouteClass.getHelpCenterPage()),
+                        onTap: () =>
+                            Get.toNamed(RouteClass.getHelpCenterPage()),
                       ),
                       _buildSettingsItem(
                         context,
                         icon: Icons.settings_outlined,
                         title: "App Settings",
-                        onTap: () => Get.toNamed(RouteClass.getSettingsOnePage()),
+                        onTap: () =>
+                            Get.toNamed(RouteClass.getSettingsOnePage()),
                       ),
                     ],
                   ),
@@ -411,11 +457,15 @@ class _SettingsState extends State<SettingsPage> {
 
                   // Logout Button
                   OutlinedButton(
-                    onPressed: _isLoggingOut ? null : () => _handleLogout(context),
+                    onPressed: _isLoggingOut
+                        ? null
+                        : () => _handleLogout(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: BorderSide(
-                        color: Colors.red.withValues(alpha: isDarkMode ? 0.3 : 0.5),
+                        color: Colors.red.withValues(
+                          alpha: isDarkMode ? 0.3 : 0.5,
+                        ),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -452,10 +502,7 @@ class _SettingsState extends State<SettingsPage> {
             ),
           ),
           if (_isLoggingOut)
-            const ModalBarrier(
-              dismissible: false,
-              color: Colors.black54,
-            ),
+            const ModalBarrier(dismissible: false, color: Colors.black54),
         ],
       ),
     );
@@ -487,9 +534,7 @@ class _SettingsState extends State<SettingsPage> {
             borderRadius: BorderRadius.circular(12),
           ),
           color: theme.cardColor,
-          child: Column(
-            children: items,
-          ),
+          child: Column(children: items),
         ),
       ],
     );
@@ -510,10 +555,7 @@ class _SettingsState extends State<SettingsPage> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: theme.iconTheme.color,
-            ),
+            Icon(icon, color: theme.iconTheme.color),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -552,7 +594,8 @@ class ImageViewerScreen extends StatefulWidget {
 }
 
 class _ImageViewerScreenState extends State<ImageViewerScreen> {
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
   TapDownDetails? _doubleTapDetails;
 
   void _handleDoubleTapDown(TapDownDetails details) {
@@ -586,23 +629,24 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()),
         );
 
         try {
           // Download to app's temporary directory (no permissions needed)
           final tempDir = await getTemporaryDirectory();
-          final filePath = '${tempDir.path}/profile_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
-          
+          final filePath =
+              '${tempDir.path}/profile_image_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
           await Dio().download(widget.imageUrl, filePath);
-          
+
           Navigator.of(context).pop();
-          
+
           // Share the downloaded image
-          await Share.shareXFiles([XFile(filePath)], 
-            text: 'Profile photo of ${widget.userName}');
+          await Share.shareXFiles([
+            XFile(filePath),
+          ], text: 'Profile photo of ${widget.userName}');
         } catch (downloadError) {
           Navigator.of(context).pop();
           // Fallback: share the URL instead
@@ -667,7 +711,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             child: CircularProgressIndicator(
               value: loadingProgress.expectedTotalBytes != null
                   ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
+                        loadingProgress.expectedTotalBytes!
                   : null,
             ),
           );
@@ -701,7 +745,10 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
             onPressed: _navigateToEditProfile,
             tooltip: "Edit Profile",
           ),
-          if (!widget.isAssetImage && widget.imageUrl.isNotEmpty) // Only show share button for actual profile images
+          if (!widget.isAssetImage &&
+              widget
+                  .imageUrl
+                  .isNotEmpty) // Only show share button for actual profile images
             IconButton(
               icon: const Icon(Icons.share, color: Colors.white),
               onPressed: _shareImage,
