@@ -1,0 +1,39 @@
+workflows:
+  ios-working:
+    name: iOS Working Build
+    instance_type: mac_mini_m1
+    max_build_duration: 120
+
+    environment:
+      groups:
+        - iOS_AppStore_Keys   # Must contain App Store cert + API key
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      vars:
+        BUNDLE_ID: com.gagcars.gordonautogarage
+
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install
+          cd ..
+
+      - name: Build iOS IPA (automatic signing)
+        script: |
+          flutter build ipa \
+            --release \
+            --export-options-plist=ios/ExportOptions.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      email:
+        recipients:
+          - edemkweku.jerrykanfra@gmail.com

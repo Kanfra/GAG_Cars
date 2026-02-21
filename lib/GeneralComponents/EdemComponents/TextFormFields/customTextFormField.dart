@@ -80,12 +80,12 @@ class CustomTextFormField extends StatelessWidget {
             vertical: SizeGlobalVariables.double_size_ten, // Adjust vertical padding
             horizontal: SizeGlobalVariables.double_size_ten,
           ),
-          fillColor: fillColor ?? ColorGlobalVariables.textFieldColor.withOpacity(SizeGlobalVariables.zero_point_nine_nine),
+          fillColor: fillColor ?? ColorGlobalVariables.textFieldColor.withValues(alpha: SizeGlobalVariables.zero_point_nine_nine),
           filled: ColorGlobalVariables.trueValue,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
-              color: enabledBorderColor ?? ColorGlobalVariables.greenColor.withOpacity(SizeGlobalVariables.point_one),
+              color: enabledBorderColor ?? ColorGlobalVariables.greenColor.withValues(alpha: SizeGlobalVariables.point_one),
               width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
@@ -116,7 +116,7 @@ class CustomTextFormField extends StatelessWidget {
           ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: hintTextColor ?? ColorGlobalVariables.fadedBlackColor.withOpacity(SizeGlobalVariables.point_two_two),
+            color: hintTextColor ?? ColorGlobalVariables.fadedBlackColor.withValues(alpha: SizeGlobalVariables.point_two_two),
             fontSize: SizeGlobalVariables.double_size_fourteen,
           ),
         ),
@@ -161,7 +161,7 @@ class CustomTextFormField extends StatelessWidget {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(borderRadius ?? SizeGlobalVariables.double_size_eight),
             borderSide: BorderSide(
-              color: enabledBorderColor ?? ColorGlobalVariables.greenColor.withOpacity(SizeGlobalVariables.point_one),
+              color: enabledBorderColor ?? ColorGlobalVariables.greenColor.withValues(alpha: SizeGlobalVariables.point_one),
               width: borderWidth ?? SizeGlobalVariables.one_point_two,
             ),
           ),
@@ -192,7 +192,7 @@ class CustomTextFormField extends StatelessWidget {
           ),
           hintText: hintText,
           hintStyle: TextStyle(
-            color: ColorGlobalVariables.fadedBlackColor.withOpacity(SizeGlobalVariables.zero_point_six_six),
+            color: ColorGlobalVariables.fadedBlackColor.withValues(alpha: SizeGlobalVariables.zero_point_six_six),
             fontSize: SizeGlobalVariables.double_size_fourteen,
             fontWeight: FontWeight.normal,
           ),

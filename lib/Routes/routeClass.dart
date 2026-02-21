@@ -198,7 +198,11 @@ class RouteClass {
 
     // Profile
     // GetPage(page: () => const SettingsPage(), name: settingsPage, transition: Transition.noTransition),
-    GetPage(page: () => const SettingsOnePage(), name: settingsOnePage, transition: Transition.noTransition),
+    GetPage(
+      page: () => const SettingsOnePage(), 
+      name: settingsOnePage, 
+      transition: Transition.noTransition
+      ),
     GetPage(page: () => const SecurityPage(), name: securityPage, transition: Transition.noTransition),
     GetPage(page: () => const SecurityOnePage(), name: securityOnePage, transition: Transition.noTransition),
     GetPage(page: (){

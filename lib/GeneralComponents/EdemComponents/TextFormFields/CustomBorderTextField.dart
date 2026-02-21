@@ -52,7 +52,7 @@ class CustomBorderTextFormField extends StatelessWidget {
       fillColor: ColorGlobalVariables.textFieldColor,
       hintText: hintText,
       hintStyle: TextStyle(
-        color: hintTextColor ?? Colors.black.withOpacity(0.5),
+        color: hintTextColor ?? Colors.black.withValues(alpha: 0.5),
         fontSize: SizeGlobalVariables.double_size_fourteen,
       ),
       prefixIcon: isPrefixIconRequired && prefixIconData != null

@@ -3,32 +3,21 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/TextFormFields/customTextFormField.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
-import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/filterBottomSheetContent.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Screens/searchPage.dart';
-import 'package:gag_cars_frontend/Pages/HomePage/Services/HomeService/homeService.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiEnpoints.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
@@ -60,11 +49,11 @@ class _HomePageState extends State<HomePage> {
 
   void _scrollListener() {
     final provider = Provider.of<HomeProvider>(context, listen: false);
-    
+
     // Handle search bar show/hide based on scroll direction
     if (_scrollController.hasClients) {
       final currentOffset = _scrollController.offset;
-      
+
       // Show search bar when at the top
       if (currentOffset <= 0) {
         if (!_showSearchBar) {
@@ -72,7 +61,7 @@ class _HomePageState extends State<HomePage> {
             _showSearchBar = true;
           });
         }
-      } 
+      }
       // Hide when scrolling down, show when scrolling up
       else if (currentOffset > _lastScrollOffset + 50) {
         // Scrolling down - hide search bar
@@ -89,16 +78,15 @@ class _HomePageState extends State<HomePage> {
           });
         }
       }
-      
+
       _lastScrollOffset = currentOffset;
     }
-    
+
     // Load more functionality (unchanged)
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 100 &&
         !provider.isLoadingMore &&
         provider.hasMoreRecommended) {
-      
       _loadMoreDebouncer?.cancel();
       _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), () {
         provider.loadMoreRecommended();
@@ -109,10 +97,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadData() async {
     final homeProvider = Provider.of<HomeProvider>(context, listen: false);
     await homeProvider.fetchAllData();
-  }
-
-  void _onRefresh() async {
-    await _loadData();
   }
 
   void _navigateToSearchPage() {
@@ -132,7 +116,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: Offset(0, 10),
               ),
@@ -146,16 +130,14 @@ class _HomePageState extends State<HomePage> {
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(
-                      color: theme.dividerColor,
-                      width: 1,
-                    ),
+                    bottom: BorderSide(color: theme.dividerColor, width: 1),
                   ),
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      backgroundColor: ColorGlobalVariables.brownColor
+                          .withValues(alpha: 0.1),
                       child: Icon(
                         Icons.person,
                         color: ColorGlobalVariables.brownColor,
@@ -188,14 +170,16 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              
+
               // Settings Option
               ListTile(
                 leading: Container(
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                    color: ColorGlobalVariables.brownColor.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -226,10 +210,12 @@ class _HomePageState extends State<HomePage> {
                 ),
                 onTap: () {
                   Navigator.pop(context); // Close the menu
-                  Get.toNamed(RouteClass.getProfileUpdatePage()); // Navigate to SettingsPage
+                  Get.toNamed(
+                    RouteClass.getProfileUpdatePage(),
+                  ); // Navigate to SettingsPage
                 },
               ),
-              
+
               // Close Button
               Padding(
                 padding: EdgeInsets.all(16),
@@ -238,11 +224,11 @@ class _HomePageState extends State<HomePage> {
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.brightness == Brightness.dark 
-                          ? Colors.grey[800] 
+                      backgroundColor: theme.brightness == Brightness.dark
+                          ? Colors.grey[800]
                           : Colors.grey[100],
-                      foregroundColor: theme.brightness == Brightness.dark 
-                          ? Colors.grey[300] 
+                      foregroundColor: theme.brightness == Brightness.dark
+                          ? Colors.grey[300]
                           : Colors.grey[700],
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -286,7 +272,11 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(FontAwesomeIcons.bars, size: 20, color: theme.iconTheme.color),
+          icon: Icon(
+            FontAwesomeIcons.bars,
+            size: 20,
+            color: theme.iconTheme.color,
+          ),
           onPressed: () {
             _showMenu(context);
           },
@@ -302,13 +292,21 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(FontAwesomeIcons.globe, size: 20, color: theme.iconTheme.color),
+            icon: Icon(
+              FontAwesomeIcons.globe,
+              size: 20,
+              color: theme.iconTheme.color,
+            ),
             onPressed: () => Get.toNamed(RouteClass.newsBlogPage),
           ),
           Stack(
             children: [
               IconButton(
-                icon: Icon(Icons.notifications, size: 22, color: theme.iconTheme.color),
+                icon: Icon(
+                  Icons.notifications,
+                  size: 22,
+                  color: theme.iconTheme.color,
+                ),
                 onPressed: () => Get.toNamed(RouteClass.notificationsPage),
               ),
               Positioned(
@@ -329,35 +327,35 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: SafeArea(
-        child: homeProvider.isLoading 
+        child: homeProvider.isLoading
             ? _buildLoadingState(theme)
-            : homeProvider.errorMessage.isNotEmpty 
-                ? _buildErrorState(homeProvider, theme)
-                : RefreshIndicator(
-                    onRefresh: _loadData,
-                    child: Stack(
-                      children: [
-                        _buildContent(screenSize, homeProvider, theme),
-                        
-                        // Floating Search Bar
-                        Positioned(
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          child: AnimatedContainer(
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            transform: Matrix4.translationValues(
-                              0, 
-                              _showSearchBar ? 0 : -100, 
-                              0
-                            ),
-                            child: _buildSearchWidget(theme),
-                          ),
+            : homeProvider.errorMessage.isNotEmpty
+            ? _buildErrorState(homeProvider, theme)
+            : RefreshIndicator(
+                onRefresh: _loadData,
+                child: Stack(
+                  children: [
+                    _buildContent(screenSize, homeProvider, theme),
+
+                    // Floating Search Bar
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        transform: Matrix4.translationValues(
+                          0,
+                          _showSearchBar ? 0 : -100,
+                          0,
                         ),
-                      ],
+                        child: _buildSearchWidget(theme),
+                      ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -368,7 +366,9 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              ColorGlobalVariables.brownColor,
+            ),
           ),
           SizedBox(height: 16),
           Text(
@@ -392,7 +392,10 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 16),
           Text(
             homeProvider.errorMessage,
-            style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 16),
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 16,
+            ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
@@ -412,25 +415,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildContent(Size screenSize, HomeProvider homeProvider, ThemeData theme) {
+  Widget _buildContent(
+    Size screenSize,
+    HomeProvider homeProvider,
+    ThemeData theme,
+  ) {
     return CustomScrollView(
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         // Add padding at the top for the floating search bar
-        SliverToBoxAdapter(
-          child: SizedBox(height: _showSearchBar ? 80 : 0),
-        ),
+        SliverToBoxAdapter(child: SizedBox(height: _showSearchBar ? 80 : 0)),
 
         // Trending Makes Section
-        SliverToBoxAdapter(
-          child: _buildTrendingMakes(homeProvider, theme),
-        ),
+        SliverToBoxAdapter(child: _buildTrendingMakes(homeProvider, theme)),
 
         // Categories Section
-        SliverToBoxAdapter(
-          child: _buildCategoriesSection(homeProvider, theme),
-        ),
+        SliverToBoxAdapter(child: _buildCategoriesSection(homeProvider, theme)),
 
         // Special Offers Section
         SliverToBoxAdapter(
@@ -459,14 +460,15 @@ class _HomePageState extends State<HomePage> {
                       CustomRoundIconButton(
                         iconData: Icons.list,
                         isBorderSlightlyCurved: true,
-                        onIconButtonClickFunction: () => _toggleRecommendedView('list'),
+                        onIconButtonClickFunction: () =>
+                            _toggleRecommendedView('list'),
                         buttonSize: 36,
                         iconSize: 16,
-                        backgroundColor: _recommendedViewType == 'list' 
-                            ? ColorGlobalVariables.brownColor 
+                        backgroundColor: _recommendedViewType == 'list'
+                            ? ColorGlobalVariables.brownColor
                             : theme.cardColor,
-                        iconDataColor: _recommendedViewType == 'list' 
-                            ? Colors.white 
+                        iconDataColor: _recommendedViewType == 'list'
+                            ? Colors.white
                             : theme.iconTheme.color,
                       ),
                       SizedBox(width: 8),
@@ -474,14 +476,15 @@ class _HomePageState extends State<HomePage> {
                       CustomRoundIconButton(
                         iconData: Icons.grid_view,
                         isBorderSlightlyCurved: true,
-                        onIconButtonClickFunction: () => _toggleRecommendedView('grid'),
+                        onIconButtonClickFunction: () =>
+                            _toggleRecommendedView('grid'),
                         buttonSize: 36,
                         iconSize: 16,
-                        backgroundColor: _recommendedViewType == 'grid' 
-                            ? ColorGlobalVariables.brownColor 
+                        backgroundColor: _recommendedViewType == 'grid'
+                            ? ColorGlobalVariables.brownColor
                             : theme.cardColor,
-                        iconDataColor: _recommendedViewType == 'grid' 
-                            ? Colors.white 
+                        iconDataColor: _recommendedViewType == 'grid'
+                            ? Colors.white
                             : theme.iconTheme.color,
                       ),
                     ],
@@ -494,12 +497,10 @@ class _HomePageState extends State<HomePage> {
         // Recommended Items based on selected view
         if (homeProvider.recommendedItems.isNotEmpty)
           _recommendedViewType == 'grid'
-            ? _buildRecommendedGrid(homeProvider, theme)
-            : _buildRecommendedList(homeProvider, theme)
+              ? _buildRecommendedGrid(homeProvider, theme)
+              : _buildRecommendedList(homeProvider, theme)
         else
-          SliverToBoxAdapter(
-            child: _buildEmptyRecommendedSection(theme),
-          ),
+          SliverToBoxAdapter(child: _buildEmptyRecommendedSection(theme)),
 
         // Loading More Indicator
         SliverToBoxAdapter(
@@ -510,7 +511,9 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       children: [
                         CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            ColorGlobalVariables.brownColor,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -529,7 +532,8 @@ class _HomePageState extends State<HomePage> {
 
         // No More Items Message
         SliverToBoxAdapter(
-          child: !homeProvider.hasMoreRecommended &&
+          child:
+              !homeProvider.hasMoreRecommended &&
                   homeProvider.recommendedItems.isNotEmpty
               ? Padding(
                   padding: const EdgeInsets.all(24),
@@ -560,30 +564,20 @@ class _HomePageState extends State<HomePage> {
           mainAxisSpacing: 12,
           childAspectRatio: 0.72,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final recommended = homeProvider.recommendedItems[index];
-            return _RecommendedItemGridWidget(
-              recommended: recommended,
-            );
-          },
-          childCount: homeProvider.recommendedItems.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final recommended = homeProvider.recommendedItems[index];
+          return _RecommendedItemGridWidget(recommended: recommended);
+        }, childCount: homeProvider.recommendedItems.length),
       ),
     );
   }
 
   Widget _buildRecommendedList(HomeProvider homeProvider, ThemeData theme) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final recommended = homeProvider.recommendedItems[index];
-          return _RecommendedItemListWidget(
-            recommended: recommended,
-          );
-        },
-        childCount: homeProvider.recommendedItems.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final recommended = homeProvider.recommendedItems[index];
+        return _RecommendedItemListWidget(recommended: recommended);
+      }, childCount: homeProvider.recommendedItems.length),
     );
   }
 
@@ -594,7 +588,7 @@ class _HomePageState extends State<HomePage> {
         color: theme.appBarTheme.backgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -608,15 +602,12 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 12,
                 offset: Offset(0, 4),
               ),
             ],
-            border: Border.all(
-              color: theme.dividerColor,
-              width: 1,
-            ),
+            border: Border.all(color: theme.dividerColor, width: 1),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -632,7 +623,9 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     'Search for cars, brands, or models...',
                     style: TextStyle(
-                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
+                      color: theme.textTheme.bodyMedium?.color?.withValues(
+                        alpha: 0.6,
+                      ),
                       fontSize: 16,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -641,7 +634,9 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: ColorGlobalVariables.blueColor.withOpacity(0.1),
+                    color: ColorGlobalVariables.blueColor.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -673,7 +668,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildTrendingMakes(HomeProvider homeProvider, ThemeData theme) {
     final hasTrendingMakes = homeProvider.trendingMakes.isNotEmpty;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -703,8 +698,12 @@ class _HomePageState extends State<HomePage> {
                     Get.toNamed(
                       RouteClass.getAllMakesPage(),
                       arguments: {
-                        'selectedBrand': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
-                        'brands': homeProvider.trendingMakes.map((make) => make.toJson()).toList(),
+                        'selectedBrand': homeProvider.trendingMakes
+                            .map((make) => make.toJson())
+                            .toList(),
+                        'brands': homeProvider.trendingMakes
+                            .map((make) => make.toJson())
+                            .toList(),
                         'type': 'brands',
                       },
                     );
@@ -713,19 +712,23 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        
+
         if (hasTrendingMakes)
           SizedBox(
             height: 80,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 12),
-              itemCount: homeProvider.trendingMakes.length > 6 ? 6 : homeProvider.trendingMakes.length,
+              itemCount: homeProvider.trendingMakes.length > 6
+                  ? 6
+                  : homeProvider.trendingMakes.length,
               itemBuilder: (context, index) {
                 final make = homeProvider.trendingMakes[index];
                 return GestureDetector(
-                  onTap: (){
-                    final brandItems = homeProvider.recommendedItems.where((item) {
+                  onTap: () {
+                    final brandItems = homeProvider.recommendedItems.where((
+                      item,
+                    ) {
                       final itemBrandId = item.brand?.id ?? item.brandId;
                       return itemBrandId == make.id;
                     }).toList();
@@ -733,8 +736,8 @@ class _HomePageState extends State<HomePage> {
                       RouteClass.getSelectedBrandPage(),
                       arguments: {
                         'selectedBrand': make.toJson(),
-                        'type': 'selectedBrand'
-                      }
+                        'type': 'selectedBrand',
+                      },
                     );
                   },
                   child: Container(
@@ -770,7 +773,7 @@ class _HomePageState extends State<HomePage> {
             subtitle: 'Popular car brands will appear here',
             theme: theme,
           ),
-        
+
         SizedBox(height: 24),
       ],
     );
@@ -778,7 +781,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildCategoriesSection(HomeProvider homeProvider, ThemeData theme) {
     final hasCategories = homeProvider.categories.isNotEmpty;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -793,14 +796,16 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        
+
         if (hasCategories)
           SizedBox(
             height: 100,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.symmetric(horizontal: 12),
-              itemCount: homeProvider.categories.length > 6 ? 6 : homeProvider.categories.length,
+              itemCount: homeProvider.categories.length > 6
+                  ? 6
+                  : homeProvider.categories.length,
               itemBuilder: (context, index) {
                 final category = homeProvider.categories[index];
                 return GestureDetector(
@@ -831,8 +836,8 @@ class _HomePageState extends State<HomePage> {
                           height: 50,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(25),
-                            color: theme.brightness == Brightness.dark 
-                                ? Colors.grey[700] 
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.grey[700]
                                 : Colors.grey[100],
                           ),
                           child: ClipRRect(
@@ -870,15 +875,19 @@ class _HomePageState extends State<HomePage> {
             subtitle: 'Vehicle categories will be shown here',
             theme: theme,
           ),
-        
+
         SizedBox(height: 24),
       ],
     );
   }
 
-  Widget _buildSpecialOffers(HomeProvider homeProvider, Size screenSize, ThemeData theme) {
+  Widget _buildSpecialOffers(
+    HomeProvider homeProvider,
+    Size screenSize,
+    ThemeData theme,
+  ) {
     final hasSpecialOffers = homeProvider.specialOffers.isNotEmpty;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -893,7 +902,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
-        
+
         if (hasSpecialOffers)
           SizedBox(
             height: 180,
@@ -913,7 +922,7 @@ class _HomePageState extends State<HomePage> {
 
                 return GestureDetector(
                   onTap: () {
-                    Get.toNamed( 
+                    Get.toNamed(
                       RouteClass.getSpecialOfferDetailPage(),
                       arguments: {
                         "specialOffer": offer,
@@ -944,7 +953,8 @@ class _HomePageState extends State<HomePage> {
                                   width: double.infinity,
                                   height: double.infinity,
                                   fit: BoxFit.cover,
-                                  errorWidget: (context, url, error) => _buildImageErrorPlaceholder(theme),
+                                  errorWidget: (context, url, error) =>
+                                      _buildImageErrorPlaceholder(theme),
                                 )
                               : _buildImageErrorPlaceholder(theme),
                           Container(
@@ -954,7 +964,7 @@ class _HomePageState extends State<HomePage> {
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.8),
+                                  Colors.black.withValues(alpha: 0.8),
                                 ],
                               ),
                             ),
@@ -963,7 +973,10 @@ class _HomePageState extends State<HomePage> {
                             left: 12,
                             top: 12,
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: ColorGlobalVariables.redColor,
                                 borderRadius: BorderRadius.circular(8),
@@ -985,18 +998,20 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (brandImage != null && !brandImage.contains('assets/'))
+                                if (brandImage != null &&
+                                    !brandImage.contains('assets/'))
                                   SizedBox(
                                     width: 32,
                                     height: 32,
                                     child: CachedNetworkImage(
                                       imageUrl: getImageUrl(brandImage, null),
                                       fit: BoxFit.contain,
-                                      errorWidget: (context, url, error) => Icon(
-                                        Icons.business,
-                                        size: 24,
-                                        color: Colors.white,
-                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(
+                                            Icons.business,
+                                            size: 24,
+                                            color: Colors.white,
+                                          ),
                                     ),
                                   ),
                                 SizedBox(height: 8),
@@ -1037,7 +1052,7 @@ class _HomePageState extends State<HomePage> {
             theme: theme,
             isHorizontal: true,
           ),
-        
+
         SizedBox(height: 24),
       ],
     );
@@ -1051,7 +1066,7 @@ class _HomePageState extends State<HomePage> {
           Icon(
             Icons.car_rental_outlined,
             size: 64,
-            color: theme.iconTheme.color?.withOpacity(0.5),
+            color: theme.iconTheme.color?.withValues(alpha: 0.5),
           ),
           SizedBox(height: 16),
           Text(
@@ -1067,7 +1082,7 @@ class _HomePageState extends State<HomePage> {
             'We\'ll show personalized recommendations here based on your preferences',
             style: TextStyle(
               fontSize: 14,
-              color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -1081,10 +1096,7 @@ class _HomePageState extends State<HomePage> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: Text(
-              'Refresh',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('Refresh', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -1104,10 +1116,7 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.dividerColor,
-          width: 1,
-        ),
+        border: Border.all(color: theme.dividerColor, width: 1),
       ),
       child: isHorizontal
           ? Row(
@@ -1116,7 +1125,7 @@ class _HomePageState extends State<HomePage> {
                 Icon(
                   icon,
                   size: 32,
-                  color: theme.iconTheme.color?.withOpacity(0.5),
+                  color: theme.iconTheme.color?.withValues(alpha: 0.5),
                 ),
                 SizedBox(width: 12),
                 Expanded(
@@ -1136,7 +1145,9 @@ class _HomePageState extends State<HomePage> {
                         subtitle,
                         style: TextStyle(
                           fontSize: 14,
-                          color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                          color: theme.textTheme.bodyMedium?.color?.withValues(
+                            alpha: 0.7,
+                          ),
                         ),
                       ),
                     ],
@@ -1150,7 +1161,7 @@ class _HomePageState extends State<HomePage> {
                 Icon(
                   icon,
                   size: 48,
-                  color: theme.iconTheme.color?.withOpacity(0.5),
+                  color: theme.iconTheme.color?.withValues(alpha: 0.5),
                 ),
                 SizedBox(height: 12),
                 Text(
@@ -1166,7 +1177,9 @@ class _HomePageState extends State<HomePage> {
                   subtitle,
                   style: TextStyle(
                     fontSize: 14,
-                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                    color: theme.textTheme.bodyMedium?.color?.withValues(
+                      alpha: 0.7,
+                    ),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -1175,55 +1188,59 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _navigateToCategoryItems(Categories category, HomeProvider homeProvider) {
+  void _navigateToCategoryItems(
+    Categories category,
+    HomeProvider homeProvider,
+  ) {
     final logger = Logger();
-    
+
     // Filter recommended items that belong to this category
     final categoryItems = homeProvider.recommendedItems.where((item) {
       final itemCategoryId = item.category?.id ?? item.categoryId;
       return itemCategoryId == category.id;
     }).toList();
 
-    logger.w('📊 Found ${categoryItems.length} items for category: ${category.name}');
-    
+    logger.w(
+      '📊 Found ${categoryItems.length} items for category: ${category.name}',
+    );
+
     if (categoryItems.isNotEmpty) {
       // Get the first item ID to use as reference
       final firstItemId = categoryItems.first.id ?? '';
-      
+
       Get.toNamed(
         RouteClass.getSelectedCategoryItemPage(),
         arguments: {
           'selectedCategory': category,
           'categoryItems': categoryItems,
           'itemId': firstItemId,
-        }
+        },
       );
     } else {
       logger.w('⚠️ No items found for category: ${category.name}');
-      
+
       Get.toNamed(
         RouteClass.getSelectedCategoryItemPage(),
         arguments: {
           'selectedCategory': category,
           'categoryItems': [],
           'itemId': category.id.toString(),
-        }
+        },
       );
     }
   }
 
   Widget _buildCategoryImage(Categories category, ThemeData theme) {
     final imageUrl = category.image;
-    final hasValidImage = imageUrl.isNotEmpty && 
-                         !imageUrl.contains('assets/');
-    
+    final hasValidImage = imageUrl.isNotEmpty && !imageUrl.contains('assets/');
+
     if (hasValidImage) {
       return CachedNetworkImage(
         imageUrl: '${ApiEndpoint.baseImageUrl}$imageUrl',
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
-          color: theme.brightness == Brightness.dark 
-              ? Colors.grey[700] 
+          color: theme.brightness == Brightness.dark
+              ? Colors.grey[700]
               : Colors.grey[100],
           child: Center(
             child: Icon(
@@ -1234,8 +1251,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         errorWidget: (context, url, error) => Container(
-          color: theme.brightness == Brightness.dark 
-              ? Colors.grey[700] 
+          color: theme.brightness == Brightness.dark
+              ? Colors.grey[700]
               : Colors.grey[100],
           child: Center(
             child: Icon(
@@ -1248,8 +1265,8 @@ class _HomePageState extends State<HomePage> {
       );
     } else {
       return Container(
-        color: theme.brightness == Brightness.dark 
-            ? Colors.grey[700] 
+        color: theme.brightness == Brightness.dark
+            ? Colors.grey[700]
             : Colors.grey[100],
         child: Center(
           child: Icon(
@@ -1264,14 +1281,18 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark 
-          ? Colors.grey[800] 
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
           : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 32,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 4),
             Text(
               'No Image',
@@ -1291,12 +1312,11 @@ class _HomePageState extends State<HomePage> {
 class _RecommendedItemGridWidget extends StatefulWidget {
   final RecommendedItem recommended;
 
-  const _RecommendedItemGridWidget({
-    required this.recommended,
-  });
+  const _RecommendedItemGridWidget({required this.recommended});
 
   @override
-  __RecommendedItemGridWidgetState createState() => __RecommendedItemGridWidgetState();
+  __RecommendedItemGridWidgetState createState() =>
+      __RecommendedItemGridWidgetState();
 }
 
 class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
@@ -1304,34 +1324,37 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<Color?> _colorAnimation;
-  
+
   bool _isLiked = false;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _colorAnimation = ColorTween(
-      begin: Colors.grey[400],
-      end: Colors.red,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _scaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _colorAnimation = ColorTween(begin: Colors.grey[400], end: Colors.red)
+        .animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     _initializeLikeStatus();
   }
@@ -1344,9 +1367,12 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
 
   void _checkWishlistStatus() {
     try {
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(
+        context,
+        listen: false,
+      );
       final isInWishlist = wishlistManager.isLiked(widget.recommended.id);
-      
+
       setState(() {
         _isLiked = isInWishlist;
         if (_isLiked) {
@@ -1354,13 +1380,13 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
         }
       });
     } catch (e) {
-      print('Error checking wishlist status: $e');
+      debugPrint('Error checking wishlist status: $e');
     }
   }
 
   Future<void> _toggleLike() async {
     if (_isLoading) return;
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -1372,18 +1398,22 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
         _animationController.forward();
       }
 
-      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
-      
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(
+        context,
+        listen: false,
+      );
+
       final result = await wishlistProvider.toggleWishlistItem(
-        itemId: widget.recommended.id, context: context,
+        itemId: widget.recommended.id,
+        context: context,
       );
 
       if (result) {
         setState(() {
           _isLiked = !_isLiked;
         });
-        
+
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1404,7 +1434,8 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
         } else {
           _animationController.reverse();
         }
-        
+
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1417,13 +1448,14 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
         );
       }
     } catch (e) {
-      print('Wishlist error: $e');
+      debugPrint('Wishlist error: $e');
       if (_isLiked) {
         _animationController.forward();
       } else {
         _animationController.reverse();
       }
-      
+
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1445,6 +1477,26 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
   }
 
   @override
@@ -1491,13 +1543,13 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: theme.brightness == Brightness.dark 
-                        ? Colors.grey[800] 
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.grey[800]
                         : Colors.grey[100],
                     child: _buildRecommendedImage(firstImage, theme),
                   ),
                 ),
-                
+
                 // CATEGORY BADGE
                 Positioned(
                   top: 8,
@@ -1505,7 +1557,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -1518,7 +1570,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     ),
                   ),
                 ),
-                
+
                 // PROMOTED BADGE
                 if (isPromoted)
                   Positioned(
@@ -1547,7 +1599,7 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                       ),
                     ),
                   ),
-                
+
                 // Animated Wishlist Button
                 Positioned(
                   bottom: 8,
@@ -1589,10 +1641,12 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                                   animation: _colorAnimation,
                                   builder: (context, child) {
                                     return Icon(
-                                      _isLiked ? Icons.favorite : Icons.favorite_border,
+                                      _isLiked
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
                                       size: 18,
-                                      color: _isLiked 
-                                          ? _colorAnimation.value 
+                                      color: _isLiked
+                                          ? _colorAnimation.value
                                           : theme.iconTheme.color,
                                     );
                                   },
@@ -1616,17 +1670,43 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Text(
-                          widget.recommended.name ?? 'Unnamed Vehicle',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: theme.textTheme.titleLarge?.color,
+                        child: Tooltip(
+                          message: widget.recommended.name ?? 'Unnamed Vehicle',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            widget.recommended.name ?? 'Unnamed Vehicle',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: theme.textTheme.titleLarge?.color,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                      SizedBox(width: 5),
                       Text(
                         widget.recommended.condition ?? 'Used',
                         style: TextStyle(
@@ -1643,18 +1723,53 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${userProvider.user?.countryCurrencySymbol} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ColorGlobalVariables.redColor,
+                      Expanded(
+                        child: Tooltip(
+                          message:
+                              '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          textStyle: TextStyle(
+                            color: theme.textTheme.titleLarge?.color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Text(
+                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: ColorGlobalVariables.redColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
+                      SizedBox(width: 5),
                       if (widget.recommended.mileage != null)
                         Row(
                           children: [
-                            Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
+                            Icon(
+                              Icons.speed,
+                              size: 14,
+                              color: theme.iconTheme.color,
+                            ),
                             SizedBox(width: 4),
                             Text(
                               "${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.mileage!))} km",
@@ -1690,12 +1805,22 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                         )
                       else
                         SizedBox(width: 24),
-                      
+
+                      SizedBox(
+                        width: 4,
+                      ), // 4px spacing between logo and settings
+
                       if (widget.recommended.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
-                            SizedBox(width: 4),
+                            Icon(
+                              Icons.settings,
+                              size: 14,
+                              color: theme.iconTheme.color,
+                            ),
+                            SizedBox(
+                              width: 2,
+                            ), // Reduced spacing between icon and text
                             Text(
                               widget.recommended.transmission!,
                               style: TextStyle(
@@ -1705,22 +1830,57 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                             ),
                           ],
                         ),
-                      
+
+                      SizedBox(
+                        width: 4,
+                      ), // 4px spacing between settings and location
+
                       if (widget.recommended.location != null)
-                        Flexible(
+                        Expanded(
                           child: Row(
                             children: [
-                              Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
-                              SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  widget.recommended.location!,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: theme.textTheme.bodyMedium?.color,
+                              Icon(
+                                Icons.location_on,
+                                size: 14,
+                                color: theme.iconTheme.color,
+                              ),
+                              SizedBox(
+                                width: 2,
+                              ), // Reduced spacing between icon and text
+                              Expanded(
+                                child: Tooltip(
+                                  message: widget.recommended.location!,
+                                  preferBelow: false,
+                                  margin: EdgeInsets.all(8),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  decoration: BoxDecoration(
+                                    color: theme.cardColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 8,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  textStyle: TextStyle(
+                                    color: theme.textTheme.titleLarge?.color,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  child: Text(
+                                    widget.recommended.location!,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ),
                             ],
@@ -1738,9 +1898,11 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
   }
 
   Widget _buildRecommendedImage(String? imageUrl, ThemeData theme) {
-    if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
+    if (imageUrl != null &&
+        imageUrl.isNotEmpty &&
+        !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-      
+
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,
@@ -1749,7 +1911,9 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
             child: CircularProgressIndicator(
               value: downloadProgress.progress,
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ColorGlobalVariables.brownColor,
+              ),
             ),
           );
         },
@@ -1764,14 +1928,18 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark 
-          ? Colors.grey[800] 
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
           : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 32,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 4),
             Text(
               'No Image',
@@ -1791,12 +1959,11 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
 class _RecommendedItemListWidget extends StatefulWidget {
   final RecommendedItem recommended;
 
-  const _RecommendedItemListWidget({
-    required this.recommended,
-  });
+  const _RecommendedItemListWidget({required this.recommended});
 
   @override
-  __RecommendedItemListWidgetState createState() => __RecommendedItemListWidgetState();
+  __RecommendedItemListWidgetState createState() =>
+      __RecommendedItemListWidgetState();
 }
 
 class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
@@ -1804,34 +1971,37 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<Color?> _colorAnimation;
-  
+
   bool _isLiked = false;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _colorAnimation = ColorTween(
-      begin: Colors.grey[400],
-      end: Colors.red,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _scaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _colorAnimation = ColorTween(begin: Colors.grey[400], end: Colors.red)
+        .animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
 
     _initializeLikeStatus();
   }
@@ -1844,9 +2014,12 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
 
   void _checkWishlistStatus() {
     try {
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(
+        context,
+        listen: false,
+      );
       final isInWishlist = wishlistManager.isLiked(widget.recommended.id);
-      
+
       setState(() {
         _isLiked = isInWishlist;
         if (_isLiked) {
@@ -1854,13 +2027,13 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         }
       });
     } catch (e) {
-      print('Error checking wishlist status: $e');
+      debugPrint('Error checking wishlist status: $e');
     }
   }
 
   Future<void> _toggleLike() async {
     if (_isLoading) return;
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -1872,18 +2045,28 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         _animationController.forward();
       }
 
-      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
-      
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(
+        context,
+        listen: false,
+      );
+      final wishlistManager = Provider.of<WishlistManager>(
+        context,
+        listen: false,
+      );
+
       final result = await wishlistProvider.toggleWishlistItem(
-        itemId: widget.recommended.id, context: context,
+        itemId: widget.recommended.id,
+        context: context,
       );
 
       if (result) {
         setState(() {
           _isLiked = !_isLiked;
         });
-        
+
+        if (!context.mounted) return;
+        if (!context.mounted) return;
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1904,7 +2087,10 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         } else {
           _animationController.reverse();
         }
-        
+
+        if (!context.mounted) return;
+        if (!context.mounted) return;
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -1917,13 +2103,14 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         );
       }
     } catch (e) {
-      print('Wishlist error: $e');
+      debugPrint('Wishlist error: $e');
       if (_isLiked) {
         _animationController.forward();
       } else {
         _animationController.reverse();
       }
-      
+
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -1945,6 +2132,26 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  // Helper method to format price with commas (same as grid view)
+  String _formatPriceWithCommas(String priceString) {
+    try {
+      final int price = int.parse(priceString);
+      final String priceStr = price.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return priceString;
+    }
   }
 
   @override
@@ -1998,19 +2205,22 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                     child: Container(
                       width: 160,
                       height: 160,
-                      color: theme.brightness == Brightness.dark 
-                          ? Colors.grey[800] 
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.grey[800]
                           : Colors.grey[100],
                       child: _buildRecommendedImage(firstImage, theme),
                     ),
                   ),
-                  
+
                   if (isPromoted)
                     Positioned(
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber[700],
                           borderRadius: BorderRadius.circular(6),
@@ -2103,19 +2313,22 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                                         height: 16,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.grey,
-                                          ),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.grey,
+                                              ),
                                         ),
                                       )
                                     : AnimatedBuilder(
                                         animation: _colorAnimation,
                                         builder: (context, child) {
                                           return Icon(
-                                            _isLiked ? Icons.favorite : Icons.favorite_border,
+                                            _isLiked
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
                                             size: 16,
-                                            color: _isLiked 
-                                                ? _colorAnimation.value 
+                                            color: _isLiked
+                                                ? _colorAnimation.value
                                                 : theme.iconTheme.color,
                                           );
                                         },
@@ -2134,23 +2347,52 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: true, number: int.parse(widget.recommended.price ?? '0'))}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorGlobalVariables.redColor,
+                          child: Tooltip(
+                            message:
+                                '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                            preferBelow: false,
+                            margin: EdgeInsets.all(8),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            decoration: BoxDecoration(
+                              color: theme.cardColor,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            textStyle: TextStyle(
+                              color: theme.textTheme.titleLarge?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(widget.recommended.price ?? '0')}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: ColorGlobalVariables.redColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
-                            color: theme.brightness == Brightness.dark 
-                                ? Colors.grey[700] 
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.grey[700]
                                 : Colors.grey[100],
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -2175,7 +2417,11 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.speed, size: 12, color: theme.iconTheme.color),
+                                Icon(
+                                  Icons.speed,
+                                  size: 12,
+                                  color: theme.iconTheme.color,
+                                ),
                                 SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
@@ -2191,16 +2437,24 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                               ],
                             ),
                           ),
-                        
+
                         if (widget.recommended.transmission != null)
-                          SizedBox(width: 8),
-                        
+                          SizedBox(
+                            width: 4,
+                          ), // 4px spacing between mileage and transmission
+
                         if (widget.recommended.transmission != null)
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
-                                SizedBox(width: 2),
+                                Icon(
+                                  Icons.settings,
+                                  size: 12,
+                                  color: theme.iconTheme.color,
+                                ),
+                                SizedBox(
+                                  width: 2,
+                                ), // Reduced spacing between icon and text
                                 Expanded(
                                   child: Text(
                                     widget.recommended.transmission!,
@@ -2227,24 +2481,57 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
-                                SizedBox(width: 2),
+                                Icon(
+                                  Icons.location_on,
+                                  size: 12,
+                                  color: theme.iconTheme.color,
+                                ),
+                                SizedBox(
+                                  width: 2,
+                                ), // Reduced spacing between icon and text
                                 Expanded(
-                                  child: Text(
-                                    widget.recommended.location!,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: theme.textTheme.bodyMedium?.color,
+                                  child: Tooltip(
+                                    message: widget.recommended.location!,
+                                    preferBelow: false,
+                                    margin: EdgeInsets.all(8),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                    decoration: BoxDecoration(
+                                      color: theme.cardColor,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 8,
+                                          offset: Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    textStyle: TextStyle(
+                                      color: theme.textTheme.titleLarge?.color,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    child: Text(
+                                      widget.recommended.location!,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color:
+                                            theme.textTheme.bodyMedium?.color,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        
-                        if (brandImage != null && !brandImage.contains('assets/'))
+
+                        if (brandImage != null &&
+                            !brandImage.contains('assets/'))
                           SizedBox(
                             width: 20,
                             height: 20,
@@ -2271,22 +2558,26 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
   }
 
   Widget _buildRecommendedImage(String? imageUrl, ThemeData theme) {
-    if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
+    if (imageUrl != null &&
+        imageUrl.isNotEmpty &&
+        !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-      
+
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,
         progressIndicatorBuilder: (context, url, downloadProgress) {
           return Container(
-            color: theme.brightness == Brightness.dark 
-                ? Colors.grey[800] 
+            color: theme.brightness == Brightness.dark
+                ? Colors.grey[800]
                 : Colors.grey[200],
             child: Center(
               child: CircularProgressIndicator(
                 value: downloadProgress.progress,
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  ColorGlobalVariables.brownColor,
+                ),
               ),
             ),
           );
@@ -2302,14 +2593,18 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark 
-          ? Colors.grey[800] 
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
           : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 24,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 2),
             Text(
               'No Image',

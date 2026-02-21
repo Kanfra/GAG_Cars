@@ -31,7 +31,7 @@ import Flutter
   }
   
   // Handle universal links (https://gagcars.com)
-  override func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+  func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
     if let url = userActivity.webpageURL {
       handleIncomingLink(url.absoluteString)
       return true

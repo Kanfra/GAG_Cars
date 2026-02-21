@@ -29,7 +29,7 @@ class WishlistManager with ChangeNotifier {
         }
       } catch (e) {
         if (kDebugMode) {
-          print('Error syncing wishlist item: $e');
+          debugPrint('Error syncing wishlist item: $e');
         }
       }
     }

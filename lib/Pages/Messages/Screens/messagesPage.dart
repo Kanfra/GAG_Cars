@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Models/chatContactModel.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Providers/contactsProvider.dart';
@@ -17,6 +18,7 @@ class MessagesPage extends StatefulWidget {
 class _MessagesPageState extends State<MessagesPage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'All Messages';
+  Timer? _pollingTimer;
 
   @override
   void initState() {
@@ -25,6 +27,16 @@ class _MessagesPageState extends State<MessagesPage> {
     // Load contacts when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadContacts();
+      _startPolling();
+    });
+  }
+
+  void _startPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        context.read<ContactsProvider>().syncContacts();
+      }
     });
   }
 
@@ -72,6 +84,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void dispose() {
+    _pollingTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -79,7 +92,7 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(theme),
@@ -87,15 +100,15 @@ class _MessagesPageState extends State<MessagesPage> {
         children: [
           // Search Bar
           _buildSearchBar(theme),
-          
+
           // Categories
           _buildCategoryTabs(theme),
-          
+
           // Contacts List
           _buildContactsList(theme),
         ],
       ),
-      
+
       // Floating Action Button
       // floatingActionButton: _buildFloatingActionButton(),
     );
@@ -108,7 +121,9 @@ class _MessagesPageState extends State<MessagesPage> {
       title: Text(
         "Messages",
         style: TextStyle(
-          color: theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
+          color:
+              theme.appBarTheme.foregroundColor ??
+              ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -116,7 +131,10 @@ class _MessagesPageState extends State<MessagesPage> {
       centerTitle: true,
       actions: [
         IconButton(
-          icon: Icon(Icons.refresh_rounded, color: theme.iconTheme.color ?? Colors.black54),
+          icon: Icon(
+            Icons.refresh_rounded,
+            color: theme.iconTheme.color ?? Colors.black54,
+          ),
           onPressed: _refreshContacts,
         ),
       ],
@@ -125,7 +143,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   Widget _buildSearchBar(ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Container(
@@ -133,7 +151,7 @@ class _MessagesPageState extends State<MessagesPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -144,20 +162,20 @@ class _MessagesPageState extends State<MessagesPage> {
           decoration: InputDecoration(
             hintText: "Search contacts...",
             hintStyle: TextStyle(
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
-              fontSize: 16
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
+              fontSize: 16,
             ),
             prefixIcon: Icon(
-              Icons.search_rounded, 
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
-              size: 24
+              Icons.search_rounded,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
+              size: 24,
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
                     icon: Icon(
-                      Icons.clear_rounded, 
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[500], 
-                      size: 20
+                      Icons.clear_rounded,
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
+                      size: 20,
                     ),
                     onPressed: () {
                       _searchController.clear();
@@ -171,11 +189,14 @@ class _MessagesPageState extends State<MessagesPage> {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
           ),
           style: TextStyle(
-            color: theme.textTheme.titleLarge?.color, 
-            fontSize: 16
+            color: theme.textTheme.titleLarge?.color,
+            fontSize: 16,
           ),
         ),
       ),
@@ -185,7 +206,7 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget _buildCategoryTabs(ThemeData theme) {
     final categories = ['All Messages'];
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return SizedBox(
       height: 50,
       child: ListView(
@@ -200,7 +221,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   Widget _buildCategoryItem(String category, ThemeData theme, bool isDarkMode) {
     final isActive = _selectedCategory == category;
-    
+
     return Container(
       margin: const EdgeInsets.only(right: 12),
       child: Material(
@@ -211,16 +232,22 @@ class _MessagesPageState extends State<MessagesPage> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: isActive ? ColorGlobalVariables.brownColor : theme.cardColor,
+              color: isActive
+                  ? ColorGlobalVariables.brownColor
+                  : theme.cardColor,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isActive ? ColorGlobalVariables.brownColor : isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
+                color: isActive
+                    ? ColorGlobalVariables.brownColor
+                    : isDarkMode
+                    ? Colors.grey[700]!
+                    : Colors.grey[300]!,
                 width: 1.5,
               ),
               boxShadow: [
                 if (!isActive)
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -230,7 +257,9 @@ class _MessagesPageState extends State<MessagesPage> {
               child: Text(
                 category,
                 style: TextStyle(
-                  color: isActive ? Colors.white : theme.textTheme.bodyMedium?.color,
+                  color: isActive
+                      ? Colors.white
+                      : theme.textTheme.bodyMedium?.color,
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                 ),
@@ -280,7 +309,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   Widget _buildContactsListView(List<ChatContact> contacts, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -288,7 +317,7 @@ class _MessagesPageState extends State<MessagesPage> {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, -5),
           ),
@@ -318,7 +347,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   Widget _buildContactTile(ChatContact contact, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -337,7 +366,11 @@ class _MessagesPageState extends State<MessagesPage> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: contact.activeStatus == 1 ? Colors.green : isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+                        color: contact.activeStatus == 1
+                            ? Colors.green
+                            : isDarkMode
+                            ? Colors.grey[600]!
+                            : Colors.grey[300]!,
                         width: 2,
                       ),
                     ),
@@ -356,18 +389,15 @@ class _MessagesPageState extends State<MessagesPage> {
                         decoration: BoxDecoration(
                           color: Colors.green,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.cardColor,
-                            width: 2,
-                          ),
+                          border: Border.all(color: theme.cardColor, width: 2),
                         ),
                       ),
                     ),
                 ],
               ),
-              
+
               const SizedBox(width: 12),
-              
+
               // Contact Content
               Expanded(
                 child: Column(
@@ -378,7 +408,9 @@ class _MessagesPageState extends State<MessagesPage> {
                       children: [
                         Expanded(
                           child: Text(
-                            contact.name.isNotEmpty ? contact.name : 'Unknown User',
+                            contact.name.isNotEmpty
+                                ? contact.name
+                                : 'Unknown User',
                             style: TextStyle(
                               color: theme.textTheme.titleLarge?.color,
                               fontSize: 16,
@@ -397,9 +429,9 @@ class _MessagesPageState extends State<MessagesPage> {
                           ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 4),
-                    
+
                     Text(
                       'Start a conversation',
                       style: TextStyle(
@@ -410,9 +442,9 @@ class _MessagesPageState extends State<MessagesPage> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     // const SizedBox(height: 4),
-                    
+
                     // // Phone number
                     // Text(
                     //   contact.phone.isNotEmpty ? contact.phone : 'No phone number',
@@ -435,24 +467,33 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget _buildUserImage(ChatContact contact, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
     final imageUrl = contact.profilePhoto ?? contact.avatar;
-    
+
     if (imageUrl.isNotEmpty && imageUrl.startsWith('http')) {
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: BoxFit.cover,
         placeholder: (context, url) => Container(
           color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-          child: Icon(Icons.person, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
+          child: Icon(
+            Icons.person,
+            color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+          ),
         ),
         errorWidget: (context, url, error) => Container(
           color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-          child: Icon(Icons.person, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
+          child: Icon(
+            Icons.person,
+            color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+          ),
         ),
       );
     } else {
       return Container(
         color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-        child: Icon(Icons.person, color: isDarkMode ? Colors.grey[500] : Colors.grey[400]),
+        child: Icon(
+          Icons.person,
+          color: isDarkMode ? Colors.grey[500] : Colors.grey[400],
+        ),
       );
     }
   }
@@ -462,9 +503,7 @@ class _MessagesPageState extends State<MessagesPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: ColorGlobalVariables.brownColor,
-          ),
+          CircularProgressIndicator(color: ColorGlobalVariables.brownColor),
           const SizedBox(height: 16),
           Text(
             'Loading contacts...',
@@ -582,9 +621,7 @@ class _MessagesPageState extends State<MessagesPage> {
     return FloatingActionButton(
       backgroundColor: ColorGlobalVariables.brownColor,
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onPressed: _startNewChat,
       child: const Icon(Icons.edit_rounded, color: Colors.white, size: 24),
     );
@@ -592,12 +629,12 @@ class _MessagesPageState extends State<MessagesPage> {
 
   String _formatTime(String timestamp) {
     if (timestamp.isEmpty) return '';
-    
+
     try {
       final dateTime = DateTime.parse(timestamp);
       final now = DateTime.now();
       final difference = now.difference(dateTime);
-      
+
       if (difference.inMinutes < 1) {
         return 'Now';
       } else if (difference.inMinutes < 60) {

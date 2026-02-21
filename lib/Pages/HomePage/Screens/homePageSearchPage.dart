@@ -372,7 +372,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.05),
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
                 blurRadius: 6,
                 offset: Offset(0, 2),
               ),
@@ -391,7 +391,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: _getCategoryColor(category.name).withOpacity(0.1),
+                    color: _getCategoryColor(category.name).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: _buildCategoryImage(category),
@@ -413,16 +413,16 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
-                  '${_getCategoryCount(category.name)} items',
-                  style: TextStyle(
-                    color: isDarkMode ? Colors.white60 : Colors.grey[500],
-                    fontSize: 10,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                // SizedBox(height: 2),
+                // Text(
+                //   '${_getCategoryCount(category.name)} items',
+                //   style: TextStyle(
+                //     color: isDarkMode ? Colors.white60 : Colors.grey[500],
+                //     fontSize: 10,
+                //   ),
+                //   maxLines: 1,
+                //   overflow: TextOverflow.ellipsis,
+                // ),
               ],
             ),
           ),
@@ -518,8 +518,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
         Expanded(
           child: GridView.builder(
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 220,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
               childAspectRatio: 0.72,
@@ -756,7 +756,7 @@ class _SearchResultItemWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.12),
+              color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.12),
               blurRadius: 6,
               offset: Offset(0, 2),
             ),
@@ -782,7 +782,7 @@ class _SearchResultItemWidget extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
+                      color: Colors.black.withValues(alpha: 0.7),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -857,22 +857,40 @@ class _SearchResultItemWidget extends StatelessWidget {
                           ],
                         ),
                       if (searchItem.mileage != null)
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.speed, 
-                              size: 14, 
-                              color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                        Tooltip(
+                          message: '${searchItem.mileage} km',
+                          preferBelow: false,
+                          margin: EdgeInsets.all(8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!,
                             ),
-                            SizedBox(width: 4),
-                            Text(
-                              "${_formatMileage(searchItem.mileage!)} km",
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                          ),
+                          textStyle: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black87,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.speed, 
+                                size: 14, 
+                                color: isDarkMode ? Colors.white60 : Colors.grey[600]
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 4),
+                              Text(
+                                "${_formatMileage(searchItem.mileage!)} km",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                     ],
                   ),
@@ -962,13 +980,18 @@ class _SearchResultItemWidget extends StatelessWidget {
   String _formatPrice(String? price) {
     if (price == null || price.isEmpty) return '0';
     try {
-      final number = int.parse(price);
-      if (number >= 1000000) {
-        return '${(number / 1000000).toStringAsFixed(1)}M';
-      } else if (number >= 1000) {
-        return '${(number / 1000).toStringAsFixed(1)}K';
+      final int priceValue = int.parse(price);
+      final String priceStr = priceValue.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
       }
-      return number.toString();
+
+      return formattedPrice.toString();
     } catch (e) {
       return price;
     }

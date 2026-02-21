@@ -21,10 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PostItemPage extends StatefulWidget {
   final bool hasPendingUpload;
-  const PostItemPage({
-    super.key,
-    this.hasPendingUpload = false,
-  });
+  const PostItemPage({super.key, this.hasPendingUpload = false});
 
   @override
   State<PostItemPage> createState() => _PostItemPageState();
@@ -36,11 +33,12 @@ class _PostItemPageState extends State<PostItemPage> {
   // Controllers
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _itemNameController = TextEditingController();
-  final TextEditingController _itemDescriptionController = TextEditingController();
+  final TextEditingController _itemDescriptionController =
+      TextEditingController();
   final TextEditingController _colorController = TextEditingController();
 
   final Logger logger = Logger();
-  
+
   // State variables
   String selectedColorName = '';
   Color selectedColor = Colors.blue;
@@ -53,7 +51,7 @@ class _PostItemPageState extends State<PostItemPage> {
   ItemCategory? selectedCategory;
   List<String> selectedFeatures = [];
   int year = DateTime.now().year;
-  
+
   // Loading states
   bool _isLoading = false;
   bool _isUploading = false;
@@ -73,57 +71,57 @@ class _PostItemPageState extends State<PostItemPage> {
     {'name': 'Light Red', 'color': Colors.red[300]!, 'value': '#EF5350'},
     {'name': 'Crimson', 'color': Color(0xFFDC143C), 'value': '#DC143C'},
     {'name': 'Maroon', 'color': Color(0xFF800000), 'value': '#800000'},
-    
+
     {'name': 'Blue', 'color': Colors.blue, 'value': '#2196F3'},
     {'name': 'Dark Blue', 'color': Colors.blue[700]!, 'value': '#1976D2'},
     {'name': 'Light Blue', 'color': Colors.blue[300]!, 'value': '#64B5F6'},
     {'name': 'Navy Blue', 'color': Color(0xFF000080), 'value': '#000080'},
     {'name': 'Sky Blue', 'color': Color(0xFF87CEEB), 'value': '#87CEEB'},
-    
+
     {'name': 'Green', 'color': Colors.green, 'value': '#4CAF50'},
     {'name': 'Dark Green', 'color': Colors.green[700]!, 'value': '#388E3C'},
     {'name': 'Light Green', 'color': Colors.green[300]!, 'value': '#81C784'},
     {'name': 'Forest Green', 'color': Color(0xFF228B22), 'value': '#228B22'},
     {'name': 'Lime Green', 'color': Color(0xFF32CD32), 'value': '#32CD32'},
-    
+
     {'name': 'Yellow', 'color': Colors.yellow, 'value': '#FFEB3B'},
     {'name': 'Gold', 'color': Color(0xFFFFD700), 'value': '#FFD700'},
     {'name': 'Light Yellow', 'color': Colors.yellow[300]!, 'value': '#FFF176'},
     {'name': 'Amber', 'color': Colors.amber, 'value': '#FFC107'},
-    
+
     {'name': 'Orange', 'color': Colors.orange, 'value': '#FF9800'},
     {'name': 'Dark Orange', 'color': Colors.orange[700]!, 'value': '#F57C00'},
     {'name': 'Light Orange', 'color': Colors.orange[300]!, 'value': '#FFB74D'},
-    
+
     {'name': 'Purple', 'color': Colors.purple, 'value': '#9C27B0'},
     {'name': 'Dark Purple', 'color': Colors.purple[700]!, 'value': '#7B1FA2'},
     {'name': 'Light Purple', 'color': Colors.purple[300]!, 'value': '#BA68C8'},
     {'name': 'Violet', 'color': Color(0xFFEE82EE), 'value': '#EE82EE'},
-    
+
     {'name': 'Pink', 'color': Colors.pink, 'value': '#E91E63'},
     {'name': 'Hot Pink', 'color': Color(0xFFFF69B4), 'value': '#FF69B4'},
     {'name': 'Light Pink', 'color': Colors.pink[300]!, 'value': '#F06292'},
-    
+
     {'name': 'Brown', 'color': Colors.brown, 'value': '#795548'},
     {'name': 'Dark Brown', 'color': Colors.brown[700]!, 'value': '#5D4037'},
     {'name': 'Light Brown', 'color': Colors.brown[300]!, 'value': '#A1887F'},
     {'name': 'Tan', 'color': Color(0xFFD2B48C), 'value': '#D2B48C'},
-    
+
     {'name': 'Gray', 'color': Colors.grey, 'value': '#9E9E9E'},
     {'name': 'Dark Gray', 'color': Colors.grey[700]!, 'value': '#616161'},
     {'name': 'Light Gray', 'color': Colors.grey[300]!, 'value': '#E0E0E0'},
     {'name': 'Silver', 'color': Color(0xFFC0C0C0), 'value': '#C0C0C0'},
     {'name': 'Charcoal', 'color': Color(0xFF36454F), 'value': '#36454F'},
-    
+
     {'name': 'Black', 'color': Colors.black, 'value': '#000000'},
     {'name': 'White', 'color': Colors.white, 'value': '#FFFFFF'},
     {'name': 'Ivory', 'color': Color(0xFFFFFFF0), 'value': '#FFFFF0'},
     {'name': 'Beige', 'color': Color(0xFFF5F5DC), 'value': '#F5F5DC'},
-    
+
     {'name': 'Teal', 'color': Colors.teal, 'value': '#009688'},
     {'name': 'Cyan', 'color': Colors.cyan, 'value': '#00BCD4'},
     {'name': 'Turquoise', 'color': Color(0xFF40E0D0), 'value': '#40E0D0'},
-    
+
     {'name': 'Indigo', 'color': Colors.indigo, 'value': '#3F51B5'},
     {'name': 'Magenta', 'color': Color(0xFFFF00FF), 'value': '#FF00FF'},
     {'name': 'Lavender', 'color': Color(0xFFE6E6FA), 'value': '#E6E6FA'},
@@ -153,35 +151,35 @@ class _PostItemPageState extends State<PostItemPage> {
 
   // Theme helper methods
   bool get _isDarkMode => Theme.of(context).brightness == Brightness.dark;
-  
+
   Color _getBackgroundColor() {
     return _isDarkMode ? const Color(0xFF303030) : const Color(0xFFFAFAFA);
   }
-  
+
   Color _getCardColor() {
     return _isDarkMode ? const Color(0xFF424242) : Colors.white;
   }
-  
+
   Color _getTextColor() {
     return _isDarkMode ? const Color(0xB3FFFFFF) : const Color(0xDD000000);
   }
-  
+
   Color _getHintTextColor() {
     return _isDarkMode ? const Color(0x66FFFFFF) : const Color(0x8A000000);
   }
-  
+
   Color _getBorderColor() {
     return _isDarkMode ? const Color(0xFF616161) : const Color(0xFFE0E0E0);
   }
-  
+
   Color _getInputBackgroundColor() {
     return _isDarkMode ? const Color(0xFF424242) : const Color(0xFFF5F5F5);
   }
-  
+
   Color _getDialogBackgroundColor() {
     return _isDarkMode ? const Color(0xFF424242) : Colors.white;
   }
-  
+
   Color _getDialogSurfaceColor() {
     return _isDarkMode ? const Color(0xFF303030) : const Color(0xFFFAFAFA);
   }
@@ -190,9 +188,15 @@ class _PostItemPageState extends State<PostItemPage> {
     logger.i("Loading initial data...");
     setState(() => _isLoading = true);
     try {
-      final itemCategoriesProvider = Provider.of<ItemCategoriesProvider>(context, listen: false);
-      final makeModelProvider = Provider.of<MakeAndModelProvider>(context, listen: false);
-      
+      final itemCategoriesProvider = Provider.of<ItemCategoriesProvider>(
+        context,
+        listen: false,
+      );
+      final makeModelProvider = Provider.of<MakeAndModelProvider>(
+        context,
+        listen: false,
+      );
+
       await Future.wait([
         itemCategoriesProvider.getAllCategories(),
         makeModelProvider.fetchMakesWithModels(),
@@ -211,13 +215,13 @@ class _PostItemPageState extends State<PostItemPage> {
     if (mounted) {
       setState(() => _isCheckingUpload = true);
     }
-    
+
     try {
       if (selectedCategory?.id == null) {
         return {
           'can_upload': false,
           'reason': 'No category selected',
-          'error': 'Please select a category first'
+          'error': 'Please select a category first',
         };
       }
 
@@ -225,29 +229,24 @@ class _PostItemPageState extends State<PostItemPage> {
       final result = await canUploadService.checkCanUpload(
         categoryId: selectedCategory!.id,
       );
-      
+
       final bool canUpload = result['can_upload'] ?? false;
       final String reason = result['reason'] ?? 'No reason provided';
-      
-      return {
-        'can_upload': canUpload,
-        'reason': reason,
-        'error': null
-      };
-      
+
+      return {'can_upload': canUpload, 'reason': reason, 'error': null};
     } catch (e) {
       String errorMessage = 'Unable to verify upload permissions';
-      
+
       if (e.toString().contains('Unauthorized')) {
         errorMessage = 'Please login again to continue';
       } else if (e.toString().contains('Network error')) {
         errorMessage = 'Please check your internet connection';
       }
-      
+
       return {
         'can_upload': false,
         'reason': 'Service unavailable',
-        'error': errorMessage
+        'error': errorMessage,
       };
     } finally {
       if (mounted) {
@@ -258,22 +257,25 @@ class _PostItemPageState extends State<PostItemPage> {
 
   Map<String, dynamic> _prepareVehicleData() {
     Map<String, dynamic> normalizedFields = {};
-    
+
     if (_colorController.text.trim().isNotEmpty) {
       normalizedFields['color'] = _colorController.text.trim();
     }
-    
+
     if (year.toString().isNotEmpty) {
       normalizedFields['year'] = year.toString().trim();
     }
 
-    normalizedFields.addAll(selectedFields.map((key, value) => 
-      MapEntry(key.toLowerCase().replaceAll(' ', '_'), value)));
+    normalizedFields.addAll(
+      selectedFields.map(
+        (key, value) => MapEntry(key.toLowerCase().replaceAll(' ', '_'), value),
+      ),
+    );
 
     return {
       'category_id': selectedCategory?.id,
       'brand_id': selectedMake?["id"],
-      'brand_model_id': selectedModel?.id, 
+      'brand_model_id': selectedModel?.id,
       'name': _itemNameController.text.trim(),
       'slug': _createSlug(_itemNameController.text.trim()),
       ...normalizedFields,
@@ -287,7 +289,7 @@ class _PostItemPageState extends State<PostItemPage> {
 
   Future<void> _uploadVehicleWithData(Map<String, dynamic> vehicleData) async {
     logger.i("Starting vehicle upload with prepared data...");
-    
+
     try {
       // Process and validate images
       List<File> imageFiles = [];
@@ -296,19 +298,23 @@ class _PostItemPageState extends State<PostItemPage> {
         if (await file.exists()) {
           imageFiles.add(file);
         } else {
-          throw Exception('One or more selected images are no longer available');
+          throw Exception(
+            'One or more selected images are no longer available',
+          );
         }
       }
 
-      if (imageFiles.length < minImagesRequired) { 
-        throw Exception('At least $minImagesRequired valid images are required');
+      if (imageFiles.length < minImagesRequired) {
+        throw Exception(
+          'At least $minImagesRequired valid images are required',
+        );
       }
 
       // Prepare final request body
       final requestBody = {
         'category_id': vehicleData['category_id'],
         'brand_id': vehicleData['brand_id'],
-        'brand_model_id': vehicleData['brand_model_id'], 
+        'brand_model_id': vehicleData['brand_model_id'],
         'name': vehicleData['name'],
         'slug': vehicleData['slug'],
         ...vehicleData,
@@ -316,13 +322,12 @@ class _PostItemPageState extends State<PostItemPage> {
         'price': vehicleData['price'],
         'description': vehicleData['description'],
         'features': vehicleData['features'],
-        'images': imageFiles
+        'images': imageFiles,
       };
-      
+
       await VehicleService.uploadVehicle(requestBody: requestBody);
-      
+
       logger.i("Vehicle uploaded successfully");
-      
     } catch (e) {
       logger.e("Error in _uploadVehicleWithData: $e");
       rethrow;
@@ -332,25 +337,23 @@ class _PostItemPageState extends State<PostItemPage> {
   Future<void> _storeVehicleDataForLater() async {
     final vehicleData = _prepareVehicleData();
     final prefs = await SharedPreferences.getInstance();
-    
+
     // Store both the data and a flag
     await prefs.setString('pending_vehicle_data', json.encode(vehicleData));
     await prefs.setBool('pending_upload', true);
-    
+
     logger.i("Vehicle data stored for later upload");
   }
 
   Future<void> _navigateToPromotionsPage() async {
     await _storeVehicleDataForLater();
-    
+
     // Navigate to promotions page
     final result = await Get.toNamed(
       RouteClass.getPromotionsPage(),
-      arguments: {
-        'type': 'upload',
-      },
+      arguments: {'type': 'upload', 'category_id': selectedCategory?.id},
     );
-    
+
     // Handle payment result - if payment was successful, the upload will happen in WebViewPaymentPage
     // No need to process anything here as the flow continues in WebViewPaymentPage
     if (result == true && mounted) {
@@ -371,22 +374,22 @@ class _PostItemPageState extends State<PostItemPage> {
       _showErrorSnackBar('Please select a category');
       return false;
     }
-    
+
     if (selectedMake == null) {
       _showErrorSnackBar('Please select a vehicle make');
       return false;
     }
-    
+
     if (selectedModel == null) {
       _showErrorSnackBar('Please select a vehicle model');
       return false;
     }
-    
+
     if (selectedLocation == null) {
       _showErrorSnackBar('Please select a location');
       return false;
     }
-    
+
     return true;
   }
 
@@ -394,7 +397,7 @@ class _PostItemPageState extends State<PostItemPage> {
     showCustomSnackBar(
       backgroundColor: ColorGlobalVariables.redColor,
       title: "Error",
-      message: message
+      message: message,
     );
   }
 
@@ -402,18 +405,18 @@ class _PostItemPageState extends State<PostItemPage> {
     showCustomSnackBar(
       backgroundColor: ColorGlobalVariables.greenColor,
       title: "Success",
-      message: message
+      message: message,
     );
   }
 
   void _clearAllFormFields() {
     logger.i("Clearing all form fields after successful upload...");
-    
+
     _priceController.clear();
     _itemNameController.clear();
     _itemDescriptionController.clear();
     _colorController.clear();
-    
+
     setState(() {
       selectedColorName = '';
       selectedColor = Colors.blue;
@@ -427,9 +430,9 @@ class _PostItemPageState extends State<PostItemPage> {
       year = DateTime.now().year;
       selectedFields = {};
     });
-    
+
     _formKey.currentState?.reset();
-    
+
     logger.i("All form fields cleared successfully after upload");
   }
 
@@ -439,52 +442,56 @@ class _PostItemPageState extends State<PostItemPage> {
       return;
     }
 
-    if (selectedImages.length < minImagesRequired || selectedImages.length > maxImagesAllowed) {
-      _showErrorSnackBar('Please upload between $minImagesRequired and $maxImagesAllowed images');
+    if (selectedImages.length < minImagesRequired ||
+        selectedImages.length > maxImagesAllowed) {
+      _showErrorSnackBar(
+        'Please upload between $minImagesRequired and $maxImagesAllowed images',
+      );
       return;
     }
-    
+
     if (!_validateRequiredFields()) {
       return;
     }
-    
+
     setState(() => _isUploading = true);
-    
+
     try {
       final uploadCheckResult = await _checkCanUpload();
       final bool canUpload = uploadCheckResult['can_upload'] ?? false;
       final String? error = uploadCheckResult['error'];
-      
+
       if (error != null) {
         _showErrorSnackBar(error);
         return;
       }
-      
+
       if (canUpload) {
         // Free category - direct upload
         logger.i("Free category - uploading directly");
         final vehicleData = _prepareVehicleData();
         await _uploadVehicleWithData(vehicleData);
-        
+
         _showSuccessSnackBar('Vehicle listed successfully');
         _clearAllFormFields();
         _navigateToMyListings();
-        
       } else {
         // Premium category - payment required
         logger.i("Premium category - navigating to payment");
-        _showSuccessSnackBar("Purchase an upload package to list in this category");
+        _showSuccessSnackBar(
+          "Purchase an upload package to list in this category",
+        );
         await _navigateToPromotionsPage();
       }
     } catch (e) {
       String errorMessage = 'Failed to process your request';
-      
+
       if (e.toString().contains('Unauthorized')) {
         errorMessage = 'Please login again to continue';
       } else if (e.toString().contains('Network error')) {
         errorMessage = 'Please check your internet connection';
       }
-      
+
       _showErrorSnackBar('$errorMessage: ${e.toString()}');
     } finally {
       if (mounted) {
@@ -499,7 +506,9 @@ class _PostItemPageState extends State<PostItemPage> {
 
   void _showSimpleColorPicker() {
     final searchController = TextEditingController();
-    final filteredColors = ValueNotifier<List<Map<String, dynamic>>>(colorOptions);
+    final filteredColors = ValueNotifier<List<Map<String, dynamic>>>(
+      colorOptions,
+    );
     final dialogSelectedColorName = ValueNotifier<String>(selectedColorName);
     final dialogSelectedColor = ValueNotifier<Color>(selectedColor);
 
@@ -507,9 +516,7 @@ class _PostItemPageState extends State<PostItemPage> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: _getDialogBackgroundColor(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         elevation: 25,
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -527,8 +534,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -547,13 +554,17 @@ class _PostItemPageState extends State<PostItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.7,
+                            ),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),
@@ -595,7 +606,10 @@ class _PostItemPageState extends State<PostItemPage> {
                     builder: (context, color, child) {
                       if (colorName.isEmpty) return const SizedBox();
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -620,7 +634,9 @@ class _PostItemPageState extends State<PostItemPage> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Colors.black.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     ),
@@ -670,7 +686,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -683,25 +699,27 @@ class _PostItemPageState extends State<PostItemPage> {
                       prefixIcon: Container(
                         margin: const EdgeInsets.all(12),
                         child: Icon(
-                          Icons.search_rounded, 
+                          Icons.search_rounded,
                           color: ColorGlobalVariables.brownColor,
                           size: 20,
                         ),
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       hintStyle: TextStyle(
                         color: _getHintTextColor(),
                         fontSize: 14,
                       ),
                     ),
-                    style: TextStyle(
-                      color: _getTextColor(),
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: _getTextColor(), fontSize: 14),
                     onChanged: (value) {
                       filteredColors.value = colorOptions.where((color) {
-                        final colorName = color['name'].toString().toLowerCase();
+                        final colorName = color['name']
+                            .toString()
+                            .toLowerCase();
                         return colorName.contains(value.toLowerCase());
                       }).toList();
                     },
@@ -719,30 +737,34 @@ class _PostItemPageState extends State<PostItemPage> {
                       if (filteredColors.isEmpty) {
                         return _buildColorEmptyState();
                       }
-                      
+
                       return ValueListenableBuilder<String>(
                         valueListenable: dialogSelectedColorName,
                         builder: (context, selectedName, child) {
                           return GridView.builder(
                             padding: const EdgeInsets.only(bottom: 16),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              mainAxisSpacing: 8,
-                              childAspectRatio: 0.85,
-                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3,
+                                  crossAxisSpacing: 8,
+                                  mainAxisSpacing: 8,
+                                  childAspectRatio: 0.85,
+                                ),
                             itemCount: filteredColors.length,
                             itemBuilder: (context, index) {
                               final colorOption = filteredColors[index];
-                              final isSelected = selectedName == colorOption['name'];
-                              
+                              final isSelected =
+                                  selectedName == colorOption['name'];
+
                               return _buildColorOptionItem(
-                                colorOption, 
+                                colorOption,
                                 isSelected,
                                 onTap: () {
-                                  dialogSelectedColorName.value = colorOption['name'];
-                                  dialogSelectedColor.value = colorOption['color'];
-                                }
+                                  dialogSelectedColorName.value =
+                                      colorOption['name'];
+                                  dialogSelectedColor.value =
+                                      colorOption['color'];
+                                },
                               );
                             },
                           );
@@ -780,7 +802,10 @@ class _PostItemPageState extends State<PostItemPage> {
                           borderRadius: BorderRadius.circular(14),
                           onTap: () => Navigator.pop(context),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                             child: Text(
                               'Cancel',
                               style: TextStyle(
@@ -805,12 +830,15 @@ class _PostItemPageState extends State<PostItemPage> {
                               end: Alignment.bottomRight,
                               colors: [
                                 ColorGlobalVariables.brownColor,
-                                ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                ColorGlobalVariables.brownColor.withValues(
+                                  alpha: 0.8,
+                                ),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                color: ColorGlobalVariables.brownColor
+                                    .withValues(alpha: 0.4),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -826,10 +854,13 @@ class _PostItemPageState extends State<PostItemPage> {
                                     selectedColorName = colorName;
                                     selectedColor = dialogSelectedColor.value;
                                     _colorController.text = colorName;
-                                    
+
                                     // Also update the selectedFields for the form field
-                                    for (final field in selectedCategory?.itemFields ?? []) {
-                                      if (field.label.toLowerCase().contains("color")) {
+                                    for (final field
+                                        in selectedCategory?.itemFields ?? []) {
+                                      if (field.label.toLowerCase().contains(
+                                        "color",
+                                      )) {
                                         selectedFields[field.name] = colorName;
                                       }
                                     }
@@ -838,7 +869,10 @@ class _PostItemPageState extends State<PostItemPage> {
                                 }
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 28,
+                                  vertical: 12,
+                                ),
                                 child: Text(
                                   'Confirm',
                                   style: TextStyle(
@@ -864,7 +898,7 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   Widget _buildColorOptionItem(
-    Map<String, dynamic> colorOption, 
+    Map<String, dynamic> colorOption,
     bool isSelected, {
     required VoidCallback onTap,
   }) {
@@ -878,12 +912,14 @@ class _PostItemPageState extends State<PostItemPage> {
             color: _getCardColor(),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : _getBorderColor(),
+              color: isSelected
+                  ? ColorGlobalVariables.brownColor
+                  : _getBorderColor(),
               width: isSelected ? 2.5 : 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 6,
                 offset: const Offset(0, 3),
               ),
@@ -898,13 +934,10 @@ class _PostItemPageState extends State<PostItemPage> {
                 decoration: BoxDecoration(
                   color: colorOption['color'],
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: _getBorderColor(),
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: _getBorderColor(), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -972,10 +1005,7 @@ class _PostItemPageState extends State<PostItemPage> {
             const SizedBox(height: 6),
             Text(
               'Try searching with different keywords',
-              style: TextStyle(
-                color: _getHintTextColor(),
-                fontSize: 13,
-              ),
+              style: TextStyle(color: _getHintTextColor(), fontSize: 13),
               textAlign: TextAlign.center,
             ),
           ],
@@ -997,9 +1027,7 @@ class _PostItemPageState extends State<PostItemPage> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: _getDialogBackgroundColor(),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         elevation: 25,
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -1016,8 +1044,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.15),
-                      ColorGlobalVariables.brownColor.withOpacity(0.08),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                     ],
                   ),
                   borderRadius: const BorderRadius.only(
@@ -1036,13 +1064,17 @@ class _PostItemPageState extends State<PostItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.7),
+                            ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.7,
+                            ),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),
@@ -1075,7 +1107,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   ],
                 ),
               ),
-              
+
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -1083,10 +1115,7 @@ class _PostItemPageState extends State<PostItemPage> {
                     decoration: BoxDecoration(
                       color: _getCardColor(),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: _getBorderColor(),
-                        width: 2,
-                      ),
+                      border: Border.all(color: _getBorderColor(), width: 2),
                     ),
                     child: ValueListenableBuilder<int>(
                       valueListenable: dialogSelectedYear,
@@ -1098,7 +1127,7 @@ class _PostItemPageState extends State<PostItemPage> {
                           itemBuilder: (context, index) {
                             final yearValue = years[index];
                             final isSelected = selectedYear == yearValue;
-                            
+
                             return Material(
                               color: Colors.transparent,
                               child: InkWell(
@@ -1107,15 +1136,20 @@ class _PostItemPageState extends State<PostItemPage> {
                                 },
                                 borderRadius: BorderRadius.circular(12),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 18,
+                                    horizontal: 20,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: isSelected 
-                                        ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+                                    color: isSelected
+                                        ? ColorGlobalVariables.brownColor
+                                              .withValues(alpha: 0.1)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(12),
                                     border: isSelected
                                         ? Border.all(
-                                            color: ColorGlobalVariables.brownColor,
+                                            color:
+                                                ColorGlobalVariables.brownColor,
                                             width: 2,
                                           )
                                         : null,
@@ -1132,8 +1166,12 @@ class _PostItemPageState extends State<PostItemPage> {
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(
-                                          isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
-                                          color: isSelected ? Colors.white : _getHintTextColor(),
+                                          isSelected
+                                              ? Icons.check_rounded
+                                              : Icons.calendar_today_rounded,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : _getHintTextColor(),
                                           size: 20,
                                         ),
                                       ),
@@ -1142,18 +1180,22 @@ class _PostItemPageState extends State<PostItemPage> {
                                         child: Text(
                                           yearValue.toString(),
                                           style: TextStyle(
-                                            color: isSelected 
-                                                ? ColorGlobalVariables.brownColor
+                                            color: isSelected
+                                                ? ColorGlobalVariables
+                                                      .brownColor
                                                 : _getTextColor(),
                                             fontSize: 18,
-                                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                            fontWeight: isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.w500,
                                           ),
                                         ),
                                       ),
                                       if (isSelected)
                                         Icon(
                                           Icons.check_circle_rounded,
-                                          color: ColorGlobalVariables.brownColor,
+                                          color:
+                                              ColorGlobalVariables.brownColor,
                                           size: 24,
                                         ),
                                     ],
@@ -1168,7 +1210,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   ),
                 ),
               ),
-              
+
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -1195,7 +1237,10 @@ class _PostItemPageState extends State<PostItemPage> {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () => Navigator.pop(context),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 14,
+                            ),
                             child: Text(
                               'Cancel',
                               style: TextStyle(
@@ -1220,12 +1265,15 @@ class _PostItemPageState extends State<PostItemPage> {
                               end: Alignment.bottomRight,
                               colors: [
                                 ColorGlobalVariables.brownColor,
-                                ColorGlobalVariables.brownColor.withOpacity(0.8),
+                                ColorGlobalVariables.brownColor.withValues(
+                                  alpha: 0.8,
+                                ),
                               ],
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.4),
+                                color: ColorGlobalVariables.brownColor
+                                    .withValues(alpha: 0.4),
                                 blurRadius: 12,
                                 offset: const Offset(0, 6),
                               ),
@@ -1238,18 +1286,25 @@ class _PostItemPageState extends State<PostItemPage> {
                               onTap: () {
                                 setState(() {
                                   year = selectedYear;
-                                  
+
                                   // Also update the selectedFields for the form field
-                                  for (final field in selectedCategory?.itemFields ?? []) {
-                                    if (field.label.toLowerCase().contains("year")) {
-                                      selectedFields[field.name] = selectedYear.toString();
+                                  for (final field
+                                      in selectedCategory?.itemFields ?? []) {
+                                    if (field.label.toLowerCase().contains(
+                                      "year",
+                                    )) {
+                                      selectedFields[field.name] = selectedYear
+                                          .toString();
                                     }
                                   }
                                 });
                                 Navigator.pop(context);
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 14,
+                                ),
                                 child: Text(
                                   'Confirm',
                                   style: TextStyle(
@@ -1275,7 +1330,11 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   Color _getContrastColor(Color backgroundColor) {
-    final luminance = (0.299 * backgroundColor.red + 0.587 * backgroundColor.green + 0.114 * backgroundColor.blue) / 255;
+    final luminance =
+        (0.299 * backgroundColor.red +
+            0.587 * backgroundColor.green +
+            0.114 * backgroundColor.blue) /
+        255;
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 
@@ -1306,7 +1365,7 @@ class _PostItemPageState extends State<PostItemPage> {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const SpinKitDoubleBounce(
@@ -1334,15 +1393,9 @@ class _PostItemPageState extends State<PostItemPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: _isDarkMode 
-              ? [
-                  const Color(0xFF303030),
-                  const Color(0xFF424242),
-                ]
-              : [
-                  Colors.white,
-                  Colors.grey.shade50,
-                ],
+          colors: _isDarkMode
+              ? [const Color(0xFF303030), const Color(0xFF424242)]
+              : [Colors.white, Colors.grey.shade50],
         ),
       ),
       child: Form(
@@ -1371,14 +1424,14 @@ class _PostItemPageState extends State<PostItemPage> {
 
   Widget _buildCategoryField() {
     final provider = Provider.of<ItemCategoriesProvider>(context);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1388,7 +1441,8 @@ class _PostItemPageState extends State<PostItemPage> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => _showCategorySelectionDialog(provider.categories?.data ?? []),
+          onTap: () =>
+              _showCategorySelectionDialog(provider.categories?.data ?? []),
           child: Container(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -1401,8 +1455,8 @@ class _PostItemPageState extends State<PostItemPage> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        ColorGlobalVariables.brownColor.withOpacity(0.2),
-                        ColorGlobalVariables.brownColor.withOpacity(0.1),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                        ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(15),
@@ -1430,9 +1484,9 @@ class _PostItemPageState extends State<PostItemPage> {
                       Text(
                         selectedCategory?.name ?? "Select a Category",
                         style: TextStyle(
-                          color: selectedCategory != null 
-                            ? _getTextColor() 
-                            : _getHintTextColor(),
+                          color: selectedCategory != null
+                              ? _getTextColor()
+                              : _getHintTextColor(),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -1455,11 +1509,12 @@ class _PostItemPageState extends State<PostItemPage> {
 
   List<Widget> _buildFormFields() {
     final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
-    
+
     return [
       _buildTextField(
         title: "${selectedCategory?.name ?? 'Item'} Name",
-        hintText: "Enter ${selectedCategory?.name.toLowerCase() ?? 'item'} name",
+        hintText:
+            "Enter ${selectedCategory?.name.toLowerCase() ?? 'item'} name",
         controller: _itemNameController,
         icon: Icons.directions_car_rounded,
       ),
@@ -1498,7 +1553,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1518,8 +1573,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1546,10 +1601,7 @@ class _PostItemPageState extends State<PostItemPage> {
             decoration: BoxDecoration(
               color: _getInputBackgroundColor(),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: _getBorderColor(),
-                width: 1.5,
-              ),
+              border: Border.all(color: _getBorderColor(), width: 1.5),
             ),
             child: TextFormField(
               controller: controller,
@@ -1562,11 +1614,11 @@ class _PostItemPageState extends State<PostItemPage> {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: hintText,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                hintStyle: TextStyle(
-                  color: _getHintTextColor(),
-                  fontSize: 15,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
                 ),
+                hintStyle: TextStyle(color: _getHintTextColor(), fontSize: 15),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -1588,7 +1640,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1607,8 +1659,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1633,13 +1685,9 @@ class _PostItemPageState extends State<PostItemPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: _buildMakeField(provider),
-              ),
+              Expanded(child: _buildMakeField(provider)),
               const SizedBox(width: 16),
-              Expanded(
-                child: _buildModelField(provider),
-              ),
+              Expanded(child: _buildModelField(provider)),
             ],
           ),
         ],
@@ -1671,10 +1719,7 @@ class _PostItemPageState extends State<PostItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -1682,9 +1727,9 @@ class _PostItemPageState extends State<PostItemPage> {
                     child: Text(
                       selectedMake?['name'] ?? "Select Make",
                       style: TextStyle(
-                        color: selectedMake != null 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: selectedMake != null
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1726,7 +1771,9 @@ class _PostItemPageState extends State<PostItemPage> {
                 _showErrorSnackBar("Select a Make first");
                 return;
               }
-              _showModelSelectionDialog(provider.getModelsForMake(selectedMake!['id']));
+              _showModelSelectionDialog(
+                provider.getModelsForMake(selectedMake!['id']),
+              );
             },
             child: Container(
               height: 56,
@@ -1734,10 +1781,7 @@ class _PostItemPageState extends State<PostItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -1745,9 +1789,9 @@ class _PostItemPageState extends State<PostItemPage> {
                     child: Text(
                       selectedModel?.name ?? "Select Model",
                       style: TextStyle(
-                        color: selectedModel != null 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: selectedModel != null
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1777,7 +1821,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1796,8 +1840,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1832,9 +1876,13 @@ class _PostItemPageState extends State<PostItemPage> {
             itemCount: itemFields.length,
             itemBuilder: (context, index) {
               final field = itemFields[index];
-              final currentValue = selectedFields[field.name] ?? 
-                (field.label.toLowerCase().contains("color") ? _colorController.text : 
-                 field.label.toLowerCase().contains("year") ? year.toString() : "");
+              final currentValue =
+                  selectedFields[field.name] ??
+                  (field.label.toLowerCase().contains("color")
+                      ? _colorController.text
+                      : field.label.toLowerCase().contains("year")
+                      ? year.toString()
+                      : "");
 
               return _buildFormFieldItem(field, currentValue);
             },
@@ -1878,20 +1926,19 @@ class _PostItemPageState extends State<PostItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      currentValue.isNotEmpty ? currentValue : "Select ${field.label}",
+                      currentValue.isNotEmpty
+                          ? currentValue
+                          : "Select ${field.label}",
                       style: TextStyle(
-                        color: currentValue.isNotEmpty 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: currentValue.isNotEmpty
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1918,7 +1965,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -1937,8 +1984,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -1963,13 +2010,9 @@ class _PostItemPageState extends State<PostItemPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: _buildLocationField(),
-              ),
+              Expanded(child: _buildLocationField()),
               const SizedBox(width: 16),
-              Expanded(
-                child: _buildPriceField(context),
-              ),
+              Expanded(child: _buildPriceField(context)),
             ],
           ),
         ],
@@ -1995,7 +2038,9 @@ class _PostItemPageState extends State<PostItemPage> {
           child: InkWell(
             borderRadius: BorderRadius.circular(15),
             onTap: () async {
-              final result = await Get.toNamed(RouteClass.getLocationSearchPage());
+              final result = await Get.toNamed(
+                RouteClass.getLocationSearchPage(),
+              );
               if (result != null && mounted) {
                 setState(() {
                   _currentPosition = result['position'];
@@ -2009,10 +2054,7 @@ class _PostItemPageState extends State<PostItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -2026,9 +2068,9 @@ class _PostItemPageState extends State<PostItemPage> {
                     child: Text(
                       selectedLocation ?? "Search Location",
                       style: TextStyle(
-                        color: selectedLocation != null 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: selectedLocation != null
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -2058,16 +2100,26 @@ class _PostItemPageState extends State<PostItemPage> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          height: 56,
+        _buildDynamicHeightPriceField(userProvider),
+      ],
+    );
+  }
+
+  Widget _buildDynamicHeightPriceField(UserProvider userProvider) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          height: _calculatePriceFieldHeight(
+            _priceController.text,
+            constraints.maxWidth,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: _getInputBackgroundColor(),
             borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: _getBorderColor(),
-              width: 1.5,
-            ),
+            border: Border.all(color: _getBorderColor(), width: 1.5),
           ),
           child: Row(
             children: [
@@ -2091,6 +2143,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 child: TextFormField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
+                  maxLines: null, // Allow multiple lines if needed
                   style: TextStyle(
                     color: _getTextColor(),
                     fontSize: 15,
@@ -2099,9 +2152,8 @@ class _PostItemPageState extends State<PostItemPage> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Enter price',
-                    hintStyle: TextStyle(
-                      color: _getHintTextColor(),
-                    ),
+                    hintStyle: TextStyle(color: _getHintTextColor()),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -2112,26 +2164,68 @@ class _PostItemPageState extends State<PostItemPage> {
                     }
                     return null;
                   },
+                  onChanged: (value) {
+                    // Trigger rebuild to update height
+                    setState(() {});
+                  },
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        );
+      },
     );
+  }
+
+  double _calculatePriceFieldHeight(String text, double maxWidth) {
+    if (text.isEmpty) {
+      return 56.0; // Default height
+    }
+
+    // Calculate approximate text width
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: _getTextColor(),
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+    );
+
+    textPainter.layout(maxWidth: double.infinity);
+
+    // Available width for text (total width - currency symbol - padding - margins)
+    final availableWidth = maxWidth - 60 - 40; // currency symbol area - padding
+
+    // If text width exceeds available space, increase height
+    if (textPainter.width > availableWidth) {
+      // Calculate how many lines we need
+      final linesNeeded = (textPainter.width / availableWidth).ceil();
+      final newHeight =
+          56.0 + ((linesNeeded - 1) * 20.0); // Add 20px per extra line
+
+      // Cap the maximum height
+      return newHeight.clamp(56.0, 120.0);
+    }
+
+    return 56.0; // Default height if text fits
   }
 
   Widget _buildFeatures() {
     final hasFeatures = selectedCategory?.features.isNotEmpty ?? false;
     if (!hasFeatures) return const SizedBox();
-    
+
     return Container(
       decoration: BoxDecoration(
         color: _getCardColor(),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -2151,8 +2245,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -2178,7 +2272,9 @@ class _PostItemPageState extends State<PostItemPage> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: selectedCategory!.features.map((feature) => _buildFeatureChip(feature)).toList(),
+            children: selectedCategory!.features
+                .map((feature) => _buildFeatureChip(feature))
+                .toList(),
           ),
         ],
       ),
@@ -2187,7 +2283,7 @@ class _PostItemPageState extends State<PostItemPage> {
 
   Widget _buildFeatureChip(String feature) {
     final isSelected = selectedFeatures.contains(feature);
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -2197,20 +2293,22 @@ class _PostItemPageState extends State<PostItemPage> {
           duration: const Duration(milliseconds: 300),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            gradient: isSelected 
+            gradient: isSelected
                 ? LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.8),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                     ],
                   )
                 : null,
             color: isSelected ? null : _getCardColor(),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : _getBorderColor(),
+              color: isSelected
+                  ? ColorGlobalVariables.brownColor
+                  : _getBorderColor(),
               width: 2,
             ),
           ),
@@ -2234,7 +2332,7 @@ class _PostItemPageState extends State<PostItemPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -2254,8 +2352,8 @@ class _PostItemPageState extends State<PostItemPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      ColorGlobalVariables.brownColor.withOpacity(0.2),
-                      ColorGlobalVariables.brownColor.withOpacity(0.1),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -2280,10 +2378,7 @@ class _PostItemPageState extends State<PostItemPage> {
           const SizedBox(height: 12),
           Text(
             "Tap to add images ($minImagesRequired-$maxImagesAllowed required)",
-            style: TextStyle(
-              color: _getHintTextColor(),
-              fontSize: 14,
-            ),
+            style: TextStyle(color: _getHintTextColor(), fontSize: 14),
           ),
           const SizedBox(height: 16),
           Material(
@@ -2297,14 +2392,11 @@ class _PostItemPageState extends State<PostItemPage> {
                 decoration: BoxDecoration(
                   color: _getInputBackgroundColor(),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: _getBorderColor(),
-                    width: 2,
-                  ),
+                  border: Border.all(color: _getBorderColor(), width: 2),
                 ),
-                child: selectedImages.isEmpty 
-                  ? _buildEmptyImageState()
-                  : _buildImageGrid(),
+                child: selectedImages.isEmpty
+                    ? _buildEmptyImageState()
+                    : _buildImageGrid(),
               ),
             ),
           ),
@@ -2316,9 +2408,9 @@ class _PostItemPageState extends State<PostItemPage> {
                 Text(
                   '${selectedImages.length}/$maxImagesAllowed images selected',
                   style: TextStyle(
-                    color: selectedImages.length >= minImagesRequired 
-                      ? ColorGlobalVariables.greenColor 
-                      : ColorGlobalVariables.redColor,
+                    color: selectedImages.length >= minImagesRequired
+                        ? ColorGlobalVariables.greenColor
+                        : ColorGlobalVariables.redColor,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -2329,9 +2421,14 @@ class _PostItemPageState extends State<PostItemPage> {
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => setState(() => selectedImages = []),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                        color: ColorGlobalVariables.redColor.withValues(
+                          alpha: 0.1,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: ColorGlobalVariables.redColor,
@@ -2389,10 +2486,7 @@ class _PostItemPageState extends State<PostItemPage> {
         const SizedBox(height: 4),
         Text(
           "$minImagesRequired-$maxImagesAllowed images required",
-          style: TextStyle(
-            color: _getHintTextColor(),
-            fontSize: 14,
-          ),
+          style: TextStyle(color: _getHintTextColor(), fontSize: 14),
         ),
       ],
     );
@@ -2417,14 +2511,11 @@ class _PostItemPageState extends State<PostItemPage> {
   Widget _buildImageContainer(int index) {
     final hasImage = index < selectedImages.length;
     final canAddMore = selectedImages.length < maxImagesAllowed;
-    
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getBorderColor(),
-          width: 2,
-        ),
+        border: Border.all(color: _getBorderColor(), width: 2),
       ),
       child: Stack(
         children: [
@@ -2450,10 +2541,8 @@ class _PostItemPageState extends State<PostItemPage> {
               ),
             )
           else
-            Container(
-              color: _getInputBackgroundColor(),
-            ),
-          
+            Container(color: _getInputBackgroundColor()),
+
           if (hasImage)
             Positioned(
               top: 4,
@@ -2463,7 +2552,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -2482,7 +2571,7 @@ class _PostItemPageState extends State<PostItemPage> {
   Widget _buildUploadButton() {
     final isProcessing = _isUploading || _isCheckingUpload;
     final hasEnoughImages = selectedImages.length >= minImagesRequired;
-    
+
     return SafeArea(
       top: false,
       child: Padding(
@@ -2492,9 +2581,9 @@ class _PostItemPageState extends State<PostItemPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: (isProcessing || !hasEnoughImages) 
-                  ? Colors.grey.withOpacity(0.4)
-                  : ColorGlobalVariables.brownColor.withOpacity(0.4),
+                color: (isProcessing || !hasEnoughImages)
+                    ? Colors.grey.withValues(alpha: 0.4)
+                    : ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -2504,27 +2593,28 @@ class _PostItemPageState extends State<PostItemPage> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: (isProcessing || !hasEnoughImages) ? null : _formValidation,
+              onTap: (isProcessing || !hasEnoughImages)
+                  ? null
+                  : _formValidation,
               child: Container(
                 height: 60,
                 decoration: BoxDecoration(
-                  gradient: (isProcessing || !hasEnoughImages) 
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.grey,
-                          Colors.grey.shade600,
-                        ],
-                      )
-                    : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
-                        ],
-                      ),
+                  gradient: (isProcessing || !hasEnoughImages)
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Colors.grey, Colors.grey.shade600],
+                        )
+                      : LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.8,
+                            ),
+                          ],
+                        ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Center(
@@ -2537,12 +2627,16 @@ class _PostItemPageState extends State<PostItemPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
                             Text(
-                              _isCheckingUpload ? 'Checking...' : 'Uploading...',
+                              _isCheckingUpload
+                                  ? 'Checking...'
+                                  : 'Uploading...',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -2589,9 +2683,10 @@ class _PostItemPageState extends State<PostItemPage> {
       appBar: _buildAppBar(),
       body: _isLoading
           ? _buildLoadingIndicator()
-          : (categoriesProvider.error != null || makeModelProvider.error != null) 
-            ? _buildErrorView(categoriesProvider, makeModelProvider) 
-            : _buildMainContent(),
+          : (categoriesProvider.error != null ||
+                makeModelProvider.error != null)
+          ? _buildErrorView(categoriesProvider, makeModelProvider)
+          : _buildMainContent(),
     );
   }
 
@@ -2609,7 +2704,7 @@ class _PostItemPageState extends State<PostItemPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: ColorGlobalVariables.redColor.withOpacity(0.1),
+                color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -2629,11 +2724,10 @@ class _PostItemPageState extends State<PostItemPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              categoriesProvider.error ?? makeModelProvider.error ?? 'Unknown error occurred',
-              style: TextStyle(
-                color: _getHintTextColor(),
-                fontSize: 16,
-              ),
+              categoriesProvider.error ??
+                  makeModelProvider.error ??
+                  'Unknown error occurred',
+              style: TextStyle(color: _getHintTextColor(), fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -2642,7 +2736,9 @@ class _PostItemPageState extends State<PostItemPage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                    color: ColorGlobalVariables.brownColor.withValues(
+                      alpha: 0.3,
+                    ),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
@@ -2654,14 +2750,19 @@ class _PostItemPageState extends State<PostItemPage> {
                   borderRadius: BorderRadius.circular(20),
                   onTap: _loadInitialData,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.8,
+                          ),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -2708,13 +2809,15 @@ class _PostItemPageState extends State<PostItemPage> {
         setState(() {
           final availableSlots = maxImagesAllowed - selectedImages.length;
           if (availableSlots > 0) {
-            final filesToAdd = pickedFiles.length > availableSlots 
+            final filesToAdd = pickedFiles.length > availableSlots
                 ? pickedFiles.sublist(0, availableSlots)
                 : pickedFiles;
             selectedImages.addAll(filesToAdd);
-            
+
             if (pickedFiles.length > availableSlots) {
-              _showErrorSnackBar('Maximum of $maxImagesAllowed images allowed. Added $availableSlots images.');
+              _showErrorSnackBar(
+                'Maximum of $maxImagesAllowed images allowed. Added $availableSlots images.',
+              );
             }
           } else {
             _showErrorSnackBar('Maximum of $maxImagesAllowed images reached');
@@ -2728,7 +2831,9 @@ class _PostItemPageState extends State<PostItemPage> {
 
   // ========== DIALOG METHODS ==========
 
-  Future<void> _showCategorySelectionDialog(List<ItemCategory> categories) async {
+  Future<void> _showCategorySelectionDialog(
+    List<ItemCategory> categories,
+  ) async {
     final selected = await showDialog<ItemCategory>(
       context: context,
       builder: (context) => _buildSearchableDialog(
@@ -2752,18 +2857,26 @@ class _PostItemPageState extends State<PostItemPage> {
   }
 
   Future<void> _showMakeSelectionDialog(List<VehicleMake> makes) async {
+    // Debug: Check if makes are being passed correctly
+    logger.i("Make selection dialog called with ${makes.length} makes");
+
+    if (makes.isEmpty) {
+      _showErrorSnackBar('No makes available. Please try again later.');
+      return;
+    }
+
     final selected = await showDialog<VehicleMake>(
       context: context,
-      builder: (context) => _buildSearchableDialog(
+      builder: (context) => _buildMakeSelectionDialogWithLazyLoading(
         title: 'Select Make',
         subtitle: 'Choose your vehicle manufacturer',
         icon: Icons.business_center_rounded,
-        items: makes,
-        itemBuilder: (make) => make.name,
+        makes: makes,
       ),
     );
 
     if (selected != null) {
+      logger.i("Selected make: ${selected.name} (ID: ${selected.id})");
       setState(() {
         selectedMake = {'id': selected.id, 'name': selected.name};
         selectedModel = null;
@@ -2818,8 +2931,8 @@ class _PostItemPageState extends State<PostItemPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    ColorGlobalVariables.brownColor.withOpacity(0.15),
-                    ColorGlobalVariables.brownColor.withOpacity(0.08),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -2838,16 +2951,14 @@ class _PostItemPageState extends State<PostItemPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.7),
+                          ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.7,
+                          ),
                         ],
                       ),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 32,
-                    ),
+                    child: Icon(icon, color: Colors.white, size: 32),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -2861,10 +2972,7 @@ class _PostItemPageState extends State<PostItemPage> {
                   const SizedBox(height: 8),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: _getHintTextColor(),
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(color: _getHintTextColor(), fontSize: 15),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -2882,19 +2990,23 @@ class _PostItemPageState extends State<PostItemPage> {
                   controller: searchController,
                   decoration: InputDecoration(
                     hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search_rounded, color: ColorGlobalVariables.brownColor),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                    hintStyle: TextStyle(
-                      color: _getHintTextColor(),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: ColorGlobalVariables.brownColor,
                     ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    hintStyle: TextStyle(color: _getHintTextColor()),
                   ),
-                  style: TextStyle(
-                    color: _getTextColor(),
-                  ),
+                  style: TextStyle(color: _getTextColor()),
                   onChanged: (value) {
                     filteredItems.value = items.where((item) {
-                      return itemBuilder(item).toLowerCase().contains(value.toLowerCase());
+                      return itemBuilder(
+                        item,
+                      ).toLowerCase().contains(value.toLowerCase());
                     }).toList();
                   },
                 ),
@@ -2908,10 +3020,8 @@ class _PostItemPageState extends State<PostItemPage> {
                   return ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     itemCount: filteredItems.length,
-                    separatorBuilder: (context, index) => Divider(
-                      height: 1,
-                      color: _getBorderColor(),
-                    ),
+                    separatorBuilder: (context, index) =>
+                        Divider(height: 1, color: _getBorderColor()),
                     itemBuilder: (context, index) {
                       final item = filteredItems[index];
                       return Material(
@@ -2919,7 +3029,10 @@ class _PostItemPageState extends State<PostItemPage> {
                         child: InkWell(
                           onTap: () => Navigator.pop(context, item),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 18,
+                              horizontal: 12,
+                            ),
                             child: Row(
                               children: [
                                 Container(
@@ -2930,8 +3043,10 @@ class _PostItemPageState extends State<PostItemPage> {
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        ColorGlobalVariables.brownColor.withOpacity(0.15),
-                                        ColorGlobalVariables.brownColor.withOpacity(0.08),
+                                        ColorGlobalVariables.brownColor
+                                            .withValues(alpha: 0.15),
+                                        ColorGlobalVariables.brownColor
+                                            .withValues(alpha: 0.08),
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(14),
@@ -2995,7 +3110,10 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Future<void> _showSelectionDialog(List<dynamic> options, String fieldName) async {
+  Future<void> _showSelectionDialog(
+    List<dynamic> options,
+    String fieldName,
+  ) async {
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => _buildSearchableDialog(
@@ -3012,8 +3130,14 @@ class _PostItemPageState extends State<PostItemPage> {
     }
   }
 
-  Future<void> _showFieldInputDialog(String fieldLabel, String fieldName, String fieldType) async {
-    final controller = TextEditingController(text: selectedFields[fieldName]?.toString() ?? '');
+  Future<void> _showFieldInputDialog(
+    String fieldLabel,
+    String fieldName,
+    String fieldType,
+  ) async {
+    final controller = TextEditingController(
+      text: selectedFields[fieldName]?.toString() ?? '',
+    );
 
     await showDialog(
       context: context,
@@ -3021,7 +3145,9 @@ class _PostItemPageState extends State<PostItemPage> {
         backgroundColor: _getDialogBackgroundColor(),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         child: Container(
-          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.85),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.85,
+          ),
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -3035,16 +3161,12 @@ class _PostItemPageState extends State<PostItemPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                     ],
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.edit_rounded,
-                  color: Colors.white,
-                  size: 36,
-                ),
+                child: Icon(Icons.edit_rounded, color: Colors.white, size: 36),
               ),
               const SizedBox(height: 24),
               Text(
@@ -3056,7 +3178,7 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
               ),
               const SizedBox(height: 28),
-              
+
               Container(
                 decoration: BoxDecoration(
                   color: _getInputBackgroundColor(),
@@ -3065,23 +3187,24 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
                 child: TextField(
                   controller: controller,
-                  keyboardType: fieldType == "number" ? TextInputType.number : TextInputType.text,
-                  style: TextStyle(
-                    color: _getTextColor(),
-                  ),
+                  keyboardType: fieldType == "number"
+                      ? TextInputType.number
+                      : TextInputType.text,
+                  style: TextStyle(color: _getTextColor()),
                   decoration: InputDecoration(
                     hintText: "Enter $fieldLabel",
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    hintStyle: TextStyle(
-                      color: _getHintTextColor(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 20,
                     ),
+                    hintStyle: TextStyle(color: _getHintTextColor()),
                   ),
                   autofocus: true,
                 ),
               ),
               const SizedBox(height: 32),
-              
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -3099,13 +3222,18 @@ class _PostItemPageState extends State<PostItemPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (controller.text.trim().isNotEmpty) {
-                        setState(() => selectedFields[fieldName] = controller.text.trim());
+                        setState(
+                          () => selectedFields[fieldName] = controller.text
+                              .trim(),
+                        );
                         Navigator.pop(context);
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorGlobalVariables.brownColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                     child: Text(
                       'Confirm',
@@ -3116,6 +3244,688 @@ class _PostItemPageState extends State<PostItemPage> {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =============================================
+  // PAGINATED MAKE SELECTION DIALOG
+  // =============================================
+
+  Widget _buildPaginatedMakeSelectionDialog({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<VehicleMake> makes,
+  }) {
+    final searchController = TextEditingController();
+    final filteredMakes = ValueNotifier<List<VehicleMake>>(makes);
+    final currentPage = ValueNotifier<int>(1);
+    final itemsPerPage = 15; // Show 15 makes per page
+    final totalPages = ValueNotifier<int>(
+      ((makes.length - 1) / itemsPerPage).ceil(),
+    );
+
+    return Dialog(
+      backgroundColor: _getDialogBackgroundColor(),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.7,
+                          ),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 32),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: _getHintTextColor(), fontSize: 15),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            // Search Section
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _getInputBackgroundColor(),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search makes... (e.g., Toyota, BMW, Mercedes)',
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: ColorGlobalVariables.brownColor,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    hintStyle: TextStyle(color: _getHintTextColor()),
+                  ),
+                  style: TextStyle(color: _getTextColor()),
+                  onChanged: (value) {
+                    filteredMakes.value = makes.where((make) {
+                      return make.name.toLowerCase().contains(
+                        value.toLowerCase(),
+                      );
+                    }).toList();
+                    currentPage.value = 1;
+                    totalPages.value =
+                        ((filteredMakes.value.length - 1) / itemsPerPage)
+                            .ceil();
+                  },
+                ),
+              ),
+            ),
+
+            // Makes List with Pagination
+            Expanded(
+              child: ValueListenableBuilder<List<VehicleMake>>(
+                valueListenable: filteredMakes,
+                builder: (context, filteredMakes, child) {
+                  final totalMakes = filteredMakes.length;
+                  final totalPagesCount = ((totalMakes - 1) / itemsPerPage)
+                      .ceil();
+                  final startIndex = (currentPage.value - 1) * itemsPerPage;
+                  final endIndex = startIndex + itemsPerPage;
+                  final currentMakes = filteredMakes.sublist(
+                    startIndex,
+                    endIndex > totalMakes ? totalMakes : endIndex,
+                  );
+
+                  return Column(
+                    children: [
+                      // Makes Grid
+                      Expanded(
+                        child: currentMakes.isEmpty
+                            ? _buildMakesEmptyState()
+                            : GridView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 1.2,
+                                    ),
+                                itemCount: currentMakes.length,
+                                itemBuilder: (context, index) {
+                                  final make = currentMakes[index];
+                                  return _buildMakeGridItem(make);
+                                },
+                              ),
+                      ),
+
+                      // Pagination Controls
+                      if (totalPagesCount > 1)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 20,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getInputBackgroundColor(),
+                            border: Border(
+                              top: BorderSide(
+                                color: _getBorderColor(),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Previous Button
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: currentPage.value == 1
+                                        ? _getBorderColor()
+                                        : ColorGlobalVariables.brownColor,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: currentPage.value == 1
+                                        ? null
+                                        : () {
+                                            currentPage.value =
+                                                currentPage.value - 1;
+                                          },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 10,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_back_ios_rounded,
+                                            size: 16,
+                                            color: currentPage.value == 1
+                                                ? _getHintTextColor()
+                                                : ColorGlobalVariables
+                                                      .brownColor,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Previous',
+                                            style: TextStyle(
+                                              color: currentPage.value == 1
+                                                  ? _getHintTextColor()
+                                                  : ColorGlobalVariables
+                                                        .brownColor,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              // Page Info
+                              ValueListenableBuilder<int>(
+                                valueListenable: currentPage,
+                                builder: (context, page, child) {
+                                  return Text(
+                                    'Page $page of $totalPagesCount',
+                                    style: TextStyle(
+                                      color: _getTextColor(),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              // Next Button
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: currentPage.value == totalPagesCount
+                                        ? _getBorderColor()
+                                        : ColorGlobalVariables.brownColor,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: BorderRadius.circular(12),
+                                    onTap: currentPage.value == totalPagesCount
+                                        ? null
+                                        : () {
+                                            currentPage.value =
+                                                currentPage.value + 1;
+                                          },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 10,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'Next',
+                                            style: TextStyle(
+                                              color:
+                                                  currentPage.value ==
+                                                      totalPagesCount
+                                                  ? _getHintTextColor()
+                                                  : ColorGlobalVariables
+                                                        .brownColor,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            size: 16,
+                                            color:
+                                                currentPage.value ==
+                                                    totalPagesCount
+                                                ? _getHintTextColor()
+                                                : ColorGlobalVariables
+                                                      .brownColor,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            // Footer Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: _getInputBackgroundColor(),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: _getHintTextColor(),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakeGridItem(VehicleMake make) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Navigator.pop(context, make),
+        child: Container(
+          decoration: BoxDecoration(
+            color: _getCardColor(),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: _getBorderColor(), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.directions_car_rounded,
+                  color: ColorGlobalVariables.brownColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(
+                  make.name,
+                  style: TextStyle(
+                    color: _getTextColor(),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakesEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: _getInputBackgroundColor(),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.directions_car_rounded,
+                size: 40,
+                color: _getHintTextColor(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No Makes Found',
+              style: TextStyle(
+                color: _getTextColor(),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Try searching with different keywords',
+              style: TextStyle(color: _getHintTextColor(), fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =============================================
+  // LIST-BASED MAKE SELECTION DIALOG (FETCH ALL MAKES)
+  // =============================================
+
+  Widget _buildMakeSelectionDialogWithLazyLoading({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required List<VehicleMake> makes,
+  }) {
+    final searchController = TextEditingController();
+    final filteredMakes = ValueNotifier<List<VehicleMake>>(makes);
+
+    return Dialog(
+      backgroundColor: _getDialogBackgroundColor(),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
+                  ],
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(28),
+                  topRight: Radius.circular(28),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          ColorGlobalVariables.brownColor,
+                          ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.7,
+                          ),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(icon, color: Colors.white, size: 32),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: _getHintTextColor(), fontSize: 15),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+
+            // Search Section
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _getInputBackgroundColor(),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search makes... (e.g., Toyota, BMW, Mercedes)',
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      color: ColorGlobalVariables.brownColor,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    hintStyle: TextStyle(color: _getHintTextColor()),
+                  ),
+                  style: TextStyle(color: _getTextColor()),
+                  onChanged: (value) {
+                    filteredMakes.value = makes.where((make) {
+                      return make.name.toLowerCase().contains(
+                        value.toLowerCase(),
+                      );
+                    }).toList();
+                  },
+                ),
+              ),
+            ),
+
+            // Makes List
+            Expanded(
+              child: ValueListenableBuilder<List<VehicleMake>>(
+                valueListenable: filteredMakes,
+                builder: (context, filteredMakes, child) {
+                  return filteredMakes.isEmpty
+                      ? _buildMakesEmptyState()
+                      : ListView.separated(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          itemCount: filteredMakes.length,
+                          separatorBuilder: (context, index) =>
+                              Divider(height: 1, color: _getBorderColor()),
+                          itemBuilder: (context, index) {
+                            final make = filteredMakes[index];
+                            return _buildMakeListItem(make);
+                          },
+                        );
+                },
+              ),
+            ),
+
+            // Footer Section
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: _getInputBackgroundColor(),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: _getHintTextColor(),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMakeListItem(VehicleMake make) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => Navigator.pop(context, make),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.directions_car_rounded,
+                  color: ColorGlobalVariables.brownColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Text(
+                  make.name,
+                  style: TextStyle(
+                    color: _getTextColor(),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: _getHintTextColor(),
               ),
             ],
           ),

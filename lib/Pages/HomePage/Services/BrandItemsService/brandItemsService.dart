@@ -39,7 +39,7 @@ class BrandItemsService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-      ).timeout(const Duration(seconds: 30));
+      ).timeout(const Duration(seconds: 10));
 
       _logger.i('📥 [SERVICE] Response status: ${response.statusCode}');
       _logger.i('📦 [SERVICE] Response body length: ${response.body.length}');

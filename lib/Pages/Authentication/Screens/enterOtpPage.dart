@@ -13,18 +13,19 @@ import 'package:provider/provider.dart';
 
 class EnterOtpPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  
-  const EnterOtpPage({
-    super.key, 
-    required this.allJson,  
-  });
+
+  const EnterOtpPage({super.key, required this.allJson});
 
   @override
   State<EnterOtpPage> createState() => _EnterOtpPageState();
 }
 
-class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderStateMixin {
-  final List<TextEditingController> _otpControllers = List.generate(6, (index) => TextEditingController());
+class _EnterOtpPageState extends State<EnterOtpPage>
+    with SingleTickerProviderStateMixin {
+  final List<TextEditingController> _otpControllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
   bool _isLoading = false;
   bool _isError = false;
@@ -32,19 +33,18 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
   bool _isResending = false;
   bool _isAutoFilling = false;
   final logger = Logger();
-  
+
   // Timer variables
   late Timer _timer;
   int _remainingSeconds = 60;
   bool _canResend = false;
-  
+
   // Animation controllers
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _pulseAnimation;
-  late Animation<Color?> _containerColorAnimation;
 
   @override
   void initState() {
@@ -92,16 +92,6 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
       ),
     );
 
-    _containerColorAnimation = ColorTween(
-      begin: Colors.transparent,
-      end: Colors.red.withOpacity(0.1),
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
     _animationController.forward();
   }
 
@@ -140,7 +130,8 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
   }
 
   void _errorShakeAnimation() {
-    _animationController.animateBack(0.1, duration: const Duration(milliseconds: 100))
+    _animationController
+        .animateBack(0.1, duration: const Duration(milliseconds: 100))
         .then((_) => _animationController.forward());
   }
 
@@ -153,7 +144,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
 
   void _checkClipboardForOtp() async {
     if (_isAutoFilling || _isLoading) return;
-    
+
     try {
       final clipboardData = await Clipboard.getData('text/plain');
       if (clipboardData?.text != null) {
@@ -166,7 +157,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
         }
       }
     } catch (e) {
-      print("Clipboard monitoring failed: $e");
+      logger.d("Clipboard monitoring failed: $e");
     }
   }
 
@@ -240,10 +231,8 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
         }
       }
     } catch (e) {
-      print("Clipboard paste failed: $e");
-      showCustomSnackBar(
-        message: 'Failed to paste from clipboard',
-      );
+      logger.d("Clipboard paste failed: $e");
+      showCustomSnackBar(message: 'Failed to paste from clipboard');
     }
   }
 
@@ -259,7 +248,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
 
     userProvider.clearError();
     final enteredOTP = _otpControllers.map((c) => c.text).join();
-    
+
     // Validate OTP length
     if (enteredOTP.length != 6) {
       setState(() {
@@ -272,45 +261,43 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
     }
 
     try {
-      
       // Call your AuthService.verifyOtp method
-      logger.w("phone: ${widget.allJson['phone']}, entered otp: $enteredOTP, userProvider: $userProvider");
+      logger.w(
+        "phone: ${widget.allJson['phone']}, entered otp: $enteredOTP, userProvider: $userProvider",
+      );
       await AuthService.verifyOtp(
-        phone: widget.allJson['phone'], 
-        otp: enteredOTP, 
-        userProvider: userProvider
+        phone: widget.allJson['phone'],
+        otp: enteredOTP,
+        userProvider: userProvider,
       );
 
       // If we reach here, verification was successful
       await _successAnimation();
-      
+
       showCustomSnackBar(
         title: "Success",
         message: 'OTP verified successfully',
         backgroundColor: ColorGlobalVariables.greenColor,
       );
-      
+
       // Navigate to reset password page
       Get.toNamed(
-        RouteClass.getResetPasswordPage(), 
+        RouteClass.getResetPasswordPage(),
         arguments: {
           'phone': widget.allJson['phone'],
           'email': widget.allJson['email'],
-          'otp': enteredOTP
-        }
+          'otp': enteredOTP,
+        },
       );
-      
     } catch (e) {
       setState(() {
         _isError = true;
         _errorMessage = 'Invalid OTP. Please try again.';
       });
       _errorShakeAnimation();
-      showCustomSnackBar(
-        message: 'Invalid OTP. Please try again.',
-      );
+      showCustomSnackBar(message: 'Invalid OTP. Please try again.');
     } finally {
-      if(mounted){
+      if (mounted) {
         setState(() {
           _isLoading = false;
           _isAutoFilling = false;
@@ -356,9 +343,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
       setState(() {
         _isResending = false;
       });
-      showCustomSnackBar(
-        message: 'Failed to resend OTP. Please try again.',
-      );
+      showCustomSnackBar(message: 'Failed to resend OTP. Please try again.');
     }
   }
 
@@ -388,7 +373,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
             builder: (context, child) {
               return Transform(
                 transform: Matrix4.identity()
-                  ..scale(_scaleAnimation.value),
+                  ..scale(_scaleAnimation.value, _scaleAnimation.value, 1.0),
                 alignment: Alignment.center,
                 child: Opacity(
                   opacity: _fadeAnimation.value,
@@ -400,8 +385,10 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                         offset: Offset(-_slideAnimation.value, 0),
                         child: IconButton(
                           icon: Icon(
-                            Icons.arrow_back, 
-                            color: isDarkMode ? Colors.white : ColorGlobalVariables.blackColor
+                            Icons.arrow_back,
+                            color: isDarkMode
+                                ? Colors.white
+                                : ColorGlobalVariables.blackColor,
                           ),
                           onPressed: () => Navigator.pop(context),
                         ),
@@ -430,24 +417,28 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                           text: TextSpan(
                             text: 'Enter the 6-digit code sent to ',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: isDarkMode ? Colors.white70 : Colors.black54,
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.black54,
                             ),
                             children: [
                               TextSpan(
                                 text: widget.allJson['email'],
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
-                              TextSpan(
-                                text: ' and ',
-                              ),
+                              TextSpan(text: ' and '),
                               TextSpan(
                                 text: widget.allJson['phone'],
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
                             ],
@@ -512,14 +503,14 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
           color: isDarkMode ? const Color(0xFF2D2D2D) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: _remainingSeconds < 10 
-                ? Colors.red.withOpacity(0.5)
-                : Colors.green.withOpacity(0.5),
+            color: _remainingSeconds < 10
+                ? Colors.red.withValues(alpha: 0.5)
+                : Colors.green.withValues(alpha: 0.5),
             width: 2,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -558,11 +549,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
             ),
             const Spacer(),
             if (_remainingSeconds < 30)
-              Icon(
-                Icons.warning_amber_rounded,
-                color: Colors.orange,
-                size: 20,
-              ),
+              Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
           ],
         ),
       ),
@@ -597,7 +584,9 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: isDarkMode ? const Color(0xFFE3F2FD) : Colors.blue.shade800,
+                    color: isDarkMode
+                        ? const Color(0xFFE3F2FD)
+                        : Colors.blue.shade800,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -605,7 +594,9 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                   'Use the paste button or we\'ll auto-detect OTP from clipboard',
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDarkMode ? const Color(0xFFBBDEFB) : Colors.blue.shade700,
+                    color: isDarkMode
+                        ? const Color(0xFFBBDEFB)
+                        : Colors.blue.shade700,
                   ),
                 ),
               ],
@@ -619,7 +610,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  isDarkMode ? const Color(0xFF64B5F6) : Colors.blue.shade600
+                  isDarkMode ? const Color(0xFF64B5F6) : Colors.blue.shade600,
                 ),
               ),
             ),
@@ -648,9 +639,14 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                 cursor: SystemMouseCursors.click,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDarkMode ? const Color(0xFF2D2D2D) : Colors.grey[100],
+                    color: isDarkMode
+                        ? const Color(0xFF2D2D2D)
+                        : Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -682,58 +678,61 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(6, (index) {
               return SizedBox(
-                width: 52,
-                height: 64,
-                child: TextField(
-                  controller: _otpControllers[index],
-                  focusNode: _focusNodes[index],
-                  cursorColor: ColorGlobalVariables.brownColor,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  maxLength: 1,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                  decoration: InputDecoration(
-                    counterText: '',
-                    contentPadding: EdgeInsets.zero,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: _isError 
-                          ? theme.colorScheme.error 
-                          : isDarkMode ? Colors.grey[600]! : Colors.grey[400]!,
-                        width: 2,
+                    width: 52,
+                    height: 64,
+                    child: TextField(
+                      controller: _otpControllers[index],
+                      focusNode: _focusNodes[index],
+                      cursorColor: ColorGlobalVariables.brownColor,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: _isError 
-                          ? theme.colorScheme.error 
-                          : ColorGlobalVariables.brownColor,
-                        width: 2,
+                      decoration: InputDecoration(
+                        counterText: '',
+                        contentPadding: EdgeInsets.zero,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: _isError
+                                ? theme.colorScheme.error
+                                : isDarkMode
+                                ? Colors.grey[600]!
+                                : Colors.grey[400]!,
+                            width: 2,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: _isError
+                                ? theme.colorScheme.error
+                                : ColorGlobalVariables.brownColor,
+                            width: 2,
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: theme.colorScheme.error,
+                            width: 2,
+                          ),
+                        ),
+                        filled: true,
+                        fillColor: isDarkMode
+                            ? const Color(0xFF2D2D2D)
+                            : Colors.white,
                       ),
+                      onChanged: (value) => _onOTPChanged(index, value),
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.error,
-                        width: 2,
-                      ),
-                    ),
-                    filled: true,
-                    fillColor: isDarkMode 
-                      ? const Color(0xFF2D2D2D)
-                      : Colors.white,
-                  ),
-                  onChanged: (value) => _onOTPChanged(index, value),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                ),
-              ).animate().fadeIn(delay: (400 + (index * 100)).ms).slideY(begin: 0.3);
+                  )
+                  .animate()
+                  .fadeIn(delay: (400 + (index * 100)).ms)
+                  .slideY(begin: 0.3);
             }),
           ),
         ),
@@ -746,20 +745,20 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
       duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.red.withOpacity(0.1) : Colors.red.shade50,
+        color: isDarkMode
+            ? Colors.red.withValues(alpha: 0.1)
+            : Colors.red.shade50,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.shade200,
+          color: isDarkMode
+              ? Colors.red.withValues(alpha: 0.3)
+              : Colors.red.shade200,
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            color: theme.colorScheme.error,
-            size: 20,
-          ),
+          Icon(Icons.error_outline, color: theme.colorScheme.error, size: 20),
           const SizedBox(width: 12),
           Flexible(
             child: Text(
@@ -849,19 +848,26 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
           GestureDetector(
             onTap: _canResend ? _resendOTP : null,
             child: MouseRegion(
-              cursor: _canResend ? SystemMouseCursors.click : SystemMouseCursors.basic,
+              cursor: _canResend
+                  ? SystemMouseCursors.click
+                  : SystemMouseCursors.basic,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
-                  color: _canResend 
+                  color: _canResend
                       ? ColorGlobalVariables.brownColor
                       : Colors.grey,
                   borderRadius: BorderRadius.circular(25),
                   boxShadow: _canResend
                       ? [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                            color: ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.3,
+                            ),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -891,7 +897,9 @@ class _EnterOtpPageState extends State<EnterOtpPage> with SingleTickerProviderSt
                         ],
                       )
                     : Text(
-                        _canResend ? 'Resend Code' : 'Wait $_remainingSeconds seconds',
+                        _canResend
+                            ? 'Resend Code'
+                            : 'Wait $_remainingSeconds seconds',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

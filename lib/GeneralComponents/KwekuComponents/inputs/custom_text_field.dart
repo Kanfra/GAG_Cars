@@ -36,13 +36,13 @@ class CustomTextField extends StatelessWidget {
         boxShadow: isDark
             ? [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withValues(alpha: 0.3),
                   offset: const Offset(0, 3),
                   blurRadius: 8,
                   spreadRadius: -1,
                 ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.4),
+                  color: Colors.black.withValues(alpha: 0.4),
                   offset: const Offset(0, 0),
                   blurRadius: 1,
                   spreadRadius: 0,

@@ -1,13 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Buttons/customTextButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/customRoundIconButton.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textExtraSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textLarge.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textMedium.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Text/textSmall.dart';
-import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customIcon.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
@@ -58,6 +49,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
   late Animation<double> _profileImageScaleAnimation;
   late Animation<double> _profileImageFadeAnimation;
   bool _showProfilePopup = false;
+
+  // Full screen image viewer variables
+  late PageController _fullScreenPageController;
+  int _currentFullScreenIndex = 0;
+  bool _showLeftArrow = false;
+  bool _showRightArrow = false;
 
   @override
   void initState() {
@@ -110,6 +107,10 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
       curve: Curves.easeInOut,
     ));
     
+    // Initialize full screen page controller
+    _fullScreenPageController = PageController(initialPage: selectedIndex);
+    _currentFullScreenIndex = selectedIndex;
+    
     _animationController.forward();
     
     logger.i('✅ Special Offer Detail Initialized Successfully');
@@ -152,7 +153,246 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
     _scrollController.dispose();
     _animationController.dispose();
     _profileImageController.dispose();
+    _fullScreenPageController.dispose();
     super.dispose();
+  }
+
+  // ========== ENHANCED FULL SCREEN IMAGE VIEWER WITH SWIPE & ARROWS ==========
+
+  void _showFullScreenImage(int startIndex) {
+    logger.i('Opening full screen image viewer at index: $startIndex');
+    
+    setState(() {
+      _currentFullScreenIndex = startIndex;
+      _updateArrowVisibility(startIndex);
+    });
+    
+    // Update page controller to start at the selected index
+    _fullScreenPageController = PageController(initialPage: startIndex);
+    
+    showGeneralDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        final images = getItemImages();
+        
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: EdgeInsets.zero,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Stack(
+                children: [
+                  // PageView for swipeable images
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: PageView.builder(
+                      controller: _fullScreenPageController,
+                      itemCount: images.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentFullScreenIndex = index;
+                          _updateArrowVisibility(index);
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        return InteractiveViewer(
+                          panEnabled: true,
+                          minScale: 0.5,
+                          maxScale: 4.0,
+                          child: _buildSafeImage(
+                            images[index],
+                            fit: BoxFit.contain,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  
+                  // Close button
+                  Positioned(
+                    top: 50,
+                    right: 20,
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Position indicator
+                  Positioned(
+                    top: 50,
+                    left: 20,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${_currentFullScreenIndex + 1}/${images.length}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Navigation instructions
+                  Positioned(
+                    bottom: 100,
+                    left: 0,
+                    right: 0,
+                    child: AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: const Duration(seconds: 1),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.touch_app, color: Colors.white70, size: 18),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Swipe or use arrow buttons',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // LEFT ARROW BUTTON - Shows when not on first image
+                  if (_showLeftArrow)
+                    Positioned(
+                      left: 20,
+                      top: MediaQuery.of(context).size.height / 2 - 25,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Go to previous image
+                          _fullScreenPageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_left,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // RIGHT ARROW BUTTON - Shows when not on last image
+                  if (_showRightArrow)
+                    Positioned(
+                      right: 20,
+                      top: MediaQuery.of(context).size.height / 2 - 25,
+                      child: GestureDetector(
+                        onTap: () {
+                          // Go to next image
+                          _fullScreenPageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              width: 2,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.chevron_right,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: Curves.fastOutSlowIn,
+          ),
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+    ).then((_) {
+      // When dialog closes, update the main selected index to match the last viewed image
+      if (mounted) {
+        setState(() {
+          selectedIndex = _currentFullScreenIndex;
+        });
+      }
+    });
+  }
+
+  // Helper method to update arrow visibility
+  void _updateArrowVisibility(int currentIndex) {
+    final images = getItemImages();
+    setState(() {
+      _showLeftArrow = currentIndex > 0;
+      _showRightArrow = currentIndex < images.length - 1;
+    });
   }
 
   // ========== PROFILE IMAGE POPUP ANIMATION METHODS ==========
@@ -196,7 +436,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
               animation: _profileImageFadeAnimation,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withOpacity(0.9 * _profileImageFadeAnimation.value),
+                  color: Colors.black.withValues(alpha: 0.9 * _profileImageFadeAnimation.value),
                 );
               },
             ),
@@ -220,7 +460,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -236,12 +476,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: Colors.grey.withValues(alpha: 0.3),
                           width: 3,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 10,
                             spreadRadius: 2,
                             offset: const Offset(0, 4),
@@ -356,7 +596,7 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -386,12 +626,12 @@ class _SpecialOfferDetailPageState extends State<SpecialOfferDetailPage> with Ti
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: 2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -511,14 +751,14 @@ Download GAGcars app for more amazing deals!''';
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              ColorGlobalVariables.redColor.withOpacity(0.9),
-              ColorGlobalVariables.redColor.withOpacity(0.7),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.9),
+              ColorGlobalVariables.redColor.withValues(alpha: 0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: ColorGlobalVariables.redColor.withOpacity(0.3),
+              color: ColorGlobalVariables.redColor.withValues(alpha: 0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -562,7 +802,7 @@ Download GAGcars app for more amazing deals!''';
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -607,7 +847,7 @@ Download GAGcars app for more amazing deals!''';
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
@@ -626,7 +866,7 @@ Download GAGcars app for more amazing deals!''';
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withOpacity(0.8),
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -878,7 +1118,7 @@ Download GAGcars app for more amazing deals!''';
         return images.where((image) => image.isNotEmpty).toList();
       }
     } catch (e) {
-      print('Error getting item images: $e');
+      debugPrint('Error getting item images: $e');
     }
     return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
   }
@@ -938,7 +1178,7 @@ Download GAGcars app for more amazing deals!''';
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -1009,22 +1249,22 @@ Download GAGcars app for more amazing deals!''';
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               color: isDarkMode ? Colors.white : Colors.black87,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "You can call or message this number to contact the seller.",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode ? Colors.white60 : Colors.grey[600],
                           ),
                           textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "You can call or message this number to contact the seller.",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
+                ),
                 ] else ...[
                   AnimatedOpacity(
                     opacity: 1.0,
@@ -1133,97 +1373,6 @@ Download GAGcars app for more amazing deals!''';
     );
   }
 
-  // Image Zoom Dialog with smooth animation
-  void _showFullScreenImage(String imageUrl, int imageIndex) {
-    showGeneralDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      barrierDismissible: true,
-      barrierLabel: 'Close',
-      transitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Dialog(
-          backgroundColor: Colors.black,
-          insetPadding: EdgeInsets.zero,
-          child: Stack(
-            children: [
-              // Full screen image with zoom capability
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: InteractiveViewer(
-                  panEnabled: true,
-                  minScale: 0.5,
-                  maxScale: 4.0,
-                  child: _buildSafeImage(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-              
-              // Close button with animation
-              Positioned(
-                top: 50,
-                right: 20,
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                ),
-              ),
-              
-              // Image counter with fade animation
-              Positioned(
-                top: 50,
-                left: 20,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${imageIndex + 1}/${getItemImages().length}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: animation,
-            curve: Curves.fastOutSlowIn,
-          ),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
   // Helper widgets with animations
   Widget _buildSectionTitle(String title, bool isDarkMode) {
     return AnimatedContainer(
@@ -1319,7 +1468,7 @@ Download GAGcars app for more amazing deals!''';
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -1358,7 +1507,7 @@ Download GAGcars app for more amazing deals!''';
                     ),
                     if (index == selectedIndex)
                       Container(
-                        color: Colors.black.withOpacity(0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         child: const Center(
                           child: Icon(
                             Icons.check_circle,
@@ -1391,12 +1540,12 @@ Download GAGcars app for more amazing deals!''';
                   ),
                 ),
                 const SizedBox(width: 4),
-                // View button
+                // View button - UPDATED TO USE NEW FULL SCREEN VIEWER
                 SizedBox(
                   height: 28,
                   child: ElevatedButton(
                     onPressed: () {
-                      _showFullScreenImage(image, index);
+                      _showFullScreenImage(index);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorGlobalVariables.brownColor,
@@ -1530,7 +1679,7 @@ Download GAGcars app for more amazing deals!''';
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -1656,9 +1805,9 @@ Download GAGcars app for more amazing deals!''';
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: [
-                                      Colors.black.withOpacity(0.8),
+                                      Colors.black.withValues(alpha: 0.8),
                                       Colors.transparent,
-                                      Colors.black.withOpacity(0.3),
+                                      Colors.black.withValues(alpha: 0.3),
                                     ],
                                   ),
                                 ),
@@ -1804,11 +1953,11 @@ Download GAGcars app for more amazing deals!''';
                                 ),
                               ),
                               
-                              // Instructions
+                              // Instructions - UPDATED TO MENTION SWIPING
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                 child: Text(
-                                  "Tap image to set as main display • Tap 'View' to see full size",
+                                  "Tap image to set as main display • Tap 'View' to see full size with swipe navigation",
                                   style: TextStyle(
                                     fontSize: 12.0,
                                     color: isDarkMode ? Colors.white60 : Colors.grey[600],
@@ -1887,7 +2036,7 @@ Download GAGcars app for more amazing deals!''';
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
                                           color: isActive 
-                                              ? (isDarkMode ? Colors.green[900]!.withOpacity(0.3) : Colors.green[50]) 
+                                              ? (isDarkMode ? Colors.green[900]!.withValues(alpha: 0.3) : Colors.green[50]) 
                                               : (isDarkMode ? Colors.grey[800]! : Colors.grey[100]),
                                           borderRadius: BorderRadius.circular(12),
                                           border: Border.all(
@@ -1952,13 +2101,13 @@ Download GAGcars app for more amazing deals!''';
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
                                           color: isDarkMode 
-                                              ? ColorGlobalVariables.redColor.withOpacity(0.1)
-                                              : ColorGlobalVariables.redColor.withOpacity(0.05),
+                                              ? ColorGlobalVariables.redColor.withValues(alpha: 0.1)
+                                              : ColorGlobalVariables.redColor.withValues(alpha: 0.05),
                                           borderRadius: BorderRadius.circular(12),
                                           border: Border.all(
                                             color: isDarkMode
-                                                ? ColorGlobalVariables.redColor.withOpacity(0.3)
-                                                : ColorGlobalVariables.redColor.withOpacity(0.2)
+                                                ? ColorGlobalVariables.redColor.withValues(alpha: 0.3)
+                                                : ColorGlobalVariables.redColor.withValues(alpha: 0.2)
                                           ),
                                         ),
                                         child: Column(
@@ -2017,8 +2166,8 @@ Download GAGcars app for more amazing deals!''';
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
                                                 color: isDarkMode
-                                                    ? ColorGlobalVariables.redColor.withOpacity(0.2)
-                                                    : ColorGlobalVariables.redColor.withOpacity(0.1),
+                                                    ? ColorGlobalVariables.redColor.withValues(alpha: 0.2)
+                                                    : ColorGlobalVariables.redColor.withValues(alpha: 0.1),
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
                                               child: Row(
@@ -2073,7 +2222,7 @@ Download GAGcars app for more amazing deals!''';
                                           duration: const Duration(milliseconds: 500),
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
-                                            color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                            color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                                             borderRadius: BorderRadius.circular(12),
                                             border: Border.all(
                                               color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!
@@ -2112,7 +2261,7 @@ Download GAGcars app for more amazing deals!''';
                                         children: [
                                           _buildTag(
                                             "${_specialOffer.discount}% OFF", 
-                                            ColorGlobalVariables.redColor.withOpacity(0.9)
+                                            ColorGlobalVariables.redColor.withValues(alpha: 0.9)
                                           ),
                                           if(_item.warranty != null && _item.warranty! > 0)
                                             _buildTag(
@@ -2197,7 +2346,7 @@ Download GAGcars app for more amazing deals!''';
                                               duration: Duration(milliseconds: 300 + (index * 50)),
                                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                               decoration: BoxDecoration(
-                                                color: isDarkMode ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
+                                                color: isDarkMode ? Colors.blue[900]!.withValues(alpha: 0.3) : Colors.blue[50],
                                                 borderRadius: BorderRadius.circular(20),
                                                 border: Border.all(
                                                   color: isDarkMode ? Colors.blue[700]! : Colors.blue[100]!

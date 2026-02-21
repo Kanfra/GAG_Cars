@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gag_cars_frontend/GeneralComponents/AtillahComponents/customListTile.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Appbar/customAppbarOne.dart';
@@ -40,7 +39,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
       body: Column(
         children: [
-          // Header Section
+
+// Header Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(24),
@@ -49,8 +49,8 @@ class _SecurityPageState extends State<SecurityPage> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  ColorGlobalVariables.brownColor.withOpacity(0.9),
-                  ColorGlobalVariables.brownColor.withOpacity(0.7),
+                  Color(0xFF2E3A59).withValues(alpha: 0.9), // Dark blue
+                  Color(0xFF4A6785).withValues(alpha: 0.7), // Lighter blue
                 ],
               ),
               borderRadius: const BorderRadius.only(
@@ -63,7 +63,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -87,7 +87,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -113,7 +113,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   _buildSecurityCard(
                     icon: Icons.lock_reset_rounded,
                     iconColor: Colors.blue,
-                    iconBackground: isDarkMode ? Colors.blue.withOpacity(0.2) : Colors.blue[50],
+                    iconBackground: isDarkMode ? Colors.blue.withValues(alpha: 0.2) : Colors.blue[50],
                     title: 'Change Password',
                     subtitle: 'Update your account password regularly',
                     onTap: () {
@@ -140,7 +140,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   // _buildSecurityCard(
                   //   icon: Icons.fingerprint_rounded,
                   //   iconColor: Colors.green,
-                  //   iconBackground: isDarkMode ? Colors.green.withOpacity(0.2) : Colors.green[50],
+                  //   iconBackground: isDarkMode ? Colors.green.withValues(alpha: 0.2) : Colors.green[50],
                   //   title: 'Biometric Authentication',
                   //   subtitle: 'Use fingerprint or face ID to login',
                   //   onTap: () {
@@ -158,7 +158,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   //         });
                   //       },
                   //       activeColor: Colors.green,
-                  //       activeTrackColor: isDarkMode ? Colors.green.withOpacity(0.5) : Colors.green[200],
+                  //       activeTrackColor: isDarkMode ? Colors.green.withValues(alpha: 0.5) : Colors.green[200],
                   //     ),
                   //   ),
                   //   isDarkMode: isDarkMode,
@@ -169,7 +169,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   // _buildSecurityCard(
                   //   icon: Icons.verified_user_rounded,
                   //   iconColor: Colors.orange,
-                  //   iconBackground: isDarkMode ? Colors.orange.withOpacity(0.2) : Colors.orange[50],
+                  //   iconBackground: isDarkMode ? Colors.orange.withValues(alpha: 0.2) : Colors.orange[50],
                   //   title: 'Two-Factor Authentication',
                   //   subtitle: 'Add an extra layer of security',
                   //   onTap: () {
@@ -187,7 +187,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   //         });
                   //       },
                   //       activeColor: Colors.orange,
-                  //       activeTrackColor: isDarkMode ? Colors.orange.withOpacity(0.5) : Colors.orange[200],
+                  //       activeTrackColor: isDarkMode ? Colors.orange.withValues(alpha: 0.5) : Colors.orange[200],
                   //     ),
                   //   ),
                   //   isDarkMode: isDarkMode,
@@ -198,7 +198,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   // _buildSecurityCard(
                   //   icon: Icons.email_rounded,
                   //   iconColor: Colors.purple,
-                  //   iconBackground: isDarkMode ? Colors.purple.withOpacity(0.2) : Colors.purple[50],
+                  //   iconBackground: isDarkMode ? Colors.purple.withValues(alpha: 0.2) : Colors.purple[50],
                   //   title: 'Email Notifications',
                   //   subtitle: 'Get alerts for security events',
                   //   onTap: () {
@@ -216,7 +216,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   //         });
                   //       },
                   //       activeColor: Colors.purple,
-                  //       activeTrackColor: isDarkMode ? Colors.purple.withOpacity(0.5) : Colors.purple[200],
+                  //       activeTrackColor: isDarkMode ? Colors.purple.withValues(alpha: 0.5) : Colors.purple[200],
                   //     ),
                   //   ),
                   //   isDarkMode: isDarkMode,
@@ -227,7 +227,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   // _buildSecurityCard(
                   //   icon: Icons.sms_rounded,
                   //   iconColor: Colors.red,
-                  //   iconBackground: isDarkMode ? Colors.red.withOpacity(0.2) : Colors.red[50],
+                  //   iconBackground: isDarkMode ? Colors.red.withValues(alpha: 0.2) : Colors.red[50],
                   //   title: 'SMS Security Alerts',
                   //   subtitle: 'Receive security alerts via SMS',
                   //   onTap: () {
@@ -245,7 +245,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   //         });
                   //       },
                   //       activeColor: Colors.red,
-                  //       activeTrackColor: isDarkMode ? Colors.red.withOpacity(0.5) : Colors.red[200],
+                  //       activeTrackColor: isDarkMode ? Colors.red.withValues(alpha: 0.5) : Colors.red[200],
                   //     ),
                   //   ),
                   //   isDarkMode: isDarkMode,
@@ -408,11 +408,11 @@ class _SecurityPageState extends State<SecurityPage> {
   }) {
     return Card(
       elevation: 1,
-      color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue[50],
+      color: isDarkMode ? Colors.blue.withValues(alpha: 0.1) : Colors.blue[50],
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue[100]!,
+          color: isDarkMode ? Colors.blue.withValues(alpha: 0.3) : Colors.blue[100]!,
         ),
       ),
       child: Container(
@@ -570,7 +570,7 @@ class _SecurityPageState extends State<SecurityPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(isDarkMode ? 0.2 : 0.1),
+                color: color.withValues(alpha: isDarkMode ? 0.2 : 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

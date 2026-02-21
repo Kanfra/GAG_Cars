@@ -1,9 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -13,19 +9,16 @@ import 'package:uuid/uuid.dart';
 import '../../GlobalVariables/colorGlobalVariables.dart';
 
 // format number
-String formatNumber({
-  required bool shortenerRequired,
-  required int number
-  }){
-  if(shortenerRequired){
-    if(number >= 1000000){
+String formatNumber({required bool shortenerRequired, required int number}) {
+  if (shortenerRequired) {
+    if (number >= 1000000) {
       return '${NumberFormat("#,##0").format((number / 1000000))}M';
-    }
-    else if(number >= 1000){
-      return '${NumberFormat("#,##0").format(number / 1000)}K';
-    }
-    else {
-      return NumberFormat.decimalPattern().format(number);
+    } else if (number >= 1000) {
+      // For 1000 and above, use k format (e.g. 1.5k, 15k)
+      return '${NumberFormat("#,##0.#").format(number / 1000)}k';
+    } else {
+      // For numbers less than 1000, show full number with commas
+      return NumberFormat("#,##0").format(number);
     }
   }
   return NumberFormat("#,##0.00").format(number);
@@ -37,7 +30,7 @@ String formatTimeAgo(String isoDate) {
   if (isoDate.isEmpty) {
     return 'Recently';
   }
-  
+
   try {
     final date = Jiffy.parse(isoDate);
     final now = Jiffy.now();
@@ -52,7 +45,7 @@ String formatTimeAgo(String isoDate) {
         final diffInMinutes = now.diff(date, unit: Unit.minute);
         return diffInMinutes > 1 ? '$diffInMinutes minutes ago' : 'Just now';
       }
-    } 
+    }
     // 1-30 days ago (show "X days ago" + time)
     else if (diffInDays <= 30) {
       return '$diffInDays ${diffInDays == 1 ? 'day' : 'days'} ago at ${date.format(pattern: "h:mm a")}';
@@ -73,34 +66,39 @@ String formatTimeAgo(String isoDate) {
 }
 
 // pick an image
-Future<void>  pickImage(ImageSource source, ImagePicker picker, ValueChanged setStateFunction) async {
-  try{
+Future<void> pickImage(
+  ImageSource source,
+  ImagePicker picker,
+  ValueChanged setStateFunction,
+) async {
+  try {
     final pickedFile = await picker.pickImage(source: source);
-    if(pickedFile != null){
+    if (pickedFile != null) {
       setStateFunction(pickedFile);
     }
-  }catch(e){
+  } catch (e) {
     showCustomSnackBar(
       title: "Error",
-      message: "Failed to pick image: ${e.toString()}"
+      message: "Failed to pick image: ${e.toString()}",
     );
   }
 }
 
 // pick image dialog
 void showImageSourceDialog({
-  required ImagePicker picker, 
-  required ValueChanged setStateFunction
+  required ImagePicker picker,
+  required ValueChanged setStateFunction,
 }) {
   final isDarkMode = Get.isDarkMode;
-  
+
   Get.bottomSheet(
     Container(
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF424242) : Colors.white,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
-          topRight: Radius.circular(20)),
+          topRight: Radius.circular(20),
+        ),
       ),
       child: Wrap(
         children: [
@@ -172,7 +170,7 @@ void showCustomSnackBar({
     } else {
       // Fallback to ScaffoldMessenger (when context is available)
       if (context == null || !context.mounted) return;
-      
+
       final scaffoldMessenger = ScaffoldMessenger.of(context);
       scaffoldMessenger.clearSnackBars();
 
@@ -198,25 +196,18 @@ void showCustomSnackBar({
 
 // snackbar for other pages
 void showCustomAppSnackBar({
-  required BuildContext context, 
+  required BuildContext context,
   required String message,
   Color backgroundColor = ColorGlobalVariables.redColor,
 }) {
   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-  
+
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      ),
+      content: Text(message, style: TextStyle(color: Colors.white)),
       backgroundColor: backgroundColor,
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.all(16),
     ),
   );
@@ -227,7 +218,7 @@ void showFilterBottomSheet({
   required Widget widget,
 }) {
   final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-  
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -235,17 +226,24 @@ void showFilterBottomSheet({
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (context) => widget
+    builder: (context) => widget,
   );
 }
 
-String createSlug({required String name, required bool isUniqueRandomSlugRequiredOrTimestampSlug}){
-  String input = name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s-]'), ''). trim().replaceAll(RegExp(r'\s+'), '-').replaceAll(RegExp(r'-+'), '-');
-  if(isUniqueRandomSlugRequiredOrTimestampSlug){
+String createSlug({
+  required String name,
+  required bool isUniqueRandomSlugRequiredOrTimestampSlug,
+}) {
+  String input = name
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z0-9\s-]'), '')
+      .trim()
+      .replaceAll(RegExp(r'\s+'), '-')
+      .replaceAll(RegExp(r'-+'), '-');
+  if (isUniqueRandomSlugRequiredOrTimestampSlug) {
     final uniqueId = const Uuid().v4().split('-').first;
     return '$input-$uniqueId';
-  }
-  else{
+  } else {
     return '$input-${DateTime.now().millisecondsSinceEpoch}';
   }
 }
@@ -271,7 +269,7 @@ Future<void> showFieldInputDialog({
     barrierDismissible: false,
     // this ensures controller is disposed when dialog is closed
     builder: (context) => DisposableBuilder(
-      dispose: (){
+      dispose: () {
         controller.dispose();
         logger.i("Dialog TextEditingController disposed");
       },
@@ -288,7 +286,7 @@ Future<void> showFieldInputDialog({
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.2),
                 blurRadius: 10,
                 spreadRadius: 2,
               ),
@@ -309,8 +307,8 @@ Future<void> showFieldInputDialog({
               const SizedBox(height: 20),
               TextField(
                 controller: controller,
-                keyboardType: fieldType.toLowerCase() == "number" 
-                    ? TextInputType.number 
+                keyboardType: fieldType.toLowerCase() == "number"
+                    ? TextInputType.number
                     : TextInputType.text,
                 style: TextStyle(
                   color: isDarkMode ? Colors.white : Colors.grey[800],
@@ -326,19 +324,20 @@ Future<void> showFieldInputDialog({
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),
                   filled: true,
-                  fillColor: isDarkMode ? const Color(0xFF303030) : Colors.grey[100],
+                  fillColor: isDarkMode
+                      ? const Color(0xFF303030)
+                      : Colors.grey[100],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 14),
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: theme.primaryColor,
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(color: theme.primaryColor, width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -358,9 +357,12 @@ Future<void> showFieldInputDialog({
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: Text(
                       'Cancel',
@@ -382,9 +384,12 @@ Future<void> showFieldInputDialog({
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.primaryColor,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       elevation: 0,
                       shadowColor: Colors.transparent,
                     ),
@@ -415,11 +420,11 @@ Future<void> showFieldInputDialog({
 
 // Enhanced image picker with dark mode support
 Future<void> showEnhancedImageSourceDialog({
-  required ImagePicker picker, 
+  required ImagePicker picker,
   required ValueChanged setStateFunction,
   BuildContext? context,
 }) async {
-  final isDarkMode = context != null 
+  final isDarkMode = context != null
       ? Theme.of(context).brightness == Brightness.dark
       : Get.isDarkMode;
 
@@ -468,7 +473,9 @@ Future<void> showEnhancedImageSourceDialog({
             ListTile(
               leading: Icon(
                 Icons.camera_alt,
-                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+                color: isDarkMode
+                    ? Colors.white70
+                    : ColorGlobalVariables.brownColor,
               ),
               title: Text(
                 'Take Photo',
@@ -491,7 +498,9 @@ Future<void> showEnhancedImageSourceDialog({
             ListTile(
               leading: Icon(
                 Icons.photo_library,
-                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor,
+                color: isDarkMode
+                    ? Colors.white70
+                    : ColorGlobalVariables.brownColor,
               ),
               title: Text(
                 'Choose from Gallery',
@@ -557,7 +566,7 @@ void showEnhancedCustomSnackBar({
   bool error = false,
 }) {
   final isDarkMode = Get.isDarkMode;
-  
+
   // Determine background color based on type
   Color bgColor;
   if (backgroundColor != null) {
@@ -573,7 +582,14 @@ void showEnhancedCustomSnackBar({
   }
 
   Get.snackbar(
-    title ?? (success ? 'Success' : warning ? 'Warning' : error ? 'Error' : 'Info'),
+    title ??
+        (success
+            ? 'Success'
+            : warning
+            ? 'Warning'
+            : error
+            ? 'Error'
+            : 'Info'),
     message,
     backgroundColor: bgColor,
     colorText: textColor ?? Colors.white,
@@ -583,7 +599,7 @@ void showEnhancedCustomSnackBar({
     borderRadius: 12,
     boxShadows: [
       BoxShadow(
-        color: Colors.black.withOpacity(0.1),
+        color: Colors.black.withValues(alpha: 0.1),
         blurRadius: 8,
         offset: const Offset(0, 2),
       ),

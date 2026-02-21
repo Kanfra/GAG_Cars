@@ -41,9 +41,9 @@ class ItemCategoryService {
     final body = {
       'name': name,
       'description': description,
-      if (parentId != null) 'parent_id': parentId,
+      'parent_id': ?parentId,
       if (features != null && features.isNotEmpty) 'features': features,
-      if (imagePath != null) 'image': imagePath,
+      'image': ?imagePath,
     };
 
     return postApiData<ItemCategory>(
@@ -64,11 +64,11 @@ class ItemCategoryService {
   }) async {
     final endpoint = '${ApiEndpoint.categories}/$id';
     final body = {
-      if (name != null) 'name': name,
-      if (description != null) 'description': description,
-      if (parentId != null) 'parent_id': parentId,
-      if (features != null) 'features': features,
-      if (imagePath != null) 'image': imagePath,
+      'name': ?name,
+      'description': ?description,
+      'parent_id': ?parentId,
+      'features': ?features,
+      'image': ?imagePath,
     };
 
     return postApiData<ItemCategory>(

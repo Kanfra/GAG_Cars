@@ -12,18 +12,17 @@ import 'package:logger/logger.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  const ResetPasswordPage({
-    super.key,
-    required this.allJson,
-  });
+  const ResetPasswordPage({super.key, required this.allJson});
 
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTickerProviderStateMixin {
+class _ResetPasswordPageState extends State<ResetPasswordPage>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isLoading = false;
   bool _obscureText1 = true;
   bool _obscureText2 = true;
@@ -34,7 +33,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
   late Animation<double> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _iconScaleAnimation;
-  late Animation<Color?> _containerColorAnimation;
 
   // Password strength indicators
   double _passwordStrength = 0.0;
@@ -81,16 +79,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
       ),
     );
 
-    _containerColorAnimation = ColorTween(
-      begin: Colors.transparent,
-      end: Colors.green.withOpacity(0.1),
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
     _animationController.forward();
   }
 
@@ -133,7 +121,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
   }
 
   void _errorShakeAnimation() {
-    _animationController.animateBack(0.1, duration: const Duration(milliseconds: 100))
+    _animationController
+        .animateBack(0.1, duration: const Duration(milliseconds: 100))
         .then((_) => _animationController.forward());
   }
 
@@ -146,7 +135,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
   }
 
   Future<void> _resetPassword() async {
-    if (_newPasswordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
+    if (_newPasswordController.text.isEmpty ||
+        _confirmPasswordController.text.isEmpty) {
       showCustomSnackBar(
         message: 'Please fill in all fields',
         backgroundColor: ColorGlobalVariables.redColor,
@@ -174,20 +164,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
       _errorShakeAnimation();
       return;
     }
-    
+
     setState(() => _isLoading = true);
     try {
       final logger = Logger();
       logger.w("allData: ${widget.allJson}");
-      await AuthService.resetPassword( 
+      await AuthService.resetPassword(
         phone: widget.allJson["phone"],
-        email: widget.allJson["email"], 
+        email: widget.allJson["email"],
         otp: widget.allJson["otp"],
         newPassword: _newPasswordController.text,
       );
-      
+
       await _successAnimation();
-      
+
       showCustomSnackBar(
         title: 'Success',
         message: 'Password reset successfully',
@@ -201,7 +191,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
       showCustomSnackBar(
         message: 'Error: ${e.message}',
         backgroundColor: ColorGlobalVariables.redColor,
-        textColor: ColorGlobalVariables.whiteColor
+        textColor: ColorGlobalVariables.whiteColor,
       );
     } catch (e) {
       showCustomSnackBar(
@@ -238,9 +228,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                   child: AnimatedBuilder(
                     animation: _animationController,
                     builder: (context, child) {
-                      return Transform(
-                        transform: Matrix4.identity()
-                          ..scale(_scaleAnimation.value),
+                      return Transform.scale(
+                        scale: _scaleAnimation.value,
                         alignment: Alignment.center,
                         child: Opacity(
                           opacity: _fadeAnimation.value,
@@ -256,8 +245,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
-                                        (ColorGlobalVariables.brownColor ?? const Color(0xFF8B4513)).withOpacity(0.2),
-                                        (ColorGlobalVariables.brownColor ?? const Color(0xFF8B4513)).withOpacity(0.1),
+                                        ColorGlobalVariables.brownColor
+                                            .withValues(alpha: 0.2),
+                                        ColorGlobalVariables.brownColor
+                                            .withValues(alpha: 0.1),
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -265,7 +256,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: (ColorGlobalVariables.brownColor ?? const Color(0xFF8B4513)).withOpacity(0.3),
+                                        color:
+                                            (ColorGlobalVariables.brownColor ??
+                                                    const Color(0xFF8B4513))
+                                                .withValues(alpha: 0.3),
                                         blurRadius: 20,
                                         spreadRadius: 2,
                                       ),
@@ -274,12 +268,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                                   child: Icon(
                                     Icons.lock_reset_rounded,
                                     size: 50,
-                                    color: ColorGlobalVariables.brownColor ?? const Color(0xFF8B4513),
+                                    color: ColorGlobalVariables.brownColor,
                                   ),
                                 ),
                               ),
                               const SizedBox(height: 40),
-                              
+
                               // Title with slide animation
                               Transform.translate(
                                 offset: Offset(-_slideAnimation.value, 0),
@@ -288,15 +282,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                                   style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.w700,
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                     letterSpacing: -0.5,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                              
+
                               const SizedBox(height: 16),
-                              
+
                               // Subtitle with slide animation
                               Transform.translate(
                                 offset: Offset(_slideAnimation.value, 0),
@@ -305,30 +301,38 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: isDark ? Colors.white70 : const Color.fromRGBO(0, 0, 0, 0.6),
+                                    color: isDark
+                                        ? Colors.white70
+                                        : const Color.fromRGBO(0, 0, 0, 0.6),
                                     height: 1.5,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                              
+
                               const SizedBox(height: 40),
-                              
+
                               // Input Section Container
                               Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                                  color: isDark
+                                      ? const Color(0xFF1E1E1E)
+                                      : Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: isDark ? Colors.black.withOpacity(0.4) : Colors.grey.withOpacity(0.1),
+                                      color: isDark
+                                          ? Colors.black.withValues(alpha: 0.4)
+                                          : Colors.grey.withValues(alpha: 0.1),
                                       blurRadius: 30,
                                       offset: const Offset(0, 10),
                                     ),
                                   ],
                                   border: Border.all(
-                                    color: isDark ? const Color(0xFF333333) : Colors.grey.shade100,
+                                    color: isDark
+                                        ? const Color(0xFF333333)
+                                        : Colors.grey.shade100,
                                     width: 1,
                                   ),
                                 ),
@@ -339,50 +343,61 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                                       controller: _newPasswordController,
                                       hintText: 'New Password',
                                       obscureText: _obscureText1,
-                                      onToggle: () => setState(() => _obscureText1 = !_obscureText1),
+                                      onToggle: () => setState(
+                                        () => _obscureText1 = !_obscureText1,
+                                      ),
                                       isFirst: true,
                                     ),
-                                    
+
                                     // Password strength indicator
-                                    if (_newPasswordController.text.isNotEmpty) ...[
+                                    if (_newPasswordController
+                                        .text
+                                        .isNotEmpty) ...[
                                       const SizedBox(height: 16),
                                       _buildPasswordStrengthIndicator(isDark),
                                     ],
-                                    
+
                                     const SizedBox(height: 20),
-                                    
+
                                     // Confirm password field
                                     _buildPasswordField(
                                       controller: _confirmPasswordController,
                                       hintText: 'Confirm Password',
                                       obscureText: _obscureText2,
-                                      onToggle: () => setState(() => _obscureText2 = !_obscureText2),
+                                      onToggle: () => setState(
+                                        () => _obscureText2 = !_obscureText2,
+                                      ),
                                       isFirst: false,
                                     ),
-                                    
+
                                     // Password match indicator
-                                    if (_confirmPasswordController.text.isNotEmpty && _newPasswordController.text.isNotEmpty) ...[
+                                    if (_confirmPasswordController
+                                            .text
+                                            .isNotEmpty &&
+                                        _newPasswordController
+                                            .text
+                                            .isNotEmpty) ...[
                                       const SizedBox(height: 16),
                                       _buildPasswordMatchIndicator(isDark),
                                     ],
                                   ],
                                 ),
                               ),
-                              
+
                               const SizedBox(height: 40),
-                              
+
                               // Reset Button with scale animation
                               Transform.translate(
                                 offset: Offset(0, _slideAnimation.value * 0.5),
                                 child: CustomButton(
                                   buttonName: 'Reset Password',
-                                  onPressed: _resetPassword, 
+                                  onPressed: _resetPassword,
                                   isLoading: _isLoading,
                                 ),
                               ),
-                              
+
                               const SizedBox(height: 20),
-                              
+
                               // Security Tips
                               _buildSecurityTips(isDark),
                             ],
@@ -393,7 +408,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                   ),
                 ),
               ),
-              
+
               // Back Button with fade animation
               Positioned(
                 top: 60,
@@ -408,7 +423,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                         duration: const Duration(milliseconds: 200),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF2D2D2D) : Colors.grey.shade100,
+                          color: isDark
+                              ? const Color(0xFF2D2D2D)
+                              : Colors.grey.shade100,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -436,7 +453,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
     required bool isFirst,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -451,11 +468,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
         const SizedBox(height: 8),
         CustomTextField(
           controller: controller,
-          hintText: hintText, 
+          hintText: hintText,
           prefixImage: AppIcons.lock_icon,
           textInputType: TextInputType.visiblePassword,
           obscureText: obscureText,
-          suffixIcon: obscureText ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+          suffixIcon: obscureText
+              ? Icons.visibility_rounded
+              : Icons.visibility_off_rounded,
           onSuffixIconPressed: onToggle,
         ),
       ],
@@ -503,7 +522,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                 gradient: LinearGradient(
                   colors: [
                     _getPasswordStrengthColor(),
-                    _getPasswordStrengthColor().withOpacity(0.7),
+                    _getPasswordStrengthColor().withValues(alpha: 0.7),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(3),
@@ -516,9 +535,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
   }
 
   Widget _buildPasswordMatchIndicator(bool isDark) {
-    final passwordsMatch = _newPasswordController.text == _confirmPasswordController.text;
+    final passwordsMatch =
+        _newPasswordController.text == _confirmPasswordController.text;
     final isNotEmpty = _confirmPasswordController.text.isNotEmpty;
-    
+
     return Row(
       children: [
         AnimatedContainer(
@@ -526,12 +546,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
           width: 20,
           height: 20,
           decoration: BoxDecoration(
-            color: isNotEmpty 
+            color: isNotEmpty
                 ? (passwordsMatch ? Colors.green : Colors.red)
                 : Colors.transparent,
             shape: BoxShape.circle,
             border: Border.all(
-              color: isNotEmpty 
+              color: isNotEmpty
                   ? (passwordsMatch ? Colors.green : Colors.red)
                   : Colors.grey.shade400,
             ),
@@ -590,7 +610,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? const Color(0xFFE3F2FD) : Colors.blue.shade800,
+                      color: isDark
+                          ? const Color(0xFFE3F2FD)
+                          : Colors.blue.shade800,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -598,7 +620,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> with SingleTicker
                     'Use at least 8 characters with a mix of letters, numbers, and symbols for better security.',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? const Color(0xFFBBDEFB) : Colors.blue.shade700,
+                      color: isDark
+                          ? const Color(0xFFBBDEFB)
+                          : Colors.blue.shade700,
                       height: 1.4,
                     ),
                   ),
@@ -627,19 +651,23 @@ class AnimatedFractionallySizedBox extends ImplicitlyAnimatedWidget {
   });
 
   @override
-  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() => _AnimatedFractionallySizedBoxState();
+  ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
+      _AnimatedFractionallySizedBoxState();
 }
 
-class _AnimatedFractionallySizedBoxState extends AnimatedWidgetBaseState<AnimatedFractionallySizedBox> {
+class _AnimatedFractionallySizedBoxState
+    extends AnimatedWidgetBaseState<AnimatedFractionallySizedBox> {
   Tween<double>? _widthFactor;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _widthFactor = visitor(
-      _widthFactor,
-      widget.widthFactor,
-      (dynamic value) => Tween<double>(begin: value as double),
-    ) as Tween<double>?;
+    _widthFactor =
+        visitor(
+              _widthFactor,
+              widget.widthFactor,
+              (dynamic value) => Tween<double>(begin: value as double),
+            )
+            as Tween<double>?;
   }
 
   @override

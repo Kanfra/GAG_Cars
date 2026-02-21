@@ -55,7 +55,7 @@ class _SelectedCategoryItemPageState extends State<SelectedCategoryItemPage> {
       _itemId = args['itemId'] as String? ?? _category.id.toString();
       
       // Debug log
-      print('Category: ${_category.name}, Category ID: ${_category.id}, Item ID: $_itemId');
+      debugPrint('Category: ${_category.name}, Category ID: ${_category.id}, Item ID: $_itemId');
     }
   }
 
@@ -551,7 +551,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
         }
       });
     } catch (e) {
-      print('Error checking wishlist status: $e');
+      debugPrint('Error checking wishlist status: $e');
     }
   }
 
@@ -615,7 +615,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
         );
       }
     } catch (e) {
-      print('Wishlist error: $e');
+      debugPrint('Wishlist error: $e');
       if (_isLiked) {
         _animationController.forward();
       } else {
@@ -694,7 +694,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -724,7 +724,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -758,7 +758,7 @@ class __CategoryItemWidgetState extends State<_CategoryItemWidget>
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),

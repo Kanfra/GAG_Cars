@@ -123,7 +123,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -227,7 +227,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
               floating: false,
               backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
               elevation: _showAppBarShadow ? 4 : 0,
-              shadowColor: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.1),
+              shadowColor: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.1),
               leading: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -238,7 +238,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.1),
+                        color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -266,7 +266,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
               //         shape: BoxShape.circle,
               //         boxShadow: [
               //           BoxShadow(
-              //             color: Colors.black.withOpacity(isDarkMode ? 0.3 : 0.1),
+              //             color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.1),
               //             blurRadius: 8,
               //             offset: const Offset(0, 2),
               //           ),
@@ -314,7 +314,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.3),
+                            Colors.black.withValues(alpha: 0.3),
                           ],
                         ),
                       ),
@@ -330,7 +330,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -520,7 +520,7 @@ class _MainNewsPageState extends State<MainNewsPage> {
                               width: 60,
                               height: 60,
                               decoration: BoxDecoration(
-                                color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                                color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(

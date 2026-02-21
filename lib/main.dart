@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBlogPostsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBrandItemsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getBroadcastProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoriesProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getItemCategoryProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getNotificationsProvider.dart';
@@ -23,6 +24,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Services/MakeAndModelService/ma
 import 'package:gag_cars_frontend/Pages/HomePage/Services/VehicleService/cloudinaryService.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Providers/contactsProvider.dart';
 import 'package:gag_cars_frontend/Pages/Messages/Providers/messagesProvider.dart';
+import 'package:gag_cars_frontend/Pages/Messages/Providers/chatSettingsProvider.dart';
 import 'package:gag_cars_frontend/Pages/PaymentPage/Providers/packageProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/countryProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/faqProvider.dart';
@@ -42,17 +44,19 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await CloudinaryService.init();
-  
+
   // Initialize native deep linking
   await NativeDeepLinkService.initDeepLinking();
-  
+
   // Set system UI overlay style before running app
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.black.withOpacity(0.77),
-    statusBarBrightness: Brightness.light,
-    statusBarIconBrightness: Brightness.light,
-  ));
-  
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.black.withValues(alpha: 0.77),
+      statusBarBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
+
   runApp(
     MultiProvider(
       providers: [
@@ -67,59 +71,29 @@ void main() async {
           create: (context) => MakeAndModelProvider(MakeAndModelService()),
         ),
         ChangeNotifierProvider<ItemCategoriesProvider>(
-          create: (context) => ItemCategoriesProvider(
-            ItemCategoryService()
-          ),
+          create: (context) => ItemCategoriesProvider(ItemCategoryService()),
         ),
-        ChangeNotifierProvider(
-          create: (context) => UserProvider()
-        ),
-        ChangeNotifierProvider(
-          create: (context) => WishlistToggleProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => WishlistFetchProvider()
-        ),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => WishlistToggleProvider()),
+        ChangeNotifierProvider(create: (context) => WishlistFetchProvider()),
         ChangeNotifierProvider(create: (context) => CategoryDetailProvider()),
         ChangeNotifierProvider<BlogPostProvider>(
           create: (context) => BlogPostProvider(BlogPostService()),
-        ), 
-        ChangeNotifierProvider(
-          create: (context) => WishlistManager(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => PackageProvider(),
-        ),     
-        ChangeNotifierProvider(
-          create: (context) => CountryProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => SimilarItemsProvider(),
-        ), 
-        ChangeNotifierProvider(
-          create: (context) => BrandItemsProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => NotificationProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => SearchProvider()
-        ),
-        ChangeNotifierProvider(
-          create: (context) => FaqProvider()
-        ),
-        ChangeNotifierProvider(
-          create: (context) => UserDetailsProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => ContactsProvider()
-        ),
-        ChangeNotifierProvider(
-          create: (context) => MessagesProvider()
-        ),
-        ChangeNotifierProvider(
-          create:(context) => UserListingsProvider(),
-        ),
+        ChangeNotifierProvider(create: (context) => WishlistManager()),
+        ChangeNotifierProvider(create: (context) => PackageProvider()),
+        ChangeNotifierProvider(create: (context) => CountryProvider()),
+        ChangeNotifierProvider(create: (context) => SimilarItemsProvider()),
+        ChangeNotifierProvider(create: (context) => BrandItemsProvider()),
+        ChangeNotifierProvider(create: (context) => BroadcastProvider()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
+        ChangeNotifierProvider(create: (context) => SearchProvider()),
+        ChangeNotifierProvider(create: (context) => FaqProvider()),
+        ChangeNotifierProvider(create: (context) => UserDetailsProvider()),
+        ChangeNotifierProvider(create: (context) => ContactsProvider()),
+        ChangeNotifierProvider(create: (context) => MessagesProvider()),
+        ChangeNotifierProvider(create: (context) => ChatSettingsProvider()),
+        ChangeNotifierProvider(create: (context) => UserListingsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -139,25 +113,25 @@ class MyApp extends StatelessWidget {
           darkTheme: AppThemes.darkTheme,
           themeMode: themeProvider.themeMode,
           debugShowCheckedModeBanner: ColorGlobalVariables.falseValue,
-          
+
           // ✅ FIX 1: Use ONLY home (remove initialRoute)
           home: const SplashPage(),
-          
+
           // ✅ FIX 2: Keep getPages but with safety wrapper
           getPages: RouteClass.routes,
-          
+
           // ✅ FIX 3: Remove navigatorObservers (causing conflicts)
           // navigatorObservers: [],
-          
+
           // ✅ FIX 4: Remove routingCallback (causing conflicts)
           // routingCallback: null,
-          
+
           // ✅ FIX 5: Enhanced unknown route with beautiful UI
           unknownRoute: GetPage(
             name: '/not-found',
             page: () => const _NotFoundScreen(),
           ),
-          
+
           // ✅ FIX 6: Disable route restoration completely
           navigatorKey: NavigatorKey.key, // Fresh navigation key
         );
@@ -184,14 +158,10 @@ class _NotFoundScreen extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: isDark
-                ? [
-                    Colors.grey[900]!,
-                    Colors.grey[850]!,
-                    Colors.grey[800]!,
-                  ]
+                ? [Colors.grey[900]!, Colors.grey[850]!, Colors.grey[800]!]
                 : [
-                    brownColor.withOpacity(0.08),
-                    brownColor.withOpacity(0.04),
+                    brownColor.withValues(alpha: 0.08),
+                    brownColor.withValues(alpha: 0.04),
                     Colors.white,
                   ],
           ),
@@ -205,11 +175,11 @@ class _NotFoundScreen extends StatelessWidget {
                 width: 140,
                 height: 140,
                 decoration: BoxDecoration(
-                  color: brownColor.withOpacity(0.1),
+                  color: brownColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: brownColor.withOpacity(0.2),
+                      color: brownColor.withValues(alpha: 0.2),
                       blurRadius: 15,
                       spreadRadius: 2,
                     ),
@@ -221,9 +191,9 @@ class _NotFoundScreen extends StatelessWidget {
                   color: brownColor,
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Title with Brown Color
               Text(
                 'Page Not Found',
@@ -233,9 +203,9 @@ class _NotFoundScreen extends StatelessWidget {
                   color: brownColor,
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Description
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -250,9 +220,9 @@ class _NotFoundScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Action Buttons with Brown Color
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -285,9 +255,9 @@ class _NotFoundScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
                     const SizedBox(width: 16),
-                    
+
                     // Home Button with Brown Color
                     Expanded(
                       child: ElevatedButton(
@@ -299,7 +269,7 @@ class _NotFoundScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 4,
-                          shadowColor: brownColor.withOpacity(0.4),
+                          shadowColor: brownColor.withValues(alpha: 0.4),
                         ),
                         child: const Text(
                           'Go to Home',
@@ -314,27 +284,23 @@ class _NotFoundScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Additional Help Section
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : brownColor.withOpacity(0.05),
+                  color: isDark
+                      ? Colors.grey[800]
+                      : brownColor.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: brownColor.withOpacity(0.2),
-                  ),
+                  border: Border.all(color: brownColor.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.help_outline,
-                      color: brownColor,
-                      size: 24,
-                    ),
+                    Icon(Icons.help_outline, color: brownColor, size: 24),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -362,9 +328,9 @@ class _NotFoundScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Support Text with Brown Color
               TextButton(
                 onPressed: () {

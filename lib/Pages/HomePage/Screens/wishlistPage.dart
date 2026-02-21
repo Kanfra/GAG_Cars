@@ -12,7 +12,6 @@ import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 
 class WishlistPage extends StatefulWidget {
@@ -286,7 +285,7 @@ class _WishlistPageState extends State<WishlistPage> {
           Center(
             child: Icon(
               Icons.favorite,
-              color: ColorGlobalVariables.redColor.withOpacity(0.8),
+              color: ColorGlobalVariables.redColor.withValues(alpha: 0.8),
               size: 24,
             ),
           ),
@@ -803,7 +802,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.black.withOpacity(0.3),
+            Colors.black.withValues(alpha: 0.3),
             Colors.transparent,
             Colors.transparent,
           ],
@@ -817,7 +816,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -873,21 +872,44 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: ColorGlobalVariables.redColor,
+                Expanded(
+                  child: Tooltip(
+                    message: '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
+                    preferBelow: false,
+                    margin: EdgeInsets.all(8),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                      ),
+                    ),
+                    textStyle: TextStyle(
+                      color: theme.textTheme.bodyMedium?.color,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    child: Text(
+                      '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: ColorGlobalVariables.redColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
+                SizedBox(width: 5),
                 if (_getMileage() != null)
                   Row(
                     children: [
-                      Icon(Icons.speed, size: 14, color: theme.iconTheme.color),
-                      SizedBox(width: 4),
+                      Icon(Icons.speed, size: 20, color: theme.iconTheme.color),
+                      SizedBox(width: 8),
                       Text(
-                        "${formatNumber(shortenerRequired: true, number: int.parse(_getMileage()!))} km",
+                        "${_formatMileage(_getMileage()!)} km",
                         style: TextStyle(
                           fontSize: 12,
                           color: theme.textTheme.bodyMedium?.color,
@@ -981,7 +1003,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -1069,12 +1091,44 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     try {
       if (_itemData is Map) {
         final price = _itemData['price'] ?? '0';
-        return formatNumber(shortenerRequired: true, number: int.parse(price));
+        return _formatPriceWithCommas(price);
       }
       final price = _itemData?.price ?? '0';
-      return formatNumber(shortenerRequired: true, number: int.parse(price));
+      return _formatPriceWithCommas(price);
     } catch (e) {
       return '0';
+    }
+  }
+
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String? price) {
+    if (price == null || price.isEmpty) return '0';
+    try {
+      final int priceValue = int.parse(price);
+      final String priceStr = priceValue.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return formattedPrice.toString();
+    } catch (e) {
+      return price;
+    }
+  }
+
+  // Helper method to format mileage with k value
+  String _formatMileage(String? mileage) {
+    if (mileage == null || mileage.isEmpty) return '0';
+    try {
+      final int mileageValue = int.parse(mileage);
+      return formatNumber(shortenerRequired: true, number: mileageValue);
+    } catch (e) {
+      return mileage;
     }
   }
 
@@ -1350,15 +1404,33 @@ class _WishlistListItemState extends State<_WishlistListItem>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: ColorGlobalVariables.redColor,
+                          child: Tooltip(
+                            message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
+                            preferBelow: false,
+                            margin: EdgeInsets.all(8),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            textStyle: TextStyle(
+                              color: theme.textTheme.bodyMedium?.color,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            child: Text(
+                              '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: ColorGlobalVariables.redColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ),
                         SizedBox(width: 8),
@@ -1538,7 +1610,7 @@ class _WishlistListItemState extends State<_WishlistListItem>
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

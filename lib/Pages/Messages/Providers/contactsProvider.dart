@@ -7,7 +7,7 @@ class ContactsProvider with ChangeNotifier {
   List<ChatContact> _contacts = [];
   bool _isLoading = false;
   String? _error;
-  
+
   // Getters
   List<ChatContact> get contacts => _contacts;
   bool get isLoading => _isLoading;
@@ -22,10 +22,9 @@ class ContactsProvider with ChangeNotifier {
       notifyListeners();
 
       final response = await ChatService.getContacts();
-      
+
       // Safe handling of the response
       _contacts = response.contacts;
-          
     } catch (e) {
       _error = 'Failed to load contacts: ${e.toString()}';
       _contacts = []; // Clear contacts on error
@@ -40,6 +39,18 @@ class ContactsProvider with ChangeNotifier {
     await loadContacts();
   }
 
+  // Silent sync of contacts (for polling/real-time)
+  Future<void> syncContacts() async {
+    try {
+      // Fetch without setting _isLoading = true to avoid UI flickering
+      final response = await ChatService.getContacts();
+      _contacts = response.contacts;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error syncing contacts: $e');
+    }
+  }
+
   // Clear contacts and error
   void clear() {
     _contacts.clear();
@@ -50,12 +61,12 @@ class ContactsProvider with ChangeNotifier {
   // Search contacts by name or phone
   List<ChatContact> searchContacts(String query) {
     if (query.isEmpty) return _contacts;
-    
+
     return _contacts.where((contact) {
       final name = contact.name.toLowerCase();
       final phone = contact.phone.toLowerCase();
       final searchQuery = query.toLowerCase();
-      
+
       return name.contains(searchQuery) || phone.contains(searchQuery);
     }).toList();
   }

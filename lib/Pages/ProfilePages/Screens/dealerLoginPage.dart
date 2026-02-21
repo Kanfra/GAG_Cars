@@ -10,15 +10,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:logger/Logger.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DealerLoginPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  const DealerLoginPage({
-    super.key,
-    required this.allJson,
-  });
+  const DealerLoginPage({super.key, required this.allJson});
 
   @override
   State<DealerLoginPage> createState() => _DealerLoginPageState();
@@ -71,32 +68,53 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
 
   // ================== SELFIE CAPTURE ==================
   Future<void> _takeSelfie() async {
+    logger.i("📸 [DEALER_LOGIN] Starting selfie capture process...");
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
         preferredCameraDevice: CameraDevice.front,
+        imageQuality: 70,
       );
-      
-      if (image == null) return;
+
+      if (image == null) {
+        logger.w("⚠️ [DEALER_LOGIN] No image selected");
+        return;
+      }
+
+      logger.i("📍 [DEALER_LOGIN] Image captured at: ${image.path}");
 
       final inputImage = InputImage.fromFilePath(image.path);
+      logger.i("🔍 [DEALER_LOGIN] Running face detection...");
       final faces = await _faceDetector!.processImage(inputImage);
+      logger.i("👤 [DEALER_LOGIN] Faces detected: ${faces.length}");
 
       if (faces.isEmpty) {
+        logger.e("❌ [DEALER_LOGIN] No face detected");
         showCustomSnackBar(
           title: "No Face Detected",
-          message: "Please make sure your face is clearly visible in the selfie.",
+          message:
+              "Please make sure your face is clearly visible in the selfie.",
           backgroundColor: Colors.orange,
           textColor: Colors.white,
         );
         return;
       }
 
+      // 📝 PERMANENT STORAGE FIX FOR iOS
+      logger.i("💾 [DEALER_LOGIN] Saving image to stable storage...");
+      final appDir = await getApplicationDocumentsDirectory();
+      final String fileName =
+          'dealer_selfie_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String stablePath = '${appDir.path}/$fileName';
+
+      final File savedImage = await File(image.path).copy(stablePath);
+      logger.i("✅ [DEALER_LOGIN] Image saved successfully at: $stablePath");
+
       setState(() {
-        _selfieImage = File(image.path);
+        _selfieImage = savedImage;
         _isSelfieCaptured = true;
       });
-      
+
       showCustomSnackBar(
         title: "Success",
         message: "Selfie captured successfully!",
@@ -104,6 +122,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
         textColor: Colors.white,
       );
     } catch (e) {
+      logger.e("💥 [DEALER_LOGIN] Error during selfie capture: $e");
       showCustomSnackBar(
         title: "Error",
         message: "Failed to capture selfie: $e",
@@ -119,9 +138,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => IDCardCameraFrame(
-            isFront: isFront,
-          ),
+          builder: (context) => IDCardCameraFrame(isFront: isFront),
         ),
       );
 
@@ -135,7 +152,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             _isBackCaptured = true;
           }
         });
-        
+
         showCustomSnackBar(
           title: "Success",
           message: "ID ${isFront ? 'front' : 'back'} captured successfully!",
@@ -162,7 +179,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           _companyDocument = File(file.path);
           _isCompanyDocCaptured = true;
         });
-        
+
         showCustomSnackBar(
           title: "Success",
           message: "Company document uploaded successfully.",
@@ -212,7 +229,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // Single Capture Option - Scan with Frame Guide
         InkWell(
           onTap: () => _captureNationalIdWithFrame(isFront),
@@ -224,14 +241,14 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isCaptured 
-                  ? Colors.green 
-                  : (accentColor ?? ColorGlobalVariables.brownColor),
+                color: isCaptured
+                    ? Colors.green
+                    : (accentColor ?? ColorGlobalVariables.brownColor),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -242,31 +259,45 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: (isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor))
-                        .withOpacity(0.1),
+                    color:
+                        (isCaptured
+                                ? Colors.green
+                                : (accentColor ??
+                                      ColorGlobalVariables.brownColor))
+                            .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     icon,
-                    color: isCaptured ? Colors.green : (accentColor ?? ColorGlobalVariables.brownColor),
+                    color: isCaptured
+                        ? Colors.green
+                        : (accentColor ?? ColorGlobalVariables.brownColor),
                     size: 28,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  isCaptured ? "Successfully Captured!" : "Scan with Frame Guide",
+                  isCaptured
+                      ? "Successfully Captured!"
+                      : "Scan with Frame Guide",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                    color: isCaptured
+                        ? Colors.green
+                        : (isDarkMode ? Colors.white : Colors.black87),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  isCaptured ? "Perfect alignment achieved" : "Perfect alignment assistance",
+                  isCaptured
+                      ? "Perfect alignment achieved"
+                      : "Perfect alignment assistance",
                   style: TextStyle(
                     fontSize: 14,
-                    color: isCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                    color: isCaptured
+                        ? Colors.green
+                        : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -274,7 +305,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             ),
           ),
         ),
-        
+
         if (isCaptured && file != null) ...[
           const SizedBox(height: 16),
           Container(
@@ -287,7 +318,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -302,8 +333,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   return Container(
                     color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
                     child: Icon(
-                      Icons.error_outline, 
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey
+                      Icons.error_outline,
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey,
                     ),
                   );
                 },
@@ -316,7 +347,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             child: TextButton.icon(
               onPressed: () => _captureNationalIdWithFrame(isFront),
               icon: Icon(
-                Icons.camera_alt, 
+                Icons.camera_alt,
                 size: 18,
                 color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
@@ -338,9 +369,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
   }
 
   // ================== COMPANY DOCUMENT WIDGET ==================
-  Widget _buildCompanyDocumentSection({
-    required bool isDarkMode,
-  }) {
+  Widget _buildCompanyDocumentSection({required bool isDarkMode}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -372,14 +401,12 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _isCompanyDocCaptured 
-                  ? Colors.green 
-                  : Colors.teal,
+                color: _isCompanyDocCaptured ? Colors.green : Colors.teal,
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -391,7 +418,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: (_isCompanyDocCaptured ? Colors.green : Colors.teal)
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -402,19 +429,27 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _isCompanyDocCaptured ? "Successfully Uploaded!" : "Tap to Upload",
+                  _isCompanyDocCaptured
+                      ? "Successfully Uploaded!"
+                      : "Tap to Upload",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: _isCompanyDocCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                    color: _isCompanyDocCaptured
+                        ? Colors.green
+                        : (isDarkMode ? Colors.white : Colors.black87),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _isCompanyDocCaptured ? "Ready for verification" : "Choose company document",
+                  _isCompanyDocCaptured
+                      ? "Ready for verification"
+                      : "Choose company document",
                   style: TextStyle(
                     fontSize: 14,
-                    color: _isCompanyDocCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                    color: _isCompanyDocCaptured
+                        ? Colors.green
+                        : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -434,7 +469,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -476,7 +511,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             child: TextButton.icon(
               onPressed: _pickCompanyDocument,
               icon: Icon(
-                Icons.edit, 
+                Icons.edit,
                 size: 18,
                 color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
@@ -498,9 +533,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
   }
 
   // ================== SELFIE DOCUMENT WIDGET ==================
-  Widget _buildSelfieSection({
-    required bool isDarkMode,
-  }) {
+  Widget _buildSelfieSection({required bool isDarkMode}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -532,14 +565,12 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
               color: isDarkMode ? const Color(0xFF424242) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _isSelfieCaptured 
-                  ? Colors.green 
-                  : Colors.blue,
+                color: _isSelfieCaptured ? Colors.green : Colors.blue,
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -551,7 +582,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: (_isSelfieCaptured ? Colors.green : Colors.blue)
-                        .withOpacity(0.1),
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -566,15 +597,21 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: _isSelfieCaptured ? Colors.green : (isDarkMode ? Colors.white : Colors.black87),
+                    color: _isSelfieCaptured
+                        ? Colors.green
+                        : (isDarkMode ? Colors.white : Colors.black87),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _isSelfieCaptured ? "Face verified successfully" : "Front camera required",
+                  _isSelfieCaptured
+                      ? "Face verified successfully"
+                      : "Front camera required",
                   style: TextStyle(
                     fontSize: 14,
-                    color: _isSelfieCaptured ? Colors.green : (isDarkMode ? Colors.white60 : Colors.grey[600]),
+                    color: _isSelfieCaptured
+                        ? Colors.green
+                        : (isDarkMode ? Colors.white60 : Colors.grey[600]),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -589,10 +626,12 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300),
+              border: Border.all(
+                color: isDarkMode ? Colors.grey[700]! : Colors.grey.shade300,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
@@ -607,8 +646,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   return Container(
                     color: isDarkMode ? Colors.grey[800] : Colors.grey[200],
                     child: Icon(
-                      Icons.error_outline, 
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey
+                      Icons.error_outline,
+                      color: isDarkMode ? Colors.grey[400] : Colors.grey,
                     ),
                   );
                 },
@@ -621,7 +660,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
             child: TextButton.icon(
               onPressed: _takeSelfie,
               icon: Icon(
-                Icons.camera_alt, 
+                Icons.camera_alt,
                 size: 18,
                 color: isDarkMode ? Colors.white70 : Colors.grey[600],
               ),
@@ -643,14 +682,21 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
   }
 
   // ================== PROGRESS INDICATOR ==================
-  Widget _buildProgressStep(String label, int stepNumber, bool isCompleted, bool isDarkMode) {
+  Widget _buildProgressStep(
+    String label,
+    int stepNumber,
+    bool isCompleted,
+    bool isDarkMode,
+  ) {
     return Column(
       children: [
         Container(
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: isCompleted ? Colors.green : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
+            color: isCompleted
+                ? Colors.green
+                : (isDarkMode ? Colors.grey[700] : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -672,7 +718,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,
-            color: isCompleted ? Colors.green : (isDarkMode ? Colors.white70 : Colors.grey[600]),
+            color: isCompleted
+                ? Colors.green
+                : (isDarkMode ? Colors.white70 : Colors.grey[600]),
           ),
         ),
       ],
@@ -715,7 +763,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
 
       final response = await verificationService.submitVerification(
         dealerName: _garageName.text.trim(),
-        location: _selectedLocation ??
+        location:
+            _selectedLocation ??
             "Lat: ${_currentPosition!.latitude}, Lng: ${_currentPosition!.longitude}",
         selfie: _selfieImage!,
         nationalIdFront: _nationalIdFront!,
@@ -730,7 +779,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
         );
-        
+
         // Simple pop back to Settings page after success
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
@@ -779,7 +828,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
         ),
         centerTitle: true,
         backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
-        foregroundColor: isDarkMode ? Colors.white : ColorGlobalVariables.brownColor,
+        foregroundColor: isDarkMode
+            ? Colors.white
+            : ColorGlobalVariables.brownColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(
@@ -808,18 +859,23 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: isDarkMode
-                            ? [
-                                Colors.grey[800]!,
-                                Colors.grey[700]!,
-                              ]
+                            ? [Colors.grey[800]!, Colors.grey[700]!]
                             : [
-                                ColorGlobalVariables.brownColor.withOpacity(0.1),
-                                ColorGlobalVariables.maroonColor.withOpacity(0.05),
+                                ColorGlobalVariables.brownColor.withValues(
+                                  alpha: 0.1,
+                                ),
+                                ColorGlobalVariables.maroonColor.withValues(
+                                  alpha: 0.05,
+                                ),
                               ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isDarkMode ? Colors.grey[600]! : ColorGlobalVariables.brownColor.withOpacity(0.2),
+                        color: isDarkMode
+                            ? Colors.grey[600]!
+                            : ColorGlobalVariables.brownColor.withValues(
+                                alpha: 0.2,
+                              ),
                       ),
                     ),
                     child: Column(
@@ -846,7 +902,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
                             ),
@@ -870,11 +928,38 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildProgressStep("Business", 1, _garageName.text.isNotEmpty && (_currentPosition != null || _selectedLocation != null), isDarkMode),
-                      _buildProgressStep("Selfie", 2, _isSelfieCaptured, isDarkMode),
-                      _buildProgressStep("ID Front", 3, _isFrontCaptured, isDarkMode),
-                      _buildProgressStep("ID Back", 4, _isBackCaptured, isDarkMode),
-                      _buildProgressStep("Company", 5, _isCompanyDocCaptured, isDarkMode),
+                      _buildProgressStep(
+                        "Business",
+                        1,
+                        _garageName.text.isNotEmpty &&
+                            (_currentPosition != null ||
+                                _selectedLocation != null),
+                        isDarkMode,
+                      ),
+                      _buildProgressStep(
+                        "Selfie",
+                        2,
+                        _isSelfieCaptured,
+                        isDarkMode,
+                      ),
+                      _buildProgressStep(
+                        "ID Front",
+                        3,
+                        _isFrontCaptured,
+                        isDarkMode,
+                      ),
+                      _buildProgressStep(
+                        "ID Back",
+                        4,
+                        _isBackCaptured,
+                        isDarkMode,
+                      ),
+                      _buildProgressStep(
+                        "Company",
+                        5,
+                        _isCompanyDocCaptured,
+                        isDarkMode,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),
@@ -909,9 +994,15 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     cursorColor: ColorGlobalVariables.maroonColor,
                     iconSize: 22,
                     focusedBorderColor: ColorGlobalVariables.maroonColor,
-                    fillColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
-                    backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
-                    enabledBorderColor: isDarkMode ? Colors.grey[600]! : Colors.grey.shade300,
+                    fillColor: isDarkMode
+                        ? const Color(0xFF424242)
+                        : Colors.white,
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFF424242)
+                        : Colors.white,
+                    enabledBorderColor: isDarkMode
+                        ? Colors.grey[600]!
+                        : Colors.grey.shade300,
                     borderWidth: 1.5,
                     prefixIconData: Icons.business_outlined,
                     fieldWidth: double.infinity,
@@ -933,7 +1024,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     fontWeight: FontWeight.w600,
                     textColor: isDarkMode ? Colors.white : Colors.black87,
                     obscureText: false,
-                    borderColor: isDarkMode ? Colors.grey[600]! : Colors.grey.shade300,
+                    borderColor: isDarkMode
+                        ? Colors.grey[600]!
+                        : Colors.grey.shade300,
                     isTitleWithContainerWidgetRequired: true,
                     hintText: _currentPosition != null
                         ? "Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}, Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}"
@@ -942,10 +1035,16 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     isSuffixIconRequired: false,
                     isPrefixIconRequired: true,
                     isFieldHeightRequired: false,
-                    fillColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
-                    backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+                    fillColor: isDarkMode
+                        ? const Color(0xFF424242)
+                        : Colors.white,
+                    backgroundColor: isDarkMode
+                        ? const Color(0xFF424242)
+                        : Colors.white,
                     onTitleWithContainerWidgetClickFunction: () async {
-                      final result = await Get.toNamed(RouteClass.getLocationSearchPage());
+                      final result = await Get.toNamed(
+                        RouteClass.getLocationSearchPage(),
+                      );
                       if (result != null) {
                         setState(() {
                           _currentPosition = result['position'];
@@ -981,7 +1080,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   // National ID Front
                   _buildDocumentSection(
                     title: "2. National ID (Front Side)",
-                    description: "Scan the front side of your government-issued ID card. Use frame guide for perfect alignment.",
+                    description:
+                        "Scan the front side of your government-issued ID card. Use frame guide for perfect alignment.",
                     icon: Icons.credit_card,
                     isCaptured: _isFrontCaptured,
                     file: _nationalIdFront,
@@ -993,7 +1093,8 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   // National ID Back
                   _buildDocumentSection(
                     title: "3. National ID (Back Side)",
-                    description: "Scan the back side of your government-issued ID card. Use frame guide for perfect alignment.",
+                    description:
+                        "Scan the back side of your government-issued ID card. Use frame guide for perfect alignment.",
                     icon: Icons.credit_card_outlined,
                     isCaptured: _isBackCaptured,
                     file: _nationalIdBack,
@@ -1012,10 +1113,14 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.orange.withOpacity(0.1) : Colors.orange.withOpacity(0.05),
+                      color: isDarkMode
+                          ? Colors.orange.withValues(alpha: 0.1)
+                          : Colors.orange.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.withOpacity(0.2)
+                        color: isDarkMode
+                            ? Colors.orange.withValues(alpha: 0.3)
+                            : Colors.orange.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -1036,7 +1141,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                  color: isDarkMode
+                                      ? Colors.white
+                                      : Colors.black87,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -1044,7 +1151,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                                 "• Place ID card on a flat, dark surface\n• Ensure good, even lighting\n• Align the ID card within the frame guide\n• Keep camera steady and parallel to the card\n• Avoid shadows, glare, and reflections\n• Make sure all text is clear and readable",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey[700],
                                   height: 1.4,
                                 ),
                               ),
@@ -1062,10 +1171,14 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDarkMode ? Colors.blue.withOpacity(0.1) : Colors.blue.withOpacity(0.05),
+                      color: isDarkMode
+                          ? Colors.blue.withValues(alpha: 0.1)
+                          : Colors.blue.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isDarkMode ? Colors.blue.withOpacity(0.3) : Colors.blue.withOpacity(0.2)
+                        color: isDarkMode
+                            ? Colors.blue.withValues(alpha: 0.3)
+                            : Colors.blue.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -1082,7 +1195,9 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                             "All documents are encrypted and securely stored. We comply with data protection regulations and only use them for verification purposes.",
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDarkMode ? Colors.white70 : Colors.grey[700],
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[700],
                               height: 1.4,
                             ),
                           ),
@@ -1096,17 +1211,21 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _validateForm() && !_isLoading ? _handleApplicationSubmit : null,
+                      onPressed: _validateForm() && !_isLoading
+                          ? _handleApplicationSubmit
+                          : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _validateForm() 
-                            ? ColorGlobalVariables.brownColor 
-                            : (isDarkMode ? Colors.grey[600] : Colors.grey[400]),
+                        backgroundColor: _validateForm()
+                            ? ColorGlobalVariables.brownColor
+                            : (isDarkMode
+                                  ? Colors.grey[600]
+                                  : Colors.grey[400]),
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         elevation: 2,
-                        shadowColor: Colors.black.withOpacity(0.1),
+                        shadowColor: Colors.black.withValues(alpha: 0.1),
                       ),
                       child: _isLoading
                           ? const SizedBox(
@@ -1136,7 +1255,7 @@ class _DealerLoginPageState extends State<DealerLoginPage> {
           // Loading overlay
           if (_isLoading)
             Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Center(
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -1211,7 +1330,9 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
 
   void _startAlignmentSimulation() {
     // Simulate alignment detection - in real app, you'd use image analysis
-    _alignmentTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) {
+    _alignmentTimer = Timer.periodic(const Duration(milliseconds: 1500), (
+      timer,
+    ) {
       if (mounted && !_isCapturing) {
         setState(() {
           _isCardAligned = !_isCardAligned; // Simulate alignment change
@@ -1227,14 +1348,15 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
 
     try {
       final XFile image = await _controller.takePicture();
-      
+
       // Save to temporary directory
       final tempDir = await getTemporaryDirectory();
-      final String fileName = 'id_${widget.isFront ? 'front' : 'back'}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String fileName =
+          'id_${widget.isFront ? 'front' : 'back'}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final String filePath = '${tempDir.path}/$fileName';
-      
+
       final File savedImage = await File(image.path).copy(filePath);
-      
+
       if (mounted) {
         Navigator.pop(context, savedImage);
       }
@@ -1275,12 +1397,11 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
       ),
       body: Stack(
         children: [
-          if (_isCameraInitialized)
-            CameraPreview(_controller),
-          
+          if (_isCameraInitialized) CameraPreview(_controller),
+
           // Frame overlay
           _buildFrameOverlay(),
-          
+
           // Instructions
           Positioned(
             bottom: 120,
@@ -1290,15 +1411,15 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
                   Text(
-                    _isCardAligned 
-                      ? 'Perfect! Card is aligned ✅' 
-                      : 'Align the ID card within the frame',
+                    _isCardAligned
+                        ? 'Perfect! Card is aligned ✅'
+                        : 'Align the ID card within the frame',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,
@@ -1309,11 +1430,11 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
                   const SizedBox(height: 8),
                   Text(
                     widget.isFront
-                      ? 'Ensure the front side is clearly visible'
-                      : 'Ensure the back side is clearly visible',
+                        ? 'Ensure the front side is clearly visible'
+                        : 'Ensure the back side is clearly visible',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 14,
                     ),
                   ),
@@ -1321,7 +1442,7 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
               ),
             ),
           ),
-          
+
           // Capture button
           Positioned(
             bottom: 40,
@@ -1367,7 +1488,7 @@ class _IDCardCameraFrameState extends State<IDCardCameraFrame> {
 // ================== FRAME GUIDE PAINTER ==================
 class FrameGuidePainter extends CustomPainter {
   final bool isAligned;
-  
+
   FrameGuidePainter({required this.isAligned});
 
   @override
@@ -1378,27 +1499,51 @@ class FrameGuidePainter extends CustomPainter {
       ..strokeWidth = 2;
 
     final cornerLength = 25.0;
-    
+
     // Draw corner guides
     // Top-left corner
     canvas.drawLine(Offset(0, 0), Offset(cornerLength, 0), paint);
     canvas.drawLine(Offset(0, 0), Offset(0, cornerLength), paint);
-    
+
     // Top-right corner
-    canvas.drawLine(Offset(size.width, 0), Offset(size.width - cornerLength, 0), paint);
-    canvas.drawLine(Offset(size.width, 0), Offset(size.width, cornerLength), paint);
-    
+    canvas.drawLine(
+      Offset(size.width, 0),
+      Offset(size.width - cornerLength, 0),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width, 0),
+      Offset(size.width, cornerLength),
+      paint,
+    );
+
     // Bottom-left corner
-    canvas.drawLine(Offset(0, size.height), Offset(cornerLength, size.height), paint);
-    canvas.drawLine(Offset(0, size.height), Offset(0, size.height - cornerLength), paint);
-    
+    canvas.drawLine(
+      Offset(0, size.height),
+      Offset(cornerLength, size.height),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(0, size.height),
+      Offset(0, size.height - cornerLength),
+      paint,
+    );
+
     // Bottom-right corner
-    canvas.drawLine(Offset(size.width, size.height), Offset(size.width - cornerLength, size.height), paint);
-    canvas.drawLine(Offset(size.width, size.height), Offset(size.width, size.height - cornerLength), paint);
+    canvas.drawLine(
+      Offset(size.width, size.height),
+      Offset(size.width - cornerLength, size.height),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width, size.height),
+      Offset(size.width, size.height - cornerLength),
+      paint,
+    );
 
     // Draw alignment guides (grid lines)
     final guidePaint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
+      ..color = Colors.white.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -1431,10 +1576,7 @@ class FrameGuidePainter extends CustomPainter {
     textPainter.layout();
     textPainter.paint(
       canvas,
-      Offset(
-        (size.width - textPainter.width) / 2,
-        size.height + 10,
-      ),
+      Offset((size.width - textPainter.width) / 2, size.height + 10),
     );
   }
 
@@ -1454,21 +1596,38 @@ void showCustomSnackBar({
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+        elevation: 6,
+        duration: const Duration(seconds: 4),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              children: [
+                Icon(
+                  backgroundColor == Colors.green
+                      ? Icons.check_circle
+                      : (backgroundColor == Colors.red
+                            ? Icons.error
+                            : Icons.info),
+                  color: textColor,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              message,
-              style: TextStyle(color: textColor),
-            ),
+            const SizedBox(height: 4),
+            Text(message, style: TextStyle(color: textColor, fontSize: 13)),
           ],
         ),
       ),

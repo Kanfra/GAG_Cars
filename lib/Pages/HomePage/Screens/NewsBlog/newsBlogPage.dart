@@ -137,7 +137,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
         _updateTabsWithCategories(blogPostProvider.posts);
         _hasFetchedData = true;
       } catch (e) {
-        print('Error fetching posts: $e');
+        debugPrint('Error fetching posts: $e');
       } finally {
         if (mounted) {
           setState(() {
@@ -196,7 +196,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
     try {
       await blogPostProvider.loadMorePosts(category: tabTitle == 'All News' ? null : tabTitle);
     } catch (e) {
-      print('Error loading more posts for $tabTitle: $e');
+      debugPrint('Error loading more posts for $tabTitle: $e');
     }
   }
 
@@ -212,7 +212,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
       
       _tabRefreshControllers[tabTitle]?.refreshCompleted();
     } catch (e) {
-      print('Refresh error: $e');
+      debugPrint('Refresh error: $e');
       _tabRefreshControllers[tabTitle]?.refreshFailed();
     }
   }
@@ -340,7 +340,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.08),
+                    color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -371,8 +371,8 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
                                   colors: [
-                                    ColorGlobalVariables.brownColor.withOpacity(0.1),
-                                    ColorGlobalVariables.brownColor.withOpacity(0.3),
+                                    ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+                                    ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                                   ],
                                 ),
                               ),
@@ -399,7 +399,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withOpacity(0.3),
+                              Colors.black.withValues(alpha: 0.3),
                             ],
                           ),
                         ),
@@ -416,7 +416,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: Colors.black.withValues(alpha: 0.2),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -440,7 +440,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                       //   child: Container(
                       //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       //     decoration: BoxDecoration(
-                      //       color: Colors.black.withOpacity(0.7),
+                      //       color: Colors.black.withValues(alpha: 0.7),
                       //       borderRadius: BorderRadius.circular(10),
                       //     ),
                       //     child: Row(
@@ -504,7 +504,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                                   width: 32,
                                   height: 32,
                                   decoration: BoxDecoration(
-                                    color: ColorGlobalVariables.brownColor.withOpacity(0.1),
+                                    color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -922,7 +922,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                     borderRadius: BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDarkMode ? 0.1 : 0.05),
+                        color: Colors.black.withValues(alpha: isDarkMode ? 0.1 : 0.05),
                         blurRadius: 15,
                         offset: const Offset(0, 4),
                       ),
@@ -975,7 +975,7 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                   color: isDarkMode ? const Color(0xFF424242) : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDarkMode ? 0.1 : 0.03),
+                      color: Colors.black.withValues(alpha: isDarkMode ? 0.1 : 0.03),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -994,12 +994,12 @@ class _NewsBlogPageState extends State<NewsBlogPage> with TickerProviderStateMix
                           gradient: LinearGradient(
                             colors: [
                               ColorGlobalVariables.brownColor,
-                              ColorGlobalVariables.brownColor.withOpacity(0.8),
+                              ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                             ],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),

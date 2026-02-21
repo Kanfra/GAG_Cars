@@ -201,7 +201,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 30,
                   offset: const Offset(0, 10),
                 ),
@@ -239,7 +239,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage>
                       IconButton(
                         icon: Icon(
                           Icons.close_rounded,
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           size: 24,
                         ),
                         onPressed: () => Get.back(),
@@ -399,12 +399,12 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage>
                                           padding: const EdgeInsets.all(16),
                                           decoration: BoxDecoration(
                                             color: isSelected
-                                                ? ColorGlobalVariables.brownColor.withOpacity(0.1)
+                                                ? ColorGlobalVariables.brownColor.withValues(alpha: 0.1)
                                                 : Colors.transparent,
                                             borderRadius: BorderRadius.circular(12),
                                             border: Border.all(
                                               color: isSelected
-                                                  ? ColorGlobalVariables.brownColor.withOpacity(0.3)
+                                                  ? ColorGlobalVariables.brownColor.withValues(alpha: 0.3)
                                                   : Colors.transparent,
                                               width: 1.5,
                                             ),
@@ -492,7 +492,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -658,7 +658,7 @@ class _SignUpWithEmailPageState extends State<SignUpWithEmailPage>
                   builder: (context, child) {
                     return Transform(
                       transform: Matrix4.identity()
-                        ..scale(_scaleAnimation.value),
+                        ..scale(_scaleAnimation.value, _scaleAnimation.value, 1.0),
                       alignment: Alignment.center,
                       child: Opacity(
                         opacity: _fadeAnimation.value,

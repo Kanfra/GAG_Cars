@@ -197,7 +197,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -256,12 +256,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -322,7 +322,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                     end: Alignment.bottomRight,
                     colors: [
                       ColorGlobalVariables.brownColor,
-                      ColorGlobalVariables.brownColor.withOpacity(0.7),
+                      ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                     ],
                   ),
                   shape: BoxShape.circle,
@@ -381,12 +381,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withOpacity(0.8),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                          color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -510,11 +510,11 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withOpacity(0.1),
+          color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -547,7 +547,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -582,7 +582,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -659,13 +659,13 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                   end: Alignment.bottomRight,
                   colors: [
                     ColorGlobalVariables.brownColor,
-                    ColorGlobalVariables.brownColor.withOpacity(0.8),
+                    ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                    color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -709,8 +709,8 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               end: Alignment.bottomRight,
               colors: isDarkMode
                   ? [
-                      Colors.red.withOpacity(0.2),
-                      Colors.red.withOpacity(0.1),
+                      Colors.red.withValues(alpha: 0.2),
+                      Colors.red.withValues(alpha: 0.1),
                     ]
                   : [
                       Colors.red.shade50,
@@ -719,12 +719,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.shade200,
+              color: isDarkMode ? Colors.red.withValues(alpha: 0.3) : Colors.red.shade200,
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -736,7 +736,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.red.withOpacity(0.3) : Colors.red.shade100,
+                  color: isDarkMode ? Colors.red.withValues(alpha: 0.3) : Colors.red.shade100,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -795,8 +795,8 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               end: Alignment.bottomRight,
               colors: isDarkMode
                   ? [
-                      Colors.orange.withOpacity(0.2),
-                      Colors.orange.withOpacity(0.1),
+                      Colors.orange.withValues(alpha: 0.2),
+                      Colors.orange.withValues(alpha: 0.1),
                     ]
                   : [
                       Colors.orange.shade50,
@@ -805,12 +805,12 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
             ),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.shade200,
+              color: isDarkMode ? Colors.orange.withValues(alpha: 0.3) : Colors.orange.shade200,
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -822,7 +822,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isDarkMode ? Colors.orange.withOpacity(0.3) : Colors.orange.shade100,
+                  color: isDarkMode ? Colors.orange.withValues(alpha: 0.3) : Colors.orange.shade100,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -877,11 +877,11 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withOpacity(0.1),
+                color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: ColorGlobalVariables.brownColor.withOpacity(0.2),
+                    color: ColorGlobalVariables.brownColor.withValues(alpha: 0.2),
                     blurRadius: 15,
                     offset: const Offset(0, 4),
                   ),
@@ -933,14 +933,14 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                           Colors.grey[600]!,
                         ]
                       : [
-                          ColorGlobalVariables.brownColor.withOpacity(0.1),
-                          ColorGlobalVariables.brownColor.withOpacity(0.05),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+                          ColorGlobalVariables.brownColor.withValues(alpha: 0.05),
                         ],
                 ),
                 borderRadius: BorderRadius.circular(60),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -949,7 +949,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
               child: Icon(
                 Icons.explore_rounded,
                 size: 50,
-                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor.withOpacity(0.6),
+                color: isDarkMode ? Colors.white70 : ColorGlobalVariables.brownColor.withValues(alpha: 0.6),
               ),
             ),
             const SizedBox(height: 24),
@@ -981,7 +981,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: ColorGlobalVariables.brownColor.withOpacity(0.3),
+                      color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
                       blurRadius: 15,
                       offset: const Offset(0, 6),
                     ),
@@ -1000,7 +1000,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withOpacity(0.8),
+                            ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(20),
@@ -1053,7 +1053,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
@@ -1069,7 +1069,7 @@ class _LocationSearchPageState extends State<LocationSearchPage> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withOpacity(0.1),
+                        color: isDarkMode ? Colors.grey[700] : ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(

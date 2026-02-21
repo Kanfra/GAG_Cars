@@ -16,15 +16,16 @@ class SimilarItemsResponse with _$SimilarItemsResponse {
 }
 
 @freezed
+@JsonSerializable(explicitToJson: true)
 class SimilarItem with _$SimilarItem {
   const SimilarItem._();
 
-  @JsonSerializable(explicitToJson: true)
   const factory SimilarItem({
     @JsonKey(name: 'id') required String id,
     @JsonKey(name: 'user_id') String? userId,
     @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
-    @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt) int? brandModelId,
+    @JsonKey(name: 'brand_model_id', fromJson: _parseNullableInt)
+    int? brandModelId,
     @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
     @JsonKey(name: 'category_id', fromJson: _parseNullableInt) int? categoryId,
     @JsonKey(name: 'name') String? name,
@@ -34,23 +35,30 @@ class SimilarItem with _$SimilarItem {
     @JsonKey(name: 'images', fromJson: _parseStringList) List<String>? images,
     @JsonKey(name: 'location') String? location,
     @JsonKey(name: 'serial_number') String? serialNumber,
-    @JsonKey(name: 'Condition') String? condition, // ✅ FIXED: Capital 'C' to match JSON
+    @JsonKey(name: 'Condition')
+    String? condition, // ✅ FIXED: Capital 'C' to match JSON
     @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString) String? engineCapacity, // ✅ FIXED: Handle both int and string
+    @JsonKey(name: 'engine_capacity', fromJson: _parseNullableString)
+    String? engineCapacity, // ✅ FIXED: Handle both int and string
     @JsonKey(name: 'transmission') String? transmission,
     @JsonKey(name: 'color') String? color,
     @JsonKey(name: 'build_type') String? buildType,
-    @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt) int? numberOfPassengers,
-    @JsonKey(name: 'features', fromJson: _parseStringList) List<String>? features,
+    @JsonKey(name: 'number_of_passengers', fromJson: _parseNullableInt)
+    int? numberOfPassengers,
+    @JsonKey(name: 'features', fromJson: _parseStringList)
+    List<String>? features,
     @JsonKey(name: 'status') String? status,
-    @JsonKey(name: 'price', fromJson: _parseNullableString) String? price, // ✅ FIXED: Handle both int and string
-    @JsonKey(name: 'mileage', fromJson: _parseNullableString) String? mileage, // ✅ FIXED: Handle both int and string
+    @JsonKey(name: 'price', fromJson: _parseNullableString)
+    String? price, // ✅ FIXED: Handle both int and string
+    @JsonKey(name: 'mileage', fromJson: _parseNullableString)
+    String? mileage, // ✅ FIXED: Handle both int and string
     @JsonKey(name: 'warranty', fromJson: _parseNullableInt) int? warranty,
     @JsonKey(name: 'warranty_expiration') String? warrantyExpiration,
     @JsonKey(name: 'deleted_at') String? deletedAt,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
-    @JsonKey(name: 'Height', fromJson: _parseNullableString) String? height, // ✅ FIXED: Handle both int and string
+    @JsonKey(name: 'Height', fromJson: _parseNullableString)
+    String? height, // ✅ FIXED: Handle both int and string
     @JsonKey(name: 'VIN') String? vin,
     // Added nested objects
     @JsonKey(name: 'brand') Brand? brand,
@@ -66,7 +74,8 @@ class SimilarItem with _$SimilarItem {
 @freezed
 class Brand with _$Brand {
   const factory Brand({
-    @JsonKey(name: 'id', fromJson: _parseInt) required int id, // ✅ FIXED: Ensure int parsing
+    @JsonKey(name: 'id', fromJson: _parseInt)
+    required int id, // ✅ FIXED: Ensure int parsing
     @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
     @JsonKey(name: 'name') String? name,
     @JsonKey(name: 'slug') String? slug,
@@ -81,25 +90,29 @@ class Brand with _$Brand {
 @freezed
 class Category with _$Category {
   const factory Category({
-    @JsonKey(name: 'id', fromJson: _parseInt) required int id, // ✅ FIXED: Ensure int parsing
+    @JsonKey(name: 'id', fromJson: _parseInt)
+    required int id, // ✅ FIXED: Ensure int parsing
     @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
     @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
     @JsonKey(name: 'name') String? name,
     @JsonKey(name: 'slug') String? slug,
     @JsonKey(name: 'description') String? description,
-    @JsonKey(name: 'features', fromJson: _parseStringList) List<String>? features,
+    @JsonKey(name: 'features', fromJson: _parseStringList)
+    List<String>? features,
     @JsonKey(name: 'image') String? image,
     @JsonKey(name: 'created_at') String? createdAt,
     @JsonKey(name: 'updated_at') String? updatedAt,
   }) = _Category;
 
-  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
+  factory Category.fromJson(Map<String, dynamic> json) =>
+      _$CategoryFromJson(json);
 }
 
 @freezed
 class BrandModel with _$BrandModel {
   const factory BrandModel({
-    @JsonKey(name: 'id', fromJson: _parseInt) required int id, // ✅ FIXED: Ensure int parsing
+    @JsonKey(name: 'id', fromJson: _parseInt)
+    required int id, // ✅ FIXED: Ensure int parsing
     @JsonKey(name: 'brand_id', fromJson: _parseNullableInt) int? brandId,
     @JsonKey(name: 'name') String? name,
     @JsonKey(name: 'slug') String? slug,
@@ -107,7 +120,8 @@ class BrandModel with _$BrandModel {
     @JsonKey(name: 'updated_at') String? updatedAt,
   }) = _BrandModel;
 
-  factory BrandModel.fromJson(Map<String, dynamic> json) => _$BrandModelFromJson(json);
+  factory BrandModel.fromJson(Map<String, dynamic> json) =>
+      _$BrandModelFromJson(json);
 }
 
 @freezed
@@ -125,8 +139,10 @@ class User with _$User {
     @JsonKey(name: 'country_id', fromJson: _parseNullableInt) int? countryId,
     @JsonKey(name: 'state_id', fromJson: _parseNullableInt) int? stateId,
     @JsonKey(name: 'profile_photo') String? profilePhoto,
-    @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt) int? uploadsLeft,
-    @JsonKey(name: 'active_status', fromJson: _parseNullableInt) int? activeStatus,
+    @JsonKey(name: 'uploads_left', fromJson: _parseNullableInt)
+    int? uploadsLeft,
+    @JsonKey(name: 'active_status', fromJson: _parseNullableInt)
+    int? activeStatus,
     @JsonKey(name: 'avatar') String? avatar,
     @JsonKey(name: 'dark_mode', fromJson: _parseNullableInt) int? darkMode,
     @JsonKey(name: 'messenger_color') String? messengerColor,
@@ -151,7 +167,8 @@ class PaginationLinks with _$PaginationLinks {
 @freezed
 class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
-    @JsonKey(name: 'current_page', fromJson: _parseNullableInt) int? currentPage,
+    @JsonKey(name: 'current_page', fromJson: _parseNullableInt)
+    int? currentPage,
     @JsonKey(name: 'from', fromJson: _parseNullableInt) int? from,
     @JsonKey(name: 'last_page', fromJson: _parseNullableInt) int? lastPage,
     @JsonKey(name: 'links') List<PaginationLink>? links,
@@ -205,27 +222,6 @@ int? _parseNullableInt(dynamic value) {
   return null;
 }
 
-double? _parseNullableDouble(dynamic value) {
-  if (value == null) return null;
-  if (value is double) return value;
-  if (value is String) {
-    if (value.isEmpty) return null;
-    return double.tryParse(value);
-  }
-  if (value is num) return value.toDouble();
-  return null;
-}
-
-bool _parseBool(dynamic value) {
-  if (value == null) return false;
-  if (value is bool) return value;
-  if (value is int) return value == 1;
-  if (value is String) {
-    return value.toLowerCase() == 'true' || value == '1';
-  }
-  return false;
-}
-
 String? _parseNullableString(dynamic value) {
   if (value == null) return null;
   if (value is String) return value.isEmpty ? null : value;
@@ -234,7 +230,7 @@ String? _parseNullableString(dynamic value) {
   if (value is double) return value.toString();
   if (value is num) return value.toString();
   if (value is bool) return value.toString();
-  
+
   final stringValue = value.toString();
   return stringValue.isEmpty ? null : stringValue;
 }
@@ -247,27 +243,17 @@ String _parseString(dynamic value) {
   if (value is double) return value.toString();
   if (value is num) return value.toString();
   if (value is bool) return value.toString();
-  
+
   return value.toString();
 }
 
 List<String> _parseStringList(dynamic value) {
   if (value == null) return [];
   if (value is List) {
-    return value.map((item) => _parseString(item)).where((item) => item.isNotEmpty).toList();
+    return value
+        .map((item) => _parseString(item))
+        .where((item) => item.isNotEmpty)
+        .toList();
   }
   return [];
-}
-
-DateTime? _parseDateTime(dynamic value) {
-  if (value == null) return null;
-  if (value is DateTime) return value;
-  if (value is String && value.isNotEmpty) {
-    try {
-      return DateTime.parse(value);
-    } catch (_) {
-      return null;
-    }
-  }
-  return null;
 }
