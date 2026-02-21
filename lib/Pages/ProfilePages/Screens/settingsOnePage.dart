@@ -22,6 +22,22 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
   bool _isLoggingOut = false;
   bool _isDeletingAccount = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Refresh user data to get latest verification status when page is accessed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.isLoggedIn) {
+        try {
+          userProvider.fetchUserProfile();
+        } catch (e) {
+          debugPrint('Failed to refresh user profile: $e');
+        }
+      }
+    });
+  }
+
   // Helper method to get profile image widget with robust error handling
   Widget _getProfileImage(UserModel? user) {
     // Priority 1: User's existing profile image from server (with validation)
@@ -48,7 +64,8 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               child: Center(
                 child: CircularProgressIndicator(
                   value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                      ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
                       : null,
                 ),
               ),
@@ -57,7 +74,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         ),
       );
     }
-    
+
     // Priority 2: Default profile image
     return _buildDefaultProfileImage();
   }
@@ -85,11 +102,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
           ),
         ],
       ),
-      child: const Icon(
-        Icons.person_rounded,
-        color: Colors.white,
-        size: 40,
-      ),
+      child: const Icon(Icons.person_rounded, color: Colors.white, size: 40),
     );
   }
 
@@ -102,9 +115,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 20,
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -118,11 +129,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.logout_rounded,
-                  color: Colors.red,
-                  size: 40,
-                ),
+                child: Icon(Icons.logout_rounded, color: Colors.red, size: 40),
               ),
               const SizedBox(height: 20),
               Text(
@@ -137,7 +144,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'Are you sure you want to log out?',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -158,7 +167,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -222,7 +233,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       try {
         // Simulate API call delay
         await Future.delayed(const Duration(seconds: 1));
-        
+
         // Perform logout
         userProvider.clearUser();
         Get.offAllNamed(RouteClass.getSignInWithPhonePage());
@@ -242,9 +253,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 20,
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -258,11 +267,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   color: Colors.red.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.warning_rounded,
-                  color: Colors.red,
-                  size: 40,
-                ),
+                child: Icon(Icons.warning_rounded, color: Colors.red, size: 40),
               ),
               const SizedBox(height: 20),
               Text(
@@ -277,7 +282,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'This action cannot be undone! All your data will be permanently deleted.',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -292,17 +299,15 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_rounded,
-                      color: Colors.red,
-                      size: 20,
-                    ),
+                    Icon(Icons.info_rounded, color: Colors.red, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'This will remove all your listings, favorites, and personal information.',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                           fontSize: 14,
                         ),
                       ),
@@ -326,7 +331,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -341,10 +348,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            Colors.red,
-                            Colors.redAccent,
-                          ],
+                          colors: [Colors.red, Colors.redAccent],
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -389,17 +393,20 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     }
   }
 
-  Future<void> _performAccountDeletion(BuildContext context, UserProvider userProvider) async {
+  Future<void> _performAccountDeletion(
+    BuildContext context,
+    UserProvider userProvider,
+  ) async {
     setState(() => _isDeletingAccount = true);
 
     try {
       // Call the actual delete service
       final success = await AuthService.deleteUser();
-      
+
       if (success) {
         // Account deleted successfully
         userProvider.clearUser();
-        
+
         // Show success message
         Get.snackbar(
           'Account Deleted',
@@ -408,10 +415,10 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
           colorText: Colors.white,
           duration: const Duration(seconds: 3),
         );
-        
+
         // Navigate to sign in page after a brief delay
         await Future.delayed(const Duration(milliseconds: 1500));
-        
+
         Get.offAllNamed(RouteClass.getSignInWithPhonePage());
       } else {
         // Handle unauthorized case (token invalid)
@@ -421,7 +428,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
           backgroundColor: Colors.orange,
           colorText: Colors.white,
         );
-        
+
         // Clear user data and navigate to login
         userProvider.clearUser();
         Get.offAllNamed(RouteClass.getSignInWithPhonePage());
@@ -438,9 +445,10 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
 
   void _handleDeleteError(dynamic error) {
     String errorMessage = 'Failed to delete account. Please try again.';
-    
+
     if (error.toString().contains('Network error')) {
-      errorMessage = 'Network error. Please check your internet connection and try again.';
+      errorMessage =
+          'Network error. Please check your internet connection and try again.';
     } else if (error.toString().contains('Timeout')) {
       errorMessage = 'Request timeout. Please try again.';
     } else if (error.toString().contains('401')) {
@@ -448,7 +456,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
     } else if (error.toString().contains('500')) {
       errorMessage = 'Server error. Please try again later.';
     }
-    
+
     Get.snackbar(
       'Error',
       errorMessage,
@@ -463,9 +471,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 20,
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -484,10 +490,12 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
                     ],
                   ),
-                  shape: BoxShape.circle, 
+                  shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
+                      color: ColorGlobalVariables.brownColor.withValues(
+                        alpha: 0.3,
+                      ),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -510,9 +518,11 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Version 1.0.0',
+                'Version 2.1.0',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -566,12 +576,16 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
+                          ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.8,
+                          ),
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
+                          color: ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.3,
+                          ),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -583,7 +597,10 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         borderRadius: BorderRadius.circular(12),
                         onTap: () => Navigator.pop(context),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
                           child: const Text(
                             'Got It',
                             style: TextStyle(
@@ -609,9 +626,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 20,
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -625,11 +640,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   color: Colors.amber.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.star_rounded,
-                  color: Colors.amber,
-                  size: 40,
-                ),
+                child: Icon(Icons.star_rounded, color: Colors.amber, size: 40),
               ),
               const SizedBox(height: 20),
               Text(
@@ -644,7 +655,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               Text(
                 'How would you rate your experience with GAGcars?',
                 style: TextStyle(
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                   fontSize: 15,
                 ),
                 textAlign: TextAlign.center,
@@ -656,7 +669,11 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 children: List.generate(5, (index) {
                   return Icon(
                     Icons.star_rounded,
-                    color: index < 4 ? Colors.amber : Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.3),
+                    color: index < 4
+                        ? Colors.amber
+                        : Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.3),
                     size: 40,
                   );
                 }),
@@ -667,17 +684,25 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).dividerColor ?? Colors.grey[300]!),
+                  border: Border.all(
+                    color: Theme.of(context).dividerColor ?? Colors.grey[300]!,
+                  ),
                 ),
                 child: TextField(
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: 'Tell us about your experience (optional)...',
-                    hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.5)),
+                    hintStyle: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.all(16),
                   ),
-                  style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                  style: TextStyle(
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -696,7 +721,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       child: Text(
                         'Maybe Later',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -710,10 +737,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [
-                            Colors.amber,
-                            Colors.orange,
-                          ],
+                          colors: [Colors.amber, Colors.orange],
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -804,7 +828,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      _isDeletingAccount ? 'Deleting Account...' : 'Logging Out...',
+                      _isDeletingAccount
+                          ? 'Deleting Account...'
+                          : 'Logging Out...',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -850,7 +876,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
         child: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new_rounded,
-            color: Theme.of(context).appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
+            color:
+                Theme.of(context).appBarTheme.foregroundColor ??
+                ColorGlobalVariables.brownColor,
             size: 20,
           ),
           onPressed: () => Get.back(),
@@ -859,7 +887,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
       title: Text(
         'Settings',
         style: TextStyle(
-          color: Theme.of(context).appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
+          color:
+              Theme.of(context).appBarTheme.foregroundColor ??
+              ColorGlobalVariables.brownColor,
           fontSize: 22,
           fontWeight: FontWeight.bold,
         ),
@@ -904,14 +934,18 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   Text(
                     user?.email ?? 'No email provided',
                     style: TextStyle(
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                       fontSize: 14,
                     ),
                   ),
                   const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
-                      color: ColorGlobalVariables.brownColor.withValues(alpha: 0.1),
+                      color: ColorGlobalVariables.brownColor.withValues(
+                        alpha: 0.1,
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Material(
@@ -922,7 +956,10 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                           Get.toNamed(RouteClass.getProfileUpdatePage());
                         },
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -1073,7 +1110,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -1086,7 +1125,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 Text(
                   valueText,
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -1094,13 +1135,17 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                 const SizedBox(width: 8),
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                   size: 24,
                 ),
               ] else ...[
                 Icon(
                   Icons.chevron_right_rounded,
-                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                   size: 24,
                 ),
               ],
@@ -1132,10 +1177,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               : LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.grey[400]!,
-                    Colors.grey[500]!,
-                  ],
+                  colors: [Colors.grey[400]!, Colors.grey[500]!],
                 ),
           boxShadow: [
             BoxShadow(
@@ -1248,11 +1290,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                   color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.blue,
-                  size: 24,
-                ),
+                child: Icon(icon, color: Colors.blue, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -1271,7 +1309,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                     ),
@@ -1280,7 +1320,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
               ),
               Icon(
                 Icons.chevron_right_rounded,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.4),
                 size: 24,
               ),
             ],
@@ -1368,11 +1410,7 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                             ),
                           ),
                         )
-                      : Icon(
-                          icon,
-                          color: color,
-                          size: 24,
-                        ),
+                      : Icon(icon, color: color, size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -1391,7 +1429,9 @@ class _SettingsOnePageState extends State<SettingsOnePage> {
                       Text(
                         subtitle,
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                           fontSize: 14,
                         ),
                       ),
