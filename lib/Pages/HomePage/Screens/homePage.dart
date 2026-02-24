@@ -125,52 +125,6 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: theme.dividerColor, width: 1),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: ColorGlobalVariables.brownColor
-                          .withValues(alpha: 0.1),
-                      child: Icon(
-                        Icons.person,
-                        color: ColorGlobalVariables.brownColor,
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Menu',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: theme.textTheme.titleLarge?.color,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'App settings and preferences',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: theme.textTheme.bodySmall?.color,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               // Settings Option
               ListTile(
                 leading: Container(

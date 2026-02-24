@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dart';
 import 'package:gag_cars_frontend/Pages/ProfilePages/Screens/myListingPage.dart';
+import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:get/get.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
@@ -141,8 +142,11 @@ class PaymentFailedPage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Go back to promotions page to try again
-                        Get.back();
+                        // Go back to the main app on the Post tab (index 2)
+                        Get.offAllNamed(
+                          RouteClass.getMainBottomNavigationPage(),
+                          arguments: {'selected_tab_index': 2},
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ColorGlobalVariables.redColor,

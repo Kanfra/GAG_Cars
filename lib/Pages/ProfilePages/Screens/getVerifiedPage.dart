@@ -29,6 +29,7 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   bool _isSelfieCaptured = false;
   bool _isFrontCaptured = false;
   bool _isBackCaptured = false;
+  bool _isProcessingSelfie = false;
 
   // UI states
   bool _isLoading = false;
@@ -61,19 +62,35 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
   // ================== SELFIE CAPTURE ==================
   Future<void> _takeSelfie() async {
     _logger.i("📸 Starting selfie capture process...");
+    setState(() {
+      _isProcessingSelfie = true;
+    });
+
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.camera,
         preferredCameraDevice: CameraDevice.front,
-        imageQuality: 70, // Slightly reduce quality for faster processing
+        imageQuality: 70,
       );
 
       if (image == null) {
         _logger.w("⚠️ No image selected (user cancelled or failed)");
+        setState(() {
+          _isProcessingSelfie = false;
+        });
         return;
       }
 
       _logger.i("📍 Image captured at: ${image.path}");
+
+      // Show immediate feedback
+      showCustomSnackBar(
+        title: "Image Captured",
+        message: "Analyzing selfie... please wait.",
+        backgroundColor: Colors.blue,
+        textColor: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
 
       final inputImage = InputImage.fromFilePath(image.path);
       _logger.i("🔍 Running face detection...");
@@ -82,6 +99,9 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
 
       if (faces.isEmpty) {
         _logger.e("❌ No face detected in the captured image");
+        setState(() {
+          _isProcessingSelfie = false;
+        });
         showCustomSnackBar(
           title: "No Face Detected",
           message:
@@ -93,7 +113,6 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
       }
 
       // 📝 PERMANENT STORAGE FIX FOR iOS
-      // Copy image to documents directory to ensure it persists and remains accessible
       _logger.i("💾 Saving image to stable storage...");
       final appDir = await getApplicationDocumentsDirectory();
       final String fileName =
@@ -103,10 +122,13 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
       final File savedImage = await File(image.path).copy(stablePath);
       _logger.i("✅ Image saved successfully at: $stablePath");
 
-      setState(() {
-        _selfieImage = savedImage;
-        _isSelfieCaptured = true;
-      });
+      if (mounted) {
+        setState(() {
+          _selfieImage = savedImage;
+          _isSelfieCaptured = true;
+          _isProcessingSelfie = false;
+        });
+      }
 
       showCustomSnackBar(
         title: "Success",
@@ -116,6 +138,11 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
       );
     } catch (e) {
       _logger.e("💥 Error during selfie capture: $e");
+      if (mounted) {
+        setState(() {
+          _isProcessingSelfie = false;
+        });
+      }
       showCustomSnackBar(
         title: "Error",
         message: "Failed to capture selfie: $e",
@@ -223,29 +250,64 @@ class _GetVerifiedPageState extends State<GetVerifiedPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  _isSelfieCaptured ? "Successfully Captured!" : "Take Selfie",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: _isSelfieCaptured
-                        ? Colors.green
-                        : (isDarkMode ? Colors.white : Colors.black87),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _isSelfieCaptured
-                      ? "Face verified successfully"
-                      : "Front camera required",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: _isSelfieCaptured
-                        ? Colors.green
-                        : (isDarkMode ? Colors.white60 : Colors.grey[600]),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                _isProcessingSelfie
+                    ? Column(
+                        children: [
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.blue,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Analyzing selfie...",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDarkMode
+                                  ? Colors.white60
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Text(
+                            _isSelfieCaptured
+                                ? "Successfully Captured!"
+                                : "Take Selfie",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: _isSelfieCaptured
+                                  ? Colors.green
+                                  : (isDarkMode
+                                        ? Colors.white
+                                        : Colors.black87),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _isSelfieCaptured
+                                ? "Face verified successfully"
+                                : "Front camera required",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: _isSelfieCaptured
+                                  ? Colors.green
+                                  : (isDarkMode
+                                        ? Colors.white60
+                                        : Colors.grey[600]),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
               ],
             ),
           ),
@@ -1225,6 +1287,7 @@ void showCustomSnackBar({
   required String message,
   required Color backgroundColor,
   required Color textColor,
+  Duration? duration,
 }) {
   final context = navigatorKey.currentContext;
   if (context != null) {
@@ -1235,7 +1298,7 @@ void showCustomSnackBar({
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         margin: const EdgeInsets.all(16),
         elevation: 6,
-        duration: const Duration(seconds: 4),
+        duration: duration ?? const Duration(seconds: 4),
         content: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,

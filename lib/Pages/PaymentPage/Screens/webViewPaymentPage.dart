@@ -56,7 +56,7 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   // Timer for auto-verification
   Timer? _verificationTimer;
   Timer? _redirectCheckTimer;
-  Timer? _manualButtonTimer;
+
   Timer? _statusUpdateTimer;
 
   @override
@@ -96,39 +96,8 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   }
 
   void _startAutoVerificationTimer() {
-    _verificationTimer = Timer(const Duration(seconds: 90), () {
-      if (!_paymentVerified && !_isProcessing && mounted) {
-        _updateStatus('Auto-verifying payment...');
-        _verifyPayment();
-      }
-    });
-
-    _redirectCheckTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      if (!_paymentVerified && !_isProcessing && mounted) {
-        _checkCurrentUrl();
-      } else {
-        timer.cancel();
-      }
-    });
-
-    _manualButtonTimer = Timer(const Duration(seconds: 30), () {
-      if (!_paymentVerified && !_paymentFailed && mounted) {
-        setState(() {
-          _showManualNavigationButton = true;
-        });
-      }
-    });
-  }
-
-  Future<void> _checkCurrentUrl() async {
-    try {
-      final currentUrl = await _webViewController.currentUrl();
-      if (currentUrl != null && mounted) {
-        _checkPaymentSuccess(currentUrl);
-      }
-    } catch (e) {
-      // Silent fail
-    }
+    // Automatic verification timers disabled to prevent premature triggers.
+    // Verification is now explicitly triggered by the user via the "PROCEED TO RECEIPT" button.
   }
 
   void _initializeFromArguments() {
@@ -174,6 +143,9 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
     try {
       _webViewController = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setUserAgent(
+          "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1",
+        )
         ..setBackgroundColor(const Color(0x00000000))
         ..setNavigationDelegate(
           NavigationDelegate(
@@ -280,15 +252,16 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
         (pattern) => url.toLowerCase().contains(pattern.toLowerCase()),
       );
 
-      final shouldVerify =
-          (hasSuccessIndicator && !isExcludedPage) ||
-          (!url.contains('checkout.paystack.com') &&
-              !url.contains('viff3zgs61lrnka') &&
-              url.isNotEmpty);
+      final shouldVerify = hasSuccessIndicator && !isExcludedPage;
 
       if (shouldVerify && !_paymentVerified && !_isProcessing) {
-        _updateStatus('Payment detected - verifying...');
-        _verifyPayment();
+        _updateStatus('Payment complete? Please proceed below');
+        // Show the manual navigation button only when success markers are detected
+        if (mounted) {
+          setState(() {
+            _showManualNavigationButton = true;
+          });
+        }
       }
     } catch (e) {
       // Silent fail
@@ -1091,7 +1064,6 @@ class _WebViewPaymentPageState extends State<WebViewPaymentPage> {
   void dispose() {
     _verificationTimer?.cancel();
     _redirectCheckTimer?.cancel();
-    _manualButtonTimer?.cancel();
     _statusUpdateTimer?.cancel();
     super.dispose();
   }

@@ -395,9 +395,6 @@ class _PromotionsPageState extends State<PromotionsPage> {
   ) {
     final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     final isDarkMode = themeProvider.isDarkMode;
-    final listingFeature = promotion['features'].isNotEmpty
-        ? promotion['features'][0]
-        : 'Premium features';
 
     return Container(
       decoration: BoxDecoration(
@@ -521,18 +518,20 @@ class _PromotionsPageState extends State<PromotionsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildDetailItem(
-                    Icons.calendar_today,
+                    _packageType == 'upload'
+                        ? Icons.inventory_2_outlined
+                        : Icons.timer_outlined,
                     promotion['startText'],
                     isDarkMode,
                   ),
                   _buildDetailItem(
-                    Icons.attach_money,
+                    Icons.payments_outlined,
                     promotion['endText'],
                     isDarkMode,
                   ),
                   _buildDetailItem(
-                    Icons.list_alt,
-                    listingFeature.toString(),
+                    Icons.verified_outlined,
+                    "Secure",
                     isDarkMode,
                   ),
                 ],
