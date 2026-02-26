@@ -49,7 +49,8 @@ class User with _$User {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
     @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) int? countryId,
     @JsonKey(name: 'state_id', fromJson: _parseDynamicToInt) int? stateId,
-    @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString) String? profilePhoto,
+    @JsonKey(name: 'profile_photo', fromJson: _parseDynamicToString)
+    String? profilePhoto,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -74,14 +75,15 @@ class Brand with _$Brand {
 class BrandModel with _$BrandModel {
   const factory BrandModel({
     @JsonKey(fromJson: _parseDynamicToInt) required int id,
-    @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) required int brandId,
+    @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
+    required int brandId,
     required String name,
     required String slug,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _BrandModel;
 
-  factory BrandModel.fromJson(Map<String, dynamic> json) => 
+  factory BrandModel.fromJson(Map<String, dynamic> json) =>
       _$BrandModelFromJson(json);
 }
 
@@ -100,7 +102,7 @@ class Category with _$Category {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Category;
 
-  factory Category.fromJson(Map<String, dynamic> json) => 
+  factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
 }
 
@@ -110,7 +112,8 @@ class SingleItem with _$SingleItem {
     @JsonKey(fromJson: _parseDynamicToString) required String id,
     @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
     @JsonKey(name: 'country_id', fromJson: _parseDynamicToInt) int? countryId,
-    @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt) int? brandModelId,
+    @JsonKey(name: 'brand_model_id', fromJson: _parseDynamicToInt)
+    int? brandModelId,
     @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt) int? brandId,
     @JsonKey(name: 'category_id', fromJson: _parseDynamicToInt) int? categoryId,
     @JsonKey(fromJson: _parseDynamicToString) String? name,
@@ -119,14 +122,19 @@ class SingleItem with _$SingleItem {
     @JsonKey(fromJson: _parseDynamicToString) String? description,
     List<String>? images,
     @JsonKey(fromJson: _parseDynamicToString) String? location,
-    @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString) String? serialNumber,
+    @JsonKey(name: 'serial_number', fromJson: _parseDynamicToString)
+    String? serialNumber,
     @JsonKey(fromJson: _parseDynamicToString) String? condition,
-    @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString) String? steerPosition,
-    @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString) String? engineCapacity,
+    @JsonKey(name: 'steer_position', fromJson: _parseDynamicToString)
+    String? steerPosition,
+    @JsonKey(name: 'engine_capacity', fromJson: _parseDynamicToString)
+    String? engineCapacity,
     @JsonKey(fromJson: _parseDynamicToString) String? transmission,
     @JsonKey(fromJson: _parseDynamicToString) String? color,
-    @JsonKey(name: 'build_type', fromJson: _parseDynamicToString) String? buildType,
-    @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt) int? numberOfPassengers,
+    @JsonKey(name: 'build_type', fromJson: _parseDynamicToString)
+    String? buildType,
+    @JsonKey(name: 'number_of_passengers', fromJson: _parseDynamicToInt)
+    int? numberOfPassengers,
     List<String>? features,
     @JsonKey(fromJson: _parseDynamicToString) String? status,
     @JsonKey(fromJson: _parseDynamicToString) String? price,
@@ -142,10 +150,12 @@ class SingleItem with _$SingleItem {
     Category? category,
     @JsonKey(name: 'brand_model') BrandModel? brandModel,
     User? user,
-    @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool) bool? isPromoted,
+    @JsonKey(name: 'is_promoted', fromJson: _parseDynamicToBool)
+    bool? isPromoted,
   }) = _SingleItem;
 
-  factory SingleItem.fromJson(Map<String, dynamic> json) => _$SingleItemFromJson(json);
+  factory SingleItem.fromJson(Map<String, dynamic> json) =>
+      _$SingleItemFromJson(json);
 }
 
 @freezed
@@ -156,7 +166,7 @@ class SingleItemResponse with _$SingleItemResponse {
     required SingleItemMeta meta,
   }) = _SingleItemResponse;
 
-  factory SingleItemResponse.fromJson(Map<String, dynamic> json) => 
+  factory SingleItemResponse.fromJson(Map<String, dynamic> json) =>
       _$SingleItemResponseFromJson(json);
 }
 
@@ -169,24 +179,27 @@ class SingleItemLinks with _$SingleItemLinks {
     String? next,
   }) = _SingleItemLinks;
 
-  factory SingleItemLinks.fromJson(Map<String, dynamic> json) => 
+  factory SingleItemLinks.fromJson(Map<String, dynamic> json) =>
       _$SingleItemLinksFromJson(json);
 }
 
 @freezed
 class SingleItemMeta with _$SingleItemMeta {
   const factory SingleItemMeta({
-    @JsonKey(name: 'current_page', fromJson: _parseDynamicToInt) required int currentPage,
+    @JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
+    required int currentPage,
     @JsonKey(fromJson: _parseDynamicToInt) required int? from,
-    @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt) required int lastPage,
+    @JsonKey(name: 'last_page', fromJson: _parseDynamicToInt)
+    required int lastPage,
     required List<SingleItemMetaLink> links,
     required String path,
-    @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt) required int perPage,
+    @JsonKey(name: 'per_page', fromJson: _parseDynamicToInt)
+    required int perPage,
     @JsonKey(fromJson: _parseDynamicToInt) required int? to,
     @JsonKey(fromJson: _parseDynamicToInt) required int total,
   }) = _SingleItemMeta;
 
-  factory SingleItemMeta.fromJson(Map<String, dynamic> json) => 
+  factory SingleItemMeta.fromJson(Map<String, dynamic> json) =>
       _$SingleItemMetaFromJson(json);
 }
 
@@ -199,6 +212,6 @@ class SingleItemMetaLink with _$SingleItemMetaLink {
     @JsonKey(fromJson: _parseDynamicToBool) required bool active,
   }) = _SingleItemMetaLink;
 
-  factory SingleItemMetaLink.fromJson(Map<String, dynamic> json) => 
+  factory SingleItemMetaLink.fromJson(Map<String, dynamic> json) =>
       _$SingleItemMetaLinkFromJson(json);
 }

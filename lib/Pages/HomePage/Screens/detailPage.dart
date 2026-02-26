@@ -1326,7 +1326,7 @@ class _DetailPageState extends State<DetailPage>
                                               ),
                                               const SizedBox(width: 6),
                                               if (userDetailsProvider
-                                                  .isVerified)
+                                                  .isVerified(_currentUserId!))
                                                 CustomImage(
                                                   imagePath:
                                                       '${ImageStringGlobalVariables.iconPath}check.png',
@@ -2368,7 +2368,7 @@ Download GAGcars app for more amazing vehicles!''';
     final List<Widget> badges = [];
     final theme = Theme.of(context);
 
-    if (userDetailsProvider.isVerifiedDealer) {
+    if (userDetailsProvider.isVerifiedDealer(_currentUserId!)) {
       badges.add(
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
@@ -2403,7 +2403,7 @@ Download GAGcars app for more amazing vehicles!''';
       );
     }
 
-    if (userDetailsProvider.isVerified) {
+    if (userDetailsProvider.isVerified(_currentUserId!)) {
       badges.add(
         Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
@@ -2875,7 +2875,9 @@ Download GAGcars app for more amazing vehicles!''';
   Widget _buildAdsCount() {
     return Consumer<UserDetailsProvider>(
       builder: (context, userDetailsProvider, child) {
-        final formattedAdsCount = userDetailsProvider.formattedAdsCount;
+        final formattedAdsCount = userDetailsProvider.getFormattedAdsCount(
+          _currentUserId!,
+        );
 
         return GestureDetector(
           onTap: () {

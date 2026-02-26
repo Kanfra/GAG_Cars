@@ -11,6 +11,7 @@ import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 
 class HomePageSearchPage extends StatefulWidget {
   const HomePageSearchPage({super.key});
@@ -92,7 +93,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
 
   void _onSearchTextChanged() {
     final query = _searchController.text.trim();
-    
+
     if (query.isEmpty) {
       setState(() {
         _showInitialState = true;
@@ -105,16 +106,19 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
       setState(() {
         _showInitialState = false;
       });
-      Provider.of<SearchProvider>(context, listen: false).searchWithDebounce(query);
+      Provider.of<SearchProvider>(
+        context,
+        listen: false,
+      ).searchWithDebounce(query);
     }
   }
 
   void _performSearch(String query) {
     if (query.trim().isEmpty) return;
-    
+
     _searchController.text = query;
     _searchFocusNode.unfocus();
-    
+
     // Commented out recent searches functionality
     // if (!_recentSearches.contains(query)) {
     //   setState(() {
@@ -128,7 +132,10 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
     setState(() {
       _showInitialState = false;
     });
-    Provider.of<SearchProvider>(context, listen: false).searchWithDebounce(query);
+    Provider.of<SearchProvider>(
+      context,
+      listen: false,
+    ).searchWithDebounce(query);
   }
 
   void _clearSearch() {
@@ -166,8 +173,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
       elevation: 0,
       leading: IconButton(
         icon: Icon(
-          Icons.arrow_back_ios_rounded, 
-          color: isDarkMode ? Colors.white : Colors.black87
+          Icons.arrow_back_ios_rounded,
+          color: isDarkMode ? Colors.white : Colors.black87,
         ),
         onPressed: () => Get.back(),
       ),
@@ -177,29 +184,29 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           color: isDarkMode ? const Color(0xFF616161) : Colors.grey[50],
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDarkMode ? const Color(0xFF757575) : Colors.grey[300]!
+            color: isDarkMode ? const Color(0xFF757575) : Colors.grey[300]!,
           ),
         ),
         child: TextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
           autofocus: true,
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
-          ),
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black87),
           decoration: InputDecoration(
             hintText: 'Search cars, brands, models...',
-            hintStyle: TextStyle(color: isDarkMode ? Colors.white60 : Colors.grey[500]),
+            hintStyle: TextStyle(
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
+            ),
             border: InputBorder.none,
             prefixIcon: Icon(
-              Icons.search_rounded, 
-              color: isDarkMode ? Colors.white60 : Colors.grey[500]
+              Icons.search_rounded,
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
             ),
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
                     icon: Icon(
-                      Icons.clear_rounded, 
-                      color: isDarkMode ? Colors.white60 : Colors.grey[500]
+                      Icons.clear_rounded,
+                      color: isDarkMode ? Colors.white60 : Colors.grey[500],
                     ),
                     onPressed: _clearSearch,
                   )
@@ -240,7 +247,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
 
   Widget _buildSearchSuggestions(bool isDarkMode) {
     final homeProvider = Provider.of<HomeProvider>(context, listen: true);
-    
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(16),
       child: Column(
@@ -363,10 +370,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
       child: Container(
         margin: EdgeInsets.all(2),
         child: Container(
-          constraints: BoxConstraints(
-            minHeight: 100,
-            maxHeight: 120,
-          ),
+          constraints: BoxConstraints(minHeight: 100, maxHeight: 120),
           decoration: BoxDecoration(
             color: isDarkMode ? const Color(0xFF424242) : Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -378,7 +382,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
               ),
             ],
             border: Border.all(
-              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[100]!
+              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[100]!,
             ),
           ),
           child: Padding(
@@ -391,16 +395,16 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: _getCategoryColor(category.name).withValues(alpha: 0.1),
+                    color: _getCategoryColor(
+                      category.name,
+                    ).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: _buildCategoryImage(category),
                 ),
                 SizedBox(height: 8),
                 Container(
-                  constraints: BoxConstraints(
-                    maxWidth: 80,
-                  ),
+                  constraints: BoxConstraints(maxWidth: 80),
                   child: Text(
                     category.name,
                     style: TextStyle(
@@ -453,9 +457,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
 
   Widget _buildCategoryImage(Categories category) {
     final imageUrl = category.image;
-    final hasValidImage = imageUrl.isNotEmpty && 
-                         !imageUrl.contains('assets/');
-    
+    final hasValidImage = imageUrl.isNotEmpty && !imageUrl.contains('assets/');
+
     if (hasValidImage) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(25),
@@ -543,7 +546,9 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              ColorGlobalVariables.brownColor,
+            ),
           ),
           SizedBox(height: 16),
           Text(
@@ -564,9 +569,9 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.error_outline, 
-            size: 64, 
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[400]
+            Icons.error_outline,
+            size: 64,
+            color: isDarkMode ? Colors.grey[400] : Colors.grey[400],
           ),
           SizedBox(height: 16),
           Text(
@@ -581,8 +586,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
           Text(
             searchProvider.errorMessage,
             style: TextStyle(
-              color: isDarkMode ? Colors.white60 : Colors.grey[500], 
-              fontSize: 14
+              color: isDarkMode ? Colors.white60 : Colors.grey[500],
+              fontSize: 14,
             ),
             textAlign: TextAlign.center,
           ),
@@ -596,10 +601,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: Text(
-              'Try Again',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('Try Again', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -642,10 +644,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text(
-              'Clear Search',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: Text('Clear Search', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -680,8 +679,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   //         mainAxisSize: MainAxisSize.min,
   //         children: [
   //           Icon(
-  //             icon, 
-  //             size: 16, 
+  //             icon,
+  //             size: 16,
   //             color: isDarkMode ? Colors.white60 : Colors.grey[600]
   //           ),
   //           SizedBox(width: 6),
@@ -702,8 +701,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   // Widget _buildSearchSuggestionItem(String search, bool isDarkMode) {
   //   return ListTile(
   //     leading: Icon(
-  //       Icons.trending_up_rounded, 
-  //       color: isDarkMode ? Colors.white60 : Colors.grey[500], 
+  //       Icons.trending_up_rounded,
+  //       color: isDarkMode ? Colors.white60 : Colors.grey[500],
   //       size: 20
   //     ),
   //     title: Text(
@@ -713,8 +712,8 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
   //       ),
   //     ),
   //     trailing: Icon(
-  //       Icons.arrow_forward_ios_rounded, 
-  //       size: 16, 
+  //       Icons.arrow_forward_ios_rounded,
+  //       size: 16,
   //       color: isDarkMode ? Colors.white60 : Colors.grey[400]
   //     ),
   //     onTap: () => _performSearch(search),
@@ -732,13 +731,28 @@ class _SearchResultItemWidget extends StatelessWidget {
     required this.isDarkMode,
   });
 
+  void _initializeVerificationStatus(BuildContext context) {
+    final userId = searchItem.user?.id;
+    if (userId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          Provider.of<UserDetailsProvider>(
+            context,
+            listen: false,
+          ).fetchUserDetails(userId);
+        }
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _initializeVerificationStatus(context);
     final userProvider = Provider.of<UserProvider>(context);
     final firstImage = searchItem.images?.isNotEmpty == true
         ? searchItem.images!.first
         : null;
-    
+
     return GestureDetector(
       onTap: () {
         Get.toNamed(
@@ -772,7 +786,9 @@ class _SearchResultItemWidget extends StatelessWidget {
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: isDarkMode ? const Color(0xFF616161) : Colors.grey[100],
+                    color: isDarkMode
+                        ? const Color(0xFF616161)
+                        : Colors.grey[100],
                     child: _buildSearchItemImage(firstImage),
                   ),
                 ),
@@ -829,7 +845,9 @@ class _SearchResultItemWidget extends StatelessWidget {
                           searchItem.year!,
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                            color: isDarkMode
+                                ? Colors.white60
+                                : Colors.grey[600],
                           ),
                         ),
                     ],
@@ -842,16 +860,20 @@ class _SearchResultItemWidget extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Icons.settings, 
-                              size: 14, 
-                              color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                              Icons.settings,
+                              size: 14,
+                              color: isDarkMode
+                                  ? Colors.white60
+                                  : Colors.grey[600],
                             ),
                             SizedBox(width: 4),
                             Text(
                               searchItem.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                color: isDarkMode
+                                    ? Colors.white60
+                                    : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -861,12 +883,19 @@ class _SearchResultItemWidget extends StatelessWidget {
                           message: '${searchItem.mileage} km',
                           preferBelow: false,
                           margin: EdgeInsets.all(8),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
+                            color: isDarkMode
+                                ? const Color(0xFF424242)
+                                : Colors.grey[50],
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!,
+                              color: isDarkMode
+                                  ? const Color(0xFF616161)
+                                  : Colors.grey[300]!,
                             ),
                           ),
                           textStyle: TextStyle(
@@ -877,16 +906,20 @@ class _SearchResultItemWidget extends StatelessWidget {
                           child: Row(
                             children: [
                               Icon(
-                                Icons.speed, 
-                                size: 14, 
-                                color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                                Icons.speed,
+                                size: 14,
+                                color: isDarkMode
+                                    ? Colors.white60
+                                    : Colors.grey[600],
                               ),
                               SizedBox(width: 4),
                               Text(
                                 "${_formatMileage(searchItem.mileage!)} km",
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                                  color: isDarkMode
+                                      ? Colors.white60
+                                      : Colors.grey[600],
                                 ),
                               ),
                             ],
@@ -899,9 +932,9 @@ class _SearchResultItemWidget extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          Icons.location_on, 
-                          size: 14, 
-                          color: isDarkMode ? Colors.white60 : Colors.grey[600]
+                          Icons.location_on,
+                          size: 14,
+                          color: isDarkMode ? Colors.white60 : Colors.grey[600],
                         ),
                         SizedBox(width: 4),
                         Expanded(
@@ -909,7 +942,9 @@ class _SearchResultItemWidget extends StatelessWidget {
                             searchItem.location!,
                             style: TextStyle(
                               fontSize: 11,
-                              color: isDarkMode ? Colors.white60 : Colors.grey[600],
+                              color: isDarkMode
+                                  ? Colors.white60
+                                  : Colors.grey[600],
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -917,6 +952,40 @@ class _SearchResultItemWidget extends StatelessWidget {
                         ),
                       ],
                     ),
+
+                  // VERIFIED DEALER INDICATOR (Repositioned to the end)
+                  Consumer<UserDetailsProvider>(
+                    builder: (context, userDetailsProvider, child) {
+                      final userId = searchItem.user?.id;
+                      if (userId != null &&
+                          userDetailsProvider.isVerifiedDealer(userId)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                color: Colors.blue[600],
+                                size: 12,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'VERIFIED DEALER',
+                                style: TextStyle(
+                                  color: Colors.blue[600],
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -927,9 +996,11 @@ class _SearchResultItemWidget extends StatelessWidget {
   }
 
   Widget _buildSearchItemImage(String? imageUrl) {
-    if (imageUrl != null && imageUrl.isNotEmpty && !imageUrl.contains('assets/')) {
+    if (imageUrl != null &&
+        imageUrl.isNotEmpty &&
+        !imageUrl.contains('assets/')) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-      
+
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,
@@ -938,7 +1009,9 @@ class _SearchResultItemWidget extends StatelessWidget {
             child: CircularProgressIndicator(
               value: downloadProgress.progress,
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ColorGlobalVariables.brownColor,
+              ),
             ),
           );
         },
@@ -959,9 +1032,9 @@ class _SearchResultItemWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.image_not_supported, 
-              size: 32, 
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[400]
+              Icons.image_not_supported,
+              size: 32,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[400],
             ),
             SizedBox(height: 4),
             Text(

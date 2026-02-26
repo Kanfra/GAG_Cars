@@ -12,6 +12,7 @@ import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:shimmer/shimmer.dart';
 
 class WishlistPage extends StatefulWidget {
@@ -74,7 +75,7 @@ class _WishlistPageState extends State<WishlistPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(theme),
@@ -88,9 +89,11 @@ class _WishlistPageState extends State<WishlistPage> {
       isLeadingWidgetExist: false,
       leadingIconData: Icons.arrow_back_ios_new,
       appbarBackgroundColor: theme.appBarTheme.backgroundColor ?? Colors.white,
-      leadingIconDataColor: theme.iconTheme.color ?? ColorGlobalVariables.fadedBlackColor,
+      leadingIconDataColor:
+          theme.iconTheme.color ?? ColorGlobalVariables.fadedBlackColor,
       titleText: "My Wishlist",
-      titleTextColor: theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
+      titleTextColor:
+          theme.appBarTheme.foregroundColor ?? ColorGlobalVariables.brownColor,
       titleFontWeight: FontWeight.bold,
       titleTextSize: 22,
       centerTitle: true,
@@ -112,7 +115,9 @@ class _WishlistPageState extends State<WishlistPage> {
           buttonSize: 40,
           isBorderSlightlyCurved: true,
           onIconButtonClickFunction: () => _handleNotificationTap(),
-          backgroundColor: theme.brightness == Brightness.dark ? Colors.grey[800]! : Colors.grey[50]!,
+          backgroundColor: theme.brightness == Brightness.dark
+              ? Colors.grey[800]!
+              : Colors.grey[50]!,
           iconDataColor: theme.iconTheme.color ?? Colors.grey[700],
         ),
         Positioned(
@@ -152,7 +157,8 @@ class _WishlistPageState extends State<WishlistPage> {
                 _buildHeaderSliver(provider, theme),
                 if (provider.isLoading && provider.wishlistItems.isEmpty)
                   _buildLoadingSliver(theme)
-                else if (provider.errorMessage.isNotEmpty && provider.wishlistItems.isEmpty)
+                else if (provider.errorMessage.isNotEmpty &&
+                    provider.wishlistItems.isEmpty)
                   _buildErrorSliver(provider, theme)
                 else if (provider.wishlistItems.isEmpty)
                   _buildEmptySliver(theme)
@@ -169,7 +175,10 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverToBoxAdapter _buildHeaderSliver(WishlistFetchProvider provider, ThemeData theme) {
+  SliverToBoxAdapter _buildHeaderSliver(
+    WishlistFetchProvider provider,
+    ThemeData theme,
+  ) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
@@ -209,7 +218,9 @@ class _WishlistPageState extends State<WishlistPage> {
   Widget _buildViewToggleButtons(ThemeData theme) {
     return Container(
       decoration: BoxDecoration(
-        color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
+        color: theme.brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.grey[100],
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -221,11 +232,11 @@ class _WishlistPageState extends State<WishlistPage> {
             onIconButtonClickFunction: () => _toggleView('grid'),
             buttonSize: 36,
             iconSize: 16,
-            backgroundColor: _viewType == 'grid' 
-                ? ColorGlobalVariables.brownColor 
+            backgroundColor: _viewType == 'grid'
+                ? ColorGlobalVariables.brownColor
                 : theme.cardColor,
-            iconDataColor: _viewType == 'grid' 
-                ? Colors.white 
+            iconDataColor: _viewType == 'grid'
+                ? Colors.white
                 : theme.iconTheme.color,
           ),
           SizedBox(width: 4),
@@ -236,11 +247,11 @@ class _WishlistPageState extends State<WishlistPage> {
             onIconButtonClickFunction: () => _toggleView('list'),
             buttonSize: 36,
             iconSize: 16,
-            backgroundColor: _viewType == 'list' 
-                ? ColorGlobalVariables.brownColor 
+            backgroundColor: _viewType == 'list'
+                ? ColorGlobalVariables.brownColor
                 : theme.cardColor,
-            iconDataColor: _viewType == 'list' 
-                ? Colors.white 
+            iconDataColor: _viewType == 'list'
+                ? Colors.white
                 : theme.iconTheme.color,
           ),
         ],
@@ -278,7 +289,9 @@ class _WishlistPageState extends State<WishlistPage> {
         children: [
           Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ColorGlobalVariables.redColor,
+              ),
               strokeWidth: 3,
             ),
           ),
@@ -294,7 +307,10 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  SliverFillRemaining _buildErrorSliver(WishlistFetchProvider provider, ThemeData theme) {
+  SliverFillRemaining _buildErrorSliver(
+    WishlistFetchProvider provider,
+    ThemeData theme,
+  ) {
     return SliverFillRemaining(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -317,7 +333,9 @@ class _WishlistPageState extends State<WishlistPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              provider.errorMessage.isNotEmpty ? provider.errorMessage : 'An unknown error occurred',
+              provider.errorMessage.isNotEmpty
+                  ? provider.errorMessage
+                  : 'An unknown error occurred',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -340,18 +358,13 @@ class _WishlistPageState extends State<WishlistPage> {
         backgroundColor: ColorGlobalVariables.redColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
         shadowColor: Colors.transparent,
       ),
       child: Text(
         'Try Again',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -367,7 +380,9 @@ class _WishlistPageState extends State<WishlistPage> {
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
+                color: theme.brightness == Brightness.dark
+                    ? Colors.grey[800]
+                    : Colors.grey[100],
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -410,9 +425,7 @@ class _WishlistPageState extends State<WishlistPage> {
         backgroundColor: ColorGlobalVariables.brownColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 2,
       ),
       child: Row(
@@ -422,10 +435,7 @@ class _WishlistPageState extends State<WishlistPage> {
           const SizedBox(width: 8),
           Text(
             'Browse Vehicles',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -440,7 +450,10 @@ class _WishlistPageState extends State<WishlistPage> {
     }
   }
 
-  SliverPadding _buildGridSliver(WishlistFetchProvider provider, ThemeData theme) {
+  SliverPadding _buildGridSliver(
+    WishlistFetchProvider provider,
+    ThemeData theme,
+  ) {
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       sliver: SliverGrid(
@@ -450,32 +463,20 @@ class _WishlistPageState extends State<WishlistPage> {
           mainAxisSpacing: 16,
           childAspectRatio: 0.72,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = provider.wishlistItems[index];
-            return _WishlistGridItem(
-              item: item,
-              index: index,
-            );
-          },
-          childCount: provider.wishlistItems.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = provider.wishlistItems[index];
+          return _WishlistGridItem(item: item, index: index);
+        }, childCount: provider.wishlistItems.length),
       ),
     );
   }
 
   SliverList _buildListSliver(WishlistFetchProvider provider, ThemeData theme) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final item = provider.wishlistItems[index];
-          return _WishlistListItem(
-            item: item,
-            index: index,
-          );
-        },
-        childCount: provider.wishlistItems.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final item = provider.wishlistItems[index];
+        return _WishlistListItem(item: item, index: index);
+      }, childCount: provider.wishlistItems.length),
     );
   }
 
@@ -491,7 +492,9 @@ class _WishlistPageState extends State<WishlistPage> {
                 height: 24,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    ColorGlobalVariables.brownColor,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -543,10 +546,7 @@ class _WishlistGridItem extends StatefulWidget {
   final dynamic item;
   final int index;
 
-  const _WishlistGridItem({
-    required this.item,
-    required this.index,
-  });
+  const _WishlistGridItem({required this.item, required this.index});
 
   @override
   State<_WishlistGridItem> createState() => _WishlistGridItemState();
@@ -557,22 +557,43 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
-  
+
   bool _isRemoving = false;
+
+  void _initializeVerificationStatus() {
+    String? userId;
+    if (_itemData is Map) {
+      userId = _itemData['user']?['id']?.toString();
+    } else {
+      userId = _itemData?.user?.id?.toString();
+    }
+
+    if (userId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Provider.of<UserDetailsProvider>(
+            context,
+            listen: false,
+          ).fetchUserDetails(userId!);
+        }
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    
+    _initializeVerificationStatus();
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    
+
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
@@ -594,20 +615,23 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
 
   Future<void> _removeItem() async {
     if (_isRemoving) return;
-    
+
     setState(() => _isRemoving = true);
     _animationController.forward();
 
     try {
       final toggleProvider = context.read<WishlistToggleProvider>();
       final fetchProvider = context.read<WishlistFetchProvider>();
-      
-      final success = await toggleProvider.toggleWishlistItem(itemId: _itemId, context: context);
+
+      final success = await toggleProvider.toggleWishlistItem(
+        itemId: _itemId,
+        context: context,
+      );
 
       if (success) {
         await Future.delayed(const Duration(milliseconds: 300));
         fetchProvider.removeItem(_itemId);
-        
+
         _showRemovalSnackbar();
       } else {
         _animationController.reverse();
@@ -678,16 +702,13 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         return Transform.scale(
           scale: _scaleAnimation.value,
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: child,
-          ),
+          child: Opacity(opacity: _opacityAnimation.value, child: child),
         );
       },
       child: _buildCardContent(theme),
@@ -712,25 +733,17 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
               children: [
                 // Image Section
                 _buildImageSection(imageUrl, theme),
-                
+
                 // Content Section
                 _buildContentSection(brandImage, theme),
               ],
             ),
-            
+
             // Remove Button
-            Positioned(
-              top: 8,
-              right: 8,
-              child: _buildRemoveButton(theme),
-            ),
+            Positioned(top: 8, right: 8, child: _buildRemoveButton(theme)),
 
             // Category Badge
-            Positioned(
-              top: 8,
-              left: 8,
-              child: _buildCategoryBadge(),
-            ),
+            Positioned(top: 8, left: 8, child: _buildCategoryBadge()),
           ],
         ),
       ),
@@ -743,12 +756,11 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
       child: Container(
         height: 120,
         width: double.infinity,
-        color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[100],
+        color: theme.brightness == Brightness.dark
+            ? Colors.grey[800]
+            : Colors.grey[100],
         child: Stack(
-          children: [
-            _buildImage(imageUrl, theme),
-            _buildImageOverlay(),
-          ],
+          children: [_buildImage(imageUrl, theme), _buildImageOverlay()],
         ),
       ),
     );
@@ -762,8 +774,12 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
       height: double.infinity,
       progressIndicatorBuilder: (context, url, progress) {
         return Shimmer.fromColors(
-          baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-          highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+          baseColor: theme.brightness == Brightness.dark
+              ? Colors.grey[700]!
+              : Colors.grey[300]!,
+          highlightColor: theme.brightness == Brightness.dark
+              ? Colors.grey[600]!
+              : Colors.grey[100]!,
           child: Container(color: theme.cardColor),
         );
       },
@@ -775,12 +791,18 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 32,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 4),
             Text(
               'No Image',
@@ -832,7 +854,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
 
   Widget _buildContentSection(String? brandImage, ThemeData theme) {
     final userProvider = Provider.of<UserProvider>(context);
-    
+
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -874,15 +896,20 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
               children: [
                 Expanded(
                   child: Tooltip(
-                    message: '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
+                    message:
+                        '${userProvider.user?.countryCurrencySymbol} ${_getFormattedPrice()}',
                     preferBelow: false,
                     margin: EdgeInsets.all(8),
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
-                      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[50],
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                        color: theme.brightness == Brightness.dark
+                            ? Colors.grey[700]!
+                            : Colors.grey[300]!,
                       ),
                     ),
                     textStyle: TextStyle(
@@ -943,12 +970,16 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                   )
                 else
                   SizedBox(width: 24),
-                
+
                 // Transmission - Consistent with HomePage
                 if (_getTransmission() != null)
                   Row(
                     children: [
-                      Icon(Icons.settings, size: 14, color: theme.iconTheme.color),
+                      Icon(
+                        Icons.settings,
+                        size: 14,
+                        color: theme.iconTheme.color,
+                      ),
                       SizedBox(width: 4),
                       Text(
                         _getTransmission()!,
@@ -959,13 +990,17 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                       ),
                     ],
                   ),
-                
+
                 // Location - Consistent with HomePage
                 if (_getLocation() != null)
                   Flexible(
                     child: Row(
                       children: [
-                        Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
+                        Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: theme.iconTheme.color,
+                        ),
                         SizedBox(width: 4),
                         Flexible(
                           child: Text(
@@ -982,6 +1017,42 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                     ),
                   ),
               ],
+            ),
+
+            // VERIFIED DEALER INDICATOR (Repositioned to the end)
+            Consumer<UserDetailsProvider>(
+              builder: (context, userDetailsProvider, child) {
+                String? userId;
+                if (_itemData is Map) {
+                  userId = _itemData['user']?['id']?.toString();
+                } else {
+                  userId = _itemData?.user?.id?.toString();
+                }
+
+                if (userId != null &&
+                    userDetailsProvider.isVerifiedDealer(userId)) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.verified, color: Colors.blue[600], size: 12),
+                        SizedBox(width: 4),
+                        Text(
+                          'VERIFIED DEALER',
+                          style: TextStyle(
+                            color: Colors.blue[600],
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ],
         ),
@@ -1014,7 +1085,9 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                   padding: const EdgeInsets.all(6),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      ColorGlobalVariables.redColor,
+                    ),
                   ),
                 )
               : Icon(
@@ -1033,13 +1106,24 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
       if (_itemData is Map) {
         final images = _itemData['images'] as List?;
         final firstImage = images?.isNotEmpty == true ? images!.first : null;
-        return getImageUrl(firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+        return getImageUrl(
+          firstImage ??
+              "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+          null,
+        );
       }
       final images = _itemData?.images;
       final firstImage = images?.isNotEmpty == true ? images!.first : null;
-      return getImageUrl(firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+      return getImageUrl(
+        firstImage ??
+            "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+        null,
+      );
     } catch (e) {
-      return getImageUrl("${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+      return getImageUrl(
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+        null,
+      );
     }
   }
 
@@ -1057,7 +1141,9 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
   String _getCategory() {
     try {
       if (_itemData is Map) {
-        return _itemData['category']?['name'] ?? _itemData['buildType'] ?? 'Car';
+        return _itemData['category']?['name'] ??
+            _itemData['buildType'] ??
+            'Car';
       }
       return _itemData?.category?.name ?? _itemData?.buildType ?? 'Car';
     } catch (e) {
@@ -1171,10 +1257,7 @@ class _WishlistListItem extends StatefulWidget {
   final dynamic item;
   final int index;
 
-  const _WishlistListItem({
-    required this.item,
-    required this.index,
-  });
+  const _WishlistListItem({required this.item, required this.index});
 
   @override
   State<_WishlistListItem> createState() => _WishlistListItemState();
@@ -1185,22 +1268,43 @@ class _WishlistListItemState extends State<_WishlistListItem>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
-  
+
   bool _isRemoving = false;
+
+  void _initializeVerificationStatus() {
+    String? userId;
+    if (_itemData is Map) {
+      userId = _itemData['user']?['id']?.toString();
+    } else {
+      userId = _itemData?.user?.id?.toString();
+    }
+
+    if (userId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Provider.of<UserDetailsProvider>(
+            context,
+            listen: false,
+          ).fetchUserDetails(userId!);
+        }
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    
+    _initializeVerificationStatus();
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
+
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
-    
+
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
@@ -1222,20 +1326,23 @@ class _WishlistListItemState extends State<_WishlistListItem>
 
   Future<void> _removeItem() async {
     if (_isRemoving) return;
-    
+
     setState(() => _isRemoving = true);
     _animationController.forward();
 
     try {
       final toggleProvider = context.read<WishlistToggleProvider>();
       final fetchProvider = context.read<WishlistFetchProvider>();
-      
-      final success = await toggleProvider.toggleWishlistItem(itemId: _itemId, context: context);
+
+      final success = await toggleProvider.toggleWishlistItem(
+        itemId: _itemId,
+        context: context,
+      );
 
       if (success) {
         await Future.delayed(const Duration(milliseconds: 300));
         fetchProvider.removeItem(_itemId);
-        
+
         _showRemovalSnackbar();
       } else {
         _animationController.reverse();
@@ -1307,16 +1414,13 @@ class _WishlistListItemState extends State<_WishlistListItem>
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
-    
+
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         return Transform.scale(
           scale: _scaleAnimation.value,
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: child,
-          ),
+          child: Opacity(opacity: _opacityAnimation.value, child: child),
         );
       },
       child: Container(
@@ -1349,13 +1453,13 @@ class _WishlistListItemState extends State<_WishlistListItem>
                     child: Container(
                       width: 160,
                       height: 160,
-                      color: theme.brightness == Brightness.dark 
-                          ? Colors.grey[800] 
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.grey[800]
                           : Colors.grey[100],
                       child: _buildImage(theme),
                     ),
                   ),
-                  
+
                   // Remove Button
                   Positioned(
                     top: 8,
@@ -1405,15 +1509,23 @@ class _WishlistListItemState extends State<_WishlistListItem>
                       children: [
                         Expanded(
                           child: Tooltip(
-                            message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
+                            message:
+                                '${userProvider.user?.countryCurrencySymbol ?? ''} ${_getFormattedPrice()}',
                             preferBelow: false,
                             margin: EdgeInsets.all(8),
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
-                              color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[50],
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.grey[800]
+                                  : Colors.grey[50],
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
+                                color: theme.brightness == Brightness.dark
+                                    ? Colors.grey[700]!
+                                    : Colors.grey[300]!,
                               ),
                             ),
                             textStyle: TextStyle(
@@ -1435,10 +1547,13 @@ class _WishlistListItemState extends State<_WishlistListItem>
                         ),
                         SizedBox(width: 8),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
-                            color: theme.brightness == Brightness.dark 
-                                ? Colors.grey[700] 
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.grey[700]
                                 : Colors.grey[100],
                             borderRadius: BorderRadius.circular(6),
                           ),
@@ -1461,7 +1576,11 @@ class _WishlistListItemState extends State<_WishlistListItem>
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.speed, size: 12, color: theme.iconTheme.color),
+                                Icon(
+                                  Icons.speed,
+                                  size: 12,
+                                  color: theme.iconTheme.color,
+                                ),
                                 SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
@@ -1477,15 +1596,18 @@ class _WishlistListItemState extends State<_WishlistListItem>
                               ],
                             ),
                           ),
-                        
-                        if (_getTransmission() != null)
-                          SizedBox(width: 8),
-                        
+
+                        if (_getTransmission() != null) SizedBox(width: 8),
+
                         if (_getTransmission() != null)
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.settings, size: 12, color: theme.iconTheme.color),
+                                Icon(
+                                  Icons.settings,
+                                  size: 12,
+                                  color: theme.iconTheme.color,
+                                ),
                                 SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
@@ -1511,7 +1633,11 @@ class _WishlistListItemState extends State<_WishlistListItem>
                           Expanded(
                             child: Row(
                               children: [
-                                Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
+                                Icon(
+                                  Icons.location_on,
+                                  size: 12,
+                                  color: theme.iconTheme.color,
+                                ),
                                 SizedBox(width: 2),
                                 Expanded(
                                   child: Text(
@@ -1527,9 +1653,10 @@ class _WishlistListItemState extends State<_WishlistListItem>
                               ],
                             ),
                           ),
-                        
+
                         // Brand Image - Consistent with HomePage
-                        if (_getBrandImage() != null && !_getBrandImage()!.contains('assets/'))
+                        if (_getBrandImage() != null &&
+                            !_getBrandImage()!.contains('assets/'))
                           SizedBox(
                             width: 20,
                             height: 20,
@@ -1545,6 +1672,46 @@ class _WishlistListItemState extends State<_WishlistListItem>
                           ),
                       ],
                     ),
+
+                    // VERIFIED DEALER INDICATOR (Repositioned to the end)
+                    Consumer<UserDetailsProvider>(
+                      builder: (context, userDetailsProvider, child) {
+                        String? userId;
+                        if (_itemData is Map) {
+                          userId = _itemData['user']?['id']?.toString();
+                        } else {
+                          userId = _itemData?.user?.id?.toString();
+                        }
+
+                        if (userId != null &&
+                            userDetailsProvider.isVerifiedDealer(userId)) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified,
+                                  color: Colors.blue[600],
+                                  size: 12,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'VERIFIED DEALER',
+                                  style: TextStyle(
+                                    color: Colors.blue[600],
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -1557,14 +1724,18 @@ class _WishlistListItemState extends State<_WishlistListItem>
 
   Widget _buildImage(ThemeData theme) {
     final imageUrl = _getImageUrl();
-    
+
     return CachedNetworkImage(
       imageUrl: imageUrl,
       fit: BoxFit.cover,
       progressIndicatorBuilder: (context, url, progress) {
         return Shimmer.fromColors(
-          baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-          highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
+          baseColor: theme.brightness == Brightness.dark
+              ? Colors.grey[700]!
+              : Colors.grey[300]!,
+          highlightColor: theme.brightness == Brightness.dark
+              ? Colors.grey[600]!
+              : Colors.grey[100]!,
           child: Container(color: theme.cardColor),
         );
       },
@@ -1576,12 +1747,18 @@ class _WishlistListItemState extends State<_WishlistListItem>
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 24,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 2),
             Text(
               'No Image',
@@ -1621,7 +1798,9 @@ class _WishlistListItemState extends State<_WishlistListItem>
                   padding: const EdgeInsets.all(6),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.redColor),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      ColorGlobalVariables.redColor,
+                    ),
                   ),
                 )
               : Icon(
@@ -1640,13 +1819,24 @@ class _WishlistListItemState extends State<_WishlistListItem>
       if (_itemData is Map) {
         final images = _itemData['images'] as List?;
         final firstImage = images?.isNotEmpty == true ? images!.first : null;
-        return getImageUrl(firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+        return getImageUrl(
+          firstImage ??
+              "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+          null,
+        );
       }
       final images = _itemData?.images;
       final firstImage = images?.isNotEmpty == true ? images!.first : null;
-      return getImageUrl(firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+      return getImageUrl(
+        firstImage ??
+            "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+        null,
+      );
     } catch (e) {
-      return getImageUrl("${ImageStringGlobalVariables.imagePath}car_placeholder.png", null);
+      return getImageUrl(
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png",
+        null,
+      );
     }
   }
 
@@ -1664,7 +1854,9 @@ class _WishlistListItemState extends State<_WishlistListItem>
   String _getCategory() {
     try {
       if (_itemData is Map) {
-        return _itemData['category']?['name'] ?? _itemData['buildType'] ?? 'Car';
+        return _itemData['category']?['name'] ??
+            _itemData['buildType'] ??
+            'Car';
       }
       return _itemData?.category?.name ?? _itemData?.buildType ?? 'Car';
     } catch (e) {

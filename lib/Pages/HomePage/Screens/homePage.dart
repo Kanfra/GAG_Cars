@@ -11,6 +11,7 @@ import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.da
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
@@ -1311,6 +1312,23 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
         );
 
     _initializeLikeStatus();
+    _initializeVerificationStatus();
+  }
+
+  void _initializeVerificationStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final userId = widget.recommended.user?.id;
+      if (userId != null) {
+        final userDetailsProvider = Provider.of<UserDetailsProvider>(
+          context,
+          listen: false,
+        );
+        if (!userDetailsProvider.hasUserDetails(userId)) {
+          userDetailsProvider.fetchUserDetails(userId);
+        }
+      }
+    });
   }
 
   void _initializeLikeStatus() {
@@ -1842,6 +1860,40 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                         ),
                     ],
                   ),
+
+                  // VERIFIED DEALER INDICATOR (Repositioned to the end)
+                  Consumer<UserDetailsProvider>(
+                    builder: (context, userDetailsProvider, child) {
+                      final userId = widget.recommended.user?.id;
+                      if (userId != null &&
+                          userDetailsProvider.isVerifiedDealer(userId)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                color: Colors.blue[600],
+                                size: 12,
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'VERIFIED DEALER',
+                                style: TextStyle(
+                                  color: Colors.blue[600],
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1958,6 +2010,23 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
         );
 
     _initializeLikeStatus();
+    _initializeVerificationStatus();
+  }
+
+  void _initializeVerificationStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final userId = widget.recommended.user?.id;
+      if (userId != null) {
+        final userDetailsProvider = Provider.of<UserDetailsProvider>(
+          context,
+          listen: false,
+        );
+        if (!userDetailsProvider.hasUserDetails(userId)) {
+          userDetailsProvider.fetchUserDetails(userId);
+        }
+      }
+    });
   }
 
   void _initializeLikeStatus() {
@@ -2227,12 +2296,16 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                                 overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: 2),
-                              Text(
-                                widget.recommended.category?.name ?? 'Car',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: theme.textTheme.bodyMedium?.color,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    widget.recommended.category?.name ?? 'Car',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -2500,6 +2573,40 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                             ),
                           ),
                       ],
+                    ),
+
+                    // VERIFIED DEALER INDICATOR (Repositioned to the end)
+                    Consumer<UserDetailsProvider>(
+                      builder: (context, userDetailsProvider, child) {
+                        final userId = widget.recommended.user?.id;
+                        if (userId != null &&
+                            userDetailsProvider.isVerifiedDealer(userId)) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified,
+                                  color: Colors.blue[600],
+                                  size: 12,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'VERIFIED DEALER',
+                                  style: TextStyle(
+                                    color: Colors.blue[600],
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
                   ],
                 ),

@@ -7,6 +7,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserListingsProvid
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:provider/provider.dart';
@@ -14,10 +15,7 @@ import 'package:provider/provider.dart';
 class AdsPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
 
-  const AdsPage({
-    super.key,
-    required this.allJson,
-  });
+  const AdsPage({super.key, required this.allJson});
 
   @override
   State<AdsPage> createState() => _AdsPageState();
@@ -39,13 +37,12 @@ class _AdsPageState extends State<AdsPage> {
 
   void _scrollListener() {
     final provider = Provider.of<UserListingsProvider>(context, listen: false);
-    
+
     // Load more functionality
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 100 &&
         !provider.isLoadingMore &&
         provider.hasMore) {
-      
       _loadMoreDebouncer?.cancel();
       _loadMoreDebouncer = Timer(const Duration(milliseconds: 300), () {
         provider.loadMoreListings();
@@ -54,6 +51,13 @@ class _AdsPageState extends State<AdsPage> {
   }
 
   Future<void> _loadData() async {
+    final userId = widget.allJson['user']['id']?.toString();
+    if (userId != null) {
+      Provider.of<UserDetailsProvider>(
+        context,
+        listen: false,
+      ).fetchUserDetails(userId);
+    }
     final provider = Provider.of<UserListingsProvider>(context, listen: false);
     await provider.loadInitialListings(widget.allJson['user']['id']);
   }
@@ -72,7 +76,7 @@ class _AdsPageState extends State<AdsPage> {
     final logger = Logger();
     logger.e('phone number: ${widget.allJson['user']['phone']}');
     Get.toNamed(
-      RouteClass.getAdsDetailPage(), 
+      RouteClass.getAdsDetailPage(),
       arguments: {
         'user': widget.allJson['user'],
         'phoneNumber': widget.allJson['phoneNumber'],
@@ -88,14 +92,14 @@ class _AdsPageState extends State<AdsPage> {
       final int price = int.parse(priceString);
       final String priceStr = price.toString();
       final StringBuffer formattedPrice = StringBuffer();
-      
+
       for (int i = 0; i < priceStr.length; i++) {
         if (i > 0 && (priceStr.length - i) % 3 == 0) {
           formattedPrice.write(',');
         }
         formattedPrice.write(priceStr[i]);
       }
-      
+
       return formattedPrice.toString();
     } catch (e) {
       return priceString;
@@ -121,7 +125,11 @@ class _AdsPageState extends State<AdsPage> {
         backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_rounded, size: 20, color: theme.iconTheme.color),
+          icon: Icon(
+            Icons.arrow_back_ios_rounded,
+            size: 20,
+            color: theme.iconTheme.color,
+          ),
           onPressed: () => Get.back(),
         ),
         title: Text(
@@ -141,14 +149,16 @@ class _AdsPageState extends State<AdsPage> {
               Container(
                 margin: EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
-                  color: _viewType == 'list' 
-                      ? ColorGlobalVariables.brownColor 
+                  color: _viewType == 'list'
+                      ? ColorGlobalVariables.brownColor
                       : theme.cardColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: IconButton(
                   icon: Icon(Icons.list, size: 20),
-                  color: _viewType == 'list' ? Colors.white : theme.iconTheme.color,
+                  color: _viewType == 'list'
+                      ? Colors.white
+                      : theme.iconTheme.color,
                   onPressed: () => _toggleView('list'),
                 ),
               ),
@@ -156,14 +166,16 @@ class _AdsPageState extends State<AdsPage> {
               Container(
                 margin: EdgeInsets.only(right: 16),
                 decoration: BoxDecoration(
-                  color: _viewType == 'grid' 
-                      ? ColorGlobalVariables.brownColor 
+                  color: _viewType == 'grid'
+                      ? ColorGlobalVariables.brownColor
                       : theme.cardColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: IconButton(
                   icon: Icon(Icons.grid_view, size: 20),
-                  color: _viewType == 'grid' ? Colors.white : theme.iconTheme.color,
+                  color: _viewType == 'grid'
+                      ? Colors.white
+                      : theme.iconTheme.color,
                   onPressed: () => _toggleView('grid'),
                 ),
               ),
@@ -172,14 +184,14 @@ class _AdsPageState extends State<AdsPage> {
         ],
       ),
       body: SafeArea(
-        child: userListingsProvider.isLoading 
+        child: userListingsProvider.isLoading
             ? _buildLoadingState(theme)
-            : userListingsProvider.hasError 
-                ? _buildErrorState(userListingsProvider, theme)
-                : RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    child: _buildContent(userListingsProvider, theme),
-                  ),
+            : userListingsProvider.hasError
+            ? _buildErrorState(userListingsProvider, theme)
+            : RefreshIndicator(
+                onRefresh: _onRefresh,
+                child: _buildContent(userListingsProvider, theme),
+              ),
       ),
     );
   }
@@ -190,7 +202,9 @@ class _AdsPageState extends State<AdsPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              ColorGlobalVariables.brownColor,
+            ),
           ),
           SizedBox(height: 16),
           Text(
@@ -214,12 +228,16 @@ class _AdsPageState extends State<AdsPage> {
           SizedBox(height: 16),
           Text(
             provider.errorMessage,
-            style: TextStyle(color: theme.textTheme.bodyMedium?.color, fontSize: 16),
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 16,
+            ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => provider.loadInitialListings(widget.allJson['user']['id']),
+            onPressed: () =>
+                provider.loadInitialListings(widget.allJson['user']['id']),
             style: ElevatedButton.styleFrom(
               backgroundColor: ColorGlobalVariables.brownColor,
               shape: RoundedRectangleBorder(
@@ -241,9 +259,7 @@ class _AdsPageState extends State<AdsPage> {
       slivers: [
         // Empty State
         if (!provider.hasListings && !provider.isLoading)
-          SliverFillRemaining(
-            child: _buildEmptyState(theme),
-          )
+          SliverFillRemaining(child: _buildEmptyState(theme))
         else
           // Listings Header
           SliverToBoxAdapter(
@@ -289,7 +305,9 @@ class _AdsPageState extends State<AdsPage> {
                     child: Column(
                       children: [
                         CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            ColorGlobalVariables.brownColor,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -386,32 +404,26 @@ class _AdsPageState extends State<AdsPage> {
           mainAxisSpacing: 12,
           childAspectRatio: 0.72,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final listing = provider.listings[index];
-            return _ListingItemGridWidget(
-              listing: listing,
-              onTap: () => _navigateToDetailPage(listing),
-            );
-          },
-          childCount: provider.listings.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final listing = provider.listings[index];
+          return _ListingItemGridWidget(
+            listing: listing,
+            onTap: () => _navigateToDetailPage(listing),
+          );
+        }, childCount: provider.listings.length),
       ),
     );
   }
 
   Widget _buildListingsList(UserListingsProvider provider, ThemeData theme) {
     return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) {
-          final listing = provider.listings[index];
-          return _ListingItemListWidget(
-            listing: listing,
-            onTap: () => _navigateToDetailPage(listing),
-          );
-        },
-        childCount: provider.listings.length,
-      ),
+      delegate: SliverChildBuilderDelegate((context, index) {
+        final listing = provider.listings[index];
+        return _ListingItemListWidget(
+          listing: listing,
+          onTap: () => _navigateToDetailPage(listing),
+        );
+      }, childCount: provider.listings.length),
     );
   }
 }
@@ -421,10 +433,7 @@ class _ListingItemGridWidget extends StatelessWidget {
   final Listing listing;
   final VoidCallback onTap;
 
-  const _ListingItemGridWidget({
-    required this.listing,
-    required this.onTap,
-  });
+  const _ListingItemGridWidget({required this.listing, required this.onTap});
 
   // Helper method to format price with commas
   String _formatPriceWithCommas(String priceString) {
@@ -432,14 +441,14 @@ class _ListingItemGridWidget extends StatelessWidget {
       final int price = int.parse(priceString);
       final String priceStr = price.toString();
       final StringBuffer formattedPrice = StringBuffer();
-      
+
       for (int i = 0; i < priceStr.length; i++) {
         if (i > 0 && (priceStr.length - i) % 3 == 0) {
           formattedPrice.write(',');
         }
         formattedPrice.write(priceStr[i]);
       }
-      
+
       return formattedPrice.toString();
     } catch (e) {
       return priceString;
@@ -451,7 +460,9 @@ class _ListingItemGridWidget extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
     // FIXED: Null-safe image handling
-    final firstImage = listing.images?.isNotEmpty == true ? listing.images!.first : null;
+    final firstImage = listing.images?.isNotEmpty == true
+        ? listing.images!.first
+        : null;
     // FIXED: Null-safe boolean
     final isPromoted = listing.isPromoted ?? false;
 
@@ -480,13 +491,13 @@ class _ListingItemGridWidget extends StatelessWidget {
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: theme.brightness == Brightness.dark 
-                        ? Colors.grey[800] 
+                    color: theme.brightness == Brightness.dark
+                        ? Colors.grey[800]
                         : Colors.grey[100],
                     child: _buildListingImage(firstImage, theme),
                   ),
                 ),
-                
+
                 // Status Badge
                 Positioned(
                   top: 8,
@@ -507,7 +518,7 @@ class _ListingItemGridWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 // Promoted Badge
                 if (isPromoted)
                   Positioned(
@@ -554,7 +565,10 @@ class _ListingItemGridWidget extends StatelessWidget {
                           message: listing.name ?? 'No Name',
                           preferBelow: false,
                           margin: EdgeInsets.all(8),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: theme.cardColor,
                             borderRadius: BorderRadius.circular(8),
@@ -584,7 +598,9 @@ class _ListingItemGridWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(width: 5), // 5px spacing between name and category
+                      SizedBox(
+                        width: 5,
+                      ), // 5px spacing between name and category
                       Text(
                         // FIXED: Null-safe category name
                         listing.category?.name ?? 'No Category',
@@ -597,10 +613,10 @@ class _ListingItemGridWidget extends StatelessWidget {
                   ),
 
                   SizedBox(height: 5), // 5px spacing between name and category
-
                   // Price with Tooltip
                   Tooltip(
-                    message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                    message:
+                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
                     preferBelow: false,
                     margin: EdgeInsets.all(8),
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -633,7 +649,6 @@ class _ListingItemGridWidget extends StatelessWidget {
                   ),
 
                   SizedBox(height: 10), // Reduced from 12 to 10
-
                   // Location with Tooltip
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -641,14 +656,21 @@ class _ListingItemGridWidget extends StatelessWidget {
                       Expanded(
                         child: Row(
                           children: [
-                            Icon(Icons.location_on, size: 14, color: theme.iconTheme.color),
+                            Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: theme.iconTheme.color,
+                            ),
                             SizedBox(width: 4),
                             Expanded(
                               child: Tooltip(
                                 message: listing.location ?? 'No Location',
                                 preferBelow: false,
                                 margin: EdgeInsets.all(8),
-                                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 decoration: BoxDecoration(
                                   color: theme.cardColor,
                                   borderRadius: BorderRadius.circular(8),
@@ -684,11 +706,14 @@ class _ListingItemGridWidget extends StatelessWidget {
                   ),
 
                   SizedBox(height: 6), // Reduced from 8 to 6
-
                   // Created Date
                   Row(
                     children: [
-                      Icon(Icons.access_time, size: 12, color: theme.iconTheme.color),
+                      Icon(
+                        Icons.access_time,
+                        size: 12,
+                        color: theme.iconTheme.color,
+                      ),
                       SizedBox(width: 4),
                       Text(
                         // FIXED: Null-safe date
@@ -699,6 +724,40 @@ class _ListingItemGridWidget extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+
+                  // VERIFIED DEALER INDICATOR (Repositioned to the end of card details)
+                  Consumer<UserDetailsProvider>(
+                    builder: (context, userDetailsProvider, child) {
+                      final userId = listing.userId;
+                      if (userId != null &&
+                          userDetailsProvider.isVerifiedDealer(userId)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                color: Colors.blue[600],
+                                size: 12,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'VERIFIED DEALER',
+                                style: TextStyle(
+                                  color: Colors.blue[600],
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ],
               ),
@@ -712,7 +771,7 @@ class _ListingItemGridWidget extends StatelessWidget {
   Widget _buildListingImage(String? imageUrl, ThemeData theme) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-      
+
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,
@@ -721,7 +780,9 @@ class _ListingItemGridWidget extends StatelessWidget {
             child: CircularProgressIndicator(
               value: downloadProgress.progress,
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                ColorGlobalVariables.brownColor,
+              ),
             ),
           );
         },
@@ -736,14 +797,18 @@ class _ListingItemGridWidget extends StatelessWidget {
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark 
-          ? Colors.grey[800] 
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
           : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 32, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 32,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 4),
             Text(
               'No Image',
@@ -761,7 +826,7 @@ class _ListingItemGridWidget extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays == 0) {
       return 'Today';
     } else if (difference.inDays == 1) {
@@ -781,10 +846,7 @@ class _ListingItemListWidget extends StatelessWidget {
   final Listing listing;
   final VoidCallback onTap;
 
-  const _ListingItemListWidget({
-    required this.listing,
-    required this.onTap,
-  });
+  const _ListingItemListWidget({required this.listing, required this.onTap});
 
   // Helper method to format price with commas
   String _formatPriceWithCommas(String priceString) {
@@ -792,14 +854,14 @@ class _ListingItemListWidget extends StatelessWidget {
       final int price = int.parse(priceString);
       final String priceStr = price.toString();
       final StringBuffer formattedPrice = StringBuffer();
-      
+
       for (int i = 0; i < priceStr.length; i++) {
         if (i > 0 && (priceStr.length - i) % 3 == 0) {
           formattedPrice.write(',');
         }
         formattedPrice.write(priceStr[i]);
       }
-      
+
       return formattedPrice.toString();
     } catch (e) {
       return priceString;
@@ -811,7 +873,9 @@ class _ListingItemListWidget extends StatelessWidget {
     final userProvider = Provider.of<UserProvider>(context);
     final theme = Theme.of(context);
     // FIXED: Null-safe image handling
-    final firstImage = listing.images?.isNotEmpty == true ? listing.images!.first : null;
+    final firstImage = listing.images?.isNotEmpty == true
+        ? listing.images!.first
+        : null;
     // FIXED: Null-safe boolean
     final isPromoted = listing.isPromoted ?? false;
 
@@ -847,19 +911,22 @@ class _ListingItemListWidget extends StatelessWidget {
                     child: Container(
                       width: 160,
                       height: 160,
-                      color: theme.brightness == Brightness.dark 
-                          ? Colors.grey[800] 
+                      color: theme.brightness == Brightness.dark
+                          ? Colors.grey[800]
                           : Colors.grey[100],
                       child: _buildListingImage(firstImage, theme),
                     ),
                   ),
-                  
+
                   if (isPromoted)
                     Positioned(
                       top: 8,
                       left: 8,
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.amber[700],
                           borderRadius: BorderRadius.circular(6),
@@ -902,7 +969,10 @@ class _ListingItemListWidget extends StatelessWidget {
                             message: listing.name ?? 'No Name',
                             preferBelow: false,
                             margin: EdgeInsets.all(8),
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: theme.cardColor,
                               borderRadius: BorderRadius.circular(8),
@@ -944,14 +1014,19 @@ class _ListingItemListWidget extends StatelessWidget {
                       ],
                     ),
 
-                    SizedBox(height: 5), // 5px spacing between name and category
-
+                    SizedBox(
+                      height: 5,
+                    ), // 5px spacing between name and category
                     // Price with Tooltip
                     Tooltip(
-                      message: '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
+                      message:
+                          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPriceWithCommas(listing.price ?? '0')}',
                       preferBelow: false,
                       margin: EdgeInsets.all(8),
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: theme.cardColor,
                         borderRadius: BorderRadius.circular(8),
@@ -989,14 +1064,23 @@ class _ListingItemListWidget extends StatelessWidget {
                         Expanded(
                           child: Row(
                             children: [
-                              Icon(Icons.location_on, size: 12, color: theme.iconTheme.color),
-                              SizedBox(width: 4), // 4px spacing between icon and text
+                              Icon(
+                                Icons.location_on,
+                                size: 12,
+                                color: theme.iconTheme.color,
+                              ),
+                              SizedBox(
+                                width: 4,
+                              ), // 4px spacing between icon and text
                               Expanded(
                                 child: Tooltip(
                                   message: listing.location ?? 'No Location',
                                   preferBelow: false,
                                   margin: EdgeInsets.all(8),
-                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: theme.cardColor,
                                     borderRadius: BorderRadius.circular(8),
@@ -1036,7 +1120,11 @@ class _ListingItemListWidget extends StatelessWidget {
                     // Created Date
                     Row(
                       children: [
-                        Icon(Icons.access_time, size: 12, color: theme.iconTheme.color),
+                        Icon(
+                          Icons.access_time,
+                          size: 12,
+                          color: theme.iconTheme.color,
+                        ),
                         SizedBox(width: 4),
                         Text(
                           // FIXED: Null-safe date
@@ -1047,6 +1135,40 @@ class _ListingItemListWidget extends StatelessWidget {
                           ),
                         ),
                       ],
+                    ),
+
+                    // VERIFIED DEALER INDICATOR (Repositioned to the end of card details)
+                    Consumer<UserDetailsProvider>(
+                      builder: (context, userDetailsProvider, child) {
+                        final userId = listing.userId;
+                        if (userId != null &&
+                            userDetailsProvider.isVerifiedDealer(userId)) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified,
+                                  color: Colors.blue[600],
+                                  size: 12,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'VERIFIED DEALER',
+                                  style: TextStyle(
+                                    color: Colors.blue[600],
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
                     ),
                   ],
                 ),
@@ -1061,20 +1183,22 @@ class _ListingItemListWidget extends StatelessWidget {
   Widget _buildListingImage(String? imageUrl, ThemeData theme) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
       final String fullImageUrl = getImageUrl(imageUrl, null);
-      
+
       return CachedNetworkImage(
         imageUrl: fullImageUrl,
         fit: BoxFit.cover,
         progressIndicatorBuilder: (context, url, downloadProgress) {
           return Container(
-            color: theme.brightness == Brightness.dark 
-                ? Colors.grey[800] 
+            color: theme.brightness == Brightness.dark
+                ? Colors.grey[800]
                 : Colors.grey[200],
             child: Center(
               child: CircularProgressIndicator(
                 value: downloadProgress.progress,
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  ColorGlobalVariables.brownColor,
+                ),
               ),
             ),
           );
@@ -1090,14 +1214,18 @@ class _ListingItemListWidget extends StatelessWidget {
 
   Widget _buildImageErrorPlaceholder(ThemeData theme) {
     return Container(
-      color: theme.brightness == Brightness.dark 
-          ? Colors.grey[800] 
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
           : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 24, color: theme.iconTheme.color),
+            Icon(
+              Icons.image_not_supported,
+              size: 24,
+              color: theme.iconTheme.color,
+            ),
             SizedBox(height: 2),
             Text(
               'No Image',
@@ -1115,7 +1243,7 @@ class _ListingItemListWidget extends StatelessWidget {
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays == 0) {
       return 'Today';
     } else if (difference.inDays == 1) {

@@ -10,15 +10,13 @@ import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/ApiUtils/apiUtils.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class SelectedBrandPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  const SelectedBrandPage({
-    super.key,
-    required this.allJson,
-  });
+  const SelectedBrandPage({super.key, required this.allJson});
 
   @override
   State<SelectedBrandPage> createState() => _SelectedBrandPageState();
@@ -84,7 +82,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     if (!_scrollController.hasClients) return;
 
     final currentOffset = _scrollController.offset;
-    
+
     // Handle search bar visibility
     if (currentOffset <= 0) {
       if (!_showSearchBar) {
@@ -99,9 +97,9 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         setState(() => _showSearchBar = true);
       }
     }
-    
+
     _lastScrollOffset = currentOffset;
-    
+
     // Handle load more
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
     if (_scrollController.position.pixels >=
@@ -113,7 +111,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
 
   void _loadInitialItems() {
     final provider = Provider.of<BrandItemsProvider>(context, listen: false);
-    
+
     if (!provider.isLoading && !_initialLoadCompleted) {
       debugPrint('🔄 Loading vehicles for brand: $_brandId');
       provider.loadInitialItems(_brandId);
@@ -146,8 +144,8 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios, 
-            size: 20, 
+            Icons.arrow_back_ios,
+            size: 20,
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           onPressed: () => Get.back(),
@@ -167,7 +165,9 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           builder: (context, provider, child) {
             return RefreshIndicator(
               onRefresh: _onRefresh,
-              backgroundColor: isDarkMode ? const Color(0xFF424242) : Colors.white,
+              backgroundColor: isDarkMode
+                  ? const Color(0xFF424242)
+                  : Colors.white,
               color: ColorGlobalVariables.brownColor,
               child: Stack(
                 children: [
@@ -187,13 +187,9 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
       controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
-        SliverToBoxAdapter(
-          child: SizedBox(height: _showSearchBar ? 80 : 0),
-        ),
+        SliverToBoxAdapter(child: SizedBox(height: _showSearchBar ? 80 : 0)),
 
-        SliverToBoxAdapter(
-          child: _buildHeaderSection(provider, isDarkMode),
-        ),
+        SliverToBoxAdapter(child: _buildHeaderSection(provider, isDarkMode)),
 
         // State-based content
         ..._buildStateContent(provider, isDarkMode),
@@ -201,7 +197,10 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     );
   }
 
-  List<Widget> _buildStateContent(BrandItemsProvider provider, bool isDarkMode) {
+  List<Widget> _buildStateContent(
+    BrandItemsProvider provider,
+    bool isDarkMode,
+  ) {
     if (provider.isLoading && provider.items.isEmpty) {
       return [_buildLoadingState(isDarkMode)];
     } else if (provider.hasError && provider.items.isEmpty) {
@@ -251,12 +250,17 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                   ),
                 ],
                 border: Border.all(
-                  color: isDarkMode ? const Color(0xFF616161) : Colors.grey.withValues(alpha: 0.2),
+                  color: isDarkMode
+                      ? const Color(0xFF616161)
+                      : Colors.grey.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     Icon(
@@ -276,9 +280,14 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.blueColor.withValues(alpha: 0.1),
+                        color: ColorGlobalVariables.blueColor.withValues(
+                          alpha: 0.1,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -352,7 +361,11 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
     }
   }
 
-  Widget _buildStatsSection(BrandItemsProvider provider, bool isDarkMode, BuildContext context) {
+  Widget _buildStatsSection(
+    BrandItemsProvider provider,
+    bool isDarkMode,
+    BuildContext context,
+  ) {
     final userProvider = Provider.of<UserProvider>(context);
     final priceRange = _calculatePriceRange(provider.items);
     return Container(
@@ -388,14 +401,13 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
 
   Map<String, double> _calculatePriceRange(List<BrandItem> items) {
     if (items.isEmpty) return {'min': 0, 'max': 0};
-    
-    final prices = items.map((item) => double.tryParse(item.price) ?? 0).toList();
+
+    final prices = items
+        .map((item) => double.tryParse(item.price) ?? 0)
+        .toList();
     prices.sort();
-    
-    return {
-      'min': prices.first,
-      'max': prices.last,
-    };
+
+    return {'min': prices.first, 'max': prices.last};
   }
 
   Widget _buildLoadingState(bool isDarkMode) {
@@ -406,9 +418,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircularProgressIndicator(
-                color: ColorGlobalVariables.brownColor,
-              ),
+              CircularProgressIndicator(color: ColorGlobalVariables.brownColor),
               const SizedBox(height: 16),
               Text(
                 'Loading vehicles...',
@@ -432,11 +442,7 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 80,
-              color: Colors.red[400],
-            ),
+            Icon(Icons.error_outline, size: 80, color: Colors.red[400]),
             const SizedBox(height: 24),
             Text(
               'Unable to Load Vehicles',
@@ -554,16 +560,10 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
           mainAxisSpacing: 12,
           childAspectRatio: 0.72,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final item = provider.items[index];
-            return BrandItemCard(
-              item: item,
-              isDarkMode: isDarkMode,
-            );
-          },
-          childCount: provider.items.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final item = provider.items[index];
+          return BrandItemCard(item: item, isDarkMode: isDarkMode);
+        }, childCount: provider.items.length),
       ),
     );
   }
@@ -604,22 +604,28 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDarkMode ? const Color(0xFF1E3A5F) : Colors.blue[50],
+                      color: isDarkMode
+                          ? const Color(0xFF1E3A5F)
+                          : Colors.blue[50],
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.refresh, 
-                          color: isDarkMode ? const Color(0xFF90CAF9) : Colors.blue[700], 
-                          size: 20
+                          Icons.refresh,
+                          color: isDarkMode
+                              ? const Color(0xFF90CAF9)
+                              : Colors.blue[700],
+                          size: 20,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Load More Vehicles',
                           style: TextStyle(
-                            color: isDarkMode ? const Color(0xFF90CAF9) : Colors.blue[700],
+                            color: isDarkMode
+                                ? const Color(0xFF90CAF9)
+                                : Colors.blue[700],
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
@@ -657,9 +663,13 @@ class _SelectedBrandPageState extends State<SelectedBrandPage> {
         final end = fullError.indexOf('",', start);
         return fullError.substring(start, end).replaceAll('"', '');
       }
-      return fullError.length > 150 ? '${fullError.substring(0, 150)}...' : fullError;
+      return fullError.length > 150
+          ? '${fullError.substring(0, 150)}...'
+          : fullError;
     } catch (e) {
-      return fullError.length > 150 ? '${fullError.substring(0, 150)}...' : fullError;
+      return fullError.length > 150
+          ? '${fullError.substring(0, 150)}...'
+          : fullError;
     }
   }
 }
@@ -692,14 +702,32 @@ class _BrandItemCardState extends State<BrandItemCard>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.3), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.3, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+    _initializeVerificationStatus();
     _initializeLikeStatus();
+  }
+
+  void _initializeVerificationStatus() {
+    final userId = widget.item.user?.id;
+    if (userId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Provider.of<UserDetailsProvider>(
+            context,
+            listen: false,
+          ).fetchUserDetails(userId);
+        }
+      });
+    }
   }
 
   void _initializeLikeStatus() {
@@ -710,7 +738,10 @@ class _BrandItemCardState extends State<BrandItemCard>
 
   void _checkWishlistStatus() {
     try {
-      final wishlistManager = Provider.of<WishlistManager>(context, listen: false);
+      final wishlistManager = Provider.of<WishlistManager>(
+        context,
+        listen: false,
+      );
       final isInWishlist = wishlistManager.isLiked(widget.item.id);
       setState(() {
         _isLiked = isInWishlist;
@@ -732,7 +763,10 @@ class _BrandItemCardState extends State<BrandItemCard>
         _animationController.forward();
       }
 
-      final wishlistProvider = Provider.of<WishlistToggleProvider>(context, listen: false);
+      final wishlistProvider = Provider.of<WishlistToggleProvider>(
+        context,
+        listen: false,
+      );
       final result = await wishlistProvider.toggleWishlistItem(
         itemId: widget.item.id,
         context: context,
@@ -742,7 +776,9 @@ class _BrandItemCardState extends State<BrandItemCard>
         setState(() => _isLiked = !_isLiked);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isLiked ? 'Added to wishlist!' : 'Removed from wishlist'),
+            content: Text(
+              _isLiked ? 'Added to wishlist!' : 'Removed from wishlist',
+            ),
             backgroundColor: _isLiked ? Colors.green : Colors.orange,
             duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
@@ -772,7 +808,9 @@ class _BrandItemCardState extends State<BrandItemCard>
   @override
   Widget build(BuildContext context) {
     // Use the extension methods from your model
-    final firstImage = widget.item.firstImage ?? "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final firstImage =
+        widget.item.firstImage ??
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
     final formattedPrice = widget.item.formattedPrice;
     final displayCondition = widget.item.displayCondition;
 
@@ -806,11 +844,15 @@ class _BrandItemCardState extends State<BrandItemCard>
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   child: Container(
                     height: 120,
                     width: double.infinity,
-                    color: widget.isDarkMode ? const Color(0xFF424242) : Colors.grey[200],
+                    color: widget.isDarkMode
+                        ? const Color(0xFF424242)
+                        : Colors.grey[200],
                     child: _buildItemImage(firstImage),
                   ),
                 ),
@@ -820,7 +862,10 @@ class _BrandItemCardState extends State<BrandItemCard>
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withValues(alpha: 0.7),
                         borderRadius: BorderRadius.circular(8),
@@ -848,7 +893,9 @@ class _BrandItemCardState extends State<BrandItemCard>
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: widget.isDarkMode ? const Color(0xFF424242) : Colors.white,
+                            color: widget.isDarkMode
+                                ? const Color(0xFF424242)
+                                : Colors.white,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -865,14 +912,22 @@ class _BrandItemCardState extends State<BrandItemCard>
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      widget.isDarkMode ? Colors.white70 : Colors.grey[600]!,
+                                      widget.isDarkMode
+                                          ? Colors.white70
+                                          : Colors.grey[600]!,
                                     ),
                                   ),
                                 )
                               : Icon(
-                                  _isLiked ? Icons.favorite : Icons.favorite_border,
+                                  _isLiked
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
                                   size: 18,
-                                  color: _isLiked ? Colors.red : (widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
+                                  color: _isLiked
+                                      ? Colors.red
+                                      : (widget.isDarkMode
+                                            ? Colors.white70
+                                            : Colors.grey[600]),
                                 ),
                         ),
                       ),
@@ -896,7 +951,9 @@ class _BrandItemCardState extends State<BrandItemCard>
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: widget.isDarkMode ? Colors.white : Colors.black87,
+                            color: widget.isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -906,7 +963,9 @@ class _BrandItemCardState extends State<BrandItemCard>
                         widget.item.displayYear,
                         style: TextStyle(
                           fontSize: 12,
-                          color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
+                          color: widget.isDarkMode
+                              ? Colors.white70
+                              : Colors.grey[600],
                         ),
                       ),
                     ],
@@ -920,16 +979,25 @@ class _BrandItemCardState extends State<BrandItemCard>
                           message: formattedPrice,
                           preferBelow: false,
                           margin: EdgeInsets.all(8),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: widget.isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
+                            color: widget.isDarkMode
+                                ? const Color(0xFF424242)
+                                : Colors.grey[50],
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: widget.isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!,
+                              color: widget.isDarkMode
+                                  ? const Color(0xFF616161)
+                                  : Colors.grey[300]!,
                             ),
                           ),
                           textStyle: TextStyle(
-                            color: widget.isDarkMode ? Colors.white : Colors.black87,
+                            color: widget.isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
@@ -950,28 +1018,45 @@ class _BrandItemCardState extends State<BrandItemCard>
                           message: '${widget.item.mileage} km',
                           preferBelow: false,
                           margin: EdgeInsets.all(8),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: widget.isDarkMode ? const Color(0xFF424242) : Colors.grey[50],
+                            color: widget.isDarkMode
+                                ? const Color(0xFF424242)
+                                : Colors.grey[50],
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: widget.isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!,
+                              color: widget.isDarkMode
+                                  ? const Color(0xFF616161)
+                                  : Colors.grey[300]!,
                             ),
                           ),
                           textStyle: TextStyle(
-                            color: widget.isDarkMode ? Colors.white : Colors.black87,
+                            color: widget.isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.speed, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
+                              Icon(
+                                Icons.speed,
+                                size: 14,
+                                color: widget.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 "${formatNumber(shortenerRequired: true, number: int.parse(widget.item.mileage!))} km",
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
+                                  color: widget.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey[600],
                                 ),
                               ),
                             ],
@@ -987,13 +1072,21 @@ class _BrandItemCardState extends State<BrandItemCard>
                       if (widget.item.transmission != null)
                         Row(
                           children: [
-                            Icon(Icons.settings, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
+                            Icon(
+                              Icons.settings,
+                              size: 14,
+                              color: widget.isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               widget.item.transmission!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
+                                color: widget.isDarkMode
+                                    ? Colors.white70
+                                    : Colors.grey[600],
                               ),
                             ),
                           ],
@@ -1001,14 +1094,22 @@ class _BrandItemCardState extends State<BrandItemCard>
                       Flexible(
                         child: Row(
                           children: [
-                            Icon(Icons.location_on, size: 14, color: widget.isDarkMode ? Colors.white70 : Colors.grey[600]),
+                            Icon(
+                              Icons.location_on,
+                              size: 14,
+                              color: widget.isDarkMode
+                                  ? Colors.white70
+                                  : Colors.grey[600],
+                            ),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 widget.item.displayLocation,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
+                                  color: widget.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.grey[600],
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -1018,6 +1119,40 @@ class _BrandItemCardState extends State<BrandItemCard>
                         ),
                       ),
                     ],
+                  ),
+
+                  // VERIFIED DEALER INDICATOR (Repositioned to the end)
+                  Consumer<UserDetailsProvider>(
+                    builder: (context, userDetailsProvider, child) {
+                      final userId = widget.item.user?.id;
+                      if (userId != null &&
+                          userDetailsProvider.isVerifiedDealer(userId)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.verified,
+                                color: Colors.blue[600],
+                                size: 12,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'VERIFIED DEALER',
+                                style: TextStyle(
+                                  color: Colors.blue[600],
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
                   ),
                 ],
               ),
@@ -1029,13 +1164,16 @@ class _BrandItemCardState extends State<BrandItemCard>
   }
 
   Widget _buildItemImage(String imageUrl) {
-    final bool isAssetImage = imageUrl == "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
+    final bool isAssetImage =
+        imageUrl ==
+        "${ImageStringGlobalVariables.imagePath}car_placeholder.png";
 
     if (isAssetImage) {
       return Image.asset(
         imageUrl,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => _buildImageErrorPlaceholder(),
+        errorBuilder: (context, error, stackTrace) =>
+            _buildImageErrorPlaceholder(),
       );
     } else {
       return CachedNetworkImage(
@@ -1045,7 +1183,9 @@ class _BrandItemCardState extends State<BrandItemCard>
           child: CircularProgressIndicator(
             value: downloadProgress.progress,
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              ColorGlobalVariables.brownColor,
+            ),
           ),
         ),
         errorWidget: (context, url, error) => _buildImageErrorPlaceholder(),
@@ -1061,8 +1201,8 @@ class _BrandItemCardState extends State<BrandItemCard>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.image_not_supported, 
-              size: 32, 
+              Icons.image_not_supported,
+              size: 32,
               color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
             ),
             const SizedBox(height: 4),

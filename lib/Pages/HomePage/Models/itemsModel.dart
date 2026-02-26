@@ -51,7 +51,7 @@ class BrandModel with _$BrandModel {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _BrandModel;
 
-  factory BrandModel.fromJson(Map<String, dynamic> json) => 
+  factory BrandModel.fromJson(Map<String, dynamic> json) =>
       _$BrandModelFromJson(json);
 }
 
@@ -70,7 +70,7 @@ class Category with _$Category {
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Category;
 
-  factory Category.fromJson(Map<String, dynamic> json) => 
+  factory Category.fromJson(Map<String, dynamic> json) =>
       _$CategoryFromJson(json);
 }
 
@@ -115,7 +115,7 @@ class RecommendedItem with _$RecommendedItem {
     @JsonKey(name: 'is_promoted') bool? isPromoted,
   }) = _RecommendedItem;
 
-  factory RecommendedItem.fromJson(Map<String, dynamic> json) => 
+  factory RecommendedItem.fromJson(Map<String, dynamic> json) =>
       _$RecommendedItemFromJson(json);
 }
 
@@ -127,7 +127,7 @@ class RecommendedResponse with _$RecommendedResponse {
     required RecommendedMeta meta,
   }) = _RecommendedResponse;
 
-  factory RecommendedResponse.fromJson(Map<String, dynamic> json) => 
+  factory RecommendedResponse.fromJson(Map<String, dynamic> json) =>
       _$RecommendedResponseFromJson(json);
 }
 
@@ -140,7 +140,7 @@ class RecommendedLinks with _$RecommendedLinks {
     String? next,
   }) = _RecommendedLinks;
 
-  factory RecommendedLinks.fromJson(Map<String, dynamic> json) => 
+  factory RecommendedLinks.fromJson(Map<String, dynamic> json) =>
       _$RecommendedLinksFromJson(json);
 }
 
@@ -148,16 +148,16 @@ class RecommendedLinks with _$RecommendedLinks {
 class RecommendedMeta with _$RecommendedMeta {
   const factory RecommendedMeta({
     @JsonKey(name: 'current_page') required int currentPage,
-    required int? from,        // FIXED: Made nullable
+    required int? from, // FIXED: Made nullable
     @JsonKey(name: 'last_page') required int lastPage,
     required List<RecommendedMetaLink> links,
     required String path,
     @JsonKey(name: 'per_page') required int perPage,
-    required int? to,          // FIXED: Made nullable
+    required int? to, // FIXED: Made nullable
     required int total,
   }) = _RecommendedMeta;
 
-  factory RecommendedMeta.fromJson(Map<String, dynamic> json) => 
+  factory RecommendedMeta.fromJson(Map<String, dynamic> json) =>
       _$RecommendedMetaFromJson(json);
 }
 
@@ -170,6 +170,6 @@ class RecommendedMetaLink with _$RecommendedMetaLink {
     required bool active,
   }) = _RecommendedMetaLink;
 
-  factory RecommendedMetaLink.fromJson(Map<String, dynamic> json) => 
+  factory RecommendedMetaLink.fromJson(Map<String, dynamic> json) =>
       _$RecommendedMetaLinkFromJson(json);
 }
