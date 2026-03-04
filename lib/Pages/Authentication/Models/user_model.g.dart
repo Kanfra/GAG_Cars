@@ -6,40 +6,39 @@ part of 'user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
-    _$UserModelImpl(
-      id: json['id'] as String?,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      password: json['password'] as String?,
-      phoneNumber: json['phone'] as String?,
-      paidSeller: (json['paid_seller'] as num?)?.toInt(),
-      emailVerifiedAt: json['email_verified_at'] == null
-          ? null
-          : DateTime.parse(json['email_verified_at'] as String),
-      countryId: (json['country_id'] as num?)?.toInt(),
-      stateId: (json['state_id'] as num?)?.toInt(),
-      profileImage: json['profile_photo'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
-      deletedAt: json['deleted_at'] == null
-          ? null
-          : DateTime.parse(json['deleted_at'] as String),
-      uploadsLeft: (json['uploads_left'] as num?)?.toInt(),
-      activeStatus: (json['active_status'] as num?)?.toInt(),
-      avatar: json['avatar'] as String?,
-      darkMode: (json['dark_mode'] as num?)?.toInt(),
-      messengerColor: json['messenger_color'] as String?,
-      country: json['country'] == null
-          ? null
-          : CountryModel.fromJson(json['country'] as Map<String, dynamic>),
-    );
+_UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
+  id: json['id'] as String?,
+  name: json['name'] as String,
+  email: json['email'] as String,
+  password: json['password'] as String?,
+  phoneNumber: json['phone'] as String?,
+  paidSeller: (json['paid_seller'] as num?)?.toInt(),
+  emailVerifiedAt: json['email_verified_at'] == null
+      ? null
+      : DateTime.parse(json['email_verified_at'] as String),
+  countryId: (json['country_id'] as num?)?.toInt(),
+  stateId: (json['state_id'] as num?)?.toInt(),
+  profileImage: json['profile_photo'] as String?,
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+  deletedAt: json['deleted_at'] == null
+      ? null
+      : DateTime.parse(json['deleted_at'] as String),
+  uploadsLeft: (json['uploads_left'] as num?)?.toInt(),
+  activeStatus: (json['active_status'] as num?)?.toInt(),
+  avatar: json['avatar'] as String?,
+  darkMode: (json['dark_mode'] as num?)?.toInt(),
+  messengerColor: json['messenger_color'] as String?,
+  country: json['country'] == null
+      ? null
+      : CountryModel.fromJson(json['country'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
+Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -62,8 +61,8 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'country': instance.country?.toJson(),
     };
 
-_$CountryModelImpl _$$CountryModelImplFromJson(Map<String, dynamic> json) =>
-    _$CountryModelImpl(
+_CountryModel _$CountryModelFromJson(Map<String, dynamic> json) =>
+    _CountryModel(
       id: (json['id'] as num?)?.toInt(),
       name: json['name'] as String?,
       iso3: json['iso3'] as String?,
@@ -83,7 +82,7 @@ _$CountryModelImpl _$$CountryModelImplFromJson(Map<String, dynamic> json) =>
       emoji: json['emoji'] as String?,
     );
 
-Map<String, dynamic> _$$CountryModelImplToJson(_$CountryModelImpl instance) =>
+Map<String, dynamic> _$CountryModelToJson(_CountryModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

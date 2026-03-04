@@ -5,7 +5,7 @@ part 'specialOfferModel.freezed.dart';
 part 'specialOfferModel.g.dart';
 
 @freezed
-class SpecialOfferResponse with _$SpecialOfferResponse {
+abstract class SpecialOfferResponse with _$SpecialOfferResponse {
   const factory SpecialOfferResponse({
     @Default([]) List<SpecialOffer> data,
     PaginationLinks? links,
@@ -17,7 +17,7 @@ class SpecialOfferResponse with _$SpecialOfferResponse {
 }
 
 @freezed
-class SpecialOffer with _$SpecialOffer {
+abstract class SpecialOffer with _$SpecialOffer {
   const factory SpecialOffer({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
@@ -41,7 +41,7 @@ class SpecialOffer with _$SpecialOffer {
 }
 
 @freezed
-class Item with _$Item {
+abstract class Item with _$Item {
   const factory Item({
     @JsonKey(fromJson: _parseString) required String id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
@@ -90,7 +90,7 @@ class Item with _$Item {
 }
 
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     @JsonKey(fromJson: _parseString) required String id,
     @JsonKey(fromJson: _parseString) required String name,
@@ -118,7 +118,7 @@ class User with _$User {
 }
 
 @freezed
-class Brand with _$Brand {
+abstract class Brand with _$Brand {
   const factory Brand({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
@@ -133,7 +133,7 @@ class Brand with _$Brand {
 }
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
@@ -152,7 +152,7 @@ class Category with _$Category {
 }
 
 @freezed
-class BrandModel with _$BrandModel {
+abstract class BrandModel with _$BrandModel {
   const factory BrandModel({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'brand_id', fromJson: _parseInt) int? brandId,
@@ -167,7 +167,7 @@ class BrandModel with _$BrandModel {
 }
 
 @freezed
-class PaginationLinks with _$PaginationLinks {
+abstract class PaginationLinks with _$PaginationLinks {
   const factory PaginationLinks({
     String? first,
     String? last,
@@ -180,7 +180,7 @@ class PaginationLinks with _$PaginationLinks {
 }
 
 @freezed
-class PaginationMeta with _$PaginationMeta {
+abstract class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     @JsonKey(name: 'current_page', fromJson: _parseInt)
     required int currentPage,
@@ -198,7 +198,7 @@ class PaginationMeta with _$PaginationMeta {
 }
 
 @freezed
-class PaginationMetaLink with _$PaginationMetaLink {
+abstract class PaginationMetaLink with _$PaginationMetaLink {
   const factory PaginationMetaLink({String? url, String? label, bool? active}) =
       _PaginationMetaLink;
 

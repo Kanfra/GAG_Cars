@@ -6,7 +6,7 @@ part 'packageModel.g.dart';
 typedef PackageList = List<Package>;
 
 @freezed
-class Package with _$Package {
+abstract class Package with _$Package {
   const factory Package({
     required String id,
     @JsonKey(name: 'country_id') required int countryId,
@@ -27,7 +27,7 @@ class Package with _$Package {
 }
 
 @freezed
-class Country with _$Country {
+abstract class Country with _$Country {
   const factory Country({
     required int id,
     required String name,

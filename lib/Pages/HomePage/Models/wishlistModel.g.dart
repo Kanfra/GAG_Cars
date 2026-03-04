@@ -6,22 +6,18 @@ part of 'wishlistModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$WishlistResponseImpl _$$WishlistResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$WishlistResponseImpl(
+_WishlistResponse _$WishlistResponseFromJson(Map<String, dynamic> json) =>
+    _WishlistResponse(
       data: (json['data'] as List<dynamic>)
           .map((e) => WishlistItem.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
-Map<String, dynamic> _$$WishlistResponseImplToJson(
-        _$WishlistResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-    };
+Map<String, dynamic> _$WishlistResponseToJson(_WishlistResponse instance) =>
+    <String, dynamic>{'data': instance.data};
 
-_$WishlistItemImpl _$$WishlistItemImplFromJson(Map<String, dynamic> json) =>
-    _$WishlistItemImpl(
+_WishlistItem _$WishlistItemFromJson(Map<String, dynamic> json) =>
+    _WishlistItem(
       id: json['id'] as String,
       userId: json['user_id'] as String,
       itemId: json['item_id'] as String,
@@ -30,7 +26,7 @@ _$WishlistItemImpl _$$WishlistItemImplFromJson(Map<String, dynamic> json) =>
       item: RecommendedItem.fromJson(json['item'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$WishlistItemImplToJson(_$WishlistItemImpl instance) =>
+Map<String, dynamic> _$WishlistItemToJson(_WishlistItem instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -40,9 +36,8 @@ Map<String, dynamic> _$$WishlistItemImplToJson(_$WishlistItemImpl instance) =>
       'item': instance.item,
     };
 
-_$RecommendedItemImpl _$$RecommendedItemImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RecommendedItemImpl(
+_RecommendedItem _$RecommendedItemFromJson(Map<String, dynamic> json) =>
+    _RecommendedItem(
       id: json['id'] as String,
       userId: json['user_id'] as String?,
       countryId: (json['country_id'] as num?)?.toInt(),
@@ -53,8 +48,9 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       year: json['year'] as String?,
       slug: json['slug'] as String?,
       description: json['description'] as String?,
-      images:
-          (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       location: json['location'] as String?,
       serialNumber: json['serial_number'] as String?,
       condition: json['condition'] as String?,
@@ -83,8 +79,7 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       VIN: json['VIN'] as String?,
     );
 
-Map<String, dynamic> _$$RecommendedItemImplToJson(
-        _$RecommendedItemImpl instance) =>
+Map<String, dynamic> _$RecommendedItemToJson(_RecommendedItem instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,

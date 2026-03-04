@@ -36,7 +36,7 @@ bool _parseDynamicToBool(dynamic value) {
 }
 
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     @JsonKey(fromJson: _parseDynamicToString) required String id,
     required String name,
@@ -57,7 +57,7 @@ class User with _$User {
 }
 
 @freezed
-class Brand with _$Brand {
+abstract class Brand with _$Brand {
   const factory Brand({
     @JsonKey(fromJson: _parseDynamicToInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
@@ -72,7 +72,7 @@ class Brand with _$Brand {
 }
 
 @freezed
-class BrandModel with _$BrandModel {
+abstract class BrandModel with _$BrandModel {
   const factory BrandModel({
     @JsonKey(fromJson: _parseDynamicToInt) required int id,
     @JsonKey(name: 'brand_id', fromJson: _parseDynamicToInt)
@@ -88,7 +88,7 @@ class BrandModel with _$BrandModel {
 }
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     @JsonKey(fromJson: _parseDynamicToInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
@@ -107,7 +107,7 @@ class Category with _$Category {
 }
 
 @freezed
-class SingleItem with _$SingleItem {
+abstract class SingleItem with _$SingleItem {
   const factory SingleItem({
     @JsonKey(fromJson: _parseDynamicToString) required String id,
     @JsonKey(name: 'user_id', fromJson: _parseDynamicToString) String? userId,
@@ -159,7 +159,7 @@ class SingleItem with _$SingleItem {
 }
 
 @freezed
-class SingleItemResponse with _$SingleItemResponse {
+abstract class SingleItemResponse with _$SingleItemResponse {
   const factory SingleItemResponse({
     required List<SingleItem> data,
     required SingleItemLinks links,
@@ -171,7 +171,7 @@ class SingleItemResponse with _$SingleItemResponse {
 }
 
 @freezed
-class SingleItemLinks with _$SingleItemLinks {
+abstract class SingleItemLinks with _$SingleItemLinks {
   const factory SingleItemLinks({
     required String first,
     required String last,
@@ -184,7 +184,7 @@ class SingleItemLinks with _$SingleItemLinks {
 }
 
 @freezed
-class SingleItemMeta with _$SingleItemMeta {
+abstract class SingleItemMeta with _$SingleItemMeta {
   const factory SingleItemMeta({
     @JsonKey(name: 'current_page', fromJson: _parseDynamicToInt)
     required int currentPage,
@@ -204,7 +204,7 @@ class SingleItemMeta with _$SingleItemMeta {
 }
 
 @freezed
-class SingleItemMetaLink with _$SingleItemMetaLink {
+abstract class SingleItemMetaLink with _$SingleItemMetaLink {
   const factory SingleItemMetaLink({
     @JsonKey(fromJson: _parseDynamicToString) String? url,
     @JsonKey(fromJson: _parseDynamicToString) required String label,

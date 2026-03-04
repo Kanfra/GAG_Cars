@@ -6,7 +6,7 @@ part 'trendingMakeModel.g.dart';
 
 // If you want to keep the TrendingMake name but match the API structure
 @freezed
-class TrendingMake with _$TrendingMake {
+abstract class TrendingMake with _$TrendingMake {
   const factory TrendingMake({
     @JsonKey(fromJson: _safeParseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _safeParseString) String? userId,
@@ -24,7 +24,7 @@ class TrendingMake with _$TrendingMake {
 
 // Brand Model (Car Model)
 @freezed
-class BrandModel with _$BrandModel {
+abstract class BrandModel with _$BrandModel {
   const factory BrandModel({
     @JsonKey(fromJson: _safeParseInt) required int id,
     @JsonKey(name: 'brand_id', fromJson: _safeParseInt) required int brandId,
@@ -39,7 +39,7 @@ class BrandModel with _$BrandModel {
 
 // Main Response - Updated to work with your fetchTrendingMakes function
 @freezed
-class TrendingMakeResponse with _$TrendingMakeResponse {
+abstract class TrendingMakeResponse with _$TrendingMakeResponse {
   const factory TrendingMakeResponse({
     @JsonKey(fromJson: _safeParseTrendingMakeList) required List<TrendingMake> data,
     @JsonKey(fromJson: _safeParsePaginationLinks) required PaginationLinks links,
@@ -51,7 +51,7 @@ class TrendingMakeResponse with _$TrendingMakeResponse {
 
 // Pagination Models (keeping your existing pagination structure)
 @freezed
-class PaginationLinks with _$PaginationLinks {
+abstract class PaginationLinks with _$PaginationLinks {
   const factory PaginationLinks({
     @JsonKey(fromJson: _safeParseStringWithDefault) required String first,
     @JsonKey(fromJson: _safeParseStringWithDefault) required String last,
@@ -63,7 +63,7 @@ class PaginationLinks with _$PaginationLinks {
 }
 
 @freezed
-class PaginationMeta with _$PaginationMeta {
+abstract class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     @JsonKey(name: 'current_page', fromJson: _safeParseIntWithDefault) required int currentPage,
     @JsonKey(fromJson: _safeParseIntWithDefault) required int from,
@@ -79,7 +79,7 @@ class PaginationMeta with _$PaginationMeta {
 }
 
 @freezed
-class PaginationMetaLink with _$PaginationMetaLink {
+abstract class PaginationMetaLink with _$PaginationMetaLink {
   const factory PaginationMetaLink({
     @JsonKey(fromJson: _safeParseString) String? url,
     @JsonKey(fromJson: _safeParseStringWithDefault) required String label,

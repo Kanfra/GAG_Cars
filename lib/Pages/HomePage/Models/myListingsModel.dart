@@ -20,7 +20,7 @@ int _parseInt(dynamic value) {
 }
 
 @freezed
-class MyListing with _$MyListing {
+abstract class MyListing with _$MyListing {
   const factory MyListing({
     @JsonKey(fromJson: _parseString) required String id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) required int userId,
@@ -62,7 +62,7 @@ class MyListing with _$MyListing {
 }
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,

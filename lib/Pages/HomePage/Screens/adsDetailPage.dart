@@ -10,22 +10,23 @@ import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.da
 import 'package:get/get.dart';
 import 'package:logger/Logger.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:intl/intl.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AdsDetailPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
 
-  const AdsDetailPage({
-    super.key,
-    required this.allJson,
-  });
+  const AdsDetailPage({super.key, required this.allJson});
 
   @override
   State<AdsDetailPage> createState() => _AdsDetailPageState();
 }
 
-class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProviderStateMixin {
+class _AdsDetailPageState extends State<AdsDetailPage>
+    with SingleTickerProviderStateMixin {
   late final Listing listing;
   late final Map<String, dynamic> user;
   final logger = Logger();
@@ -35,7 +36,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   double _imageOpacity = 1.0;
   bool _isSold = false;
   bool _isPromoted = false;
-  
+
   // Profile image animation controllers
   late AnimationController _profileImageController;
   late Animation<double> _profileImageScaleAnimation;
@@ -51,15 +52,15 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize listing and user from arguments
     try {
       listing = widget.allJson['listing'] as Listing;
       user = widget.allJson['user'] as Map<String, dynamic>;
-      
+
       _isSold = listing.status == 'sold';
       _isPromoted = listing.isPromoted == true;
-      
+
       logger.i('AdsDetailPage - Listing loaded: ${listing.name}');
       logger.i('AdsDetailPage - User loaded: ${_getUserName()}');
     } catch (e) {
@@ -67,39 +68,49 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
       listing = const Listing();
       user = {};
     }
-    
+
     // Initialize profile image animation controller
     _profileImageController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
-    _profileImageScaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.1), weight: 50),
-      TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
-    ]).animate(CurvedAnimation(
-      parent: _profileImageController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _profileImageFadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _profileImageController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _profileImageScaleAnimation =
+        TweenSequence<double>([
+          TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.1), weight: 50),
+          TweenSequenceItem(tween: Tween(begin: 1.1, end: 1.0), weight: 50),
+        ]).animate(
+          CurvedAnimation(
+            parent: _profileImageController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _profileImageFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _profileImageController, curve: Curves.easeInOut),
+    );
+
     // Initialize full screen page controller
     _fullScreenPageController = PageController(initialPage: selectedIndex);
     _currentFullScreenIndex = selectedIndex;
-    
+
+    // Fetch user details for verification status
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchUserDetails();
+      if (listing.createdAt == null) {
+        _fetchFullListingData();
+      }
+    });
+
     _scrollController.addListener(() {
       if (mounted) {
         setState(() {
           final scrollOffset = _scrollController.offset;
-          _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(0.0, 1.0);
-          
+          _imageOpacity = (1.0 - (scrollOffset / _appBarHeight)).clamp(
+            0.0,
+            1.0,
+          );
+
           if (scrollOffset > 0) {
             _appBarHeight = (300 - scrollOffset).clamp(100.0, 300.0);
           } else {
@@ -108,6 +119,28 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         });
       }
     });
+  }
+
+  Future<void> _fetchFullListingData() async {
+    final listingId = listing.id;
+    if (listingId == null || listingId.isEmpty) return;
+    try {
+      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+      await homeProvider.fetchRecommendedById(listingId);
+      if (mounted && homeProvider.selectedItem != null) {
+        setState(() {
+          final fetchedItem = homeProvider.selectedItem!;
+          if (fetchedItem.id.toString() == listingId.toString()) {
+            listing = listing.copyWith(createdAt: fetchedItem.createdAt);
+            logger.i(
+              '✅ [ADS_DETAIL_PAGE] Full data refreshed with createdAt: ${listing.createdAt}',
+            );
+          }
+        });
+      }
+    } catch (e) {
+      logger.e('Error fetching full listing data: $e');
+    }
   }
 
   @override
@@ -122,15 +155,15 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
 
   void _showFullScreenImage(int startIndex) {
     logger.i('Opening full screen image viewer at index: $startIndex');
-    
+
     setState(() {
       _currentFullScreenIndex = startIndex;
       _updateArrowVisibility(startIndex);
     });
-    
+
     // Update page controller to start at the selected index
     _fullScreenPageController = PageController(initialPage: startIndex);
-    
+
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black87,
@@ -139,7 +172,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) {
         final images = getListingImages();
-        
+
         return Dialog(
           backgroundColor: Colors.black,
           insetPadding: EdgeInsets.zero,
@@ -173,7 +206,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       },
                     ),
                   ),
-                  
+
                   // Close button
                   Positioned(
                     top: 50,
@@ -194,13 +227,16 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       ),
                     ),
                   ),
-                  
+
                   // Position indicator
                   Positioned(
                     top: 50,
                     left: 20,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(20),
@@ -215,7 +251,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       ),
                     ),
                   ),
-                  
+
                   // Navigation instructions
                   Positioned(
                     bottom: 100,
@@ -225,12 +261,18 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       opacity: 1.0,
                       duration: const Duration(seconds: 1),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.black54,
                                 borderRadius: BorderRadius.circular(20),
@@ -238,7 +280,11 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.touch_app, color: Colors.white70, size: 18),
+                                  Icon(
+                                    Icons.touch_app,
+                                    color: Colors.white70,
+                                    size: 18,
+                                  ),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Swipe or use arrow buttons',
@@ -255,7 +301,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       ),
                     ),
                   ),
-                  
+
                   // LEFT ARROW BUTTON - Shows when not on first image
                   if (_showLeftArrow)
                     Positioned(
@@ -287,7 +333,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         ),
                       ),
                     ),
-                  
+
                   // RIGHT ARROW BUTTON - Shows when not on last image
                   if (_showRightArrow)
                     Positioned(
@@ -331,10 +377,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
             parent: animation,
             curve: Curves.fastOutSlowIn,
           ),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
+          child: FadeTransition(opacity: animation, child: child),
         );
       },
     ).then((_) {
@@ -383,7 +426,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     final profilePhoto = _getUserProfilePhoto();
     final userName = _getUserName();
     final hasProfilePhoto = profilePhoto != null;
-    
+
     logger.i('Building profile popup - Has photo: $hasProfilePhoto');
 
     return Material(
@@ -397,12 +440,14 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
               animation: _profileImageFadeAnimation,
               builder: (context, child) {
                 return Container(
-                  color: Colors.black.withValues(alpha: 0.9 * _profileImageFadeAnimation.value),
+                  color: Colors.black.withValues(
+                    alpha: 0.9 * _profileImageFadeAnimation.value,
+                  ),
                 );
               },
             ),
           ),
-          
+
           // Profile image content
           Center(
             child: AnimatedBuilder(
@@ -460,9 +505,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                             : _buildDefaultProfileAvatar(size: 200),
                       ),
                     ),
-                    
+
                     const SizedBox(height: 20),
-                    
+
                     // User name
                     Text(
                       userName,
@@ -473,23 +518,23 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // User info
                     Text(
                       'Vehicle Seller',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.grey[600], fontSize: 16),
                     ),
 
                     // Info text when no profile photo
                     if (!hasProfilePhoto) ...[
                       const SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(12),
@@ -504,9 +549,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         ),
                       ),
                     ],
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Close button
                     SizedBox(
                       width: double.infinity,
@@ -549,7 +594,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     final userProvider = Provider.of<UserProvider>(context);
     final price = listing.price;
     if (price != null && price.isNotEmpty) {
-      return '${userProvider.user?.countryCurrencySymbol ?? ''} ${formatNumber(shortenerRequired: false, number: int.tryParse(price) ?? 0)}';
+      final int priceVal = int.tryParse(price) ?? 0;
+
+      // Format with commas manually or using a lightweight approach
+      final String formatted = NumberFormat("#,##0").format(priceVal);
+
+      return '${userProvider.user?.countryCurrencySymbol ?? ''} $formatted';
     }
     return '${userProvider.user?.countryCurrencySymbol ?? ''} 0';
   }
@@ -564,24 +614,27 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
       if (images == null || images.isEmpty) {
         return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
       }
-      
-      final validImages = images.where((image) => 
-        image.toString().isNotEmpty
-      ).map((image) {
-        String imageUrl = image.toString();
-        
-        if (imageUrl.startsWith('http')) {
-          return imageUrl;
-        }
-        
-        if (!imageUrl.contains('/') && !imageUrl.startsWith('assets/')) {
-          return 'https://dashboard.gagcars.com/storage/$imageUrl';
-        }
-        
-        return imageUrl;
-      }).toList();
-      
-      return validImages.isNotEmpty ? validImages : ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
+
+      final validImages = images
+          .where((image) => image.toString().isNotEmpty)
+          .map((image) {
+            String imageUrl = image.toString();
+
+            if (imageUrl.startsWith('http')) {
+              return imageUrl;
+            }
+
+            if (!imageUrl.contains('/') && !imageUrl.startsWith('assets/')) {
+              return 'https://dashboard.gagcars.com/storage/$imageUrl';
+            }
+
+            return imageUrl;
+          })
+          .toList();
+
+      return validImages.isNotEmpty
+          ? validImages
+          : ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
     } catch (e) {
       logger.e('Error getting listing images: $e');
       return ['${ImageStringGlobalVariables.imagePath}car_placeholder.png'];
@@ -644,14 +697,15 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   bool get hasWarranty {
     final warranty = listing.warranty;
     if (warranty is bool) return warranty;
-    if (warranty is String) return warranty.toLowerCase() == 'true' || warranty.isNotEmpty;
+    if (warranty is String)
+      return warranty.toLowerCase() == 'true' || warranty.isNotEmpty;
     if (warranty is num) return warranty > 0;
     return false;
   }
 
   String getWarrantyDetails() {
     if (!hasWarranty) return '';
-    
+
     final warranty = listing.warranty;
     if (warranty is String && warranty.isNotEmpty) return warranty;
     return 'Warranty Included';
@@ -659,9 +713,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
 
   // User information methods
   String _getUserName() {
-    return user['name']?.toString() ?? 
-           user['username']?.toString() ??
-           'Seller';
+    return user['name']?.toString() ?? user['username']?.toString() ?? 'Seller';
   }
 
   String? _getUserProfilePhoto() {
@@ -683,39 +735,50 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     return user['created_at']?.toString();
   }
 
+  void _fetchUserDetails() {
+    final userId = _getUserId();
+    if (userId != null && mounted) {
+      final userDetailsProvider = Provider.of<UserDetailsProvider>(
+        context,
+        listen: false,
+      );
+      userDetailsProvider.fetchUserDetails(userId);
+    }
+  }
+
   List<Map<String, String>> getHighlights() {
     final List<Map<String, String>> highlights = [];
-    
+
     final year = getListingYear();
     if (year != 'N/A') {
       highlights.add({'title': 'Model Year', 'value': year});
     }
-    
+
     final mileage = getListingMileage();
     if (mileage != 'N/A') {
       highlights.add({'title': 'Mileage', 'value': mileage});
     }
-    
+
     final engine = getListingEngineCapacity();
     if (engine != 'N/A') {
       highlights.add({'title': 'Engine Capacity', 'value': engine});
     }
-    
+
     final condition = getListingCondition();
     if (condition != 'N/A') {
       highlights.add({'title': 'Condition', 'value': condition});
     }
-    
+
     final transmission = getListingTransmission();
     if (transmission != 'N/A') {
       highlights.add({'title': 'Transmission', 'value': transmission});
     }
-    
+
     if (hasWarranty) {
       final warrantyDetails = getWarrantyDetails();
       highlights.add({'title': 'Warranty', 'value': warrantyDetails});
     }
-    
+
     if (highlights.isEmpty) {
       highlights.addAll([
         {'title': 'Model Year', 'value': getListingYear()},
@@ -723,38 +786,39 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         {'title': 'Condition', 'value': getListingCondition()},
       ]);
     }
-    
+
     return highlights;
   }
 
   List<Map<String, String>> getSpecifications() {
     final List<Map<String, String>> specifications = [];
-    
+
     final color = getListingColor();
     if (color != 'N/A') {
       specifications.add({'title': 'Color', 'value': color});
     }
-    
+
     final bodyType = getListingBodyType();
     if (bodyType != 'N/A') {
       specifications.add({'title': 'Body Type', 'value': bodyType});
     }
-    
+
     final seats = getListingSeats();
     if (seats != 'N/A') {
       specifications.add({'title': 'Seating Capacity', 'value': seats});
     }
-    
+
     final steerPosition = listing.steerPosition;
     if (steerPosition != null && steerPosition.isNotEmpty) {
       specifications.add({'title': 'Steering', 'value': steerPosition});
     }
-    
+
     final transmission = getListingTransmission();
-    if (transmission != 'N/A' && !specifications.any((spec) => spec['title'] == 'Transmission')) {
+    if (transmission != 'N/A' &&
+        !specifications.any((spec) => spec['title'] == 'Transmission')) {
       specifications.add({'title': 'Transmission', 'value': transmission});
     }
-    
+
     if (specifications.isEmpty) {
       specifications.addAll([
         {'title': 'Color', 'value': getListingColor()},
@@ -762,7 +826,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         {'title': 'Seating Capacity', 'value': getListingSeats()},
       ]);
     }
-    
+
     return specifications;
   }
 
@@ -779,7 +843,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
 
     try {
       String baseUrl = "https://dashboard.gagcars.com";
-      
+
       String cleanImagePath;
       if (imagePath.startsWith('/storage/')) {
         cleanImagePath = imagePath;
@@ -788,7 +852,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
       } else {
         cleanImagePath = '/storage/$imagePath';
       }
-      
+
       final fullUrl = '$baseUrl$cleanImagePath';
       return fullUrl;
     } catch (e) {
@@ -796,11 +860,17 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     }
   }
 
-  Widget _buildImageErrorPlaceholder(double? width, double? height, ThemeData theme) {
+  Widget _buildImageErrorPlaceholder(
+    double? width,
+    double? height,
+    ThemeData theme,
+  ) {
     return Container(
       width: width,
       height: height,
-      color: theme.brightness == Brightness.dark ? Colors.grey[800] : Colors.grey[200],
+      color: theme.brightness == Brightness.dark
+          ? Colors.grey[800]
+          : Colors.grey[200],
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -808,14 +878,18 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
             Icon(
               Icons.image_not_supported,
               size: (width ?? 45) * 0.4,
-              color: theme.brightness == Brightness.dark ? Colors.grey[500] : Colors.grey[400],
+              color: theme.brightness == Brightness.dark
+                  ? Colors.grey[500]
+                  : Colors.grey[400],
             ),
             const SizedBox(height: 4),
             Text(
               'No Image',
               style: TextStyle(
                 fontSize: 10,
-                color: theme.brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[500],
+                color: theme.brightness == Brightness.dark
+                    ? Colors.grey[400]
+                    : Colors.grey[500],
               ),
             ),
           ],
@@ -824,22 +898,31 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildShimmerPlaceholder(double? width, double? height, ThemeData theme) {
+  Widget _buildShimmerPlaceholder(
+    double? width,
+    double? height,
+    ThemeData theme,
+  ) {
     return Shimmer.fromColors(
-      baseColor: theme.brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[300]!,
-      highlightColor: theme.brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[100]!,
-      child: Container(
-        width: width,
-        height: height,
-        color: theme.cardColor,
-      ),
+      baseColor: theme.brightness == Brightness.dark
+          ? Colors.grey[700]!
+          : Colors.grey[300]!,
+      highlightColor: theme.brightness == Brightness.dark
+          ? Colors.grey[600]!
+          : Colors.grey[100]!,
+      child: Container(width: width, height: height, color: theme.cardColor),
     );
   }
 
-  Widget _buildSafeNetworkImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  Widget _buildSafeNetworkImage(
+    String imagePath, {
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+  }) {
     final theme = Theme.of(context);
     final String imageUrl = _getCorrectImageUrl(imagePath);
-    
+
     return CachedNetworkImage(
       imageUrl: imageUrl,
       width: width,
@@ -850,7 +933,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
           child: CircularProgressIndicator(
             value: downloadProgress.progress,
             strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(ColorGlobalVariables.brownColor),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              ColorGlobalVariables.brownColor,
+            ),
           ),
         );
       },
@@ -860,13 +945,19 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildSafeImage(String imagePath, {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+  Widget _buildSafeImage(
+    String imagePath, {
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+  }) {
     final theme = Theme.of(context);
     final String imageUrl = _getCorrectImageUrl(imagePath);
-    
-    final bool isAssetImage = imageUrl.contains('assets/') || 
-                             imageUrl.endsWith('car_placeholder.png');
-    
+
+    final bool isAssetImage =
+        imageUrl.contains('assets/') ||
+        imageUrl.endsWith('car_placeholder.png');
+
     if (isAssetImage) {
       return Image.asset(
         imageUrl,
@@ -878,7 +969,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         },
       );
     } else {
-      return _buildSafeNetworkImage(imagePath, width: width, height: height, fit: fit);
+      return _buildSafeNetworkImage(
+        imagePath,
+        width: width,
+        height: height,
+        fit: fit,
+      );
     }
   }
 
@@ -886,7 +982,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
 
   Widget _buildGalleryItem(String image, int index, ThemeData theme) {
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       width: 120,
       margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -912,7 +1008,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   topRight: Radius.circular(12),
                 ),
                 border: Border.all(
-                  color: index == selectedIndex 
+                  color: index == selectedIndex
                       ? ColorGlobalVariables.brownColor
                       : Colors.transparent,
                   width: 2,
@@ -947,7 +1043,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
               ),
             ),
           ),
-          
+
           Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -974,7 +1070,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                     style: ElevatedButton.styleFrom(
                       backgroundColor: ColorGlobalVariables.brownColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1014,10 +1113,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.blue.shade400,
-            Colors.purple.shade400,
-          ],
+          colors: [Colors.blue.shade400, Colors.purple.shade400],
         ),
         shape: BoxShape.circle,
         boxShadow: [
@@ -1029,18 +1125,14 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         ],
       ),
       child: Center(
-        child: Icon(
-          Icons.person,
-          size: size * 0.5,
-          color: Colors.white,
-        ),
+        child: Icon(Icons.person, size: size * 0.5, color: Colors.white),
       ),
     );
   }
 
   Widget _buildUserProfileImage() {
     final profilePhoto = _getUserProfilePhoto();
-    
+
     return GestureDetector(
       onTap: _openProfilePopup,
       child: MouseRegion(
@@ -1052,7 +1144,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.3),
               width: 2,
             ),
             boxShadow: [
@@ -1064,7 +1158,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
             ],
           ),
           child: ClipOval(
-            child: profilePhoto != null 
+            child: profilePhoto != null
                 ? _buildSafeNetworkImage(
                     profilePhoto,
                     width: 60,
@@ -1082,7 +1176,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
 
   Future<void> _makePhoneCall(String phoneNumber) async {
     final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
-    
+
     try {
       if (await canLaunchUrl(phoneUri)) {
         await launchUrl(phoneUri);
@@ -1153,9 +1247,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 Text(
                   "Seller: $userName",
                   style: TextStyle(
@@ -1164,9 +1258,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                     color: isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
-                
+
                 const SizedBox(height: 16),
-                
+
                 if (phoneNumber != null && phoneNumber.isNotEmpty) ...[
                   Column(
                     children: [
@@ -1182,9 +1276,15 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isDarkMode ? const Color(0xFF303030) : Colors.grey[50],
+                          color: isDarkMode
+                              ? const Color(0xFF303030)
+                              : Colors.grey[50],
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+                          border: Border.all(
+                            color: isDarkMode
+                                ? const Color(0xFF616161)
+                                : Colors.grey[300]!,
+                          ),
                         ),
                         child: Text(
                           phoneNumber,
@@ -1237,9 +1337,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                     ],
                   ),
                 ],
-                
+
                 const SizedBox(height: 24),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -1250,7 +1350,11 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: BorderSide(color: isDarkMode ? const Color(0xFF616161) : Colors.grey[300]!),
+                          side: BorderSide(
+                            color: isDarkMode
+                                ? const Color(0xFF616161)
+                                : Colors.grey[300]!,
+                          ),
                         ),
                         child: Text(
                           "Close",
@@ -1338,7 +1442,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
               final userName = _getUserName();
               final userProfilePhoto = _getUserProfilePhoto();
               final userPhone = widget.allJson['phoneNumber'];
-              
+
               if (userId != null) {
                 Get.toNamed(
                   RouteClass.getChatPage(),
@@ -1347,7 +1451,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                     'contactName': userName,
                     'contactImage': userProfilePhoto,
                     'contactPhone': userPhone,
-                  }
+                  },
                 );
               } else {
                 Get.snackbar(
@@ -1398,7 +1502,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final hasContact = widget.allJson['phoneNumber'] != null;
-    
+
     return Expanded(
       child: Container(
         height: 56,
@@ -1430,12 +1534,15 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!.withValues(alpha: 0.8),
+                      color: (isDarkMode ? Colors.grey[700] : Colors.grey[100])!
+                          .withValues(alpha: 0.8),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.contact_phone_outlined,
-                      color: hasContact ? ColorGlobalVariables.greenColor : Colors.grey,
+                      color: hasContact
+                          ? ColorGlobalVariables.greenColor
+                          : Colors.grey,
                       size: 20,
                     ),
                   ),
@@ -1456,9 +1563,13 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         hasContact ? 'Show details' : 'No contact',
                         style: TextStyle(
                           fontSize: 12,
-                          color: hasContact ? 
-                            (isDarkMode ? Colors.green[300] : ColorGlobalVariables.greenColor) : 
-                            (isDarkMode ? Colors.grey[400] : Colors.grey[500]),
+                          color: hasContact
+                              ? (isDarkMode
+                                    ? Colors.green[300]
+                                    : ColorGlobalVariables.greenColor)
+                              : (isDarkMode
+                                    ? Colors.grey[400]
+                                    : Colors.grey[500]),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1476,26 +1587,30 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   List<Widget> _buildTags(BuildContext context) {
     final List<Widget> tags = [];
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     if (hasWarranty) {
-      tags.add(_buildTag(
-        "Warranty", 
-        isDarkMode ? Colors.grey[700]! : ColorGlobalVariables.greyColor
-      ));
+      tags.add(
+        _buildTag(
+          "Warranty",
+          isDarkMode ? Colors.grey[700]! : ColorGlobalVariables.greyColor,
+        ),
+      );
     }
-    
+
     if (_isPromoted && !_isSold) {
       tags.add(_buildPromotedTag(isDarkMode));
     }
-    
+
     final categoryName = listing.category?.name;
     if (categoryName != null && categoryName.isNotEmpty) {
-      tags.add(_buildTag(
-        categoryName,
-        isDarkMode ? Colors.blue[800]! : Colors.blue[100]!
-      ));
+      tags.add(
+        _buildTag(
+          categoryName,
+          isDarkMode ? Colors.blue[800]! : Colors.blue[100]!,
+        ),
+      );
     }
-    
+
     return tags;
   }
 
@@ -1512,7 +1627,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         style: TextStyle(
           fontSize: 14.0,
           fontWeight: FontWeight.w500,
-          color: theme.brightness == Brightness.dark ? Colors.white70 : Colors.black87,
+          color: theme.brightness == Brightness.dark
+              ? Colors.white70
+              : Colors.black87,
         ),
       ),
     );
@@ -1522,13 +1639,19 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.amber[800]!.withValues(alpha: 0.3) : Colors.amber[100],
+        color: isDarkMode
+            ? Colors.amber[800]!.withValues(alpha: 0.3)
+            : Colors.amber[100],
         borderRadius: BorderRadius.circular(18),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.star, color: isDarkMode ? Colors.amber[300] : Colors.amber[700], size: 16),
+          Icon(
+            Icons.star,
+            color: isDarkMode ? Colors.amber[300] : Colors.amber[700],
+            size: 16,
+          ),
           const SizedBox(width: 6),
           Text(
             "Promoted",
@@ -1546,7 +1669,11 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
   Widget _buildInfoRow(IconData icon, String text, bool isDarkMode) {
     return Row(
       children: [
-        Icon(icon, color: isDarkMode ? Colors.white70 : Colors.grey[600], size: 20),
+        Icon(
+          icon,
+          color: isDarkMode ? Colors.white70 : Colors.grey[600],
+          size: 20,
+        ),
         const SizedBox(width: 12),
         Text(
           text,
@@ -1570,7 +1697,11 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildWrapItems(List<Map<String, String>> items, bool isDarkMode, {bool isSpecification = false}) {
+  Widget _buildWrapItems(
+    List<Map<String, String>> items,
+    bool isDarkMode, {
+    bool isSpecification = false,
+  }) {
     return Wrap(
       spacing: 24.0,
       runSpacing: 16.0,
@@ -1583,10 +1714,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                 item["title"] ?? "N/A",
                 style: TextStyle(
                   fontSize: 14.0,
-                  color: isDarkMode 
-                    ? (isSpecification ? Colors.white60 : Colors.white70)
-                    : (isSpecification ? Colors.black54 : Colors.black87),
-                  fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
+                  color: isDarkMode
+                      ? (isSpecification ? Colors.white60 : Colors.white70)
+                      : (isSpecification ? Colors.black54 : Colors.black87),
+                  fontWeight: isSpecification
+                      ? FontWeight.normal
+                      : FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 6),
@@ -1594,7 +1727,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                 item["value"] ?? "N/A",
                 style: TextStyle(
                   fontSize: 16.0,
-                  fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
+                  fontWeight: isSpecification
+                      ? FontWeight.w600
+                      : FontWeight.normal,
                   color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
@@ -1614,8 +1749,8 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
     final carHighlights = getHighlights();
     final carSpecifications = getSpecifications();
     final images = getListingImages();
-    final currentImage = images.isNotEmpty && selectedIndex < images.length 
-        ? images[selectedIndex] 
+    final currentImage = images.isNotEmpty && selectedIndex < images.length
+        ? images[selectedIndex]
         : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
 
     return Scaffold(
@@ -1624,7 +1759,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
         children: [
           CustomScrollView(
             controller: _scrollController,
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
             slivers: [
               // ========== SLIVER APP BAR ==========
               SliverAppBar(
@@ -1641,8 +1778,11 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Icon(Icons.arrow_back_ios_new_outlined, 
-                          color: Colors.white, size: 18),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_outlined,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                     onPressed: () => Get.back(),
                   ),
@@ -1673,7 +1813,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           fit: BoxFit.cover,
                         ),
                       ),
-                      
+
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -1687,7 +1827,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           ),
                         ),
                       ),
-                      
+
                       Positioned(
                         left: 20,
                         bottom: 80,
@@ -1726,7 +1866,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           top: 16,
                           left: 16,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.green,
                               borderRadius: BorderRadius.circular(20),
@@ -1747,7 +1890,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           top: 16,
                           left: _isSold ? 70 : 16,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.amber[700],
                               borderRadius: BorderRadius.circular(20),
@@ -1777,7 +1923,10 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           opacity: _imageOpacity,
                           duration: const Duration(milliseconds: 200),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.black54,
                               borderRadius: BorderRadius.circular(12),
@@ -1797,7 +1946,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   ),
                 ),
               ),
-              
+
               // ========== IMAGE GALLERY ==========
               SliverToBoxAdapter(
                 child: Container(
@@ -1813,7 +1962,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           itemCount: images.length,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemBuilder: (context, index) {
-                            final image = index < images.length ? images[index] : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
+                            final image = index < images.length
+                                ? images[index]
+                                : '${ImageStringGlobalVariables.imagePath}car_placeholder.png';
                             return GestureDetector(
                               onTap: () {
                                 if (mounted) {
@@ -1827,9 +1978,12 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                           },
                         ),
                       ),
-                      
+
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: Text(
                           "Tap image to set as main display • Tap 'View' to see full size with swipe navigation",
                           style: TextStyle(
@@ -1843,11 +1997,14 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                   ),
                 ),
               ),
-              
+
               // ========== ITEM DETAILS ==========
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1884,17 +2041,27 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                               ),
                             ),
                             const SizedBox(height: 16),
-                            _buildInfoRow(Icons.location_on_outlined, getListingLocation(), isDarkMode),
+                            _buildInfoRow(
+                              Icons.location_on_outlined,
+                              getListingLocation(),
+                              isDarkMode,
+                            ),
                             const SizedBox(height: 8),
-                            _buildInfoRow(Icons.refresh_outlined, formatTimeAgo(listing.createdAt?.toString() ?? ''), isDarkMode),
+                            _buildInfoRow(
+                              Icons.refresh_outlined,
+                              formatTimeAgo(
+                                listing.createdAt?.toString() ?? '',
+                              ),
+                              isDarkMode,
+                            ),
                             const SizedBox(height: 16),
-                            
+
                             Wrap(
                               spacing: 10,
                               runSpacing: 10,
                               children: _buildTags(context),
                             ),
-                            
+
                             const SizedBox(height: 28),
                             _buildSectionTitle("Highlights", isDarkMode),
                             const SizedBox(height: 16),
@@ -1902,9 +2069,13 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                             const SizedBox(height: 28),
                             _buildSectionTitle("Specifications", isDarkMode),
                             const SizedBox(height: 16),
-                            _buildWrapItems(carSpecifications, isDarkMode, isSpecification: true),
+                            _buildWrapItems(
+                              carSpecifications,
+                              isDarkMode,
+                              isSpecification: true,
+                            ),
                             const SizedBox(height: 16),
-                            
+
                             Divider(
                               color: theme.dividerColor,
                               height: 12,
@@ -1917,23 +2088,101 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        _getUserName(),
-                                        style: TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: theme.textTheme.titleLarge?.color,
-                                        ),
+                                      Consumer<UserDetailsProvider>(
+                                        builder: (context, userDetailsProvider, child) {
+                                          final userId = _getUserId();
+                                          final isVerified =
+                                              userId != null &&
+                                              userDetailsProvider
+                                                  .isVerifiedDealer(userId);
+
+                                          return Row(
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  _getUserName(),
+                                                  style: TextStyle(
+                                                    fontSize: 16.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: theme
+                                                        .textTheme
+                                                        .titleLarge
+                                                        ?.color,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              if (isVerified) ...[
+                                                const SizedBox(width: 8),
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 4,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    color: ColorGlobalVariables
+                                                        .brownColor
+                                                        .withValues(alpha: 0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          12,
+                                                        ),
+                                                    border: Border.all(
+                                                      color:
+                                                          ColorGlobalVariables
+                                                              .brownColor
+                                                              .withValues(
+                                                                alpha: 0.5,
+                                                              ),
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.verified,
+                                                        color:
+                                                            ColorGlobalVariables
+                                                                .brownColor,
+                                                        size: 14,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Text(
+                                                        'Verified Dealer',
+                                                        style: TextStyle(
+                                                          color:
+                                                              ColorGlobalVariables
+                                                                  .brownColor,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          );
+                                        },
                                       ),
                                       const SizedBox(height: 6),
-                                      if (_getUserJoinDate() != null) 
+                                      if (_getUserJoinDate() != null)
                                         Text(
                                           "Joined: ${formatTimeAgo(_getUserJoinDate()!)}",
                                           style: TextStyle(
                                             fontSize: 13.0,
-                                            color: theme.textTheme.bodyMedium?.color,
+                                            color: theme
+                                                .textTheme
+                                                .bodyMedium
+                                                ?.color,
                                           ),
                                         ),
                                     ],
@@ -1942,7 +2191,7 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
                               ],
                             ),
                             const SizedBox(height: 16),
-                            
+
                             Row(
                               children: [
                                 _buildChatButton(),
@@ -1959,12 +2208,9 @@ class _AdsDetailPageState extends State<AdsDetailPage> with SingleTickerProvider
               ),
             ],
           ),
-          
+
           // ========== PROFILE IMAGE POPUP OVERLAY ==========
-          if (_showProfilePopup)
-            Positioned.fill(
-              child: _buildProfilePopup(),
-            ),
+          if (_showProfilePopup) Positioned.fill(child: _buildProfilePopup()),
         ],
       ),
     );

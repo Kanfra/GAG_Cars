@@ -5,7 +5,7 @@ part 'chatContactModel.freezed.dart';
 part 'chatContactModel.g.dart';
 
 @freezed
-class ChatContactResponse with _$ChatContactResponse {
+abstract class ChatContactResponse with _$ChatContactResponse {
   const factory ChatContactResponse({
     @Default([]) List<ChatContact> contacts,
     @Default(0) int total,
@@ -17,7 +17,7 @@ class ChatContactResponse with _$ChatContactResponse {
 }
 
 @freezed
-class ChatContact with _$ChatContact {
+abstract class ChatContact with _$ChatContact {
   const factory ChatContact({
     @Default('') String id,
     @Default('Unknown') String name,

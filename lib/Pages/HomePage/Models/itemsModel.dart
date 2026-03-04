@@ -6,7 +6,7 @@ part 'itemsModel.freezed.dart';
 part 'itemsModel.g.dart';
 
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     required String id,
     required String name,
@@ -26,7 +26,7 @@ class User with _$User {
 }
 
 @freezed
-class Brand with _$Brand {
+abstract class Brand with _$Brand {
   const factory Brand({
     required int id,
     @JsonKey(name: 'user_id') String? userId,
@@ -41,7 +41,7 @@ class Brand with _$Brand {
 }
 
 @freezed
-class BrandModel with _$BrandModel {
+abstract class BrandModel with _$BrandModel {
   const factory BrandModel({
     required int id,
     @JsonKey(name: 'brand_id') required int brandId,
@@ -56,7 +56,7 @@ class BrandModel with _$BrandModel {
 }
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     required int id,
     @JsonKey(name: 'user_id') String? userId,
@@ -75,7 +75,7 @@ class Category with _$Category {
 }
 
 @freezed
-class RecommendedItem with _$RecommendedItem {
+abstract class RecommendedItem with _$RecommendedItem {
   const factory RecommendedItem({
     required String id,
     @JsonKey(name: 'user_id') String? userId,
@@ -120,7 +120,7 @@ class RecommendedItem with _$RecommendedItem {
 }
 
 @freezed
-class RecommendedResponse with _$RecommendedResponse {
+abstract class RecommendedResponse with _$RecommendedResponse {
   const factory RecommendedResponse({
     required List<RecommendedItem> data,
     required RecommendedLinks links,
@@ -132,7 +132,7 @@ class RecommendedResponse with _$RecommendedResponse {
 }
 
 @freezed
-class RecommendedLinks with _$RecommendedLinks {
+abstract class RecommendedLinks with _$RecommendedLinks {
   const factory RecommendedLinks({
     required String first,
     required String last,
@@ -145,7 +145,7 @@ class RecommendedLinks with _$RecommendedLinks {
 }
 
 @freezed
-class RecommendedMeta with _$RecommendedMeta {
+abstract class RecommendedMeta with _$RecommendedMeta {
   const factory RecommendedMeta({
     @JsonKey(name: 'current_page') required int currentPage,
     required int? from, // FIXED: Made nullable
@@ -162,7 +162,7 @@ class RecommendedMeta with _$RecommendedMeta {
 }
 
 @freezed
-class RecommendedMetaLink with _$RecommendedMetaLink {
+abstract class RecommendedMetaLink with _$RecommendedMetaLink {
   const factory RecommendedMetaLink({
     String? url,
     required String label,

@@ -7,6 +7,7 @@ import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/IconButtons/c
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/Links/links.dart';
 import 'package:gag_cars_frontend/GeneralComponents/EdemComponents/customImage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/colorGlobalVariables.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:gag_cars_frontend/Pages/Authentication/Providers/userProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/categoriesModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/itemsModel.dart';
@@ -1455,7 +1456,8 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
   String _formatPriceWithCommas(String priceString) {
     try {
       final int price = int.parse(priceString);
-      final String priceStr = price.toString();
+      String priceStr = price.toString();
+
       final StringBuffer formattedPrice = StringBuffer();
 
       for (int i = 0; i < priceStr.length; i++) {
@@ -1865,26 +1867,63 @@ class __RecommendedItemGridWidgetState extends State<_RecommendedItemGridWidget>
                   Consumer<UserDetailsProvider>(
                     builder: (context, userDetailsProvider, child) {
                       final userId = widget.recommended.user?.id;
+
+                      if (userId != null &&
+                          userDetailsProvider.isLoading(userId)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Container(
+                                  width: 60,
+                                  height: 7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                       if (userId != null &&
                           userDetailsProvider.isVerifiedDealer(userId)) {
                         return Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: const EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.verified,
                                 color: Colors.blue[600],
-                                size: 12,
+                                size: 10,
                               ),
-                              SizedBox(width: 4),
-                              Text(
-                                'VERIFIED DEALER',
-                                style: TextStyle(
-                                  color: Colors.blue[600],
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
+                              const SizedBox(width: 3),
+                              Flexible(
+                                child: Text(
+                                  'VERIFIED DEALER',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.blue[600],
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 0.3,
+                                  ),
                                 ),
                               ),
                             ],
@@ -2161,7 +2200,8 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
   String _formatPriceWithCommas(String priceString) {
     try {
       final int price = int.parse(priceString);
-      final String priceStr = price.toString();
+      String priceStr = price.toString();
+
       final StringBuffer formattedPrice = StringBuffer();
 
       for (int i = 0; i < priceStr.length; i++) {
@@ -2592,13 +2632,16 @@ class __RecommendedItemListWidgetState extends State<_RecommendedItemListWidget>
                                   size: 12,
                                 ),
                                 SizedBox(width: 4),
-                                Text(
-                                  'VERIFIED DEALER',
-                                  style: TextStyle(
-                                    color: Colors.blue[600],
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
+                                Flexible(
+                                  child: Text(
+                                    'VERIFIED DEALER',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.blue[600],
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
                                 ),
                               ],

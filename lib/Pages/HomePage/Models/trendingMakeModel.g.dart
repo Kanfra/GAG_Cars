@@ -6,8 +6,8 @@ part of 'trendingMakeModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TrendingMakeImpl _$$TrendingMakeImplFromJson(Map<String, dynamic> json) =>
-    _$TrendingMakeImpl(
+_TrendingMake _$TrendingMakeFromJson(Map<String, dynamic> json) =>
+    _TrendingMake(
       id: _safeParseInt(json['id']),
       userId: _safeParseString(json['user_id']),
       name: _safeParseStringWithDefault(json['name']),
@@ -19,7 +19,7 @@ _$TrendingMakeImpl _$$TrendingMakeImplFromJson(Map<String, dynamic> json) =>
       brandModels: _safeParseBrandModelList(json['brand_models']),
     );
 
-Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
+Map<String, dynamic> _$TrendingMakeToJson(_TrendingMake instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -32,17 +32,16 @@ Map<String, dynamic> _$$TrendingMakeImplToJson(_$TrendingMakeImpl instance) =>
       'brand_models': instance.brandModels,
     };
 
-_$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
-    _$BrandModelImpl(
-      id: _safeParseInt(json['id']),
-      brandId: _safeParseInt(json['brand_id']),
-      name: _safeParseStringWithDefault(json['name']),
-      slug: _safeParseStringWithDefault(json['slug']),
-      createdAt: _safeParseStringWithDefault(json['created_at']),
-      updatedAt: _safeParseStringWithDefault(json['updated_at']),
-    );
+_BrandModel _$BrandModelFromJson(Map<String, dynamic> json) => _BrandModel(
+  id: _safeParseInt(json['id']),
+  brandId: _safeParseInt(json['brand_id']),
+  name: _safeParseStringWithDefault(json['name']),
+  slug: _safeParseStringWithDefault(json['slug']),
+  createdAt: _safeParseStringWithDefault(json['created_at']),
+  updatedAt: _safeParseStringWithDefault(json['updated_at']),
+);
 
-Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
+Map<String, dynamic> _$BrandModelToJson(_BrandModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'brand_id': instance.brandId,
@@ -52,33 +51,31 @@ Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
       'updated_at': instance.updatedAt,
     };
 
-_$TrendingMakeResponseImpl _$$TrendingMakeResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TrendingMakeResponseImpl(
-      data: _safeParseTrendingMakeList(json['data']),
-      links: _safeParsePaginationLinks(json['links']),
-      meta: _safeParsePaginationMeta(json['meta']),
-    );
+_TrendingMakeResponse _$TrendingMakeResponseFromJson(
+  Map<String, dynamic> json,
+) => _TrendingMakeResponse(
+  data: _safeParseTrendingMakeList(json['data']),
+  links: _safeParsePaginationLinks(json['links']),
+  meta: _safeParsePaginationMeta(json['meta']),
+);
 
-Map<String, dynamic> _$$TrendingMakeResponseImplToJson(
-        _$TrendingMakeResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'links': instance.links,
-      'meta': instance.meta,
-    };
+Map<String, dynamic> _$TrendingMakeResponseToJson(
+  _TrendingMakeResponse instance,
+) => <String, dynamic>{
+  'data': instance.data,
+  'links': instance.links,
+  'meta': instance.meta,
+};
 
-_$PaginationLinksImpl _$$PaginationLinksImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PaginationLinksImpl(
+_PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) =>
+    _PaginationLinks(
       first: _safeParseStringWithDefault(json['first']),
       last: _safeParseStringWithDefault(json['last']),
       prev: _safeParseString(json['prev']),
       next: _safeParseString(json['next']),
     );
 
-Map<String, dynamic> _$$PaginationLinksImplToJson(
-        _$PaginationLinksImpl instance) =>
+Map<String, dynamic> _$PaginationLinksToJson(_PaginationLinks instance) =>
     <String, dynamic>{
       'first': instance.first,
       'last': instance.last,
@@ -86,8 +83,8 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
       'next': instance.next,
     };
 
-_$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
-    _$PaginationMetaImpl(
+_PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) =>
+    _PaginationMeta(
       currentPage: _safeParseIntWithDefault(json['current_page']),
       from: _safeParseIntWithDefault(json['from']),
       lastPage: _safeParseIntWithDefault(json['last_page']),
@@ -98,8 +95,7 @@ _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
       total: _safeParseIntWithDefault(json['total']),
     );
 
-Map<String, dynamic> _$$PaginationMetaImplToJson(
-        _$PaginationMetaImpl instance) =>
+Map<String, dynamic> _$PaginationMetaToJson(_PaginationMeta instance) =>
     <String, dynamic>{
       'current_page': instance.currentPage,
       'from': instance.from,
@@ -111,16 +107,14 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
       'total': instance.total,
     };
 
-_$PaginationMetaLinkImpl _$$PaginationMetaLinkImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PaginationMetaLinkImpl(
+_PaginationMetaLink _$PaginationMetaLinkFromJson(Map<String, dynamic> json) =>
+    _PaginationMetaLink(
       url: _safeParseString(json['url']),
       label: _safeParseStringWithDefault(json['label']),
       active: _safeParseBoolWithDefault(json['active']),
     );
 
-Map<String, dynamic> _$$PaginationMetaLinkImplToJson(
-        _$PaginationMetaLinkImpl instance) =>
+Map<String, dynamic> _$PaginationMetaLinkToJson(_PaginationMetaLink instance) =>
     <String, dynamic>{
       'url': instance.url,
       'label': instance.label,

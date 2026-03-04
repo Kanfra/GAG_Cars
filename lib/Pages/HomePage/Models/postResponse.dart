@@ -4,7 +4,7 @@ part 'postResponse.freezed.dart';
 part 'postResponse.g.dart';
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     required int id,
     @JsonKey(name: 'user_id') required String? userId,
@@ -22,7 +22,7 @@ class Category with _$Category {
 }
 
 @freezed
-class Post with _$Post {
+abstract class Post with _$Post {
   const factory Post({
     required String id,
     @JsonKey(name: 'user_id') required String userId,
@@ -44,7 +44,7 @@ class Post with _$Post {
 }
 
 @freezed
-class PaginationLink with _$PaginationLink {
+abstract class PaginationLink with _$PaginationLink {
   const factory PaginationLink({
     required String? url,
     required String label,
@@ -55,7 +55,7 @@ class PaginationLink with _$PaginationLink {
 }
 
 @freezed
-class Links with _$Links {
+abstract class Links with _$Links {
   const factory Links({
     required String first,
     required String last,
@@ -67,7 +67,7 @@ class Links with _$Links {
 }
 
 @freezed
-class Meta with _$Meta {
+abstract class Meta with _$Meta {
   const factory Meta({
     @JsonKey(name: 'current_page') required int currentPage,
     required int? from,
@@ -83,7 +83,7 @@ class Meta with _$Meta {
 }
 
 @freezed
-class PostsResponse with _$PostsResponse {
+abstract class PostsResponse with _$PostsResponse {
   const factory PostsResponse({
     required List<Post> data,
     required Links links,

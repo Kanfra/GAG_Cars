@@ -5,7 +5,7 @@ part 'searchResponseModel.freezed.dart';
 part 'searchResponseModel.g.dart';
 
 @freezed
-class SearchResponse with _$SearchResponse {
+abstract class SearchResponse with _$SearchResponse {
   const factory SearchResponse({
     required bool success,
     required String message,

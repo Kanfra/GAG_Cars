@@ -6,9 +6,8 @@ part of 'auth_response_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AuthResponseModelImpl _$$AuthResponseModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$AuthResponseModelImpl(
+_AuthResponseModel _$AuthResponseModelFromJson(Map<String, dynamic> json) =>
+    _AuthResponseModel(
       message: json['message'] as String?,
       token: json['token'] as String?,
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
@@ -16,8 +15,7 @@ _$AuthResponseModelImpl _$$AuthResponseModelImplFromJson(
       verifiedDealer: json['verified_dealer'] as bool?,
     );
 
-Map<String, dynamic> _$$AuthResponseModelImplToJson(
-        _$AuthResponseModelImpl instance) =>
+Map<String, dynamic> _$AuthResponseModelToJson(_AuthResponseModel instance) =>
     <String, dynamic>{
       'message': instance.message,
       'token': instance.token,

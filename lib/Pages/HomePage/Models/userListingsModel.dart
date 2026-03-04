@@ -5,7 +5,7 @@ part 'userListingsModel.g.dart';
 
 // Category Model
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id') dynamic userId,
@@ -25,7 +25,7 @@ class Category with _$Category {
 
 // Listing Model - ALL FIELDS MADE OPTIONAL
 @freezed
-class Listing with _$Listing {
+abstract class Listing with _$Listing {
   const factory Listing({
     @JsonKey(fromJson: _parseNullableString) String? id,
     @JsonKey(name: 'user_id', fromJson: _parseNullableString) String? userId,
@@ -68,7 +68,7 @@ class Listing with _$Listing {
 
 // Listing Response Model
 @freezed
-class ListingResponse with _$ListingResponse {
+abstract class ListingResponse with _$ListingResponse {
   const factory ListingResponse({
     required List<Listing> data,
   }) = _ListingResponse;
@@ -79,7 +79,7 @@ class ListingResponse with _$ListingResponse {
 
 // Error Response Model
 @freezed
-class ErrorResponse with _$ErrorResponse {
+abstract class ErrorResponse with _$ErrorResponse {
   const factory ErrorResponse({
     @JsonKey(fromJson: _parseNullableString) String? message,
     @JsonKey(fromJson: _parseNullableString) String? error,

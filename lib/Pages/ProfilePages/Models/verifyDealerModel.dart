@@ -5,7 +5,7 @@ part 'verifyDealerModel.g.dart';
 
 // Request Model (what you send to API)
 @freezed
-class VerificationRequest with _$VerificationRequest {
+abstract class VerificationRequest with _$VerificationRequest {
   const factory VerificationRequest({
     String? document_type,
     String? document_number,
@@ -30,7 +30,7 @@ class VerificationRequest with _$VerificationRequest {
 
 // Response Model (what you get from API) - UPDATED
 @freezed
-class VerificationResponse with _$VerificationResponse {
+abstract class VerificationResponse with _$VerificationResponse {
   const factory VerificationResponse({
     required bool success,
     String? message,
@@ -44,7 +44,7 @@ class VerificationResponse with _$VerificationResponse {
 
 // Nested Data Model
 @freezed
-class VerificationData with _$VerificationData {
+abstract class VerificationData with _$VerificationData {
   const factory VerificationData({
     required int id,
     String? document_type,

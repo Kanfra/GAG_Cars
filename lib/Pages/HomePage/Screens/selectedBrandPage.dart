@@ -717,7 +717,8 @@ class _BrandItemCardState extends State<BrandItemCard>
   }
 
   void _initializeVerificationStatus() {
-    final userId = widget.item.user?.id;
+    // Robust userId extraction (handles both top-level and nested user object)
+    final userId = widget.item.userId ?? widget.item.user?.id;
     if (userId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -1124,7 +1125,8 @@ class _BrandItemCardState extends State<BrandItemCard>
                   // VERIFIED DEALER INDICATOR (Repositioned to the end)
                   Consumer<UserDetailsProvider>(
                     builder: (context, userDetailsProvider, child) {
-                      final userId = widget.item.user?.id;
+                      // Robust userId extraction for badge lookup
+                      final userId = widget.item.userId ?? widget.item.user?.id;
                       if (userId != null &&
                           userDetailsProvider.isVerifiedDealer(userId)) {
                         return Padding(

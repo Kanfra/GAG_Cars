@@ -4,7 +4,7 @@ part 'similarItemsModel.freezed.dart';
 part 'similarItemsModel.g.dart';
 
 @freezed
-class SimilarItemsResponse with _$SimilarItemsResponse {
+abstract class SimilarItemsResponse with _$SimilarItemsResponse {
   const factory SimilarItemsResponse({
     @JsonKey(name: 'data') required List<SimilarItem> data,
     @JsonKey(name: 'links') PaginationLinks? links,
@@ -16,8 +16,7 @@ class SimilarItemsResponse with _$SimilarItemsResponse {
 }
 
 @freezed
-@JsonSerializable(explicitToJson: true)
-class SimilarItem with _$SimilarItem {
+abstract class SimilarItem with _$SimilarItem {
   const SimilarItem._();
 
   const factory SimilarItem({
@@ -72,7 +71,7 @@ class SimilarItem with _$SimilarItem {
 }
 
 @freezed
-class Brand with _$Brand {
+abstract class Brand with _$Brand {
   const factory Brand({
     @JsonKey(name: 'id', fromJson: _parseInt)
     required int id, // ✅ FIXED: Ensure int parsing
@@ -88,7 +87,7 @@ class Brand with _$Brand {
 }
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     @JsonKey(name: 'id', fromJson: _parseInt)
     required int id, // ✅ FIXED: Ensure int parsing
@@ -109,7 +108,7 @@ class Category with _$Category {
 }
 
 @freezed
-class BrandModel with _$BrandModel {
+abstract class BrandModel with _$BrandModel {
   const factory BrandModel({
     @JsonKey(name: 'id', fromJson: _parseInt)
     required int id, // ✅ FIXED: Ensure int parsing
@@ -125,7 +124,7 @@ class BrandModel with _$BrandModel {
 }
 
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     @JsonKey(name: 'id') required String id,
     @JsonKey(name: 'name') String? name,
@@ -152,7 +151,7 @@ class User with _$User {
 }
 
 @freezed
-class PaginationLinks with _$PaginationLinks {
+abstract class PaginationLinks with _$PaginationLinks {
   const factory PaginationLinks({
     @JsonKey(name: 'first') String? first,
     @JsonKey(name: 'last') String? last,
@@ -165,7 +164,7 @@ class PaginationLinks with _$PaginationLinks {
 }
 
 @freezed
-class PaginationMeta with _$PaginationMeta {
+abstract class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     @JsonKey(name: 'current_page', fromJson: _parseNullableInt)
     int? currentPage,
@@ -183,7 +182,7 @@ class PaginationMeta with _$PaginationMeta {
 }
 
 @freezed
-class PaginationLink with _$PaginationLink {
+abstract class PaginationLink with _$PaginationLink {
   const factory PaginationLink({
     @JsonKey(name: 'url') String? url,
     @JsonKey(name: 'label') String? label,

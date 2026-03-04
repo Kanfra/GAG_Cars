@@ -375,12 +375,14 @@ class _PostItemPageState extends State<PostItemPage> {
       return false;
     }
 
-    if (selectedMake == null) {
+    // Only validate Make if the category requires it
+    if ((selectedCategory?.requireMake ?? false) && selectedMake == null) {
       _showErrorSnackBar('Please select a vehicle make');
       return false;
     }
 
-    if (selectedModel == null) {
+    // Only validate Model if the category requires it
+    if ((selectedCategory?.requireModel ?? false) && selectedModel == null) {
       _showErrorSnackBar('Please select a vehicle model');
       return false;
     }
@@ -388,6 +390,29 @@ class _PostItemPageState extends State<PostItemPage> {
     if (selectedLocation == null) {
       _showErrorSnackBar('Please select a location');
       return false;
+    }
+
+    // Dynamic fields validation
+    final itemFields = selectedCategory?.itemFields ?? [];
+    for (var field in itemFields) {
+      if (field.required) {
+        final value = selectedFields[field.name];
+
+        // Special checks for color and year which might be in controllers/state
+        bool hasValue = false;
+        if (field.label.toLowerCase().contains("color")) {
+          hasValue = _colorController.text.trim().isNotEmpty;
+        } else if (field.label.toLowerCase().contains("year")) {
+          hasValue = year.toString().isNotEmpty;
+        } else {
+          hasValue = value != null && value.toString().trim().isNotEmpty;
+        }
+
+        if (!hasValue) {
+          _showErrorSnackBar('${field.label} is required');
+          return false;
+        }
+      }
     }
 
     return true;
@@ -1472,13 +1497,26 @@ class _PostItemPageState extends State<PostItemPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Category',
-                        style: TextStyle(
-                          color: _getHintTextColor(),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Category',
+                            style: TextStyle(
+                              color: _getHintTextColor(),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const Text(
+                            ' *',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -1509,6 +1547,9 @@ class _PostItemPageState extends State<PostItemPage> {
 
   List<Widget> _buildFormFields() {
     final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
+    final requireMake = selectedCategory?.requireMake ?? false;
+    final requireModel = selectedCategory?.requireModel ?? false;
+    final showMakeModelRow = requireMake || requireModel;
 
     return [
       _buildTextField(
@@ -1518,8 +1559,10 @@ class _PostItemPageState extends State<PostItemPage> {
         controller: _itemNameController,
         icon: Icons.directions_car_rounded,
       ),
-      const SizedBox(height: 20),
-      _buildMakeModelRow(makeModelProvider),
+      if (showMakeModelRow) ...[  
+        const SizedBox(height: 20),
+        _buildMakeModelRow(makeModelProvider, requireMake: requireMake, requireModel: requireModel),
+      ],
       const SizedBox(height: 20),
       _buildFormFieldsGrid(),
       const SizedBox(height: 20),
@@ -1586,13 +1629,26 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  color: _getTextColor(),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Text(
+                    ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -1633,7 +1689,21 @@ class _PostItemPageState extends State<PostItemPage> {
     );
   }
 
-  Widget _buildMakeModelRow(MakeAndModelProvider provider) {
+  Widget _buildMakeModelRow(
+    MakeAndModelProvider provider, {
+    bool requireMake = true,
+    bool requireModel = true,
+  }) {
+    // Build the header title dynamically
+    String headerTitle;
+    if (requireMake && requireModel) {
+      headerTitle = 'Make & Model';
+    } else if (requireMake) {
+      headerTitle = 'Make';
+    } else {
+      headerTitle = 'Model';
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: _getCardColor(),
@@ -1672,22 +1742,38 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                "Make & Model",
-                style: TextStyle(
-                  color: _getTextColor(),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    headerTitle,
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Text(
+                    ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildMakeField(provider)),
-              const SizedBox(width: 16),
-              Expanded(child: _buildModelField(provider)),
+              if (requireMake) ...[  
+                Expanded(child: _buildMakeField(provider)),
+                if (requireModel) const SizedBox(width: 16),
+              ],
+              if (requireModel)
+                Expanded(child: _buildModelField(provider)),
             ],
           ),
         ],
@@ -1896,13 +1982,27 @@ class _PostItemPageState extends State<PostItemPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          field.label,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: _getTextColor(),
-            fontSize: 14,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              field.label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: _getTextColor(),
+                fontSize: 14,
+              ),
+            ),
+            if (field.required)
+              const Text(
+                ' *',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         Material(
@@ -1997,13 +2097,26 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                "Location & Price",
-                style: TextStyle(
-                  color: _getTextColor(),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Location & Price",
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Text(
+                    ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -2365,13 +2478,26 @@ class _PostItemPageState extends State<PostItemPage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                "${selectedCategory?.name ?? 'Item'} Images",
-                style: TextStyle(
-                  color: _getTextColor(),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "${selectedCategory?.name ?? 'Item'} Images",
+                    style: TextStyle(
+                      color: _getTextColor(),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Text(
+                    ' *',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

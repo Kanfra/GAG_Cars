@@ -4,7 +4,7 @@ part 'makeAndModelModel.freezed.dart';
 part 'makeAndModelModel.g.dart';
 
 @freezed
-class MakeAndModelResponse with _$MakeAndModelResponse {
+abstract class MakeAndModelResponse with _$MakeAndModelResponse {
   const factory MakeAndModelResponse({
     required List<VehicleMake> data,
     required PaginationLinks links,
@@ -16,7 +16,7 @@ class MakeAndModelResponse with _$MakeAndModelResponse {
 }
 
 @freezed
-class VehicleMake with _$VehicleMake {
+abstract class VehicleMake with _$VehicleMake {
   const factory VehicleMake({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
@@ -33,7 +33,7 @@ class VehicleMake with _$VehicleMake {
 }
 
 @freezed
-class VehicleModel with _$VehicleModel {
+abstract class VehicleModel with _$VehicleModel {
   const factory VehicleModel({
     @JsonKey(fromJson: _parseInt) required int id,
     @JsonKey(name: 'brand_id', fromJson: _parseInt) required int makeId,
@@ -48,7 +48,7 @@ class VehicleModel with _$VehicleModel {
 }
 
 @freezed
-class PaginationLinks with _$PaginationLinks {
+abstract class PaginationLinks with _$PaginationLinks {
   const factory PaginationLinks({
     required String first,
     required String last,
@@ -61,7 +61,7 @@ class PaginationLinks with _$PaginationLinks {
 }
 
 @freezed
-class PaginationMeta with _$PaginationMeta {
+abstract class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     @JsonKey(name: 'current_page', fromJson: _parseInt) required int currentPage,
     @JsonKey(fromJson: _parseInt) required int from,
@@ -78,7 +78,7 @@ class PaginationMeta with _$PaginationMeta {
 }
 
 @freezed
-class PaginationLink with _$PaginationLink {
+abstract class PaginationLink with _$PaginationLink {
   const factory PaginationLink({
     required String? url,
     required String label,

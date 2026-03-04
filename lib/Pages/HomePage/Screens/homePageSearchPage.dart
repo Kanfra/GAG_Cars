@@ -3,6 +3,7 @@ import 'package:gag_cars_frontend/Pages/ProfilePages/Providers/themeProvider.dar
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Models/searchItemModel.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/searchProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
@@ -525,7 +526,7 @@ class _HomePageSearchPageState extends State<HomePageSearchPage> {
               maxCrossAxisExtent: 220,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
-              childAspectRatio: 0.72,
+              childAspectRatio: 0.70, // Increased height allowance for safety
             ),
             itemCount: results.length,
             itemBuilder: (context, index) {
@@ -732,14 +733,16 @@ class _SearchResultItemWidget extends StatelessWidget {
   });
 
   void _initializeVerificationStatus(BuildContext context) {
-    final userId = searchItem.user?.id;
+    // Robust userId extraction (handles both top-level and nested user object)
+    final userId = searchItem.userId ?? searchItem.user?.id;
     if (userId != null) {
+      final userIdStr = userId.toString();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (context.mounted) {
           Provider.of<UserDetailsProvider>(
             context,
             listen: false,
-          ).fetchUserDetails(userId);
+          ).fetchUserDetails(userIdStr);
         }
       });
     }
@@ -828,31 +831,38 @@ class _SearchResultItemWidget extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 8),
+                  SizedBox(height: 4), // Reduced spacing (8 -> 4)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPrice(searchItem.price)}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: ColorGlobalVariables.redColor,
+                      Flexible(
+                        child: Text(
+                          '${userProvider.user?.countryCurrencySymbol ?? ''} ${_formatPrice(searchItem.price)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: ColorGlobalVariables.redColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (searchItem.year != null)
-                        Text(
-                          searchItem.year!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkMode
-                                ? Colors.white60
-                                : Colors.grey[600],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            searchItem.year!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDarkMode
+                                  ? Colors.white60
+                                  : Colors.grey[600],
+                            ),
                           ),
                         ),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  SizedBox(height: 6), // Reduced spacing (12 -> 6)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -956,9 +966,44 @@ class _SearchResultItemWidget extends StatelessWidget {
                   // VERIFIED DEALER INDICATOR (Repositioned to the end)
                   Consumer<UserDetailsProvider>(
                     builder: (context, userDetailsProvider, child) {
-                      final userId = searchItem.user?.id;
-                      if (userId != null &&
-                          userDetailsProvider.isVerifiedDealer(userId)) {
+                      final userId = searchItem.userId ?? searchItem.user?.id;
+                      final userIdStr = userId?.toString();
+
+                      if (userIdStr != null &&
+                          userDetailsProvider.isLoading(userIdStr)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Container(
+                                  width: 80,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (userIdStr != null &&
+                          userDetailsProvider.isVerifiedDealer(userIdStr)) {
                         return Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Row(
@@ -1054,9 +1099,9 @@ class _SearchResultItemWidget extends StatelessWidget {
     if (price == null || price.isEmpty) return '0';
     try {
       final int priceValue = int.parse(price);
-      final String priceStr = priceValue.toString();
-      final StringBuffer formattedPrice = StringBuffer();
+      String priceStr = priceValue.toString();
 
+      final StringBuffer formattedPrice = StringBuffer();
       for (int i = 0; i < priceStr.length; i++) {
         if (i > 0 && (priceStr.length - i) % 3 == 0) {
           formattedPrice.write(',');

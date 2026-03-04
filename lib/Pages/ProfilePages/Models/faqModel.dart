@@ -4,7 +4,7 @@ part 'faqModel.freezed.dart';
 part 'faqModel.g.dart';
 
 @freezed
-class FaqResponse with _$FaqResponse {
+abstract class FaqResponse with _$FaqResponse {
   const factory FaqResponse({
     required List<Faq> data,
     required FaqLinks links,
@@ -16,7 +16,7 @@ class FaqResponse with _$FaqResponse {
 }
 
 @freezed
-class Faq with _$Faq {
+abstract class Faq with _$Faq {
   const factory Faq({
     required String id,
     @JsonKey(name: 'user_id') required String userId,
@@ -36,7 +36,7 @@ class Faq with _$Faq {
 }
 
 @freezed
-class FaqUser with _$FaqUser {
+abstract class FaqUser with _$FaqUser {
   const factory FaqUser({
     required String id,
     required String name,
@@ -62,7 +62,7 @@ class FaqUser with _$FaqUser {
 }
 
 @freezed
-class FaqCategory with _$FaqCategory {
+abstract class FaqCategory with _$FaqCategory {
   const factory FaqCategory({
     required int id,
     required String name,
@@ -78,7 +78,7 @@ class FaqCategory with _$FaqCategory {
 }
 
 @freezed
-class FaqLinks with _$FaqLinks {
+abstract class FaqLinks with _$FaqLinks {
   const factory FaqLinks({
     required String first,
     required String last,
@@ -91,7 +91,7 @@ class FaqLinks with _$FaqLinks {
 }
 
 @freezed
-class FaqMeta with _$FaqMeta {
+abstract class FaqMeta with _$FaqMeta {
   const factory FaqMeta({
     @JsonKey(name: 'current_page') required int currentPage,
     required int from,
@@ -108,7 +108,7 @@ class FaqMeta with _$FaqMeta {
 }
 
 @freezed
-class FaqMetaLink with _$FaqMetaLink {
+abstract class FaqMetaLink with _$FaqMetaLink {
   const factory FaqMetaLink({
     required String? url,
     required String label,

@@ -6,7 +6,7 @@ part 'wishlistModel.g.dart';
 
 /// Main response model
 @freezed
-class WishlistResponse with _$WishlistResponse {
+abstract class WishlistResponse with _$WishlistResponse {
   const factory WishlistResponse({
     required List<WishlistItem> data,
   }) = _WishlistResponse;
@@ -17,7 +17,7 @@ class WishlistResponse with _$WishlistResponse {
 
 /// Individual wishlist item model
 @freezed
-class WishlistItem with _$WishlistItem {
+abstract class WishlistItem with _$WishlistItem {
   const factory WishlistItem({
     required String id,
     @JsonKey(name: 'user_id') required String userId,
@@ -33,7 +33,7 @@ class WishlistItem with _$WishlistItem {
 
 /// The actual item model (reusing your existing RecommendedItem)
 @freezed
-class RecommendedItem with _$RecommendedItem {
+abstract class RecommendedItem with _$RecommendedItem {
   const factory RecommendedItem({
     required String id,
     @JsonKey(name: 'user_id') String? userId,

@@ -11,6 +11,7 @@ import 'package:gag_cars_frontend/Pages/HomePage/Providers/getSimilarItemsProvid
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/getUserDetailsProvider.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistManager.dart';
 import 'package:gag_cars_frontend/Pages/HomePage/Providers/wishlistToggleProvider.dart';
+import 'package:gag_cars_frontend/Pages/HomePage/Providers/homeProvider.dart';
 import 'package:gag_cars_frontend/Routes/routeClass.dart';
 import 'package:gag_cars_frontend/Utils/WidgetUtils/widgetUtils.dart';
 import 'package:gag_cars_frontend/Utils/simple_deep_link_handler.dart';
@@ -577,6 +578,12 @@ class _DetailPageState extends State<DetailPage>
       _preloadCategoryDetails();
       _loadSimilarItems();
       _fetchUserDetails();
+
+      // NEW: Fetch full item data if created_at is missing or empty
+      if (item!['created_at'] == null ||
+          item!['created_at'].toString().isEmpty) {
+        _fetchFullItemData();
+      }
     });
   }
 
@@ -595,13 +602,40 @@ class _DetailPageState extends State<DetailPage>
     final dynamic userObj = item!['user'];
     user = _convertUserToMap(userObj);
 
-    logger.e('Posted User is: $user');
+    logger.i('Posted User is: $user');
 
     // Extract user ID safely
     _currentUserId = _extractUserId(userObj)?.toString();
 
     logger.w('🔍 [DETAIL PAGE] Extracted user ID: $_currentUserId');
     logger.w('🔍 [DETAIL PAGE] Item user data: $user');
+  }
+
+  Future<void> _fetchFullItemData() async {
+    if (!mounted || _currentItemId.isEmpty) return;
+
+    try {
+      logger.i(
+        '🔄 [DETAIL PAGE] created_at missing, fetching full item data for ID: $_currentItemId',
+      );
+
+      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
+      await homeProvider.fetchRecommendedById(_currentItemId);
+
+      if (mounted && homeProvider.selectedItem != null) {
+        setState(() {
+          // Update the local item map with the fresh data
+          final newItemData = homeProvider.selectedItem!.toJson();
+          item = newItemData;
+          _initializeItemData(); // Re-initialize derived fields
+          logger.i(
+            '✅ [DETAIL PAGE] Full item data refreshed successfully with created_at: ${item!['created_at']}',
+          );
+        });
+      }
+    } catch (e) {
+      logger.e('❌ [DETAIL PAGE] Error fetching full item data: $e');
+    }
   }
 
   void _onScroll() {
@@ -861,16 +895,6 @@ class _DetailPageState extends State<DetailPage>
   ) {
     final fullFormattedPrice = _formatPriceWithCommas(priceString);
     final displaySymbol = currencySymbol ?? '';
-
-    if (priceString.length > 6) {
-      final truncatedDigits = priceString.substring(0, 6);
-      return Tooltip(
-        message: '$displaySymbol $fullFormattedPrice',
-        triggerMode: TooltipTriggerMode.tap,
-        showDuration: const Duration(seconds: 3),
-        child: Text('$displaySymbol $truncatedDigits...', style: style),
-      );
-    }
 
     return Text(
       '$displaySymbol $fullFormattedPrice',
@@ -1230,7 +1254,12 @@ class _DetailPageState extends State<DetailPage>
                                 ],
                                 _buildInfoRow(
                                   Icons.refresh_outlined,
-                                  formatTimeAgo(item!['created_at'] ?? ''),
+                                  (item!['created_at'] != null &&
+                                          item!['created_at']
+                                              .toString()
+                                              .isNotEmpty)
+                                      ? formatTimeAgo(item!['created_at'])
+                                      : '',
                                 ),
                                 const SizedBox(height: 16),
 
@@ -2454,12 +2483,39 @@ Download GAGcars app for more amazing vehicles!''';
       context,
       listen: true,
     );
+
+    // If loading, show shimmer placeholders
+    if (categoryDetailProvider.isCategoryLoading(categoryId)) {
+      return List.generate(
+        3,
+        (i) => {'title': '...', 'value': 'LOADING_SHIMMER'},
+      );
+    }
+
     return categoryDetailProvider.buildHighlights(categoryId, item!);
   }
 
   List<Map<String, String>> getSpecifications() {
-    // FIXED: Always use the default specifications to ensure brand name is used for "Make"
-    return _getDefaultSpecifications();
+    final categoryId =
+        item!['category_id'] ?? _extractCategoryId(item!['category']);
+    if (categoryId == null) {
+      return _getDefaultSpecifications();
+    }
+
+    final categoryDetailProvider = Provider.of<CategoryDetailProvider>(
+      context,
+      listen: true,
+    );
+
+    // If loading, show shimmer placeholders
+    if (categoryDetailProvider.isCategoryLoading(categoryId)) {
+      return List.generate(
+        4,
+        (i) => {'title': '...', 'value': 'LOADING_SHIMMER'},
+      );
+    }
+
+    return categoryDetailProvider.buildSpecifications(categoryId, item!);
   }
 
   String? _safeGetString(dynamic obj, String key) {
@@ -2512,109 +2568,81 @@ Download GAGcars app for more amazing vehicles!''';
   List<Map<String, String>> _getDefaultHighlights() {
     final List<Map<String, String>> highlights = [];
 
-    // Filter out empty values - only add if value exists and is not empty/null
-    if (item!['year'] != null &&
-        item!['year'].toString().isNotEmpty &&
-        item!['year'].toString().toLowerCase() != 'null') {
-      highlights.add({
-        'title': 'Model Year',
-        'value': item!['year'].toString(),
-      });
-    }
-    if (item!['mileage'] != null &&
-        item!['mileage'].toString().isNotEmpty &&
-        item!['mileage'].toString().toLowerCase() != 'null') {
-      highlights.add({
-        'title': 'Mileage',
-        'value':
-            '${formatNumber(shortenerRequired: true, number: int.tryParse(item!['mileage'].toString()) ?? 0)} km',
-      });
-    }
-    if (item!['engine_capacity'] != null &&
-        item!['engine_capacity'].toString().isNotEmpty &&
-        item!['engine_capacity'].toString().toLowerCase() != 'null') {
-      highlights.add({
-        'title': 'Engine',
-        'value': '${item!['engine_capacity']} L',
-      });
-    }
-    if (item!['condition'] != null &&
-        item!['condition'].toString().isNotEmpty &&
-        item!['condition'].toString().toLowerCase() != 'null') {
-      highlights.add({
-        'title': 'Condition',
-        'value': item!['condition'].toString(),
-      });
-    }
+    // Model Year
+    final year = item!['year']?.toString() ?? '';
+    highlights.add({
+      'title': 'Model Year',
+      'value': (year.isEmpty || year.toLowerCase() == 'null') ? '' : year,
+    });
 
-    return highlights; // Return only non-empty highlights
+    // Mileage
+    final mileage = item!['mileage']?.toString() ?? '';
+    highlights.add({
+      'title': 'Mileage',
+      'value': (mileage.isEmpty || mileage.toLowerCase() == 'null')
+          ? ''
+          : '${formatNumber(shortenerRequired: true, number: int.tryParse(mileage) ?? 0)} km',
+    });
+
+    // Engine
+    final engine = item!['engine_capacity']?.toString() ?? '';
+    highlights.add({
+      'title': 'Engine',
+      'value': (engine.isEmpty || engine.toLowerCase() == 'null')
+          ? ''
+          : '$engine L',
+    });
+
+    return highlights;
   }
 
   List<Map<String, String>> _getDefaultSpecifications() {
     final List<Map<String, String>> specifications = [];
 
-    // FIXED: Always use brand name for "Make" - this was the main issue
-    final brandName = _safeGetString(item!['brand'], 'name');
-    if (brandName != null &&
-        brandName.isNotEmpty &&
-        brandName.toLowerCase() != 'null') {
-      specifications.add({'title': 'Make', 'value': brandName});
-    }
+    // Make
+    final brandName = _safeGetString(item!['brand'], 'name') ?? '';
+    specifications.add({
+      'title': 'Make',
+      'value': (brandName.isEmpty || brandName.toLowerCase() == 'null')
+          ? ''
+          : brandName,
+    });
 
-    final modelName = _safeGetString(item!['brand_model'], 'name');
-    if (modelName != null &&
-        modelName.isNotEmpty &&
-        modelName.toLowerCase() != 'null') {
-      specifications.add({'title': 'Model', 'value': modelName});
-    }
+    // Model
+    final modelName = _safeGetString(item!['brand_model'], 'name') ?? '';
+    specifications.add({
+      'title': 'Model',
+      'value': (modelName.isEmpty || modelName.toLowerCase() == 'null')
+          ? ''
+          : modelName,
+    });
 
-    if (item!['color'] != null &&
-        item!['color'].toString().isNotEmpty &&
-        item!['color'].toString().toLowerCase() != 'null') {
-      specifications.add({
-        'title': 'Color',
-        'value': item!['color'].toString(),
-      });
-    }
+    // Color
+    final color = item!['color']?.toString() ?? '';
+    specifications.add({
+      'title': 'Color',
+      'value': (color.isEmpty || color.toLowerCase() == 'null') ? '' : color,
+    });
 
-    if (item!['number_of_passengers'] != null &&
-        item!['number_of_passengers'].toString().isNotEmpty &&
-        item!['number_of_passengers'].toString().toLowerCase() != 'null') {
-      specifications.add({
-        'title': 'Seats',
-        'value': '${item!['number_of_passengers']} seats',
-      });
-    }
+    // Seats
+    final seats = item!['number_of_passengers']?.toString() ?? '';
+    specifications.add({
+      'title': 'Seats',
+      'value': (seats.isEmpty || seats.toLowerCase() == 'null')
+          ? ''
+          : '$seats seats',
+    });
 
-    if (item!['transmission'] != null &&
-        item!['transmission'].toString().isNotEmpty &&
-        item!['transmission'].toString().toLowerCase() != 'null') {
-      specifications.add({
-        'title': 'Transmission',
-        'value': item!['transmission'].toString(),
-      });
-    }
+    // Transmission
+    final transmission = item!['transmission']?.toString() ?? '';
+    specifications.add({
+      'title': 'Transmission',
+      'value': (transmission.isEmpty || transmission.toLowerCase() == 'null')
+          ? ''
+          : transmission,
+    });
 
-    // Add additional specifications if available and not empty
-    if (item!['engine_capacity'] != null &&
-        item!['engine_capacity'].toString().isNotEmpty &&
-        item!['engine_capacity'].toString().toLowerCase() != 'null') {
-      specifications.add({
-        'title': 'Engine Capacity',
-        'value': '${item!['engine_capacity']} L',
-      });
-    }
-
-    if (item!['steer_position'] != null &&
-        item!['steer_position'].toString().isNotEmpty &&
-        item!['steer_position'].toString().toLowerCase() != 'null') {
-      specifications.add({
-        'title': 'Steering',
-        'value': item!['steer_position'].toString(),
-      });
-    }
-
-    return specifications; // Return only non-empty specifications
+    return specifications;
   }
 
   // ========== UI COMPONENTS ==========
@@ -2625,30 +2653,60 @@ Download GAGcars app for more amazing vehicles!''';
     bool isSpecification = false,
   }) {
     final theme = Theme.of(context);
+    final isShimmer = value == 'LOADING_SHIMMER' || value.isEmpty;
+
     return IntrinsicWidth(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14.0,
-              color: isSpecification
-                  ? theme.textTheme.bodyMedium?.color
-                  : theme.textTheme.titleLarge?.color,
-              fontWeight: isSpecification ? FontWeight.normal : FontWeight.w500,
+          if (value == 'LOADING_SHIMMER')
+            _buildShimmerPlaceholder(width: 60, height: 14)
+          else
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14.0,
+                color: isSpecification
+                    ? theme.textTheme.bodyMedium?.color
+                    : theme.textTheme.titleLarge?.color,
+                fontWeight: isSpecification
+                    ? FontWeight.normal
+                    : FontWeight.w500,
+              ),
             ),
-          ),
           const SizedBox(height: 6),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: isSpecification ? FontWeight.w600 : FontWeight.normal,
-              color: theme.textTheme.titleLarge?.color,
+          if (isShimmer)
+            _buildShimmerPlaceholder(width: 80, height: 18)
+          else
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: isSpecification
+                    ? FontWeight.w600
+                    : FontWeight.normal,
+                color: theme.textTheme.titleLarge?.color,
+              ),
             ),
-          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerPlaceholder({
+    required double width,
+    required double height,
+  }) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+        ),
       ),
     );
   }
@@ -2667,18 +2725,22 @@ Download GAGcars app for more amazing vehicles!''';
 
   Widget _buildInfoRow(IconData icon, String text) {
     final theme = Theme.of(context);
+    final isShimmer = text.isEmpty;
+
     return Row(
       children: [
         Icon(icon, color: theme.iconTheme.color, size: 20),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: theme.textTheme.bodyMedium?.color,
-              fontSize: 15.0,
-            ),
-          ),
+          child: isShimmer
+              ? _buildShimmerPlaceholder(width: 120, height: 16)
+              : Text(
+                  text,
+                  style: TextStyle(
+                    color: theme.textTheme.bodyMedium?.color,
+                    fontSize: 15.0,
+                  ),
+                ),
         ),
       ],
     );
@@ -2955,6 +3017,20 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
         );
 
     _initializeLikeStatus();
+    _initializeVerificationStatus();
+  }
+
+  void _initializeVerificationStatus() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userId = widget.item.userId ?? widget.item.user?.id;
+      if (userId != null) {
+        final userDetailsProvider = Provider.of<UserDetailsProvider>(
+          context,
+          listen: false,
+        );
+        userDetailsProvider.fetchUserDetails(userId.toString());
+      }
+    });
   }
 
   void _initializeLikeStatus() {
@@ -3554,6 +3630,73 @@ class __SimilarItemWidgetState extends State<_SimilarItemWidget>
                         ),
                       ),
                   ],
+                ),
+
+                // ========== ROW 4: Verified Dealer Section ==========
+                const SizedBox(height: 4),
+                Consumer<UserDetailsProvider>(
+                  builder: (context, userDetailsProvider, child) {
+                    final userId = widget.item.userId ?? widget.item.user?.id;
+                    final userIdStr = userId?.toString();
+
+                    if (userIdStr != null &&
+                        userDetailsProvider.isLoading(userIdStr)) {
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              width: 60,
+                              height: 7,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (userIdStr != null &&
+                        userDetailsProvider.isVerifiedDealer(userIdStr)) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.verified,
+                            color: Colors.blue[600],
+                            size: 10,
+                          ),
+                          const SizedBox(width: 3),
+                          Flexible(
+                            child: Text(
+                              'VERIFIED DEALER',
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.blue[600],
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
               ],
             ),

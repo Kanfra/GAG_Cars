@@ -6,38 +6,36 @@ part of 'vehicleModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$VehicleModelImpl _$$VehicleModelImplFromJson(Map<String, dynamic> json) =>
-    _$VehicleModelImpl(
-      user_id: json['user_id'] as String,
-      vehicle_id: json['vehicle_id'] as String,
-      vehicleName: json['vehicleName'] as String,
-      vehicleType: json['vehicleType'] as String,
-      condition: json['condition'] as String,
-      year: (json['year'] as num).toInt(),
-      make: (json['make'] as num?)?.toInt(),
-      model: json['model'] as String,
-      location:
-          VehicleLocation.fromJson(json['location'] as Map<String, dynamic>),
-      price: json['price'] as String,
-      steerPosition: json['steerPosition'] as String,
-      engineCapacity: json['engineCapacity'] as String,
-      transmission: json['transmission'] as String,
-      color: VehicleColor.fromJson(json['color'] as Map<String, dynamic>),
-      buildType: json['buildType'] as String,
-      mileage: json['mileage'] as String,
-      numberOfPassengers: (json['numberOfPassengers'] as num).toInt(),
-      features: (json['features'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      description: json['description'] as String,
-      images: (json['images'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-    );
+_VehicleModel _$VehicleModelFromJson(
+  Map<String, dynamic> json,
+) => _VehicleModel(
+  user_id: json['user_id'] as String,
+  vehicle_id: json['vehicle_id'] as String,
+  vehicleName: json['vehicleName'] as String,
+  vehicleType: json['vehicleType'] as String,
+  condition: json['condition'] as String,
+  year: (json['year'] as num).toInt(),
+  make: (json['make'] as num?)?.toInt(),
+  model: json['model'] as String,
+  location: VehicleLocation.fromJson(json['location'] as Map<String, dynamic>),
+  price: json['price'] as String,
+  steerPosition: json['steerPosition'] as String,
+  engineCapacity: json['engineCapacity'] as String,
+  transmission: json['transmission'] as String,
+  color: VehicleColor.fromJson(json['color'] as Map<String, dynamic>),
+  buildType: json['buildType'] as String,
+  mileage: json['mileage'] as String,
+  numberOfPassengers: (json['numberOfPassengers'] as num).toInt(),
+  features:
+      (json['features'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  description: json['description'] as String,
+  images:
+      (json['images'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+);
 
-Map<String, dynamic> _$$VehicleModelImplToJson(_$VehicleModelImpl instance) =>
+Map<String, dynamic> _$VehicleModelToJson(_VehicleModel instance) =>
     <String, dynamic>{
       'user_id': instance.user_id,
       'vehicle_id': instance.vehicle_id,
@@ -61,30 +59,22 @@ Map<String, dynamic> _$$VehicleModelImplToJson(_$VehicleModelImpl instance) =>
       'images': instance.images,
     };
 
-_$VehicleLocationImpl _$$VehicleLocationImplFromJson(
-        Map<String, dynamic> json) =>
-    _$VehicleLocationImpl(
+_VehicleLocation _$VehicleLocationFromJson(Map<String, dynamic> json) =>
+    _VehicleLocation(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       address: json['address'] as String?,
     );
 
-Map<String, dynamic> _$$VehicleLocationImplToJson(
-        _$VehicleLocationImpl instance) =>
+Map<String, dynamic> _$VehicleLocationToJson(_VehicleLocation instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'address': instance.address,
     };
 
-_$VehicleColorImpl _$$VehicleColorImplFromJson(Map<String, dynamic> json) =>
-    _$VehicleColorImpl(
-      hex: json['hex'] as String,
-      name: json['name'] as String,
-    );
+_VehicleColor _$VehicleColorFromJson(Map<String, dynamic> json) =>
+    _VehicleColor(hex: json['hex'] as String, name: json['name'] as String);
 
-Map<String, dynamic> _$$VehicleColorImplToJson(_$VehicleColorImpl instance) =>
-    <String, dynamic>{
-      'hex': instance.hex,
-      'name': instance.name,
-    };
+Map<String, dynamic> _$VehicleColorToJson(_VehicleColor instance) =>
+    <String, dynamic>{'hex': instance.hex, 'name': instance.name};

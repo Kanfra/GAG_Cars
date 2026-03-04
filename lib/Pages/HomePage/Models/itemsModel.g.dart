@@ -6,85 +6,82 @@ part of 'itemsModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String?,
-      emailVerifiedAt: json['email_verified_at'] == null
-          ? null
-          : DateTime.parse(json['email_verified_at'] as String),
-      paidSeller: (json['paid_seller'] as num?)?.toInt(),
-      deletedAt: json['deleted_at'] == null
-          ? null
-          : DateTime.parse(json['deleted_at'] as String),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
-      countryId: (json['country_id'] as num?)?.toInt(),
-      stateId: (json['state_id'] as num?)?.toInt(),
-      profilePhoto: json['profile_photo'] as String?,
-    );
+_User _$UserFromJson(Map<String, dynamic> json) => _User(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  email: json['email'] as String,
+  phone: json['phone'] as String?,
+  emailVerifiedAt: json['email_verified_at'] == null
+      ? null
+      : DateTime.parse(json['email_verified_at'] as String),
+  paidSeller: (json['paid_seller'] as num?)?.toInt(),
+  deletedAt: json['deleted_at'] == null
+      ? null
+      : DateTime.parse(json['deleted_at'] as String),
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+  countryId: (json['country_id'] as num?)?.toInt(),
+  stateId: (json['state_id'] as num?)?.toInt(),
+  profilePhoto: json['profile_photo'] as String?,
+);
 
-Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'email': instance.email,
-      'phone': instance.phone,
-      'email_verified_at': instance.emailVerifiedAt?.toIso8601String(),
-      'paid_seller': instance.paidSeller,
-      'deleted_at': instance.deletedAt?.toIso8601String(),
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'country_id': instance.countryId,
-      'state_id': instance.stateId,
-      'profile_photo': instance.profilePhoto,
-    };
+Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'email': instance.email,
+  'phone': instance.phone,
+  'email_verified_at': instance.emailVerifiedAt?.toIso8601String(),
+  'paid_seller': instance.paidSeller,
+  'deleted_at': instance.deletedAt?.toIso8601String(),
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+  'country_id': instance.countryId,
+  'state_id': instance.stateId,
+  'profile_photo': instance.profilePhoto,
+};
 
-_$BrandImpl _$$BrandImplFromJson(Map<String, dynamic> json) => _$BrandImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      image: json['image'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
-    );
+_Brand _$BrandFromJson(Map<String, dynamic> json) => _Brand(
+  id: (json['id'] as num).toInt(),
+  userId: json['user_id'] as String?,
+  name: json['name'] as String,
+  slug: json['slug'] as String,
+  image: json['image'] as String?,
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+);
 
-Map<String, dynamic> _$$BrandImplToJson(_$BrandImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-      'name': instance.name,
-      'slug': instance.slug,
-      'image': instance.image,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$BrandToJson(_Brand instance) => <String, dynamic>{
+  'id': instance.id,
+  'user_id': instance.userId,
+  'name': instance.name,
+  'slug': instance.slug,
+  'image': instance.image,
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+};
 
-_$BrandModelImpl _$$BrandModelImplFromJson(Map<String, dynamic> json) =>
-    _$BrandModelImpl(
-      id: (json['id'] as num).toInt(),
-      brandId: (json['brand_id'] as num).toInt(),
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
-    );
+_BrandModel _$BrandModelFromJson(Map<String, dynamic> json) => _BrandModel(
+  id: (json['id'] as num).toInt(),
+  brandId: (json['brand_id'] as num).toInt(),
+  name: json['name'] as String,
+  slug: json['slug'] as String,
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+);
 
-Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
+Map<String, dynamic> _$BrandModelToJson(_BrandModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'brand_id': instance.brandId,
@@ -94,43 +91,40 @@ Map<String, dynamic> _$$BrandModelImplToJson(_$BrandModelImpl instance) =>
       'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
-_$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
-    _$CategoryImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
-      parentId: (json['parent_id'] as num?)?.toInt(),
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      description: json['description'] as String?,
-      features: (json['features'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      image: json['image'] as String?,
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
-    );
+_Category _$CategoryFromJson(Map<String, dynamic> json) => _Category(
+  id: (json['id'] as num).toInt(),
+  userId: json['user_id'] as String?,
+  parentId: (json['parent_id'] as num?)?.toInt(),
+  name: json['name'] as String,
+  slug: json['slug'] as String,
+  description: json['description'] as String?,
+  features: (json['features'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  image: json['image'] as String?,
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+);
 
-Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-      'parent_id': instance.parentId,
-      'name': instance.name,
-      'slug': instance.slug,
-      'description': instance.description,
-      'features': instance.features,
-      'image': instance.image,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$CategoryToJson(_Category instance) => <String, dynamic>{
+  'id': instance.id,
+  'user_id': instance.userId,
+  'parent_id': instance.parentId,
+  'name': instance.name,
+  'slug': instance.slug,
+  'description': instance.description,
+  'features': instance.features,
+  'image': instance.image,
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+};
 
-_$RecommendedItemImpl _$$RecommendedItemImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RecommendedItemImpl(
+_RecommendedItem _$RecommendedItemFromJson(Map<String, dynamic> json) =>
+    _RecommendedItem(
       id: json['id'] as String,
       userId: json['user_id'] as String?,
       countryId: (json['country_id'] as num?)?.toInt(),
@@ -141,8 +135,9 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       year: json['year'] as String?,
       slug: json['slug'] as String?,
       description: json['description'] as String?,
-      images:
-          (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       location: json['location'] as String?,
       serialNumber: json['serial_number'] as String?,
       condition: json['condition'] as String?,
@@ -188,8 +183,7 @@ _$RecommendedItemImpl _$$RecommendedItemImplFromJson(
       isPromoted: json['is_promoted'] as bool?,
     );
 
-Map<String, dynamic> _$$RecommendedItemImplToJson(
-        _$RecommendedItemImpl instance) =>
+Map<String, dynamic> _$RecommendedItemToJson(_RecommendedItem instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -229,9 +223,8 @@ Map<String, dynamic> _$$RecommendedItemImplToJson(
       'is_promoted': instance.isPromoted,
     };
 
-_$RecommendedResponseImpl _$$RecommendedResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RecommendedResponseImpl(
+_RecommendedResponse _$RecommendedResponseFromJson(Map<String, dynamic> json) =>
+    _RecommendedResponse(
       data: (json['data'] as List<dynamic>)
           .map((e) => RecommendedItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -239,25 +232,23 @@ _$RecommendedResponseImpl _$$RecommendedResponseImplFromJson(
       meta: RecommendedMeta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$RecommendedResponseImplToJson(
-        _$RecommendedResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'links': instance.links,
-      'meta': instance.meta,
-    };
+Map<String, dynamic> _$RecommendedResponseToJson(
+  _RecommendedResponse instance,
+) => <String, dynamic>{
+  'data': instance.data,
+  'links': instance.links,
+  'meta': instance.meta,
+};
 
-_$RecommendedLinksImpl _$$RecommendedLinksImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RecommendedLinksImpl(
+_RecommendedLinks _$RecommendedLinksFromJson(Map<String, dynamic> json) =>
+    _RecommendedLinks(
       first: json['first'] as String,
       last: json['last'] as String,
       prev: json['prev'] as String?,
       next: json['next'] as String?,
     );
 
-Map<String, dynamic> _$$RecommendedLinksImplToJson(
-        _$RecommendedLinksImpl instance) =>
+Map<String, dynamic> _$RecommendedLinksToJson(_RecommendedLinks instance) =>
     <String, dynamic>{
       'first': instance.first,
       'last': instance.last,
@@ -265,9 +256,8 @@ Map<String, dynamic> _$$RecommendedLinksImplToJson(
       'next': instance.next,
     };
 
-_$RecommendedMetaImpl _$$RecommendedMetaImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RecommendedMetaImpl(
+_RecommendedMeta _$RecommendedMetaFromJson(Map<String, dynamic> json) =>
+    _RecommendedMeta(
       currentPage: (json['current_page'] as num).toInt(),
       from: (json['from'] as num?)?.toInt(),
       lastPage: (json['last_page'] as num).toInt(),
@@ -280,8 +270,7 @@ _$RecommendedMetaImpl _$$RecommendedMetaImplFromJson(
       total: (json['total'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$RecommendedMetaImplToJson(
-        _$RecommendedMetaImpl instance) =>
+Map<String, dynamic> _$RecommendedMetaToJson(_RecommendedMeta instance) =>
     <String, dynamic>{
       'current_page': instance.currentPage,
       'from': instance.from,
@@ -293,20 +282,19 @@ Map<String, dynamic> _$$RecommendedMetaImplToJson(
       'total': instance.total,
     };
 
-_$RecommendedMetaLinkImpl _$$RecommendedMetaLinkImplFromJson(
-        Map<String, dynamic> json) =>
-    _$RecommendedMetaLinkImpl(
+_RecommendedMetaLink _$RecommendedMetaLinkFromJson(Map<String, dynamic> json) =>
+    _RecommendedMetaLink(
       url: json['url'] as String?,
       label: json['label'] as String,
       page: (json['page'] as num?)?.toInt(),
       active: json['active'] as bool,
     );
 
-Map<String, dynamic> _$$RecommendedMetaLinkImplToJson(
-        _$RecommendedMetaLinkImpl instance) =>
-    <String, dynamic>{
-      'url': instance.url,
-      'label': instance.label,
-      'page': instance.page,
-      'active': instance.active,
-    };
+Map<String, dynamic> _$RecommendedMetaLinkToJson(
+  _RecommendedMetaLink instance,
+) => <String, dynamic>{
+  'url': instance.url,
+  'label': instance.label,
+  'page': instance.page,
+  'active': instance.active,
+};

@@ -455,12 +455,12 @@ class _WishlistPageState extends State<WishlistPage> {
     ThemeData theme,
   ) {
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       sliver: SliverGrid(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           childAspectRatio: 0.72,
         ),
         delegate: SliverChildBuilderDelegate((context, index) {
@@ -562,10 +562,15 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
 
   void _initializeVerificationStatus() {
     String? userId;
+    // Robust extraction: try top-level userId/user_id first, then nested user object
     if (_itemData is Map) {
-      userId = _itemData['user']?['id']?.toString();
+      userId =
+          (_itemData['userId'] ??
+                  _itemData['user_id'] ??
+                  _itemData['user']?['id'])
+              ?.toString();
     } else {
-      userId = _itemData?.user?.id?.toString();
+      userId = (_itemData?.userId ?? _itemData?.user?.id)?.toString();
     }
 
     if (userId != null) {
@@ -719,13 +724,20 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     final imageUrl = _getImageUrl();
     final brandImage = _getBrandImage();
 
-    return Card(
-      elevation: 2,
-      color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: _isRemoving ? null : _navigateToDetail,
-        borderRadius: BorderRadius.circular(16),
+    return GestureDetector(
+      onTap: _isRemoving ? null : _navigateToDetail,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
         child: Stack(
           children: [
             Column(
@@ -888,8 +900,6 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
               ],
             ),
 
-            SizedBox(height: 8),
-
             // Price and Mileage
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -946,8 +956,6 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
                   ),
               ],
             ),
-
-            SizedBox(height: 12),
 
             // Brand and Details - CONSISTENT with HomePage implementation
             Row(
@@ -1023,32 +1031,38 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
             Consumer<UserDetailsProvider>(
               builder: (context, userDetailsProvider, child) {
                 String? userId;
+                // Robust extraction for badge lookup
                 if (_itemData is Map) {
-                  userId = _itemData['user']?['id']?.toString();
+                  userId =
+                      (_itemData['userId'] ??
+                              _itemData['user_id'] ??
+                              _itemData['user']?['id'])
+                          ?.toString();
                 } else {
-                  userId = _itemData?.user?.id?.toString();
+                  userId = (_itemData?.userId ?? _itemData?.user?.id)
+                      ?.toString();
                 }
 
                 if (userId != null &&
                     userDetailsProvider.isVerifiedDealer(userId)) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.verified, color: Colors.blue[600], size: 12),
-                        SizedBox(width: 4),
-                        Text(
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.verified, color: Colors.blue[600], size: 10),
+                      const SizedBox(width: 3),
+                      Flexible(
+                        child: Text(
                           'VERIFIED DEALER',
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.blue[600],
-                            fontSize: 9,
+                            fontSize: 8,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                            letterSpacing: 0.3,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 }
                 return const SizedBox.shrink();
@@ -1191,7 +1205,15 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
     if (price == null || price.isEmpty) return '0';
     try {
       final int priceValue = int.parse(price);
-      final String priceStr = priceValue.toString();
+      String priceStr = priceValue.toString();
+
+      // Implement user request: truncate if it exceeds 6 digits
+      bool isTruncated = false;
+      if (priceStr.length > 6) {
+        priceStr = priceStr.substring(0, 6);
+        isTruncated = true;
+      }
+
       final StringBuffer formattedPrice = StringBuffer();
 
       for (int i = 0; i < priceStr.length; i++) {
@@ -1201,7 +1223,7 @@ class _WishlistGridItemState extends State<_WishlistGridItem>
         formattedPrice.write(priceStr[i]);
       }
 
-      return formattedPrice.toString();
+      return isTruncated ? '${formattedPrice}...' : formattedPrice.toString();
     } catch (e) {
       return price;
     }
@@ -1273,10 +1295,15 @@ class _WishlistListItemState extends State<_WishlistListItem>
 
   void _initializeVerificationStatus() {
     String? userId;
+    // Robust extraction: try top-level userId/user_id first, then nested user object
     if (_itemData is Map) {
-      userId = _itemData['user']?['id']?.toString();
+      userId =
+          (_itemData['userId'] ??
+                  _itemData['user_id'] ??
+                  _itemData['user']?['id'])
+              ?.toString();
     } else {
-      userId = _itemData?.user?.id?.toString();
+      userId = (_itemData?.userId ?? _itemData?.user?.id)?.toString();
     }
 
     if (userId != null) {
@@ -1677,32 +1704,41 @@ class _WishlistListItemState extends State<_WishlistListItem>
                     Consumer<UserDetailsProvider>(
                       builder: (context, userDetailsProvider, child) {
                         String? userId;
+                        // Robust extraction for badge lookup
                         if (_itemData is Map) {
-                          userId = _itemData['user']?['id']?.toString();
+                          userId =
+                              (_itemData['userId'] ??
+                                      _itemData['user_id'] ??
+                                      _itemData['user']?['id'])
+                                  ?.toString();
                         } else {
-                          userId = _itemData?.user?.id?.toString();
+                          userId = (_itemData?.userId ?? _itemData?.user?.id)
+                              ?.toString();
                         }
 
                         if (userId != null &&
                             userDetailsProvider.isVerifiedDealer(userId)) {
                           return Padding(
-                            padding: const EdgeInsets.only(top: 8),
+                            padding: const EdgeInsets.only(top: 4),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.verified,
                                   color: Colors.blue[600],
-                                  size: 12,
+                                  size: 10,
                                 ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'VERIFIED DEALER',
-                                  style: TextStyle(
-                                    color: Colors.blue[600],
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.5,
+                                const SizedBox(width: 3),
+                                Flexible(
+                                  child: Text(
+                                    'VERIFIED DEALER',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.blue[600],
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.3,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -1890,12 +1926,30 @@ class _WishlistListItemState extends State<_WishlistListItem>
     try {
       if (_itemData is Map) {
         final price = _itemData['price'] ?? '0';
-        return formatNumber(shortenerRequired: true, number: int.parse(price));
+        return _formatPriceWithCommas(price);
       }
       final price = _itemData?.price ?? '0';
-      return formatNumber(shortenerRequired: true, number: int.parse(price));
+      return _formatPriceWithCommas(price);
     } catch (e) {
       return '0';
+    }
+  }
+
+  String _formatPriceWithCommas(String? price) {
+    if (price == null || price.isEmpty) return '0';
+    try {
+      final int priceValue = int.parse(price);
+      final String priceStr = priceValue.toString();
+      final StringBuffer formattedPrice = StringBuffer();
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+      return formattedPrice.toString();
+    } catch (e) {
+      return price;
     }
   }
 

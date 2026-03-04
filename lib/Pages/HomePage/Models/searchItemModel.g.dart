@@ -6,87 +6,84 @@ part of 'searchItemModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String?,
-      emailVerifiedAt: json['email_verified_at'] == null
-          ? null
-          : DateTime.parse(json['email_verified_at'] as String),
-      paidSeller: (json['paid_seller'] as num?)?.toInt(),
-      deletedAt: json['deleted_at'] == null
-          ? null
-          : DateTime.parse(json['deleted_at'] as String),
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
-      updatedAt: json['updated_at'] == null
-          ? null
-          : DateTime.parse(json['updated_at'] as String),
-      countryId: (json['country_id'] as num?)?.toInt(),
-      stateId: (json['state_id'] as num?)?.toInt(),
-      profilePhoto: json['profile_photo'] as String?,
-    );
+_User _$UserFromJson(Map<String, dynamic> json) => _User(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  email: json['email'] as String,
+  phone: json['phone'] as String?,
+  emailVerifiedAt: json['email_verified_at'] == null
+      ? null
+      : DateTime.parse(json['email_verified_at'] as String),
+  paidSeller: (json['paid_seller'] as num?)?.toInt(),
+  deletedAt: json['deleted_at'] == null
+      ? null
+      : DateTime.parse(json['deleted_at'] as String),
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+  countryId: (json['country_id'] as num?)?.toInt(),
+  stateId: (json['state_id'] as num?)?.toInt(),
+  profilePhoto: json['profile_photo'] as String?,
+);
 
-Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'email': instance.email,
-      'phone': instance.phone,
-      'email_verified_at': instance.emailVerifiedAt?.toIso8601String(),
-      'paid_seller': instance.paidSeller,
-      'deleted_at': instance.deletedAt?.toIso8601String(),
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'country_id': instance.countryId,
-      'state_id': instance.stateId,
-      'profile_photo': instance.profilePhoto,
-    };
+Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'email': instance.email,
+  'phone': instance.phone,
+  'email_verified_at': instance.emailVerifiedAt?.toIso8601String(),
+  'paid_seller': instance.paidSeller,
+  'deleted_at': instance.deletedAt?.toIso8601String(),
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+  'country_id': instance.countryId,
+  'state_id': instance.stateId,
+  'profile_photo': instance.profilePhoto,
+};
 
-_$SearchItemImpl _$$SearchItemImplFromJson(Map<String, dynamic> json) =>
-    _$SearchItemImpl(
-      id: json['id'] as String,
-      userId: json['user_id'] as String?,
-      countryId: (json['country_id'] as num?)?.toInt(),
-      brandModelId: (json['brand_model_id'] as num?)?.toInt(),
-      brandId: (json['brand_id'] as num?)?.toInt(),
-      categoryId: (json['category_id'] as num?)?.toInt(),
-      name: json['name'] as String?,
-      year: json['year'] as String?,
-      slug: json['slug'] as String?,
-      description: json['description'] as String?,
-      images:
-          (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      location: json['location'] as String?,
-      serialNumber: json['serial_number'] as String?,
-      condition: json['condition'] as String?,
-      steerPosition: json['steer_position'] as String?,
-      engineCapacity: json['engine_capacity'] as String?,
-      transmission: json['transmission'] as String?,
-      color: json['color'] as String?,
-      buildType: json['build_type'] as String?,
-      numberOfPassengers: (json['number_of_passengers'] as num?)?.toInt(),
-      features: (json['features'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      status: json['status'] as String?,
-      price: json['price'] as String?,
-      mileage: json['mileage'] as String?,
-      user: json['user'] == null
-          ? null
-          : User.fromJson(json['user'] as Map<String, dynamic>),
-      warranty: (json['warranty'] as num?)?.toInt(),
-      warrantyExpiration: json['warranty_expiration'] as String?,
-      deletedAt: json['deleted_at'] as String?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
-      Height: json['Height'] as String?,
-      VIN: json['VIN'] as String?,
-    );
+_SearchItem _$SearchItemFromJson(Map<String, dynamic> json) => _SearchItem(
+  id: json['id'] as String,
+  userId: json['user_id'] as String?,
+  countryId: (json['country_id'] as num?)?.toInt(),
+  brandModelId: (json['brand_model_id'] as num?)?.toInt(),
+  brandId: (json['brand_id'] as num?)?.toInt(),
+  categoryId: (json['category_id'] as num?)?.toInt(),
+  name: json['name'] as String?,
+  year: json['year'] as String?,
+  slug: json['slug'] as String?,
+  description: json['description'] as String?,
+  images: (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  location: json['location'] as String?,
+  serialNumber: json['serial_number'] as String?,
+  condition: json['condition'] as String?,
+  steerPosition: json['steer_position'] as String?,
+  engineCapacity: json['engine_capacity'] as String?,
+  transmission: json['transmission'] as String?,
+  color: json['color'] as String?,
+  buildType: json['build_type'] as String?,
+  numberOfPassengers: (json['number_of_passengers'] as num?)?.toInt(),
+  features: (json['features'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  status: json['status'] as String?,
+  price: json['price'] as String?,
+  mileage: json['mileage'] as String?,
+  user: json['user'] == null
+      ? null
+      : User.fromJson(json['user'] as Map<String, dynamic>),
+  warranty: (json['warranty'] as num?)?.toInt(),
+  warrantyExpiration: json['warranty_expiration'] as String?,
+  deletedAt: json['deleted_at'] as String?,
+  createdAt: json['created_at'] as String?,
+  updatedAt: json['updated_at'] as String?,
+  Height: json['Height'] as String?,
+  VIN: json['VIN'] as String?,
+);
 
-Map<String, dynamic> _$$SearchItemImplToJson(_$SearchItemImpl instance) =>
+Map<String, dynamic> _$SearchItemToJson(_SearchItem instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,

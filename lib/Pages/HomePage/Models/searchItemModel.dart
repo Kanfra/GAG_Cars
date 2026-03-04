@@ -5,7 +5,7 @@ part 'searchItemModel.g.dart';
 
 
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     required String id,
     required String name,
@@ -25,7 +25,7 @@ class User with _$User {
 }
 
 @freezed
-class SearchItem with _$SearchItem {
+abstract class SearchItem with _$SearchItem {
   const factory SearchItem({
     required String id,
     @JsonKey(name: 'user_id') String? userId,

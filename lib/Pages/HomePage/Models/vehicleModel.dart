@@ -4,8 +4,8 @@ part 'vehicleModel.freezed.dart';
 part 'vehicleModel.g.dart';
 
 @freezed
-class VehicleModel with _$VehicleModel {
-  @JsonSerializable(explicitToJson: true)
+@JsonSerializable(explicitToJson: true)
+abstract class VehicleModel with _$VehicleModel {
   const factory VehicleModel({
     required String user_id,
     required String vehicle_id,
@@ -13,7 +13,7 @@ class VehicleModel with _$VehicleModel {
     required String vehicleType,
     required String condition,
     required int year,
-    required int? make,// well change here back to string again
+    required int? make, // well change here back to string again
     required String model,
     required VehicleLocation location,
     required String price,
@@ -34,7 +34,7 @@ class VehicleModel with _$VehicleModel {
 }
 
 @freezed
-class VehicleLocation with _$VehicleLocation {
+abstract class VehicleLocation with _$VehicleLocation {
   const factory VehicleLocation({
     required double latitude,
     required double longitude,
@@ -46,11 +46,9 @@ class VehicleLocation with _$VehicleLocation {
 }
 
 @freezed
-class VehicleColor with _$VehicleColor {
-  const factory VehicleColor({
-    required String hex,
-    required String name,
-  }) = _VehicleColor;
+abstract class VehicleColor with _$VehicleColor {
+  const factory VehicleColor({required String hex, required String name}) =
+      _VehicleColor;
 
   factory VehicleColor.fromJson(Map<String, dynamic> json) =>
       _$VehicleColorFromJson(json);

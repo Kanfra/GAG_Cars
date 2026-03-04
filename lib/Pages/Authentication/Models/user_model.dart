@@ -4,10 +4,10 @@ part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
 @freezed
-class UserModel with _$UserModel {
+@JsonSerializable(explicitToJson: true)
+abstract class UserModel with _$UserModel {
   const UserModel._();
 
-  @JsonSerializable(explicitToJson: true)
   const factory UserModel({
     String? id,
     required String name,
@@ -37,7 +37,7 @@ class UserModel with _$UserModel {
   bool get isPaidSeller => (paidSeller ?? 0) == 1;
   bool get isActive => (activeStatus ?? 0) == 1;
   bool get hasDarkMode => (darkMode ?? 0) == 1;
-  
+
   // Helper getters for easy access
   String? get countryName => country?.name;
   String? get countryCode => country?.iso2;
@@ -48,7 +48,7 @@ class UserModel with _$UserModel {
 
 // Add this new model in the same file or separate
 @freezed
-class CountryModel with _$CountryModel {
+abstract class CountryModel with _$CountryModel {
   const factory CountryModel({
     int? id,
     String? name,

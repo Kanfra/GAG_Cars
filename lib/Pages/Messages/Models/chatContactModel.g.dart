@@ -6,10 +6,10 @@ part of 'chatContactModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ChatContactResponseImpl _$$ChatContactResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ChatContactResponseImpl(
-      contacts: (json['contacts'] as List<dynamic>?)
+_ChatContactResponse _$ChatContactResponseFromJson(Map<String, dynamic> json) =>
+    _ChatContactResponse(
+      contacts:
+          (json['contacts'] as List<dynamic>?)
               ?.map((e) => ChatContact.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -17,39 +17,38 @@ _$ChatContactResponseImpl _$$ChatContactResponseImplFromJson(
       lastPage: (json['last_page'] as num?)?.toInt() ?? 0,
     );
 
-Map<String, dynamic> _$$ChatContactResponseImplToJson(
-        _$ChatContactResponseImpl instance) =>
-    <String, dynamic>{
-      'contacts': instance.contacts,
-      'total': instance.total,
-      'last_page': instance.lastPage,
-    };
+Map<String, dynamic> _$ChatContactResponseToJson(
+  _ChatContactResponse instance,
+) => <String, dynamic>{
+  'contacts': instance.contacts,
+  'total': instance.total,
+  'last_page': instance.lastPage,
+};
 
-_$ChatContactImpl _$$ChatContactImplFromJson(Map<String, dynamic> json) =>
-    _$ChatContactImpl(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? 'Unknown',
-      email: json['email'] as String? ?? '',
-      phone: json['phone'] as String? ?? '',
-      emailVerifiedAt: json['email_verified_at'] as String?,
-      password: json['password'] as String?,
-      paidSeller: (json['paid_seller'] as num?)?.toInt() ?? 0,
-      deletedAt: json['deleted_at'] as String?,
-      rememberToken: json['remember_token'] as String?,
-      createdAt: json['created_at'] as String? ?? '',
-      updatedAt: json['updated_at'] as String? ?? '',
-      countryId: (json['country_id'] as num?)?.toInt() ?? 0,
-      stateId: (json['state_id'] as num?)?.toInt(),
-      profilePhoto: json['profile_photo'] as String?,
-      uploadsLeft: (json['uploads_left'] as num?)?.toInt(),
-      activeStatus: (json['active_status'] as num?)?.toInt() ?? 0,
-      avatar: json['avatar'] as String? ?? '',
-      darkMode: (json['dark_mode'] as num?)?.toInt() ?? 0,
-      messengerColor: json['messenger_color'] as String?,
-      maxCreatedAt: json['max_created_at'] as String? ?? '',
-    );
+_ChatContact _$ChatContactFromJson(Map<String, dynamic> json) => _ChatContact(
+  id: json['id'] as String? ?? '',
+  name: json['name'] as String? ?? 'Unknown',
+  email: json['email'] as String? ?? '',
+  phone: json['phone'] as String? ?? '',
+  emailVerifiedAt: json['email_verified_at'] as String?,
+  password: json['password'] as String?,
+  paidSeller: (json['paid_seller'] as num?)?.toInt() ?? 0,
+  deletedAt: json['deleted_at'] as String?,
+  rememberToken: json['remember_token'] as String?,
+  createdAt: json['created_at'] as String? ?? '',
+  updatedAt: json['updated_at'] as String? ?? '',
+  countryId: (json['country_id'] as num?)?.toInt() ?? 0,
+  stateId: (json['state_id'] as num?)?.toInt(),
+  profilePhoto: json['profile_photo'] as String?,
+  uploadsLeft: (json['uploads_left'] as num?)?.toInt(),
+  activeStatus: (json['active_status'] as num?)?.toInt() ?? 0,
+  avatar: json['avatar'] as String? ?? '',
+  darkMode: (json['dark_mode'] as num?)?.toInt() ?? 0,
+  messengerColor: json['messenger_color'] as String?,
+  maxCreatedAt: json['max_created_at'] as String? ?? '',
+);
 
-Map<String, dynamic> _$$ChatContactImplToJson(_$ChatContactImpl instance) =>
+Map<String, dynamic> _$ChatContactToJson(_ChatContact instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

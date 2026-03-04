@@ -6,9 +6,8 @@ part of 'chatMessagesModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ChatMessageResponseImpl _$$ChatMessageResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ChatMessageResponseImpl(
+_ChatMessageResponse _$ChatMessageResponseFromJson(Map<String, dynamic> json) =>
+    _ChatMessageResponse(
       total: (json['total'] as num).toInt(),
       lastPage: (json['last_page'] as num).toInt(),
       lastMessageId: json['last_message_id'] as String,
@@ -17,28 +16,27 @@ _$ChatMessageResponseImpl _$$ChatMessageResponseImplFromJson(
           .toList(),
     );
 
-Map<String, dynamic> _$$ChatMessageResponseImplToJson(
-        _$ChatMessageResponseImpl instance) =>
-    <String, dynamic>{
-      'total': instance.total,
-      'last_page': instance.lastPage,
-      'last_message_id': instance.lastMessageId,
-      'messages': instance.messages,
-    };
+Map<String, dynamic> _$ChatMessageResponseToJson(
+  _ChatMessageResponse instance,
+) => <String, dynamic>{
+  'total': instance.total,
+  'last_page': instance.lastPage,
+  'last_message_id': instance.lastMessageId,
+  'messages': instance.messages,
+};
 
-_$ChatMessageImpl _$$ChatMessageImplFromJson(Map<String, dynamic> json) =>
-    _$ChatMessageImpl(
-      id: json['id'] as String,
-      fromId: json['from_id'] as String,
-      toId: json['to_id'] as String,
-      body: json['body'] as String,
-      attachment: json['attachment'] as String?,
-      seen: (json['seen'] as num).toInt(),
-      createdAt: json['created_at'] as String,
-      updatedAt: json['updated_at'] as String,
-    );
+_ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => _ChatMessage(
+  id: json['id'] as String,
+  fromId: json['from_id'] as String,
+  toId: json['to_id'] as String,
+  body: json['body'] as String,
+  attachment: json['attachment'] as String?,
+  seen: (json['seen'] as num).toInt(),
+  createdAt: json['created_at'] as String,
+  updatedAt: json['updated_at'] as String,
+);
 
-Map<String, dynamic> _$$ChatMessageImplToJson(_$ChatMessageImpl instance) =>
+Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
     <String, dynamic>{
       'id': instance.id,
       'from_id': instance.fromId,

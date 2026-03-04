@@ -5,7 +5,7 @@ part 'brandItemsModel.g.dart';
 
 // Add these nested models at the top of your file
 @freezed
-class Brand with _$Brand {
+abstract class Brand with _$Brand {
   const factory Brand({
     required int id,
     @JsonKey(name: 'user_id') String? userId,
@@ -20,7 +20,7 @@ class Brand with _$Brand {
 }
 
 @freezed
-class Category with _$Category {
+abstract class Category with _$Category {
   const factory Category({
     required int id,
     @JsonKey(name: 'user_id') String? userId,
@@ -34,11 +34,12 @@ class Category with _$Category {
     @JsonKey(name: 'updated_at') required String updatedAt,
   }) = _Category;
 
-  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
+  factory Category.fromJson(Map<String, dynamic> json) =>
+      _$CategoryFromJson(json);
 }
 
 @freezed
-class BrandModel with _$BrandModel {
+abstract class BrandModel with _$BrandModel {
   const factory BrandModel({
     required int id,
     @JsonKey(name: 'brand_id') required int brandId,
@@ -48,11 +49,12 @@ class BrandModel with _$BrandModel {
     @JsonKey(name: 'updated_at') required String updatedAt,
   }) = _BrandModel;
 
-  factory BrandModel.fromJson(Map<String, dynamic> json) => _$BrandModelFromJson(json);
+  factory BrandModel.fromJson(Map<String, dynamic> json) =>
+      _$BrandModelFromJson(json);
 }
 
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     required String id,
     required String name,
@@ -78,7 +80,7 @@ class User with _$User {
 
 // Your existing BrandItem model - FIXED engine_capacity field
 @freezed
-class BrandItem with _$BrandItem {
+abstract class BrandItem with _$BrandItem {
   const factory BrandItem({
     required String id,
     @JsonKey(name: 'user_id') String? userId,
@@ -95,7 +97,8 @@ class BrandItem with _$BrandItem {
     @JsonKey(name: 'serial_number') String? serialNumber,
     String? condition,
     @JsonKey(name: 'steer_position') String? steerPosition,
-    @JsonKey(name: 'engine_capacity') int? engineCapacity, // CHANGED FROM String? to int?
+    @JsonKey(name: 'engine_capacity')
+    int? engineCapacity, // CHANGED FROM String? to int?
     String? transmission,
     String? color,
     @JsonKey(name: 'build_type') String? buildType,
@@ -111,7 +114,7 @@ class BrandItem with _$BrandItem {
     @JsonKey(name: 'updated_at') required String updatedAt,
     @JsonKey(name: 'Height') String? height,
     @JsonKey(name: 'VIN') String? vin,
-    
+
     // ONLY ADD THESE 4 FIELDS that are in the API response
     Brand? brand,
     Category? category,
@@ -119,7 +122,8 @@ class BrandItem with _$BrandItem {
     User? user,
   }) = _BrandItem;
 
-  factory BrandItem.fromJson(Map<String, dynamic> json) => _$BrandItemFromJson(json);
+  factory BrandItem.fromJson(Map<String, dynamic> json) =>
+      _$BrandItemFromJson(json);
 }
 
 // UPDATED EXTENSIONS TO HANDLE int YEAR AND int ENGINE_CAPACITY
@@ -134,12 +138,12 @@ extension BrandItemExtensions on BrandItem {
       }
     }).toList();
   }
-  
+
   String? get firstImage {
     if (images.isEmpty) return null;
     return processedImages.first;
   }
-  
+
   // Helper to get formatted price
   String get formattedPrice {
     try {
@@ -149,36 +153,72 @@ extension BrandItemExtensions on BrandItem {
       return 'GH₵ $price';
     }
   }
-  
+
+  // Helper method to format price with commas
+  String _formatPriceWithCommas(String? price) {
+    if (price == null || price.isEmpty) return '0';
+    try {
+      final int priceValue = int.parse(price);
+      String priceStr = priceValue.toString();
+
+      // Implement user request: truncate if it exceeds 6 digits
+      bool isTruncated = false;
+      if (priceStr.length > 6) {
+        priceStr = priceStr.substring(0, 6);
+        isTruncated = true;
+      }
+
+      final StringBuffer formattedPrice = StringBuffer();
+
+      for (int i = 0; i < priceStr.length; i++) {
+        if (i > 0 && (priceStr.length - i) % 3 == 0) {
+          formattedPrice.write(',');
+        }
+        formattedPrice.write(priceStr[i]);
+      }
+
+      return isTruncated ? '${formattedPrice}...' : formattedPrice.toString();
+    } catch (e) {
+      return price;
+    }
+  }
+
   // Helper to format large numbers with commas
   String _formatNumber(int number) {
-    return number.toString().replaceAllMapped(
+    String numStr = number.toString();
+    bool isTruncated = false;
+    if (numStr.length > 6) {
+      numStr = numStr.substring(0, 6);
+      isTruncated = true;
+    }
+    final formatted = numStr.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]},',
     );
+    return isTruncated ? '$formatted...' : formatted;
   }
-  
+
   // Helper to check if item is active
   bool get isActive => status == 'active';
-  
+
   // Helper to check if item is sold
   bool get isSold => status == 'sold';
-  
+
   // Helper to get condition with fallback
   String get displayCondition {
     return condition?.toUpperCase() ?? 'N/A';
   }
-  
+
   // Helper to get year with fallback - UPDATED FOR int
   String get displayYear {
     return year != 0 ? year.toString() : 'N/A';
   }
-  
+
   // Helper to get engine capacity with fallback - UPDATED FOR int
   String get displayEngineCapacity {
     return engineCapacity != null ? '${engineCapacity}L' : 'N/A';
   }
-  
+
   // Helper to get location with fallback
   String get displayLocation {
     return location.isNotEmpty ? location : 'Location not specified';
@@ -190,46 +230,54 @@ class BrandItemConverter {
   static BrandItem fromJson(Map<String, dynamic> json) {
     // Handle potential string to int conversion for IDs and year
     final processedJson = Map<String, dynamic>.from(json);
-    
+
     // Ensure year is int - THIS IS THE MAIN FIX
     if (processedJson['year'] is String) {
       processedJson['year'] = int.tryParse(processedJson['year']) ?? 0;
     }
-    
+
     // Ensure engine_capacity is int - ADDED THIS FIX
     if (processedJson['engine_capacity'] is String) {
-      processedJson['engine_capacity'] = int.tryParse(processedJson['engine_capacity']);
+      processedJson['engine_capacity'] = int.tryParse(
+        processedJson['engine_capacity'],
+      );
     }
-    
+
     // Ensure brand_model_id is int
     if (processedJson['brand_model_id'] is String) {
-      processedJson['brand_model_id'] = int.tryParse(processedJson['brand_model_id']) ?? 0;
+      processedJson['brand_model_id'] =
+          int.tryParse(processedJson['brand_model_id']) ?? 0;
     }
-    
+
     // Ensure brand_id is int
     if (processedJson['brand_id'] is String) {
       processedJson['brand_id'] = int.tryParse(processedJson['brand_id']) ?? 0;
     }
-    
+
     // Ensure category_id is int
     if (processedJson['category_id'] is String) {
-      processedJson['category_id'] = int.tryParse(processedJson['category_id']) ?? 0;
+      processedJson['category_id'] =
+          int.tryParse(processedJson['category_id']) ?? 0;
     }
-    
+
     // Ensure warranty is int
     if (processedJson['warranty'] is String) {
       processedJson['warranty'] = int.tryParse(processedJson['warranty']) ?? 0;
     }
-    
+
     // Ensure number_of_passengers is int
     if (processedJson['number_of_passengers'] is String) {
-      processedJson['number_of_passengers'] = int.tryParse(processedJson['number_of_passengers']);
+      processedJson['number_of_passengers'] = int.tryParse(
+        processedJson['number_of_passengers'],
+      );
     }
-    
+
     return BrandItem.fromJson(processedJson);
   }
-  
+
   static List<BrandItem> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((item) => fromJson(item as Map<String, dynamic>)).toList();
+    return jsonList
+        .map((item) => fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 }

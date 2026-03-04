@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,263 +9,299 @@ part of 'auth_response_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-AuthResponseModel _$AuthResponseModelFromJson(Map<String, dynamic> json) {
-  return _AuthResponseModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$AuthResponseModel {
-  String? get message => throw _privateConstructorUsedError;
-  String? get token => throw _privateConstructorUsedError;
-  UserModel get user => throw _privateConstructorUsedError;
-  bool? get verified => throw _privateConstructorUsedError;
-  @JsonKey(name: 'verified_dealer')
-  bool? get verifiedDealer => throw _privateConstructorUsedError;
+
+ String? get message; String? get token; UserModel get user; bool? get verified;@JsonKey(name: 'verified_dealer') bool? get verifiedDealer;
+/// Create a copy of AuthResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$AuthResponseModelCopyWith<AuthResponseModel> get copyWith => _$AuthResponseModelCopyWithImpl<AuthResponseModel>(this as AuthResponseModel, _$identity);
 
   /// Serializes this AuthResponseModel to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $AuthResponseModelCopyWith<AuthResponseModel> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponseModel&&(identical(other.message, message) || other.message == message)&&(identical(other.token, token) || other.token == token)&&(identical(other.user, user) || other.user == user)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.verifiedDealer, verifiedDealer) || other.verifiedDealer == verifiedDealer));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,message,token,user,verified,verifiedDealer);
+
+@override
+String toString() {
+  return 'AuthResponseModel(message: $message, token: $token, user: $user, verified: $verified, verifiedDealer: $verifiedDealer)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $AuthResponseModelCopyWith<$Res> {
-  factory $AuthResponseModelCopyWith(
-          AuthResponseModel value, $Res Function(AuthResponseModel) then) =
-      _$AuthResponseModelCopyWithImpl<$Res, AuthResponseModel>;
-  @useResult
-  $Res call(
-      {String? message,
-      String? token,
-      UserModel user,
-      bool? verified,
-      @JsonKey(name: 'verified_dealer') bool? verifiedDealer});
+abstract mixin class $AuthResponseModelCopyWith<$Res>  {
+  factory $AuthResponseModelCopyWith(AuthResponseModel value, $Res Function(AuthResponseModel) _then) = _$AuthResponseModelCopyWithImpl;
+@useResult
+$Res call({
+ String? message, String? token, UserModel user, bool? verified,@JsonKey(name: 'verified_dealer') bool? verifiedDealer
+});
 
-  $UserModelCopyWith<$Res> get user;
+
+$UserModelCopyWith<$Res> get user;
+
 }
-
 /// @nodoc
-class _$AuthResponseModelCopyWithImpl<$Res, $Val extends AuthResponseModel>
+class _$AuthResponseModelCopyWithImpl<$Res>
     implements $AuthResponseModelCopyWith<$Res> {
-  _$AuthResponseModelCopyWithImpl(this._value, this._then);
+  _$AuthResponseModelCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final AuthResponseModel _self;
+  final $Res Function(AuthResponseModel) _then;
 
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? message = freezed,
-    Object? token = freezed,
-    Object? user = null,
-    Object? verified = freezed,
-    Object? verifiedDealer = freezed,
-  }) {
-    return _then(_value.copyWith(
-      message: freezed == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String?,
-      token: freezed == token
-          ? _value.token
-          : token // ignore: cast_nullable_to_non_nullable
-              as String?,
-      user: null == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as UserModel,
-      verified: freezed == verified
-          ? _value.verified
-          : verified // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      verifiedDealer: freezed == verifiedDealer
-          ? _value.verifiedDealer
-          : verifiedDealer // ignore: cast_nullable_to_non_nullable
-              as bool?,
-    ) as $Val);
-  }
-
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $UserModelCopyWith<$Res> get user {
-    return $UserModelCopyWith<$Res>(_value.user, (value) {
-      return _then(_value.copyWith(user: value) as $Val);
-    });
-  }
+/// Create a copy of AuthResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? message = freezed,Object? token = freezed,Object? user = null,Object? verified = freezed,Object? verifiedDealer = freezed,}) {
+  return _then(_self.copyWith(
+message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String?,user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
+as UserModel,verified: freezed == verified ? _self.verified : verified // ignore: cast_nullable_to_non_nullable
+as bool?,verifiedDealer: freezed == verifiedDealer ? _self.verifiedDealer : verifiedDealer // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+/// Create a copy of AuthResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserModelCopyWith<$Res> get user {
+  
+  return $UserModelCopyWith<$Res>(_self.user, (value) {
+    return _then(_self.copyWith(user: value));
+  });
+}
 }
 
-/// @nodoc
-abstract class _$$AuthResponseModelImplCopyWith<$Res>
-    implements $AuthResponseModelCopyWith<$Res> {
-  factory _$$AuthResponseModelImplCopyWith(_$AuthResponseModelImpl value,
-          $Res Function(_$AuthResponseModelImpl) then) =
-      __$$AuthResponseModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String? message,
-      String? token,
-      UserModel user,
-      bool? verified,
-      @JsonKey(name: 'verified_dealer') bool? verifiedDealer});
 
-  @override
-  $UserModelCopyWith<$Res> get user;
+/// Adds pattern-matching-related methods to [AuthResponseModel].
+extension AuthResponseModelPatterns on AuthResponseModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _AuthResponseModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _AuthResponseModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _AuthResponseModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _AuthResponseModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _AuthResponseModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _AuthResponseModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? message,  String? token,  UserModel user,  bool? verified, @JsonKey(name: 'verified_dealer')  bool? verifiedDealer)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _AuthResponseModel() when $default != null:
+return $default(_that.message,_that.token,_that.user,_that.verified,_that.verifiedDealer);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? message,  String? token,  UserModel user,  bool? verified, @JsonKey(name: 'verified_dealer')  bool? verifiedDealer)  $default,) {final _that = this;
+switch (_that) {
+case _AuthResponseModel():
+return $default(_that.message,_that.token,_that.user,_that.verified,_that.verifiedDealer);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? message,  String? token,  UserModel user,  bool? verified, @JsonKey(name: 'verified_dealer')  bool? verifiedDealer)?  $default,) {final _that = this;
+switch (_that) {
+case _AuthResponseModel() when $default != null:
+return $default(_that.message,_that.token,_that.user,_that.verified,_that.verifiedDealer);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-class __$$AuthResponseModelImplCopyWithImpl<$Res>
-    extends _$AuthResponseModelCopyWithImpl<$Res, _$AuthResponseModelImpl>
-    implements _$$AuthResponseModelImplCopyWith<$Res> {
-  __$$AuthResponseModelImplCopyWithImpl(_$AuthResponseModelImpl _value,
-      $Res Function(_$AuthResponseModelImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? message = freezed,
-    Object? token = freezed,
-    Object? user = null,
-    Object? verified = freezed,
-    Object? verifiedDealer = freezed,
-  }) {
-    return _then(_$AuthResponseModelImpl(
-      message: freezed == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String?,
-      token: freezed == token
-          ? _value.token
-          : token // ignore: cast_nullable_to_non_nullable
-              as String?,
-      user: null == user
-          ? _value.user
-          : user // ignore: cast_nullable_to_non_nullable
-              as UserModel,
-      verified: freezed == verified
-          ? _value.verified
-          : verified // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      verifiedDealer: freezed == verifiedDealer
-          ? _value.verifiedDealer
-          : verifiedDealer // ignore: cast_nullable_to_non_nullable
-              as bool?,
-    ));
-  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$AuthResponseModelImpl implements _AuthResponseModel {
-  const _$AuthResponseModelImpl(
-      {this.message,
-      this.token,
-      required this.user,
-      this.verified,
-      @JsonKey(name: 'verified_dealer') this.verifiedDealer});
 
-  factory _$AuthResponseModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$AuthResponseModelImplFromJson(json);
+class _AuthResponseModel implements AuthResponseModel {
+  const _AuthResponseModel({this.message, this.token, required this.user, this.verified, @JsonKey(name: 'verified_dealer') this.verifiedDealer});
+  factory _AuthResponseModel.fromJson(Map<String, dynamic> json) => _$AuthResponseModelFromJson(json);
 
-  @override
-  final String? message;
-  @override
-  final String? token;
-  @override
-  final UserModel user;
-  @override
-  final bool? verified;
-  @override
-  @JsonKey(name: 'verified_dealer')
-  final bool? verifiedDealer;
+@override final  String? message;
+@override final  String? token;
+@override final  UserModel user;
+@override final  bool? verified;
+@override@JsonKey(name: 'verified_dealer') final  bool? verifiedDealer;
 
-  @override
-  String toString() {
-    return 'AuthResponseModel(message: $message, token: $token, user: $user, verified: $verified, verifiedDealer: $verifiedDealer)';
-  }
+/// Create a copy of AuthResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AuthResponseModelCopyWith<_AuthResponseModel> get copyWith => __$AuthResponseModelCopyWithImpl<_AuthResponseModel>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$AuthResponseModelImpl &&
-            (identical(other.message, message) || other.message == message) &&
-            (identical(other.token, token) || other.token == token) &&
-            (identical(other.user, user) || other.user == user) &&
-            (identical(other.verified, verified) ||
-                other.verified == verified) &&
-            (identical(other.verifiedDealer, verifiedDealer) ||
-                other.verifiedDealer == verifiedDealer));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, message, token, user, verified, verifiedDealer);
-
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$AuthResponseModelImplCopyWith<_$AuthResponseModelImpl> get copyWith =>
-      __$$AuthResponseModelImplCopyWithImpl<_$AuthResponseModelImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$AuthResponseModelImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$AuthResponseModelToJson(this, );
 }
 
-abstract class _AuthResponseModel implements AuthResponseModel {
-  const factory _AuthResponseModel(
-          {final String? message,
-          final String? token,
-          required final UserModel user,
-          final bool? verified,
-          @JsonKey(name: 'verified_dealer') final bool? verifiedDealer}) =
-      _$AuthResponseModelImpl;
-
-  factory _AuthResponseModel.fromJson(Map<String, dynamic> json) =
-      _$AuthResponseModelImpl.fromJson;
-
-  @override
-  String? get message;
-  @override
-  String? get token;
-  @override
-  UserModel get user;
-  @override
-  bool? get verified;
-  @override
-  @JsonKey(name: 'verified_dealer')
-  bool? get verifiedDealer;
-
-  /// Create a copy of AuthResponseModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AuthResponseModelImplCopyWith<_$AuthResponseModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponseModel&&(identical(other.message, message) || other.message == message)&&(identical(other.token, token) || other.token == token)&&(identical(other.user, user) || other.user == user)&&(identical(other.verified, verified) || other.verified == verified)&&(identical(other.verifiedDealer, verifiedDealer) || other.verifiedDealer == verifiedDealer));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,message,token,user,verified,verifiedDealer);
+
+@override
+String toString() {
+  return 'AuthResponseModel(message: $message, token: $token, user: $user, verified: $verified, verifiedDealer: $verifiedDealer)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AuthResponseModelCopyWith<$Res> implements $AuthResponseModelCopyWith<$Res> {
+  factory _$AuthResponseModelCopyWith(_AuthResponseModel value, $Res Function(_AuthResponseModel) _then) = __$AuthResponseModelCopyWithImpl;
+@override @useResult
+$Res call({
+ String? message, String? token, UserModel user, bool? verified,@JsonKey(name: 'verified_dealer') bool? verifiedDealer
+});
+
+
+@override $UserModelCopyWith<$Res> get user;
+
+}
+/// @nodoc
+class __$AuthResponseModelCopyWithImpl<$Res>
+    implements _$AuthResponseModelCopyWith<$Res> {
+  __$AuthResponseModelCopyWithImpl(this._self, this._then);
+
+  final _AuthResponseModel _self;
+  final $Res Function(_AuthResponseModel) _then;
+
+/// Create a copy of AuthResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? message = freezed,Object? token = freezed,Object? user = null,Object? verified = freezed,Object? verifiedDealer = freezed,}) {
+  return _then(_AuthResponseModel(
+message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,token: freezed == token ? _self.token : token // ignore: cast_nullable_to_non_nullable
+as String?,user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
+as UserModel,verified: freezed == verified ? _self.verified : verified // ignore: cast_nullable_to_non_nullable
+as bool?,verifiedDealer: freezed == verifiedDealer ? _self.verifiedDealer : verifiedDealer // ignore: cast_nullable_to_non_nullable
+as bool?,
+  ));
+}
+
+/// Create a copy of AuthResponseModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserModelCopyWith<$Res> get user {
+  
+  return $UserModelCopyWith<$Res>(_self.user, (value) {
+    return _then(_self.copyWith(user: value));
+  });
+}
+}
+
+// dart format on

@@ -5,7 +5,7 @@ part 'userDetailsModel.freezed.dart';
 part 'userDetailsModel.g.dart';
 
 @freezed
-class UserDetails with _$UserDetails {
+abstract class UserDetails with _$UserDetails {
   const factory UserDetails({
     required String id,
     required String name,

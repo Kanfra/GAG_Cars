@@ -6,47 +6,45 @@ part of 'myListingsModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MyListingImpl _$$MyListingImplFromJson(Map<String, dynamic> json) =>
-    _$MyListingImpl(
-      id: _parseString(json['id']),
-      userId: _parseInt(json['user_id']),
-      countryId: _parseInt(json['country_id']),
-      brandModelId: _parseInt(json['brand_model_id']),
-      brandId: _parseInt(json['brand_id']),
-      categoryId: _parseInt(json['category_id']),
-      name: _parseString(json['name']),
-      year: _parseString(json['year']),
-      slug: _parseString(json['slug']),
-      description: _parseString(json['description']),
-      images:
-          (json['images'] as List<dynamic>).map((e) => e as String).toList(),
-      location: _parseString(json['location']),
-      serialNumber: _parseString(json['serial_number']),
-      condition: _parseString(json['condition']),
-      steerPosition: _parseString(json['steer_position']),
-      engineCapacity: _parseString(json['engine_capacity']),
-      transmission: _parseString(json['transmission']),
-      color: _parseString(json['color']),
-      buildType: _parseString(json['build_type']),
-      numberOfPassengers: _parseInt(json['number_of_passengers']),
-      features: json['features'] as List<dynamic>,
-      status: _parseString(json['status']),
-      price: _parseString(json['price']),
-      mileage: _parseString(json['mileage']),
-      warranty: _parseInt(json['warranty']),
-      warrantyExpiration: _parseString(json['warranty_expiration']),
-      deletedAt: _parseString(json['deleted_at']),
-      createdAt: _parseString(json['created_at']),
-      updatedAt: _parseString(json['updated_at']),
-      Height: _parseString(json['Height']),
-      VIN: _parseString(json['VIN']),
-      category: json['category'] == null
-          ? null
-          : Category.fromJson(json['category'] as Map<String, dynamic>),
-      isPromoted: json['is_promoted'] as bool?,
-    );
+_MyListing _$MyListingFromJson(Map<String, dynamic> json) => _MyListing(
+  id: _parseString(json['id']),
+  userId: _parseInt(json['user_id']),
+  countryId: _parseInt(json['country_id']),
+  brandModelId: _parseInt(json['brand_model_id']),
+  brandId: _parseInt(json['brand_id']),
+  categoryId: _parseInt(json['category_id']),
+  name: _parseString(json['name']),
+  year: _parseString(json['year']),
+  slug: _parseString(json['slug']),
+  description: _parseString(json['description']),
+  images: (json['images'] as List<dynamic>).map((e) => e as String).toList(),
+  location: _parseString(json['location']),
+  serialNumber: _parseString(json['serial_number']),
+  condition: _parseString(json['condition']),
+  steerPosition: _parseString(json['steer_position']),
+  engineCapacity: _parseString(json['engine_capacity']),
+  transmission: _parseString(json['transmission']),
+  color: _parseString(json['color']),
+  buildType: _parseString(json['build_type']),
+  numberOfPassengers: _parseInt(json['number_of_passengers']),
+  features: json['features'] as List<dynamic>,
+  status: _parseString(json['status']),
+  price: _parseString(json['price']),
+  mileage: _parseString(json['mileage']),
+  warranty: _parseInt(json['warranty']),
+  warrantyExpiration: _parseString(json['warranty_expiration']),
+  deletedAt: _parseString(json['deleted_at']),
+  createdAt: _parseString(json['created_at']),
+  updatedAt: _parseString(json['updated_at']),
+  Height: _parseString(json['Height']),
+  VIN: _parseString(json['VIN']),
+  category: json['category'] == null
+      ? null
+      : Category.fromJson(json['category'] as Map<String, dynamic>),
+  isPromoted: json['is_promoted'] as bool?,
+);
 
-Map<String, dynamic> _$$MyListingImplToJson(_$MyListingImpl instance) =>
+Map<String, dynamic> _$MyListingToJson(_MyListing instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -83,30 +81,28 @@ Map<String, dynamic> _$$MyListingImplToJson(_$MyListingImpl instance) =>
       'is_promoted': instance.isPromoted,
     };
 
-_$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
-    _$CategoryImpl(
-      id: _parseInt(json['id']),
-      userId: _parseInt(json['user_id']),
-      parentId: _parseInt(json['parent_id']),
-      name: _parseString(json['name']),
-      slug: _parseString(json['slug']),
-      description: _parseString(json['description']),
-      features: json['features'] as List<dynamic>,
-      image: _parseString(json['image']),
-      createdAt: _parseString(json['created_at']),
-      updatedAt: _parseString(json['updated_at']),
-    );
+_Category _$CategoryFromJson(Map<String, dynamic> json) => _Category(
+  id: _parseInt(json['id']),
+  userId: _parseInt(json['user_id']),
+  parentId: _parseInt(json['parent_id']),
+  name: _parseString(json['name']),
+  slug: _parseString(json['slug']),
+  description: _parseString(json['description']),
+  features: json['features'] as List<dynamic>,
+  image: _parseString(json['image']),
+  createdAt: _parseString(json['created_at']),
+  updatedAt: _parseString(json['updated_at']),
+);
 
-Map<String, dynamic> _$$CategoryImplToJson(_$CategoryImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'user_id': instance.userId,
-      'parent_id': instance.parentId,
-      'name': instance.name,
-      'slug': instance.slug,
-      'description': instance.description,
-      'features': instance.features,
-      'image': instance.image,
-      'created_at': instance.createdAt,
-      'updated_at': instance.updatedAt,
-    };
+Map<String, dynamic> _$CategoryToJson(_Category instance) => <String, dynamic>{
+  'id': instance.id,
+  'user_id': instance.userId,
+  'parent_id': instance.parentId,
+  'name': instance.name,
+  'slug': instance.slug,
+  'description': instance.description,
+  'features': instance.features,
+  'image': instance.image,
+  'created_at': instance.createdAt,
+  'updated_at': instance.updatedAt,
+};

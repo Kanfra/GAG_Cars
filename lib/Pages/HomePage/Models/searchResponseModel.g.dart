@@ -6,8 +6,8 @@ part of 'searchResponseModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SearchResponseImpl _$$SearchResponseImplFromJson(Map<String, dynamic> json) =>
-    _$SearchResponseImpl(
+_SearchResponse _$SearchResponseFromJson(Map<String, dynamic> json) =>
+    _SearchResponse(
       success: json['success'] as bool,
       message: json['message'] as String,
       data: (json['data'] as List<dynamic>?)
@@ -15,8 +15,7 @@ _$SearchResponseImpl _$$SearchResponseImplFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-Map<String, dynamic> _$$SearchResponseImplToJson(
-        _$SearchResponseImpl instance) =>
+Map<String, dynamic> _$SearchResponseToJson(_SearchResponse instance) =>
     <String, dynamic>{
       'success': instance.success,
       'message': instance.message,

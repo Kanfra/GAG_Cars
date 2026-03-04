@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:gag_cars_frontend/GlobalVariables/imageStringGlobalVariables.dart';
@@ -165,30 +167,60 @@ Future<T> postApiData<T>({
     logger.i('Sending POST request to $uri');
     logger.t('Request body: $body');
 
-    final response = await http
-        .post(
-          uri,
-          headers: {'Content-Type': 'application/json', ...?headers},
-          body: jsonEncode(body),
-        )
-        .timeout(timeout);
+    http.Response? response;
+    int retryCount = 0;
+    const int maxRetries = 3;
+
+    while (true) {
+      try {
+        response = await http
+            .post(
+              uri,
+              headers: {'Content-Type': 'application/json', ...?headers},
+              body: jsonEncode(body),
+            )
+            .timeout(timeout);
+        break; // Success, exit retry loop
+      } catch (e) {
+        retryCount++;
+        final bool isRetryable =
+            e is SocketException ||
+            e is TimeoutException ||
+            (e is http.ClientException &&
+                (e.message.contains('reset') || e.message.contains('closed')));
+
+        if (retryCount > maxRetries || !isRetryable) {
+          logger.e(
+            '❌ POST request to $uri failed after $retryCount attempts: $e',
+          );
+          rethrow;
+        }
+
+        final sleepMs = 500 * (1 << (retryCount - 1)); // 500ms, 1s, 2s
+        logger.w(
+          '🔄 Retrying POST to $uri ($retryCount/$maxRetries) in ${sleepMs}ms due to: $e',
+        );
+        await Future.delayed(Duration(milliseconds: sleepMs));
+      }
+    }
 
     logger.i('Response status: ${response.statusCode}');
     logger.t('Response body: ${response.body}');
 
-    final responseData = jsonDecode(response.body);
+    final finalResponse = response;
+    final responseData = jsonDecode(finalResponse.body);
 
     final result = statusCodeResponse<T>(
-      response: response,
+      response: finalResponse,
       successFunction200: () {
         try {
           // Handle both bool and normal responses
           if (T == bool) {
-            logger.i("Status code: ${response.statusCode}");
+            logger.i("Status code: ${finalResponse.statusCode}");
             return true as T;
           }
           logger.i(
-            "Success response from $uri, and status code: ${response.statusCode}",
+            "Success response from $uri, and status code: ${finalResponse.statusCode}",
           );
           return fromJson(responseData as Map<String, dynamic>);
         } catch (e) {
@@ -199,7 +231,7 @@ Future<T> postApiData<T>({
       successFunction201: () {
         try {
           if (T == bool) {
-            logger.i("Status code: ${response.statusCode}");
+            logger.i("Status code: ${finalResponse.statusCode}");
             return false as T;
           }
           return fromJson(responseData as Map<String, dynamic>);
@@ -271,11 +303,45 @@ Future<T> fetchApiData<T>({
       ...?headers,
     };
 
-    final response = await http.get(uri, headers: requestHeaders);
+    http.Response? response;
+    int retryCount = 0;
+    const int maxRetries = 3;
+
+    while (true) {
+      try {
+        response = await http
+            .get(uri, headers: requestHeaders)
+            .timeout(const Duration(seconds: 15));
+        break; // Success, exit retry loop
+      } catch (e) {
+        retryCount++;
+        final bool isRetryable =
+            e is SocketException ||
+            e is TimeoutException ||
+            (e is http.ClientException &&
+                (e.message.contains('reset') || e.message.contains('closed')));
+
+        if (retryCount > maxRetries || !isRetryable) {
+          logger.e(
+            '❌ GET request to $uri failed after $retryCount attempts: $e',
+          );
+          rethrow;
+        }
+
+        final sleepMs = 500 * (1 << (retryCount - 1)); // 500ms, 1s, 2s
+        logger.w(
+          '🔄 Retrying GET to $uri ($retryCount/$maxRetries) in ${sleepMs}ms due to: $e',
+        );
+        await Future.delayed(Duration(milliseconds: sleepMs));
+      }
+    }
+
     logger.i("Response status: ${response.statusCode}");
     logger.i("Response body: ${response.body}");
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
+    final finalResponse = response;
+
+    if (finalResponse.statusCode >= 200 && finalResponse.statusCode < 300) {
       try {
         final responseBody = response.body;
         if (responseBody.isEmpty) {

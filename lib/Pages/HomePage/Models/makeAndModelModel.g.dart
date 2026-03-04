@@ -6,39 +6,38 @@ part of 'makeAndModelModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MakeAndModelResponseImpl _$$MakeAndModelResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$MakeAndModelResponseImpl(
-      data: (json['data'] as List<dynamic>)
-          .map((e) => VehicleMake.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
-      meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
-    );
+_MakeAndModelResponse _$MakeAndModelResponseFromJson(
+  Map<String, dynamic> json,
+) => _MakeAndModelResponse(
+  data: (json['data'] as List<dynamic>)
+      .map((e) => VehicleMake.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  links: PaginationLinks.fromJson(json['links'] as Map<String, dynamic>),
+  meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$$MakeAndModelResponseImplToJson(
-        _$MakeAndModelResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'links': instance.links,
-      'meta': instance.meta,
-    };
+Map<String, dynamic> _$MakeAndModelResponseToJson(
+  _MakeAndModelResponse instance,
+) => <String, dynamic>{
+  'data': instance.data,
+  'links': instance.links,
+  'meta': instance.meta,
+};
 
-_$VehicleMakeImpl _$$VehicleMakeImplFromJson(Map<String, dynamic> json) =>
-    _$VehicleMakeImpl(
-      id: _parseInt(json['id']),
-      userId: _parseInt(json['user_id']),
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      image: json['image'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      models: (json['brand_models'] as List<dynamic>)
-          .map((e) => VehicleModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+_VehicleMake _$VehicleMakeFromJson(Map<String, dynamic> json) => _VehicleMake(
+  id: _parseInt(json['id']),
+  userId: _parseInt(json['user_id']),
+  name: json['name'] as String,
+  slug: json['slug'] as String,
+  image: json['image'] as String?,
+  createdAt: DateTime.parse(json['created_at'] as String),
+  updatedAt: DateTime.parse(json['updated_at'] as String),
+  models: (json['brand_models'] as List<dynamic>)
+      .map((e) => VehicleModel.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
-Map<String, dynamic> _$$VehicleMakeImplToJson(_$VehicleMakeImpl instance) =>
+Map<String, dynamic> _$VehicleMakeToJson(_VehicleMake instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -50,8 +49,8 @@ Map<String, dynamic> _$$VehicleMakeImplToJson(_$VehicleMakeImpl instance) =>
       'brand_models': instance.models,
     };
 
-_$VehicleModelImpl _$$VehicleModelImplFromJson(Map<String, dynamic> json) =>
-    _$VehicleModelImpl(
+_VehicleModel _$VehicleModelFromJson(Map<String, dynamic> json) =>
+    _VehicleModel(
       id: _parseInt(json['id']),
       makeId: _parseInt(json['brand_id']),
       name: json['name'] as String,
@@ -60,7 +59,7 @@ _$VehicleModelImpl _$$VehicleModelImplFromJson(Map<String, dynamic> json) =>
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
 
-Map<String, dynamic> _$$VehicleModelImplToJson(_$VehicleModelImpl instance) =>
+Map<String, dynamic> _$VehicleModelToJson(_VehicleModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'brand_id': instance.makeId,
@@ -70,17 +69,15 @@ Map<String, dynamic> _$$VehicleModelImplToJson(_$VehicleModelImpl instance) =>
       'updated_at': instance.updatedAt.toIso8601String(),
     };
 
-_$PaginationLinksImpl _$$PaginationLinksImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PaginationLinksImpl(
+_PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) =>
+    _PaginationLinks(
       first: json['first'] as String,
       last: json['last'] as String,
       prev: json['prev'] as String?,
       next: json['next'] as String?,
     );
 
-Map<String, dynamic> _$$PaginationLinksImplToJson(
-        _$PaginationLinksImpl instance) =>
+Map<String, dynamic> _$PaginationLinksToJson(_PaginationLinks instance) =>
     <String, dynamic>{
       'first': instance.first,
       'last': instance.last,
@@ -88,8 +85,8 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
       'next': instance.next,
     };
 
-_$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
-    _$PaginationMetaImpl(
+_PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) =>
+    _PaginationMeta(
       currentPage: _parseInt(json['current_page']),
       from: _parseInt(json['from']),
       lastPage: _parseInt(json['last_page']),
@@ -102,8 +99,7 @@ _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
       total: _parseInt(json['total']),
     );
 
-Map<String, dynamic> _$$PaginationMetaImplToJson(
-        _$PaginationMetaImpl instance) =>
+Map<String, dynamic> _$PaginationMetaToJson(_PaginationMeta instance) =>
     <String, dynamic>{
       'current_page': instance.currentPage,
       'from': instance.from,
@@ -115,15 +111,14 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
       'total': instance.total,
     };
 
-_$PaginationLinkImpl _$$PaginationLinkImplFromJson(Map<String, dynamic> json) =>
-    _$PaginationLinkImpl(
+_PaginationLink _$PaginationLinkFromJson(Map<String, dynamic> json) =>
+    _PaginationLink(
       url: json['url'] as String?,
       label: json['label'] as String,
       active: json['active'] as bool,
     );
 
-Map<String, dynamic> _$$PaginationLinkImplToJson(
-        _$PaginationLinkImpl instance) =>
+Map<String, dynamic> _$PaginationLinkToJson(_PaginationLink instance) =>
     <String, dynamic>{
       'url': instance.url,
       'label': instance.label,

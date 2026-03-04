@@ -5,7 +5,7 @@ part 'chatMessagesModel.freezed.dart';
 part 'chatMessagesModel.g.dart';
 
 @freezed
-class ChatMessageResponse with _$ChatMessageResponse {
+abstract class ChatMessageResponse with _$ChatMessageResponse {
   const factory ChatMessageResponse({
     required int total,
     @JsonKey(name: 'last_page') required int lastPage,
@@ -18,7 +18,7 @@ class ChatMessageResponse with _$ChatMessageResponse {
 }
 
 @freezed
-class ChatMessage with _$ChatMessage {
+abstract class ChatMessage with _$ChatMessage {
   const factory ChatMessage({
     required String id,
     @JsonKey(name: 'from_id') required String fromId,

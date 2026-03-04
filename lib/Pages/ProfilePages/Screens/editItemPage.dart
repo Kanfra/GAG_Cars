@@ -19,10 +19,7 @@ import 'package:provider/provider.dart';
 
 class EditItemPage extends StatefulWidget {
   final Map<String, dynamic> allJson;
-  const EditItemPage({
-    super.key,
-    required this.allJson,
-  });
+  const EditItemPage({super.key, required this.allJson});
 
   @override
   State<EditItemPage> createState() => _EditItemPageState();
@@ -35,11 +32,12 @@ class _EditItemPageState extends State<EditItemPage> {
   // Controllers
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _itemNameController = TextEditingController();
-  final TextEditingController _itemDescriptionController = TextEditingController();
+  final TextEditingController _itemDescriptionController =
+      TextEditingController();
   final TextEditingController _colorController = TextEditingController();
 
   final Logger logger = Logger();
-  
+
   // State variables
   String selectedColorName = '';
   Color selectedColor = Colors.blue;
@@ -52,7 +50,7 @@ class _EditItemPageState extends State<EditItemPage> {
   ItemCategory? selectedCategory;
   List<String> selectedFeatures = [];
   int year = DateTime.now().year;
-  
+
   // Loading states
   bool _isLoading = false;
   bool _isUpdating = false;
@@ -71,57 +69,57 @@ class _EditItemPageState extends State<EditItemPage> {
     {'name': 'Light Red', 'color': Colors.red[300]!, 'value': '#EF5350'},
     {'name': 'Crimson', 'color': Color(0xFFDC143C), 'value': '#DC143C'},
     {'name': 'Maroon', 'color': Color(0xFF800000), 'value': '#800000'},
-    
+
     {'name': 'Blue', 'color': Colors.blue, 'value': '#2196F3'},
     {'name': 'Dark Blue', 'color': Colors.blue[700]!, 'value': '#1976D2'},
     {'name': 'Light Blue', 'color': Colors.blue[300]!, 'value': '#64B5F6'},
     {'name': 'Navy Blue', 'color': Color(0xFF000080), 'value': '#000080'},
     {'name': 'Sky Blue', 'color': Color(0xFF87CEEB), 'value': '#87CEEB'},
-    
+
     {'name': 'Green', 'color': Colors.green, 'value': '#4CAF50'},
     {'name': 'Dark Green', 'color': Colors.green[700]!, 'value': '#388E3C'},
     {'name': 'Light Green', 'color': Colors.green[300]!, 'value': '#81C784'},
     {'name': 'Forest Green', 'color': Color(0xFF228B22), 'value': '#228B22'},
     {'name': 'Lime Green', 'color': Color(0xFF32CD32), 'value': '#32CD32'},
-    
+
     {'name': 'Yellow', 'color': Colors.yellow, 'value': '#FFEB3B'},
     {'name': 'Gold', 'color': Color(0xFFFFD700), 'value': '#FFD700'},
     {'name': 'Light Yellow', 'color': Colors.yellow[300]!, 'value': '#FFF176'},
     {'name': 'Amber', 'color': Colors.amber, 'value': '#FFC107'},
-    
+
     {'name': 'Orange', 'color': Colors.orange, 'value': '#FF9800'},
     {'name': 'Dark Orange', 'color': Colors.orange[700]!, 'value': '#F57C00'},
     {'name': 'Light Orange', 'color': Colors.orange[300]!, 'value': '#FFB74D'},
-    
+
     {'name': 'Purple', 'color': Colors.purple, 'value': '#9C27B0'},
     {'name': 'Dark Purple', 'color': Colors.purple[700]!, 'value': '#7B1FA2'},
     {'name': 'Light Purple', 'color': Colors.purple[300]!, 'value': '#BA68C8'},
     {'name': 'Violet', 'color': Color(0xFFEE82EE), 'value': '#EE82EE'},
-    
+
     {'name': 'Pink', 'color': Colors.pink, 'value': '#E91E63'},
     {'name': 'Hot Pink', 'color': Color(0xFFFF69B4), 'value': '#FF69B4'},
     {'name': 'Light Pink', 'color': Colors.pink[300]!, 'value': '#F06292'},
-    
+
     {'name': 'Brown', 'color': Colors.brown, 'value': '#795548'},
     {'name': 'Dark Brown', 'color': Colors.brown[700]!, 'value': '#5D4037'},
     {'name': 'Light Brown', 'color': Colors.brown[300]!, 'value': '#A1887F'},
     {'name': 'Tan', 'color': Color(0xFFD2B48C), 'value': '#D2B48C'},
-    
+
     {'name': 'Gray', 'color': Colors.grey, 'value': '#9E9E9E'},
     {'name': 'Dark Gray', 'color': Colors.grey[700]!, 'value': '#616161'},
     {'name': 'Light Gray', 'color': Colors.grey[300]!, 'value': '#E0E0E0'},
     {'name': 'Silver', 'color': Color(0xFFC0C0C0), 'value': '#C0C0C0'},
     {'name': 'Charcoal', 'color': Color(0xFF36454F), 'value': '#36454F'},
-    
+
     {'name': 'Black', 'color': Colors.black, 'value': '#000000'},
     {'name': 'White', 'color': Colors.white, 'value': '#FFFFFF'},
     {'name': 'Ivory', 'color': Color(0xFFFFFFF0), 'value': '#FFFFF0'},
     {'name': 'Beige', 'color': Color(0xFFF5F5DC), 'value': '#F5F5DC'},
-    
+
     {'name': 'Teal', 'color': Colors.teal, 'value': '#009688'},
     {'name': 'Cyan', 'color': Colors.cyan, 'value': '#00BCD4'},
     {'name': 'Turquoise', 'color': Color(0xFF40E0D0), 'value': '#40E0D0'},
-    
+
     {'name': 'Indigo', 'color': Colors.indigo, 'value': '#3F51B5'},
     {'name': 'Magenta', 'color': Color(0xFFFF00FF), 'value': '#FF00FF'},
     {'name': 'Lavender', 'color': Color(0xFFE6E6FA), 'value': '#E6E6FA'},
@@ -153,27 +151,27 @@ class _EditItemPageState extends State<EditItemPage> {
 
   // Theme helper methods - Using actual ThemeData
   bool get _isDarkMode => Theme.of(context).brightness == Brightness.dark;
-  
+
   Color _getCardColor() {
     return Theme.of(context).cardColor;
   }
-  
+
   Color _getBackgroundColor() {
     return Theme.of(context).scaffoldBackgroundColor;
   }
-  
+
   Color _getTextColor() {
     return Theme.of(context).textTheme.bodyLarge!.color!;
   }
-  
+
   Color _getHintTextColor() {
     return _isDarkMode ? const Color(0x66FFFFFF) : const Color(0x8A000000);
   }
-  
+
   Color _getBorderColor() {
     return Theme.of(context).dividerColor;
   }
-  
+
   Color _getInputBackgroundColor() {
     return Theme.of(context).inputDecorationTheme.fillColor!;
   }
@@ -182,14 +180,20 @@ class _EditItemPageState extends State<EditItemPage> {
     logger.i("Loading initial data for editing...");
     setState(() => _isLoading = true);
     try {
-      final itemCategoriesProvider = Provider.of<ItemCategoriesProvider>(context, listen: false);
-      final makeModelProvider = Provider.of<MakeAndModelProvider>(context, listen: false);
-      
+      final itemCategoriesProvider = Provider.of<ItemCategoriesProvider>(
+        context,
+        listen: false,
+      );
+      final makeModelProvider = Provider.of<MakeAndModelProvider>(
+        context,
+        listen: false,
+      );
+
       await Future.wait([
         itemCategoriesProvider.getAllCategories(),
         makeModelProvider.fetchMakesWithModels(),
       ]);
-      
+
       // After loading data, populate the form with listing data
       _populateFormWithListingData(itemCategoriesProvider, makeModelProvider);
       logger.i("Initial data loaded successfully for editing");
@@ -197,7 +201,7 @@ class _EditItemPageState extends State<EditItemPage> {
       logger.e("Error loading initial data: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load data: ${e.toString()}'))
+          SnackBar(content: Text('Failed to load data: ${e.toString()}')),
         );
       }
     } finally {
@@ -208,30 +212,33 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   void _populateFormWithListingData(
-    ItemCategoriesProvider categoriesProvider, 
-    MakeAndModelProvider makeModelProvider
+    ItemCategoriesProvider categoriesProvider,
+    MakeAndModelProvider makeModelProvider,
   ) {
     // Set category
     final categoryId = listing['category_id'];
     if (categoriesProvider.categories?.data != null && categoryId != null) {
       try {
-        selectedCategory = categoriesProvider.categories!.data
-            .firstWhere((category) => category.id == categoryId);
+        selectedCategory = categoriesProvider.categories!.data.firstWhere(
+          (category) => category.id == categoryId,
+        );
       } catch (e) {
         logger.e("Category not found: $e");
         selectedCategory = null;
       }
     }
-    
+
     // Set make and model
     final makeId = listing['brand_id'];
     final modelId = listing['brand_model_id'];
-    
+
     if (makeId != null && makeModelProvider.makes != null) {
       try {
-        final make = makeModelProvider.makes!.firstWhere((make) => make.id == makeId);
+        final make = makeModelProvider.makes!.firstWhere(
+          (make) => make.id == makeId,
+        );
         selectedMake = {'id': make.id, 'name': make.name};
-        
+
         if (modelId != null) {
           final models = makeModelProvider.getModelsForMake(makeId);
           if (models != null) {
@@ -248,18 +255,22 @@ class _EditItemPageState extends State<EditItemPage> {
         selectedMake = null;
       }
     }
-    
+
     // Set text fields
     _itemNameController.text = listing['name'] ?? '';
     _itemDescriptionController.text = listing['description'] ?? '';
     _priceController.text = listing['price']?.toString() ?? '';
-    
+
     // Set location
     selectedLocation = listing['location'];
-    
+
     // Set year
-    year = int.tryParse(listing['year']?.toString() ?? DateTime.now().year.toString()) ?? DateTime.now().year;
-    
+    year =
+        int.tryParse(
+          listing['year']?.toString() ?? DateTime.now().year.toString(),
+        ) ??
+        DateTime.now().year;
+
     // Set color
     if (listing['color'] != null) {
       _colorController.text = listing['color'];
@@ -271,22 +282,39 @@ class _EditItemPageState extends State<EditItemPage> {
         selectedColor = Colors.blue;
       }
     }
-    
+
     // Set features
     if (listing['features'] is List) {
       selectedFeatures = List<String>.from(listing['features']);
     }
-    
-    // Set item fields from the listing
+
+    // Set item fields from the listing using a normalized flat lookup map.
+    // We exclude known nested objects and any Map/List values, then lowercase
+    // ALL API keys so that mixed-case keys (e.g. "Condition") still match
+    // the field name (e.g. "condition") from item_fields.
     if (selectedCategory != null && selectedCategory!.itemFields.isNotEmpty) {
+      const excludedKeys = {'category', 'user', 'brand', 'brand_model'};
+
+      final flatListing = Map<String, dynamic>.fromEntries(
+        listing.entries
+            .where(
+              (e) =>
+                  !excludedKeys.contains(e.key.toLowerCase()) &&
+                  e.value is! Map &&
+                  e.value is! List,
+            )
+            .map((e) => MapEntry(e.key.toLowerCase(), e.value)),
+      );
+
       for (final field in selectedCategory!.itemFields) {
         final fieldKey = field.name.toLowerCase().replaceAll(' ', '_');
-        if (listing.containsKey(fieldKey) && listing[fieldKey] != null) {
-          selectedFields[field.name] = listing[fieldKey].toString();
+        if (flatListing.containsKey(fieldKey) &&
+            flatListing[fieldKey] != null) {
+          selectedFields[field.name] = flatListing[fieldKey].toString();
         }
       }
     }
-    
+
     // Set images (if they are URLs from the listing)
     if (listing['images'] is List) {
       selectedImages.clear();
@@ -306,7 +334,7 @@ class _EditItemPageState extends State<EditItemPage> {
 
   Future<void> updateCarFunction() async {
     logger.i("Starting vehicle update...");
-    
+
     try {
       if (!_validateRequiredFields()) {
         throw Exception('Please fill all required fields');
@@ -321,17 +349,18 @@ class _EditItemPageState extends State<EditItemPage> {
       if (_colorController.text.trim().isNotEmpty) {
         selectedFields['color'] = _colorController.text.trim();
       }
-      
+
       if (year.toString().isNotEmpty) {
         selectedFields['year'] = year.toString().trim();
       }
 
-      final normalizedFields = selectedFields.map((key, value) => 
-        MapEntry(key.toLowerCase().replaceAll(' ', '_'), value));
+      final normalizedFields = selectedFields.map(
+        (key, value) => MapEntry(key.toLowerCase().replaceAll(' ', '_'), value),
+      );
 
       // Process images: separate existing URLs from new files
       List<dynamic> allImages = [];
-      
+
       for (final xFile in selectedImages) {
         if (xFile.path.startsWith('http')) {
           // This is an existing image URL from the server
@@ -348,7 +377,9 @@ class _EditItemPageState extends State<EditItemPage> {
       }
 
       if (allImages.length < minImagesRequired) {
-        throw Exception('At least $minImagesRequired valid images are required');
+        throw Exception(
+          'At least $minImagesRequired valid images are required',
+        );
       }
 
       // Prepare request body
@@ -356,7 +387,7 @@ class _EditItemPageState extends State<EditItemPage> {
         'id': listing['id'],
         'category_id': selectedCategory!.id,
         'brand_id': selectedMake!["id"],
-        'brand_model_id': selectedModel!.id, 
+        'brand_model_id': selectedModel!.id,
         'name': _itemNameController.text.trim(),
         'slug': listing['slug'], // Keep the same slug for update
         ...normalizedFields,
@@ -364,15 +395,14 @@ class _EditItemPageState extends State<EditItemPage> {
         'price': _priceController.text.trim(),
         'description': _itemDescriptionController.text.trim(),
         'features': selectedFeatures,
-        'images': allImages // This contains mix of URLs (strings) and Files
+        'images': allImages, // This contains mix of URLs (strings) and Files
       };
-      
+
       logger.i("Update request body prepared");
-      
+
       await VehicleService.updateVehicle(requestBody: requestBody);
-      
+
       logger.i("Vehicle updated successfully");
-      
     } catch (e) {
       logger.e("Error in updateCarFunction: $e");
       rethrow;
@@ -384,22 +414,24 @@ class _EditItemPageState extends State<EditItemPage> {
       _showErrorSnackBar('Please select a category');
       return false;
     }
-    
-    if (selectedMake == null) {
+
+    // Conditionally validate Make based on category requirement
+    if (selectedCategory!.requireMake && selectedMake == null) {
       _showErrorSnackBar('Please select a vehicle make');
       return false;
     }
-    
-    if (selectedModel == null) {
+
+    // Conditionally validate Model based on category requirement
+    if (selectedCategory!.requireModel && selectedModel == null) {
       _showErrorSnackBar('Please select a vehicle model');
       return false;
     }
-    
+
     if (selectedLocation == null) {
       _showErrorSnackBar('Please select a location');
       return false;
     }
-    
+
     return true;
   }
 
@@ -407,7 +439,7 @@ class _EditItemPageState extends State<EditItemPage> {
     showCustomSnackBar(
       backgroundColor: ColorGlobalVariables.redColor,
       title: "Error",
-      message: message
+      message: message,
     );
   }
 
@@ -419,25 +451,27 @@ class _EditItemPageState extends State<EditItemPage> {
 
     // Updated validation for 4-10 images
     if (selectedImages.length < minImagesRequired) {
-      _showErrorSnackBar('Please upload at least $minImagesRequired images and at most $maxImagesAllowed images');
+      _showErrorSnackBar(
+        'Please upload at least $minImagesRequired images and at most $maxImagesAllowed images',
+      );
       return;
     }
-    
+
     if (!_validateRequiredFields()) {
       return;
     }
-    
+
     setState(() => _isUpdating = true);
-    
+
     try {
       // Attempt to update the vehicle
       await updateCarFunction();
-      
+
       // Only show success if update was truly successful
       showCustomSnackBar(
         backgroundColor: ColorGlobalVariables.greenColor,
         title: 'Success',
-        message: 'Vehicle updated successfully'
+        message: 'Vehicle updated successfully',
       );
 
       // Navigate back after successful update
@@ -449,7 +483,7 @@ class _EditItemPageState extends State<EditItemPage> {
       }
     } catch (e) {
       String errorMessage = 'Failed to update your vehicle';
-      
+
       if (e.toString().contains('Unauthorized')) {
         errorMessage = 'Please login again to continue';
       } else if (e.toString().contains('Network error')) {
@@ -461,9 +495,9 @@ class _EditItemPageState extends State<EditItemPage> {
       } else if (e.toString().contains('Cloudinary')) {
         errorMessage = 'Failed to upload images. Please try again.';
       }
-      
+
       _showErrorSnackBar('$errorMessage: ${e.toString()}');
-      
+
       // DO NOT clear form fields on error
       logger.e("Update failed - form fields preserved for user to fix issues");
     } finally {
@@ -483,9 +517,10 @@ class _EditItemPageState extends State<EditItemPage> {
       appBar: _buildBeautifulAppBar(),
       body: _isLoading
           ? _buildBeautifulLoadingIndicator()
-          : (categoriesProvider.error != null || makeModelProvider.error != null) 
-            ? _buildBeautifulErrorView(categoriesProvider, makeModelProvider) 
-            : _buildBeautifulMainContent(),
+          : (categoriesProvider.error != null ||
+                makeModelProvider.error != null)
+          ? _buildBeautifulErrorView(categoriesProvider, makeModelProvider)
+          : _buildBeautifulMainContent(),
     );
   }
 
@@ -574,10 +609,7 @@ class _EditItemPageState extends State<EditItemPage> {
           const SizedBox(height: 8),
           Text(
             'Getting everything ready for editing',
-            style: TextStyle(
-              color: _getHintTextColor(),
-              fontSize: 14,
-            ),
+            style: TextStyle(color: _getHintTextColor(), fontSize: 14),
           ),
         ],
       ),
@@ -590,15 +622,9 @@ class _EditItemPageState extends State<EditItemPage> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: _isDarkMode 
-              ? [
-                  const Color(0xFF303030),
-                  const Color(0xFF424242),
-                ]
-              : [
-                  Colors.white,
-                  Colors.grey.shade50,
-                ],
+          colors: _isDarkMode
+              ? [const Color(0xFF303030), const Color(0xFF424242)]
+              : [Colors.white, Colors.grey.shade50],
         ),
       ),
       child: Form(
@@ -613,7 +639,8 @@ class _EditItemPageState extends State<EditItemPage> {
                   children: [
                     _buildBeautifulCategoryField(),
                     const SizedBox(height: 20),
-                    if (selectedCategory != null) ..._buildBeautifulFormFields(),
+                    if (selectedCategory != null)
+                      ..._buildBeautifulFormFields(),
                   ],
                 ),
               ),
@@ -627,7 +654,7 @@ class _EditItemPageState extends State<EditItemPage> {
 
   Widget _buildBeautifulCategoryField() {
     final provider = Provider.of<ItemCategoriesProvider>(context);
-    
+
     return Container(
       decoration: BoxDecoration(
         color: _getCardColor(),
@@ -644,7 +671,9 @@ class _EditItemPageState extends State<EditItemPage> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => _showBeautifulCategorySelectionDialog(provider.categories?.data ?? []),
+          onTap: () => _showBeautifulCategorySelectionDialog(
+            provider.categories?.data ?? [],
+          ),
           child: Container(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -686,9 +715,9 @@ class _EditItemPageState extends State<EditItemPage> {
                       Text(
                         selectedCategory?.name ?? "Select a Category",
                         style: TextStyle(
-                          color: selectedCategory != null 
-                            ? _getTextColor() 
-                            : _getHintTextColor(),
+                          color: selectedCategory != null
+                              ? _getTextColor()
+                              : _getHintTextColor(),
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -719,11 +748,12 @@ class _EditItemPageState extends State<EditItemPage> {
 
   List<Widget> _buildBeautifulFormFields() {
     final makeModelProvider = Provider.of<MakeAndModelProvider>(context);
-    
+
     return [
       _buildBeautifulTextField(
         title: "${selectedCategory?.name ?? 'Item'} name",
-        hintText: "Enter ${selectedCategory?.name.toLowerCase() ?? 'item'} name",
+        hintText:
+            "Enter ${selectedCategory?.name.toLowerCase() ?? 'item'} name",
         controller: _itemNameController,
         icon: Icons.directions_car_rounded,
       ),
@@ -810,10 +840,7 @@ class _EditItemPageState extends State<EditItemPage> {
             decoration: BoxDecoration(
               color: _getInputBackgroundColor(),
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: _getBorderColor(),
-                width: 1.5,
-              ),
+              border: Border.all(color: _getBorderColor(), width: 1.5),
             ),
             child: TextFormField(
               controller: controller,
@@ -826,11 +853,11 @@ class _EditItemPageState extends State<EditItemPage> {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: hintText,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                hintStyle: TextStyle(
-                  color: _getHintTextColor(),
-                  fontSize: 15,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
                 ),
+                hintStyle: TextStyle(color: _getHintTextColor(), fontSize: 15),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -846,6 +873,15 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   Widget _buildBeautifulMakeModelRow(MakeAndModelProvider provider) {
+    // Determine visibility based on selected category flags
+    final bool showMake = selectedCategory?.requireMake ?? false;
+    final bool showModel = selectedCategory?.requireModel ?? false;
+
+    // If neither field is required, hide the entire row
+    if (!showMake && !showModel) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: _getCardColor(),
@@ -897,13 +933,13 @@ class _EditItemPageState extends State<EditItemPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: _buildBeautifulMakeField(provider),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildBeautifulModelField(provider),
-              ),
+              if (showMake) ...[
+                Expanded(child: _buildBeautifulMakeField(provider)),
+                const SizedBox(width: 16),
+              ],
+              if (showModel) ...[
+                Expanded(child: _buildBeautifulModelField(provider)),
+              ],
             ],
           ),
         ],
@@ -928,17 +964,15 @@ class _EditItemPageState extends State<EditItemPage> {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(15),
-            onTap: () => _showBeautifulMakeSelectionDialog(provider.makes ?? []),
+            onTap: () =>
+                _showBeautifulMakeSelectionDialog(provider.makes ?? []),
             child: Container(
               height: 56,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -946,9 +980,9 @@ class _EditItemPageState extends State<EditItemPage> {
                     child: Text(
                       selectedMake?['name'] ?? "Select Make",
                       style: TextStyle(
-                        color: selectedMake != null 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: selectedMake != null
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -990,7 +1024,9 @@ class _EditItemPageState extends State<EditItemPage> {
                 _showErrorSnackBar("Select a Make first");
                 return;
               }
-              _showBeautifulModelSelectionDialog(provider.getModelsForMake(selectedMake!['id']));
+              _showBeautifulModelSelectionDialog(
+                provider.getModelsForMake(selectedMake!['id']),
+              );
             },
             child: Container(
               height: 56,
@@ -998,10 +1034,7 @@ class _EditItemPageState extends State<EditItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -1009,9 +1042,9 @@ class _EditItemPageState extends State<EditItemPage> {
                     child: Text(
                       selectedModel?.name ?? "Select Model",
                       style: TextStyle(
-                        color: selectedModel != null 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: selectedModel != null
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1096,9 +1129,13 @@ class _EditItemPageState extends State<EditItemPage> {
             itemCount: itemFields.length,
             itemBuilder: (context, index) {
               final field = itemFields[index];
-              final currentValue = selectedFields[field.name] ?? 
-                (field.label.toLowerCase().contains("color") ? _colorController.text : 
-                 field.label.toLowerCase().contains("year") ? year.toString() : "");
+              final currentValue =
+                  selectedFields[field.name] ??
+                  (field.label.toLowerCase().contains("color")
+                      ? _colorController.text
+                      : field.label.toLowerCase().contains("year")
+                      ? year.toString()
+                      : "");
 
               return _buildBeautifulFormFieldItem(field, currentValue);
             },
@@ -1127,7 +1164,12 @@ class _EditItemPageState extends State<EditItemPage> {
             borderRadius: BorderRadius.circular(12),
             onTap: () {
               if (field.type == "string" || field.type == "number") {
-                _showBeautifulFieldInputDialog(field.label, field.name, field.type, currentValue);
+                _showBeautifulFieldInputDialog(
+                  field.label,
+                  field.name,
+                  field.type,
+                  currentValue,
+                );
               } else if (field.type == "enum") {
                 _showBeautifulSelectionDialog(field.options ?? [], field.name);
               } else if (field.type == "year") {
@@ -1142,20 +1184,19 @@ class _EditItemPageState extends State<EditItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      currentValue.isNotEmpty ? currentValue : "Select ${field.label}",
+                      currentValue.isNotEmpty
+                          ? currentValue
+                          : "Select ${field.label}",
                       style: TextStyle(
-                        color: currentValue.isNotEmpty 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: currentValue.isNotEmpty
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1227,13 +1268,9 @@ class _EditItemPageState extends State<EditItemPage> {
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(
-                child: _buildBeautifulLocationField(),
-              ),
+              Expanded(child: _buildBeautifulLocationField()),
               const SizedBox(width: 16),
-              Expanded(
-                child: _buildBeautifulPriceField(),
-              ),
+              Expanded(child: _buildBeautifulPriceField()),
             ],
           ),
         ],
@@ -1259,7 +1296,9 @@ class _EditItemPageState extends State<EditItemPage> {
           child: InkWell(
             borderRadius: BorderRadius.circular(15),
             onTap: () async {
-              final result = await Get.toNamed(RouteClass.getLocationSearchPage());
+              final result = await Get.toNamed(
+                RouteClass.getLocationSearchPage(),
+              );
               if (result != null && mounted) {
                 setState(() {
                   _currentPosition = result['position'];
@@ -1273,10 +1312,7 @@ class _EditItemPageState extends State<EditItemPage> {
               decoration: BoxDecoration(
                 color: _getInputBackgroundColor(),
                 borderRadius: BorderRadius.circular(15),
-                border: Border.all(
-                  color: _getBorderColor(),
-                  width: 1.5,
-                ),
+                border: Border.all(color: _getBorderColor(), width: 1.5),
               ),
               child: Row(
                 children: [
@@ -1290,9 +1326,9 @@ class _EditItemPageState extends State<EditItemPage> {
                     child: Text(
                       selectedLocation ?? "Search Location",
                       style: TextStyle(
-                        color: selectedLocation != null 
-                          ? _getTextColor() 
-                          : _getHintTextColor(),
+                        color: selectedLocation != null
+                            ? _getTextColor()
+                            : _getHintTextColor(),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1332,15 +1368,15 @@ class _EditItemPageState extends State<EditItemPage> {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
-          height: _calculatePriceFieldHeight(_priceController.text, constraints.maxWidth),
+          height: _calculatePriceFieldHeight(
+            _priceController.text,
+            constraints.maxWidth,
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: _getInputBackgroundColor(),
             borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: _getBorderColor(),
-              width: 1.5,
-            ),
+            border: Border.all(color: _getBorderColor(), width: 1.5),
           ),
           child: Row(
             children: [
@@ -1373,9 +1409,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: 'Enter price',
-                    hintStyle: TextStyle(
-                      color: _getHintTextColor(),
-                    ),
+                    hintStyle: TextStyle(color: _getHintTextColor()),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   validator: (value) {
@@ -1418,29 +1452,30 @@ class _EditItemPageState extends State<EditItemPage> {
       textDirection: TextDirection.ltr,
       maxLines: 1,
     );
-    
+
     textPainter.layout(maxWidth: double.infinity);
 
     // Available width for text (total width - currency symbol - padding - margins)
     final availableWidth = maxWidth - 60 - 40; // currency symbol area - padding
-    
+
     // If text width exceeds available space, increase height
     if (textPainter.width > availableWidth) {
       // Calculate how many lines we need
       final linesNeeded = (textPainter.width / availableWidth).ceil();
-      final newHeight = 56.0 + ((linesNeeded - 1) * 20.0); // Add 20px per extra line
-      
+      final newHeight =
+          56.0 + ((linesNeeded - 1) * 20.0); // Add 20px per extra line
+
       // Cap the maximum height
       return newHeight.clamp(56.0, 120.0);
     }
-    
+
     return 56.0; // Default height if text fits
   }
 
   Widget _buildBeautifulFeatures() {
     final hasFeatures = selectedCategory?.features.isNotEmpty ?? false;
     if (!hasFeatures) return const SizedBox();
-    
+
     return Container(
       decoration: BoxDecoration(
         color: _getCardColor(),
@@ -1494,7 +1529,9 @@ class _EditItemPageState extends State<EditItemPage> {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: selectedCategory!.features.map((feature) => _buildBeautifulFeatureChip(feature)).toList(),
+            children: selectedCategory!.features
+                .map((feature) => _buildBeautifulFeatureChip(feature))
+                .toList(),
           ),
         ],
       ),
@@ -1503,7 +1540,7 @@ class _EditItemPageState extends State<EditItemPage> {
 
   Widget _buildBeautifulFeatureChip(String feature) {
     final isSelected = selectedFeatures.contains(feature);
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1513,7 +1550,7 @@ class _EditItemPageState extends State<EditItemPage> {
           duration: const Duration(milliseconds: 300),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            gradient: isSelected 
+            gradient: isSelected
                 ? LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -1526,7 +1563,9 @@ class _EditItemPageState extends State<EditItemPage> {
             color: isSelected ? null : _getCardColor(),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : _getBorderColor(),
+              color: isSelected
+                  ? ColorGlobalVariables.brownColor
+                  : _getBorderColor(),
               width: 2,
             ),
             boxShadow: [
@@ -1610,10 +1649,7 @@ class _EditItemPageState extends State<EditItemPage> {
           const SizedBox(height: 12),
           Text(
             "Tap to add images ($minImagesRequired-$maxImagesAllowed required)",
-            style: TextStyle(
-              color: _getHintTextColor(),
-              fontSize: 14,
-            ),
+            style: TextStyle(color: _getHintTextColor(), fontSize: 14),
           ),
           const SizedBox(height: 16),
           Material(
@@ -1633,9 +1669,9 @@ class _EditItemPageState extends State<EditItemPage> {
                     style: BorderStyle.solid,
                   ),
                 ),
-                child: selectedImages.isEmpty 
-                  ? _buildBeautifulEmptyImageState()
-                  : _buildBeautifulImageGrid(),
+                child: selectedImages.isEmpty
+                    ? _buildBeautifulEmptyImageState()
+                    : _buildBeautifulImageGrid(),
               ),
             ),
           ),
@@ -1647,9 +1683,9 @@ class _EditItemPageState extends State<EditItemPage> {
                 Text(
                   '${selectedImages.length}/$maxImagesAllowed images selected',
                   style: TextStyle(
-                    color: selectedImages.length >= minImagesRequired 
-                      ? ColorGlobalVariables.greenColor 
-                      : ColorGlobalVariables.redColor,
+                    color: selectedImages.length >= minImagesRequired
+                        ? ColorGlobalVariables.greenColor
+                        : ColorGlobalVariables.redColor,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -1660,9 +1696,14 @@ class _EditItemPageState extends State<EditItemPage> {
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => setState(() => selectedImages = []),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: ColorGlobalVariables.redColor.withValues(alpha: 0.1),
+                        color: ColorGlobalVariables.redColor.withValues(
+                          alpha: 0.1,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: ColorGlobalVariables.redColor,
@@ -1720,10 +1761,7 @@ class _EditItemPageState extends State<EditItemPage> {
         const SizedBox(height: 4),
         Text(
           "$minImagesRequired-$maxImagesAllowed images required",
-          style: TextStyle(
-            color: _getHintTextColor(),
-            fontSize: 14,
-          ),
+          style: TextStyle(color: _getHintTextColor(), fontSize: 14),
         ),
       ],
     );
@@ -1747,16 +1785,14 @@ class _EditItemPageState extends State<EditItemPage> {
 
   Widget _buildBeautifulImageContainer(int index) {
     final hasImage = index < selectedImages.length;
-    final isNetworkImage = hasImage && selectedImages[index].path.startsWith('http');
+    final isNetworkImage =
+        hasImage && selectedImages[index].path.startsWith('http');
     final canAddMore = selectedImages.length < maxImagesAllowed;
-    
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getBorderColor(),
-          width: 2,
-        ),
+        border: Border.all(color: _getBorderColor(), width: 2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
@@ -1771,9 +1807,10 @@ class _EditItemPageState extends State<EditItemPage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image(
-                image: isNetworkImage 
-                  ? NetworkImage(selectedImages[index].path) 
-                  : FileImage(File(selectedImages[index].path)) as ImageProvider,
+                image: isNetworkImage
+                    ? NetworkImage(selectedImages[index].path)
+                    : FileImage(File(selectedImages[index].path))
+                          as ImageProvider,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: double.infinity,
@@ -1801,7 +1838,7 @@ class _EditItemPageState extends State<EditItemPage> {
                 ),
               ),
             ),
-          
+
           if (hasImage)
             Positioned(
               top: 4,
@@ -1859,7 +1896,7 @@ class _EditItemPageState extends State<EditItemPage> {
   Widget _buildBeautifulUpdateButton() {
     final isProcessing = _isUpdating;
     final hasEnoughImages = selectedImages.length >= minImagesRequired;
-    
+
     return SafeArea(
       top: false,
       child: Padding(
@@ -1869,9 +1906,9 @@ class _EditItemPageState extends State<EditItemPage> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: (isProcessing || !hasEnoughImages) 
-                  ? Colors.grey.withValues(alpha: 0.4)
-                  : ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                color: (isProcessing || !hasEnoughImages)
+                    ? Colors.grey.withValues(alpha: 0.4)
+                    : ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -1881,27 +1918,28 @@ class _EditItemPageState extends State<EditItemPage> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: (isProcessing || !hasEnoughImages) ? null : _formValidation,
+              onTap: (isProcessing || !hasEnoughImages)
+                  ? null
+                  : _formValidation,
               child: Container(
                 height: 60,
                 decoration: BoxDecoration(
-                  gradient: (isProcessing || !hasEnoughImages) 
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.grey,
-                          Colors.grey.shade600,
-                        ],
-                      )
-                    : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
-                        ],
-                      ),
+                  gradient: (isProcessing || !hasEnoughImages)
+                      ? LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Colors.grey, Colors.grey.shade600],
+                        )
+                      : LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            ColorGlobalVariables.brownColor,
+                            ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.8,
+                            ),
+                          ],
+                        ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Center(
@@ -1914,7 +1952,9 @@ class _EditItemPageState extends State<EditItemPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1997,11 +2037,10 @@ class _EditItemPageState extends State<EditItemPage> {
             ),
             const SizedBox(height: 12),
             Text(
-              categoriesProvider.error ?? makeModelProvider.error ?? 'Unknown error occurred',
-              style: TextStyle(
-                color: _getHintTextColor(),
-                fontSize: 16,
-              ),
+              categoriesProvider.error ??
+                  makeModelProvider.error ??
+                  'Unknown error occurred',
+              style: TextStyle(color: _getHintTextColor(), fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -2010,7 +2049,9 @@ class _EditItemPageState extends State<EditItemPage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
+                    color: ColorGlobalVariables.brownColor.withValues(
+                      alpha: 0.3,
+                    ),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
@@ -2022,14 +2063,19 @@ class _EditItemPageState extends State<EditItemPage> {
                   borderRadius: BorderRadius.circular(20),
                   onTap: _loadInitialData,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
                           ColorGlobalVariables.brownColor,
-                          ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
+                          ColorGlobalVariables.brownColor.withValues(
+                            alpha: 0.8,
+                          ),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -2058,7 +2104,9 @@ class _EditItemPageState extends State<EditItemPage> {
 
   void _showSimpleColorPicker() {
     final searchController = TextEditingController();
-    final filteredColors = ValueNotifier<List<Map<String, dynamic>>>(colorOptions);
+    final filteredColors = ValueNotifier<List<Map<String, dynamic>>>(
+      colorOptions,
+    );
     final dialogSelectedColorName = ValueNotifier<String>(selectedColorName);
     final dialogSelectedColor = ValueNotifier<Color>(selectedColor);
 
@@ -2108,13 +2156,17 @@ class _EditItemPageState extends State<EditItemPage> {
                             end: Alignment.bottomRight,
                             colors: [
                               ColorGlobalVariables.brownColor,
-                              ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
+                              ColorGlobalVariables.brownColor.withValues(
+                                alpha: 0.7,
+                              ),
                             ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                              color: ColorGlobalVariables.brownColor.withValues(
+                                alpha: 0.4,
+                              ),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
                             ),
@@ -2139,7 +2191,9 @@ class _EditItemPageState extends State<EditItemPage> {
                       Text(
                         'Choose from common color names',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
@@ -2156,11 +2210,16 @@ class _EditItemPageState extends State<EditItemPage> {
                       builder: (context, color, child) {
                         if (colorName.isEmpty) return const SizedBox();
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).inputDecorationTheme.fillColor,
+                              color: Theme.of(
+                                context,
+                              ).inputDecorationTheme.fillColor,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: Theme.of(context).dividerColor,
@@ -2181,7 +2240,9 @@ class _EditItemPageState extends State<EditItemPage> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         blurRadius: 6,
                                         offset: const Offset(0, 3),
                                       ),
@@ -2191,12 +2252,17 @@ class _EditItemPageState extends State<EditItemPage> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Selected Color',
                                         style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .color!
+                                              .withValues(alpha: 0.7),
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -2205,7 +2271,9 @@ class _EditItemPageState extends State<EditItemPage> {
                                       Text(
                                         colorName,
                                         style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                                          color: Theme.of(
+                                            context,
+                                          ).textTheme.bodyLarge!.color,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -2244,15 +2312,20 @@ class _EditItemPageState extends State<EditItemPage> {
                         prefixIcon: Container(
                           margin: const EdgeInsets.all(12),
                           child: Icon(
-                            Icons.search_rounded, 
+                            Icons.search_rounded,
                             color: ColorGlobalVariables.brownColor,
                             size: 20,
                           ),
                         ),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         hintStyle: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                           fontSize: 14,
                         ),
                       ),
@@ -2262,7 +2335,9 @@ class _EditItemPageState extends State<EditItemPage> {
                       ),
                       onChanged: (value) {
                         filteredColors.value = colorOptions.where((color) {
-                          final colorName = color['name'].toString().toLowerCase();
+                          final colorName = color['name']
+                              .toString()
+                              .toLowerCase();
                           return colorName.contains(value.toLowerCase());
                         }).toList();
                       },
@@ -2280,30 +2355,34 @@ class _EditItemPageState extends State<EditItemPage> {
                         if (filteredColors.isEmpty) {
                           return _buildColorEmptyState();
                         }
-                        
+
                         return ValueListenableBuilder<String>(
                           valueListenable: dialogSelectedColorName,
                           builder: (context, selectedName, child) {
                             return GridView.builder(
                               padding: const EdgeInsets.only(bottom: 16),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                childAspectRatio: 0.85,
-                              ),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 8,
+                                    mainAxisSpacing: 8,
+                                    childAspectRatio: 0.85,
+                                  ),
                               itemCount: filteredColors.length,
                               itemBuilder: (context, index) {
                                 final colorOption = filteredColors[index];
-                                final isSelected = selectedName == colorOption['name'];
-                                
+                                final isSelected =
+                                    selectedName == colorOption['name'];
+
                                 return _buildColorOptionItem(
-                                  colorOption, 
+                                  colorOption,
                                   isSelected,
                                   onTap: () {
-                                    dialogSelectedColorName.value = colorOption['name'];
-                                    dialogSelectedColor.value = colorOption['color'];
-                                  }
+                                    dialogSelectedColorName.value =
+                                        colorOption['name'];
+                                    dialogSelectedColor.value =
+                                        colorOption['color'];
+                                  },
                                 );
                               },
                             );
@@ -2341,11 +2420,18 @@ class _EditItemPageState extends State<EditItemPage> {
                             borderRadius: BorderRadius.circular(14),
                             onTap: () => Navigator.pop(context),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .color!
+                                      .withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -2366,12 +2452,15 @@ class _EditItemPageState extends State<EditItemPage> {
                                 end: Alignment.bottomRight,
                                 colors: [
                                   ColorGlobalVariables.brownColor,
-                                  ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
+                                  ColorGlobalVariables.brownColor.withValues(
+                                    alpha: 0.8,
+                                  ),
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                                  color: ColorGlobalVariables.brownColor
+                                      .withValues(alpha: 0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
@@ -2388,11 +2477,16 @@ class _EditItemPageState extends State<EditItemPage> {
                                       selectedColorName = colorName;
                                       selectedColor = dialogSelectedColor.value;
                                       _colorController.text = colorName;
-                                      
+
                                       // Also update the selectedFields for the form field
-                                      for (final field in selectedCategory?.itemFields ?? []) {
-                                        if (field.label.toLowerCase().contains("color")) {
-                                          selectedFields[field.name] = colorName;
+                                      for (final field
+                                          in selectedCategory?.itemFields ??
+                                              []) {
+                                        if (field.label.toLowerCase().contains(
+                                          "color",
+                                        )) {
+                                          selectedFields[field.name] =
+                                              colorName;
                                         }
                                       }
                                     });
@@ -2400,7 +2494,10 @@ class _EditItemPageState extends State<EditItemPage> {
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 28,
+                                    vertical: 12,
+                                  ),
                                   child: Text(
                                     'Confirm',
                                     style: TextStyle(
@@ -2427,7 +2524,7 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   Widget _buildColorOptionItem(
-    Map<String, dynamic> colorOption, 
+    Map<String, dynamic> colorOption,
     bool isSelected, {
     required VoidCallback onTap,
   }) {
@@ -2441,7 +2538,9 @@ class _EditItemPageState extends State<EditItemPage> {
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected ? ColorGlobalVariables.brownColor : Theme.of(context).dividerColor,
+              color: isSelected
+                  ? ColorGlobalVariables.brownColor
+                  : Theme.of(context).dividerColor,
               width: isSelected ? 2.5 : 1.2,
             ),
             boxShadow: [
@@ -2520,14 +2619,18 @@ class _EditItemPageState extends State<EditItemPage> {
               child: Icon(
                 Icons.color_lens_rounded,
                 size: 35,
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 16),
             Text(
               'No colors found',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -2536,7 +2639,9 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                 fontSize: 13,
               ),
               textAlign: TextAlign.center,
@@ -2601,13 +2706,17 @@ class _EditItemPageState extends State<EditItemPage> {
                             end: Alignment.bottomRight,
                             colors: [
                               ColorGlobalVariables.brownColor,
-                              ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
+                              ColorGlobalVariables.brownColor.withValues(
+                                alpha: 0.7,
+                              ),
                             ],
                           ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                              color: ColorGlobalVariables.brownColor.withValues(
+                                alpha: 0.4,
+                              ),
                               blurRadius: 15,
                               offset: const Offset(0, 6),
                             ),
@@ -2632,7 +2741,9 @@ class _EditItemPageState extends State<EditItemPage> {
                       Text(
                         'Choose the manufacturing year of your vehicle',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                           fontSize: 15,
                         ),
                         textAlign: TextAlign.center,
@@ -2640,7 +2751,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     ],
                   ),
                 ),
-                
+
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -2663,7 +2774,7 @@ class _EditItemPageState extends State<EditItemPage> {
                             itemBuilder: (context, index) {
                               final yearValue = years[index];
                               final isSelected = selectedYear == yearValue;
-                              
+
                               return Material(
                                 color: Colors.transparent,
                                 child: InkWell(
@@ -2672,15 +2783,20 @@ class _EditItemPageState extends State<EditItemPage> {
                                   },
                                   borderRadius: BorderRadius.circular(12),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 18,
+                                      horizontal: 20,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isSelected 
-                                          ? ColorGlobalVariables.brownColor.withValues(alpha: 0.1)
+                                      color: isSelected
+                                          ? ColorGlobalVariables.brownColor
+                                                .withValues(alpha: 0.1)
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(12),
                                       border: isSelected
                                           ? Border.all(
-                                              color: ColorGlobalVariables.brownColor,
+                                              color: ColorGlobalVariables
+                                                  .brownColor,
                                               width: 2,
                                             )
                                           : null,
@@ -2692,13 +2808,24 @@ class _EditItemPageState extends State<EditItemPage> {
                                           height: 40,
                                           decoration: BoxDecoration(
                                             color: isSelected
-                                                ? ColorGlobalVariables.brownColor
-                                                : Theme.of(context).inputDecorationTheme.fillColor,
+                                                ? ColorGlobalVariables
+                                                      .brownColor
+                                                : Theme.of(context)
+                                                      .inputDecorationTheme
+                                                      .fillColor,
                                             shape: BoxShape.circle,
                                           ),
                                           child: Icon(
-                                            isSelected ? Icons.check_rounded : Icons.calendar_today_rounded,
-                                            color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                                            isSelected
+                                                ? Icons.check_rounded
+                                                : Icons.calendar_today_rounded,
+                                            color: isSelected
+                                                ? Colors.white
+                                                : Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium!
+                                                      .color!
+                                                      .withValues(alpha: 0.5),
                                             size: 20,
                                           ),
                                         ),
@@ -2707,18 +2834,25 @@ class _EditItemPageState extends State<EditItemPage> {
                                           child: Text(
                                             yearValue.toString(),
                                             style: TextStyle(
-                                              color: isSelected 
-                                                  ? ColorGlobalVariables.brownColor
-                                                  : Theme.of(context).textTheme.bodyLarge!.color,
+                                              color: isSelected
+                                                  ? ColorGlobalVariables
+                                                        .brownColor
+                                                  : Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge!
+                                                        .color,
                                               fontSize: 18,
-                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                              fontWeight: isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w500,
                                             ),
                                           ),
                                         ),
                                         if (isSelected)
                                           Icon(
                                             Icons.check_circle_rounded,
-                                            color: ColorGlobalVariables.brownColor,
+                                            color:
+                                                ColorGlobalVariables.brownColor,
                                             size: 24,
                                           ),
                                       ],
@@ -2733,7 +2867,7 @@ class _EditItemPageState extends State<EditItemPage> {
                     ),
                   ),
                 ),
-                
+
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -2760,11 +2894,18 @@ class _EditItemPageState extends State<EditItemPage> {
                             borderRadius: BorderRadius.circular(16),
                             onTap: () => Navigator.pop(context),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 28,
+                                vertical: 14,
+                              ),
                               child: Text(
                                 'Cancel',
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .color!
+                                      .withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
                                 ),
@@ -2785,12 +2926,15 @@ class _EditItemPageState extends State<EditItemPage> {
                                 end: Alignment.bottomRight,
                                 colors: [
                                   ColorGlobalVariables.brownColor,
-                                  ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
+                                  ColorGlobalVariables.brownColor.withValues(
+                                    alpha: 0.8,
+                                  ),
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                                  color: ColorGlobalVariables.brownColor
+                                      .withValues(alpha: 0.4),
                                   blurRadius: 12,
                                   offset: const Offset(0, 6),
                                 ),
@@ -2804,18 +2948,25 @@ class _EditItemPageState extends State<EditItemPage> {
                                   // FIX: Update the form state when year is selected
                                   setState(() {
                                     year = selectedYear;
-                                    
+
                                     // Also update the selectedFields for the form field
-                                    for (final field in selectedCategory?.itemFields ?? []) {
-                                      if (field.label.toLowerCase().contains("year")) {
-                                        selectedFields[field.name] = selectedYear.toString();
+                                    for (final field
+                                        in selectedCategory?.itemFields ?? []) {
+                                      if (field.label.toLowerCase().contains(
+                                        "year",
+                                      )) {
+                                        selectedFields[field.name] =
+                                            selectedYear.toString();
                                       }
                                     }
                                   });
                                   Navigator.pop(context);
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 14,
+                                  ),
                                   child: Text(
                                     'Confirm',
                                     style: TextStyle(
@@ -2842,11 +2993,17 @@ class _EditItemPageState extends State<EditItemPage> {
   }
 
   Color _getContrastColor(Color backgroundColor) {
-    final luminance = (0.299 * backgroundColor.red + 0.587 * backgroundColor.green + 0.114 * backgroundColor.blue) / 255;
+    final luminance =
+        (0.299 * backgroundColor.red +
+            0.587 * backgroundColor.green +
+            0.114 * backgroundColor.blue) /
+        255;
     return luminance > 0.5 ? Colors.black : Colors.white;
   }
 
-  Future<void> _showBeautifulCategorySelectionDialog(List<ItemCategory> categories) async {
+  Future<void> _showBeautifulCategorySelectionDialog(
+    List<ItemCategory> categories,
+  ) async {
     final selected = await showDialog<ItemCategory>(
       context: context,
       builder: (context) => _buildPremiumSearchableDialog(
@@ -2870,7 +3027,9 @@ class _EditItemPageState extends State<EditItemPage> {
     }
   }
 
-  Future<void> _showBeautifulMakeSelectionDialog(List<VehicleMake> makes) async {
+  Future<void> _showBeautifulMakeSelectionDialog(
+    List<VehicleMake> makes,
+  ) async {
     final selected = await showDialog<VehicleMake>(
       context: context,
       builder: (context) => _buildPremiumSearchableDialog(
@@ -2891,7 +3050,9 @@ class _EditItemPageState extends State<EditItemPage> {
     }
   }
 
-  Future<void> _showBeautifulModelSelectionDialog(List<VehicleModel>? models) async {
+  Future<void> _showBeautifulModelSelectionDialog(
+    List<VehicleModel>? models,
+  ) async {
     if (models == null || models.isEmpty) return;
 
     final selected = await showDialog<VehicleModel>(
@@ -2926,9 +3087,7 @@ class _EditItemPageState extends State<EditItemPage> {
       data: Theme.of(context),
       child: Dialog(
         backgroundColor: Theme.of(context).cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         elevation: 25,
         child: ConstrainedBox(
           constraints: BoxConstraints(
@@ -2966,23 +3125,23 @@ class _EditItemPageState extends State<EditItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withValues(alpha: 0.7),
+                            ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.7,
+                            ),
                           ],
                         ),
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 15,
                             offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: Icon(
-                        icon,
-                        color: Colors.white,
-                        size: 32,
-                      ),
+                      child: Icon(icon, color: Colors.white, size: 32),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -2997,7 +3156,9 @@ class _EditItemPageState extends State<EditItemPage> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                         fontSize: 15,
                       ),
                       textAlign: TextAlign.center,
@@ -3027,15 +3188,20 @@ class _EditItemPageState extends State<EditItemPage> {
                       prefixIcon: Container(
                         margin: const EdgeInsets.all(14),
                         child: Icon(
-                          Icons.search_rounded, 
+                          Icons.search_rounded,
                           color: ColorGlobalVariables.brownColor,
                           size: 22,
                         ),
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 18,
+                      ),
                       hintStyle: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                         fontSize: 16,
                       ),
                     ),
@@ -3068,7 +3234,7 @@ class _EditItemPageState extends State<EditItemPage> {
                       if (filteredItems.isEmpty) {
                         return _buildPremiumEmptyState();
                       }
-                      
+
                       return ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         itemCount: filteredItems.length,
@@ -3086,7 +3252,10 @@ class _EditItemPageState extends State<EditItemPage> {
                               onTap: () => onItemSelected(item),
                               borderRadius: BorderRadius.circular(16),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                  horizontal: 12,
+                                ),
                                 child: Row(
                                   children: [
                                     Container(
@@ -3097,8 +3266,10 @@ class _EditItemPageState extends State<EditItemPage> {
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                           colors: [
-                                            ColorGlobalVariables.brownColor.withValues(alpha: 0.15),
-                                            ColorGlobalVariables.brownColor.withValues(alpha: 0.08),
+                                            ColorGlobalVariables.brownColor
+                                                .withValues(alpha: 0.15),
+                                            ColorGlobalVariables.brownColor
+                                                .withValues(alpha: 0.08),
                                           ],
                                         ),
                                         borderRadius: BorderRadius.circular(14),
@@ -3114,7 +3285,9 @@ class _EditItemPageState extends State<EditItemPage> {
                                       child: Text(
                                         itemBuilder(item),
                                         style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodyLarge!.color,
+                                          color: Theme.of(
+                                            context,
+                                          ).textTheme.bodyLarge!.color,
                                           fontSize: 17,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -3122,7 +3295,11 @@ class _EditItemPageState extends State<EditItemPage> {
                                     ),
                                     Icon(
                                       Icons.chevron_right_rounded,
-                                      color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .color!
+                                          .withValues(alpha: 0.5),
                                       size: 24,
                                     ),
                                   ],
@@ -3163,11 +3340,18 @@ class _EditItemPageState extends State<EditItemPage> {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () => Navigator.pop(context),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 14,
+                            ),
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .color!
+                                    .withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
@@ -3203,14 +3387,18 @@ class _EditItemPageState extends State<EditItemPage> {
               child: Icon(
                 Icons.search_off_rounded,
                 size: 50,
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               'No results found',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -3219,7 +3407,9 @@ class _EditItemPageState extends State<EditItemPage> {
             Text(
               'Try searching with different keywords',
               style: TextStyle(
-                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                 fontSize: 14,
               ),
               textAlign: TextAlign.center,
@@ -3230,7 +3420,10 @@ class _EditItemPageState extends State<EditItemPage> {
     );
   }
 
-  Future<void> _showBeautifulSelectionDialog(List<dynamic> options, String fieldName) async {
+  Future<void> _showBeautifulSelectionDialog(
+    List<dynamic> options,
+    String fieldName,
+  ) async {
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => _buildPremiumSearchableDialog(
@@ -3250,7 +3443,12 @@ class _EditItemPageState extends State<EditItemPage> {
     }
   }
 
-  Future<void> _showBeautifulFieldInputDialog(String fieldLabel, String fieldName, String fieldType, String currentValue) async {
+  Future<void> _showBeautifulFieldInputDialog(
+    String fieldLabel,
+    String fieldName,
+    String fieldType,
+    String currentValue,
+  ) async {
     final controller = TextEditingController(text: currentValue);
 
     await showDialog(
@@ -3286,7 +3484,9 @@ class _EditItemPageState extends State<EditItemPage> {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: ColorGlobalVariables.brownColor.withValues(alpha: 0.3),
+                        color: ColorGlobalVariables.brownColor.withValues(
+                          alpha: 0.3,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -3311,13 +3511,15 @@ class _EditItemPageState extends State<EditItemPage> {
                 Text(
                   'Please provide the $fieldLabel details',
                   style: TextStyle(
-                    color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
                     fontSize: 15,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 28),
-                
+
                 Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).inputDecorationTheme.fillColor,
@@ -3336,7 +3538,9 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                   child: TextField(
                     controller: controller,
-                    keyboardType: fieldType == "number" ? TextInputType.number : TextInputType.text,
+                    keyboardType: fieldType == "number"
+                        ? TextInputType.number
+                        : TextInputType.text,
                     style: TextStyle(
                       color: Theme.of(context).textTheme.bodyLarge!.color,
                       fontSize: 17,
@@ -3345,9 +3549,14 @@ class _EditItemPageState extends State<EditItemPage> {
                     decoration: InputDecoration(
                       hintText: "Enter $fieldLabel",
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
                       hintStyle: TextStyle(
-                        color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.color!.withValues(alpha: 0.5),
                         fontSize: 16,
                       ),
                     ),
@@ -3355,7 +3564,7 @@ class _EditItemPageState extends State<EditItemPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -3373,11 +3582,18 @@ class _EditItemPageState extends State<EditItemPage> {
                           borderRadius: BorderRadius.circular(16),
                           onTap: () => Navigator.pop(context),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 14,
+                            ),
                             child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.7),
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .color!
+                                    .withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
                               ),
@@ -3395,12 +3611,16 @@ class _EditItemPageState extends State<EditItemPage> {
                           end: Alignment.bottomRight,
                           colors: [
                             ColorGlobalVariables.brownColor,
-                            ColorGlobalVariables.brownColor.withValues(alpha: 0.8),
+                            ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.8,
+                            ),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: ColorGlobalVariables.brownColor.withValues(alpha: 0.4),
+                            color: ColorGlobalVariables.brownColor.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -3413,13 +3633,17 @@ class _EditItemPageState extends State<EditItemPage> {
                           onTap: () {
                             if (controller.text.trim().isNotEmpty) {
                               setState(() {
-                                selectedFields[fieldName] = controller.text.trim();
+                                selectedFields[fieldName] = controller.text
+                                    .trim();
                               });
                               Navigator.pop(context);
                             }
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 14,
+                            ),
                             child: Text(
                               'Confirm',
                               style: TextStyle(
@@ -3454,13 +3678,15 @@ class _EditItemPageState extends State<EditItemPage> {
         setState(() {
           final availableSlots = maxImagesAllowed - selectedImages.length;
           if (availableSlots > 0) {
-            final filesToAdd = pickedFiles.length > availableSlots 
+            final filesToAdd = pickedFiles.length > availableSlots
                 ? pickedFiles.sublist(0, availableSlots)
                 : pickedFiles;
             selectedImages.addAll(filesToAdd);
-            
+
             if (pickedFiles.length > availableSlots) {
-              _showErrorSnackBar('Maximum of $maxImagesAllowed images allowed. Added $availableSlots images.');
+              _showErrorSnackBar(
+                'Maximum of $maxImagesAllowed images allowed. Added $availableSlots images.',
+              );
             }
           } else {
             _showErrorSnackBar('Maximum of $maxImagesAllowed images reached');

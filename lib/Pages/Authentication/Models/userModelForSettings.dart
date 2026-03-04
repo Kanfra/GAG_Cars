@@ -4,7 +4,7 @@ part 'userModelForSettings.freezed.dart';
 part 'userModelForSettings.g.dart';
 
 @freezed
-class UserModelForSettings with _$UserModelForSettings {
+abstract class UserModelForSettings with _$UserModelForSettings {
   const factory UserModelForSettings({
     required String id,
     required String name,

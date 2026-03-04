@@ -6,7 +6,7 @@ part 'categoriesModel.g.dart';
 
 // Pagination Links Model
 @freezed
-class PaginationLinks with _$PaginationLinks {
+abstract class PaginationLinks with _$PaginationLinks {
   const factory PaginationLinks({
     String? first,
     String? last,
@@ -20,7 +20,7 @@ class PaginationLinks with _$PaginationLinks {
 
 // Pagination Meta Model
 @freezed
-class PaginationMeta with _$PaginationMeta {
+abstract class PaginationMeta with _$PaginationMeta {
   const factory PaginationMeta({
     required int current_page,
     required int from,
@@ -38,7 +38,7 @@ class PaginationMeta with _$PaginationMeta {
 
 // Link Model for Meta
 @freezed
-class MetaLink with _$MetaLink {
+abstract class MetaLink with _$MetaLink {
   const factory MetaLink({
     String? url,
     required String label,
@@ -52,7 +52,7 @@ class MetaLink with _$MetaLink {
 
 // Item Field Model
 @freezed
-class ItemField with _$ItemField {
+abstract class ItemField with _$ItemField {
   const factory ItemField({
     required int id,
     required String name,
@@ -74,7 +74,7 @@ class ItemField with _$ItemField {
 
 // Main Category Model (Updated with missing fields)
 @freezed
-class Categories with _$Categories {
+abstract class Categories with _$Categories {
   const factory Categories({
     required int id,
     @JsonKey(name: 'user_id') String? userId,
@@ -97,7 +97,7 @@ class Categories with _$Categories {
 
 // Categories Response Model (Updated with pagination)
 @freezed
-class CategoriesResponse with _$CategoriesResponse {
+abstract class CategoriesResponse with _$CategoriesResponse {
   const factory CategoriesResponse({
     @Default([]) List<Categories> data,
     required PaginationLinks links,
@@ -110,7 +110,7 @@ class CategoriesResponse with _$CategoriesResponse {
 
 // Detailed Category Model
 @freezed
-class DetailedCategory with _$DetailedCategory {
+abstract class DetailedCategory with _$DetailedCategory {
   const factory DetailedCategory({
     required int id,
     @JsonKey(name: 'user_id') String? userId,
@@ -132,7 +132,7 @@ class DetailedCategory with _$DetailedCategory {
 
 // Detailed Category Response Model
 @freezed
-class DetailedCategoryResponse with _$DetailedCategoryResponse {
+abstract class DetailedCategoryResponse with _$DetailedCategoryResponse {
   const factory DetailedCategoryResponse({
     required DetailedCategory data,
   }) = _DetailedCategoryResponse;

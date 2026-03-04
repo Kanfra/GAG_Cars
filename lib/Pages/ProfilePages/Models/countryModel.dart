@@ -4,7 +4,7 @@ part 'countryModel.freezed.dart';
 part 'countryModel.g.dart';
 
 @freezed
-class Country with _$Country {
+abstract class Country with _$Country {
   const factory Country({
     required int id,
     required String name,

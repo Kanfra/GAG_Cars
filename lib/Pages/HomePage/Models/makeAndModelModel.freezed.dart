@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,1541 +9,1716 @@ part of 'makeAndModelModel.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-MakeAndModelResponse _$MakeAndModelResponseFromJson(Map<String, dynamic> json) {
-  return _MakeAndModelResponse.fromJson(json);
-}
 
 /// @nodoc
 mixin _$MakeAndModelResponse {
-  List<VehicleMake> get data => throw _privateConstructorUsedError;
-  PaginationLinks get links => throw _privateConstructorUsedError;
-  PaginationMeta get meta => throw _privateConstructorUsedError;
+
+ List<VehicleMake> get data; PaginationLinks get links; PaginationMeta get meta;
+/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MakeAndModelResponseCopyWith<MakeAndModelResponse> get copyWith => _$MakeAndModelResponseCopyWithImpl<MakeAndModelResponse>(this as MakeAndModelResponse, _$identity);
 
   /// Serializes this MakeAndModelResponse to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $MakeAndModelResponseCopyWith<MakeAndModelResponse> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MakeAndModelResponse&&const DeepCollectionEquality().equals(other.data, data)&&(identical(other.links, links) || other.links == links)&&(identical(other.meta, meta) || other.meta == meta));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(data),links,meta);
+
+@override
+String toString() {
+  return 'MakeAndModelResponse(data: $data, links: $links, meta: $meta)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $MakeAndModelResponseCopyWith<$Res> {
-  factory $MakeAndModelResponseCopyWith(MakeAndModelResponse value,
-          $Res Function(MakeAndModelResponse) then) =
-      _$MakeAndModelResponseCopyWithImpl<$Res, MakeAndModelResponse>;
-  @useResult
-  $Res call(
-      {List<VehicleMake> data, PaginationLinks links, PaginationMeta meta});
+abstract mixin class $MakeAndModelResponseCopyWith<$Res>  {
+  factory $MakeAndModelResponseCopyWith(MakeAndModelResponse value, $Res Function(MakeAndModelResponse) _then) = _$MakeAndModelResponseCopyWithImpl;
+@useResult
+$Res call({
+ List<VehicleMake> data, PaginationLinks links, PaginationMeta meta
+});
 
-  $PaginationLinksCopyWith<$Res> get links;
-  $PaginationMetaCopyWith<$Res> get meta;
+
+$PaginationLinksCopyWith<$Res> get links;$PaginationMetaCopyWith<$Res> get meta;
+
 }
-
 /// @nodoc
-class _$MakeAndModelResponseCopyWithImpl<$Res,
-        $Val extends MakeAndModelResponse>
+class _$MakeAndModelResponseCopyWithImpl<$Res>
     implements $MakeAndModelResponseCopyWith<$Res> {
-  _$MakeAndModelResponseCopyWithImpl(this._value, this._then);
+  _$MakeAndModelResponseCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final MakeAndModelResponse _self;
+  final $Res Function(MakeAndModelResponse) _then;
 
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? links = null,
-    Object? meta = null,
-  }) {
-    return _then(_value.copyWith(
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<VehicleMake>,
-      links: null == links
-          ? _value.links
-          : links // ignore: cast_nullable_to_non_nullable
-              as PaginationLinks,
-      meta: null == meta
-          ? _value.meta
-          : meta // ignore: cast_nullable_to_non_nullable
-              as PaginationMeta,
-    ) as $Val);
-  }
-
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PaginationLinksCopyWith<$Res> get links {
-    return $PaginationLinksCopyWith<$Res>(_value.links, (value) {
-      return _then(_value.copyWith(links: value) as $Val);
-    });
-  }
-
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $PaginationMetaCopyWith<$Res> get meta {
-    return $PaginationMetaCopyWith<$Res>(_value.meta, (value) {
-      return _then(_value.copyWith(meta: value) as $Val);
-    });
-  }
+/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? data = null,Object? links = null,Object? meta = null,}) {
+  return _then(_self.copyWith(
+data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
+as List<VehicleMake>,links: null == links ? _self.links : links // ignore: cast_nullable_to_non_nullable
+as PaginationLinks,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
+as PaginationMeta,
+  ));
+}
+/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PaginationLinksCopyWith<$Res> get links {
+  
+  return $PaginationLinksCopyWith<$Res>(_self.links, (value) {
+    return _then(_self.copyWith(links: value));
+  });
+}/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PaginationMetaCopyWith<$Res> get meta {
+  
+  return $PaginationMetaCopyWith<$Res>(_self.meta, (value) {
+    return _then(_self.copyWith(meta: value));
+  });
+}
 }
 
-/// @nodoc
-abstract class _$$MakeAndModelResponseImplCopyWith<$Res>
-    implements $MakeAndModelResponseCopyWith<$Res> {
-  factory _$$MakeAndModelResponseImplCopyWith(_$MakeAndModelResponseImpl value,
-          $Res Function(_$MakeAndModelResponseImpl) then) =
-      __$$MakeAndModelResponseImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {List<VehicleMake> data, PaginationLinks links, PaginationMeta meta});
 
-  @override
-  $PaginationLinksCopyWith<$Res> get links;
-  @override
-  $PaginationMetaCopyWith<$Res> get meta;
+/// Adds pattern-matching-related methods to [MakeAndModelResponse].
+extension MakeAndModelResponsePatterns on MakeAndModelResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _MakeAndModelResponse value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _MakeAndModelResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _MakeAndModelResponse value)  $default,){
+final _that = this;
+switch (_that) {
+case _MakeAndModelResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _MakeAndModelResponse value)?  $default,){
+final _that = this;
+switch (_that) {
+case _MakeAndModelResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<VehicleMake> data,  PaginationLinks links,  PaginationMeta meta)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _MakeAndModelResponse() when $default != null:
+return $default(_that.data,_that.links,_that.meta);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<VehicleMake> data,  PaginationLinks links,  PaginationMeta meta)  $default,) {final _that = this;
+switch (_that) {
+case _MakeAndModelResponse():
+return $default(_that.data,_that.links,_that.meta);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<VehicleMake> data,  PaginationLinks links,  PaginationMeta meta)?  $default,) {final _that = this;
+switch (_that) {
+case _MakeAndModelResponse() when $default != null:
+return $default(_that.data,_that.links,_that.meta);case _:
+  return null;
+
+}
 }
 
-/// @nodoc
-class __$$MakeAndModelResponseImplCopyWithImpl<$Res>
-    extends _$MakeAndModelResponseCopyWithImpl<$Res, _$MakeAndModelResponseImpl>
-    implements _$$MakeAndModelResponseImplCopyWith<$Res> {
-  __$$MakeAndModelResponseImplCopyWithImpl(_$MakeAndModelResponseImpl _value,
-      $Res Function(_$MakeAndModelResponseImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? data = null,
-    Object? links = null,
-    Object? meta = null,
-  }) {
-    return _then(_$MakeAndModelResponseImpl(
-      data: null == data
-          ? _value._data
-          : data // ignore: cast_nullable_to_non_nullable
-              as List<VehicleMake>,
-      links: null == links
-          ? _value.links
-          : links // ignore: cast_nullable_to_non_nullable
-              as PaginationLinks,
-      meta: null == meta
-          ? _value.meta
-          : meta // ignore: cast_nullable_to_non_nullable
-              as PaginationMeta,
-    ));
-  }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$MakeAndModelResponseImpl implements _MakeAndModelResponse {
-  const _$MakeAndModelResponseImpl(
-      {required final List<VehicleMake> data,
-      required this.links,
-      required this.meta})
-      : _data = data;
 
-  factory _$MakeAndModelResponseImpl.fromJson(Map<String, dynamic> json) =>
-      _$$MakeAndModelResponseImplFromJson(json);
+class _MakeAndModelResponse implements MakeAndModelResponse {
+  const _MakeAndModelResponse({required final  List<VehicleMake> data, required this.links, required this.meta}): _data = data;
+  factory _MakeAndModelResponse.fromJson(Map<String, dynamic> json) => _$MakeAndModelResponseFromJson(json);
 
-  final List<VehicleMake> _data;
-  @override
-  List<VehicleMake> get data {
-    if (_data is EqualUnmodifiableListView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_data);
-  }
-
-  @override
-  final PaginationLinks links;
-  @override
-  final PaginationMeta meta;
-
-  @override
-  String toString() {
-    return 'MakeAndModelResponse(data: $data, links: $links, meta: $meta)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$MakeAndModelResponseImpl &&
-            const DeepCollectionEquality().equals(other._data, _data) &&
-            (identical(other.links, links) || other.links == links) &&
-            (identical(other.meta, meta) || other.meta == meta));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_data), links, meta);
-
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$MakeAndModelResponseImplCopyWith<_$MakeAndModelResponseImpl>
-      get copyWith =>
-          __$$MakeAndModelResponseImplCopyWithImpl<_$MakeAndModelResponseImpl>(
-              this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$MakeAndModelResponseImplToJson(
-      this,
-    );
-  }
+ final  List<VehicleMake> _data;
+@override List<VehicleMake> get data {
+  if (_data is EqualUnmodifiableListView) return _data;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_data);
 }
 
-abstract class _MakeAndModelResponse implements MakeAndModelResponse {
-  const factory _MakeAndModelResponse(
-      {required final List<VehicleMake> data,
-      required final PaginationLinks links,
-      required final PaginationMeta meta}) = _$MakeAndModelResponseImpl;
+@override final  PaginationLinks links;
+@override final  PaginationMeta meta;
 
-  factory _MakeAndModelResponse.fromJson(Map<String, dynamic> json) =
-      _$MakeAndModelResponseImpl.fromJson;
+/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$MakeAndModelResponseCopyWith<_MakeAndModelResponse> get copyWith => __$MakeAndModelResponseCopyWithImpl<_MakeAndModelResponse>(this, _$identity);
 
-  @override
-  List<VehicleMake> get data;
-  @override
-  PaginationLinks get links;
-  @override
-  PaginationMeta get meta;
-
-  /// Create a copy of MakeAndModelResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MakeAndModelResponseImplCopyWith<_$MakeAndModelResponseImpl>
-      get copyWith => throw _privateConstructorUsedError;
+@override
+Map<String, dynamic> toJson() {
+  return _$MakeAndModelResponseToJson(this, );
 }
 
-VehicleMake _$VehicleMakeFromJson(Map<String, dynamic> json) {
-  return _VehicleMake.fromJson(json);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MakeAndModelResponse&&const DeepCollectionEquality().equals(other._data, _data)&&(identical(other.links, links) || other.links == links)&&(identical(other.meta, meta) || other.meta == meta));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_data),links,meta);
+
+@override
+String toString() {
+  return 'MakeAndModelResponse(data: $data, links: $links, meta: $meta)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$MakeAndModelResponseCopyWith<$Res> implements $MakeAndModelResponseCopyWith<$Res> {
+  factory _$MakeAndModelResponseCopyWith(_MakeAndModelResponse value, $Res Function(_MakeAndModelResponse) _then) = __$MakeAndModelResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ List<VehicleMake> data, PaginationLinks links, PaginationMeta meta
+});
+
+
+@override $PaginationLinksCopyWith<$Res> get links;@override $PaginationMetaCopyWith<$Res> get meta;
+
+}
+/// @nodoc
+class __$MakeAndModelResponseCopyWithImpl<$Res>
+    implements _$MakeAndModelResponseCopyWith<$Res> {
+  __$MakeAndModelResponseCopyWithImpl(this._self, this._then);
+
+  final _MakeAndModelResponse _self;
+  final $Res Function(_MakeAndModelResponse) _then;
+
+/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? data = null,Object? links = null,Object? meta = null,}) {
+  return _then(_MakeAndModelResponse(
+data: null == data ? _self._data : data // ignore: cast_nullable_to_non_nullable
+as List<VehicleMake>,links: null == links ? _self.links : links // ignore: cast_nullable_to_non_nullable
+as PaginationLinks,meta: null == meta ? _self.meta : meta // ignore: cast_nullable_to_non_nullable
+as PaginationMeta,
+  ));
+}
+
+/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PaginationLinksCopyWith<$Res> get links {
+  
+  return $PaginationLinksCopyWith<$Res>(_self.links, (value) {
+    return _then(_self.copyWith(links: value));
+  });
+}/// Create a copy of MakeAndModelResponse
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$PaginationMetaCopyWith<$Res> get meta {
+  
+  return $PaginationMetaCopyWith<$Res>(_self.meta, (value) {
+    return _then(_self.copyWith(meta: value));
+  });
+}
+}
+
 
 /// @nodoc
 mixin _$VehicleMake {
-  @JsonKey(fromJson: _parseInt)
-  int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id', fromJson: _parseInt)
-  int? get userId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  String? get image => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_models')
-  List<VehicleModel> get models => throw _privateConstructorUsedError;
+
+@JsonKey(fromJson: _parseInt) int get id;@JsonKey(name: 'user_id', fromJson: _parseInt) int? get userId; String get name; String get slug; String? get image;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;@JsonKey(name: 'brand_models') List<VehicleModel> get models;
+/// Create a copy of VehicleMake
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$VehicleMakeCopyWith<VehicleMake> get copyWith => _$VehicleMakeCopyWithImpl<VehicleMake>(this as VehicleMake, _$identity);
 
   /// Serializes this VehicleMake to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of VehicleMake
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $VehicleMakeCopyWith<VehicleMake> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VehicleMake&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.image, image) || other.image == image)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other.models, models));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,userId,name,slug,image,createdAt,updatedAt,const DeepCollectionEquality().hash(models));
+
+@override
+String toString() {
+  return 'VehicleMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt, models: $models)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $VehicleMakeCopyWith<$Res> {
-  factory $VehicleMakeCopyWith(
-          VehicleMake value, $Res Function(VehicleMake) then) =
-      _$VehicleMakeCopyWithImpl<$Res, VehicleMake>;
-  @useResult
-  $Res call(
-      {@JsonKey(fromJson: _parseInt) int id,
-      @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
-      String name,
-      String slug,
-      String? image,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @JsonKey(name: 'brand_models') List<VehicleModel> models});
-}
+abstract mixin class $VehicleMakeCopyWith<$Res>  {
+  factory $VehicleMakeCopyWith(VehicleMake value, $Res Function(VehicleMake) _then) = _$VehicleMakeCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(fromJson: _parseInt) int id,@JsonKey(name: 'user_id', fromJson: _parseInt) int? userId, String name, String slug, String? image,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt,@JsonKey(name: 'brand_models') List<VehicleModel> models
+});
 
+
+
+
+}
 /// @nodoc
-class _$VehicleMakeCopyWithImpl<$Res, $Val extends VehicleMake>
+class _$VehicleMakeCopyWithImpl<$Res>
     implements $VehicleMakeCopyWith<$Res> {
-  _$VehicleMakeCopyWithImpl(this._value, this._then);
+  _$VehicleMakeCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final VehicleMake _self;
+  final $Res Function(VehicleMake) _then;
 
-  /// Create a copy of VehicleMake
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = freezed,
-    Object? name = null,
-    Object? slug = null,
-    Object? image = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-    Object? models = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      models: null == models
-          ? _value.models
-          : models // ignore: cast_nullable_to_non_nullable
-              as List<VehicleModel>,
-    ) as $Val);
-  }
+/// Create a copy of VehicleMake
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = freezed,Object? name = null,Object? slug = null,Object? image = freezed,Object? createdAt = null,Object? updatedAt = null,Object? models = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as int?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
+as String,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,models: null == models ? _self.models : models // ignore: cast_nullable_to_non_nullable
+as List<VehicleModel>,
+  ));
 }
 
-/// @nodoc
-abstract class _$$VehicleMakeImplCopyWith<$Res>
-    implements $VehicleMakeCopyWith<$Res> {
-  factory _$$VehicleMakeImplCopyWith(
-          _$VehicleMakeImpl value, $Res Function(_$VehicleMakeImpl) then) =
-      __$$VehicleMakeImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {@JsonKey(fromJson: _parseInt) int id,
-      @JsonKey(name: 'user_id', fromJson: _parseInt) int? userId,
-      String name,
-      String slug,
-      String? image,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt,
-      @JsonKey(name: 'brand_models') List<VehicleModel> models});
 }
 
-/// @nodoc
-class __$$VehicleMakeImplCopyWithImpl<$Res>
-    extends _$VehicleMakeCopyWithImpl<$Res, _$VehicleMakeImpl>
-    implements _$$VehicleMakeImplCopyWith<$Res> {
-  __$$VehicleMakeImplCopyWithImpl(
-      _$VehicleMakeImpl _value, $Res Function(_$VehicleMakeImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of VehicleMake
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = freezed,
-    Object? name = null,
-    Object? slug = null,
-    Object? image = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-    Object? models = null,
-  }) {
-    return _then(_$VehicleMakeImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int?,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      image: freezed == image
-          ? _value.image
-          : image // ignore: cast_nullable_to_non_nullable
-              as String?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      models: null == models
-          ? _value._models
-          : models // ignore: cast_nullable_to_non_nullable
-              as List<VehicleModel>,
-    ));
-  }
+/// Adds pattern-matching-related methods to [VehicleMake].
+extension VehicleMakePatterns on VehicleMake {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VehicleMake value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _VehicleMake() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VehicleMake value)  $default,){
+final _that = this;
+switch (_that) {
+case _VehicleMake():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VehicleMake value)?  $default,){
+final _that = this;
+switch (_that) {
+case _VehicleMake() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _parseInt)  int id, @JsonKey(name: 'user_id', fromJson: _parseInt)  int? userId,  String name,  String slug,  String? image, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt, @JsonKey(name: 'brand_models')  List<VehicleModel> models)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _VehicleMake() when $default != null:
+return $default(_that.id,_that.userId,_that.name,_that.slug,_that.image,_that.createdAt,_that.updatedAt,_that.models);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _parseInt)  int id, @JsonKey(name: 'user_id', fromJson: _parseInt)  int? userId,  String name,  String slug,  String? image, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt, @JsonKey(name: 'brand_models')  List<VehicleModel> models)  $default,) {final _that = this;
+switch (_that) {
+case _VehicleMake():
+return $default(_that.id,_that.userId,_that.name,_that.slug,_that.image,_that.createdAt,_that.updatedAt,_that.models);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _parseInt)  int id, @JsonKey(name: 'user_id', fromJson: _parseInt)  int? userId,  String name,  String slug,  String? image, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt, @JsonKey(name: 'brand_models')  List<VehicleModel> models)?  $default,) {final _that = this;
+switch (_that) {
+case _VehicleMake() when $default != null:
+return $default(_that.id,_that.userId,_that.name,_that.slug,_that.image,_that.createdAt,_that.updatedAt,_that.models);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$VehicleMakeImpl implements _VehicleMake {
-  const _$VehicleMakeImpl(
-      {@JsonKey(fromJson: _parseInt) required this.id,
-      @JsonKey(name: 'user_id', fromJson: _parseInt) this.userId,
-      required this.name,
-      required this.slug,
-      this.image,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt,
-      @JsonKey(name: 'brand_models') required final List<VehicleModel> models})
-      : _models = models;
 
-  factory _$VehicleMakeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$VehicleMakeImplFromJson(json);
+class _VehicleMake implements VehicleMake {
+  const _VehicleMake({@JsonKey(fromJson: _parseInt) required this.id, @JsonKey(name: 'user_id', fromJson: _parseInt) this.userId, required this.name, required this.slug, this.image, @JsonKey(name: 'created_at') required this.createdAt, @JsonKey(name: 'updated_at') required this.updatedAt, @JsonKey(name: 'brand_models') required final  List<VehicleModel> models}): _models = models;
+  factory _VehicleMake.fromJson(Map<String, dynamic> json) => _$VehicleMakeFromJson(json);
 
-  @override
-  @JsonKey(fromJson: _parseInt)
-  final int id;
-  @override
-  @JsonKey(name: 'user_id', fromJson: _parseInt)
-  final int? userId;
-  @override
-  final String name;
-  @override
-  final String slug;
-  @override
-  final String? image;
-  @override
-  @JsonKey(name: 'created_at')
-  final DateTime createdAt;
-  @override
-  @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
-  final List<VehicleModel> _models;
-  @override
-  @JsonKey(name: 'brand_models')
-  List<VehicleModel> get models {
-    if (_models is EqualUnmodifiableListView) return _models;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_models);
-  }
-
-  @override
-  String toString() {
-    return 'VehicleMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt, models: $models)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$VehicleMakeImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.slug, slug) || other.slug == slug) &&
-            (identical(other.image, image) || other.image == image) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt) &&
-            const DeepCollectionEquality().equals(other._models, _models));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, id, userId, name, slug, image,
-      createdAt, updatedAt, const DeepCollectionEquality().hash(_models));
-
-  /// Create a copy of VehicleMake
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$VehicleMakeImplCopyWith<_$VehicleMakeImpl> get copyWith =>
-      __$$VehicleMakeImplCopyWithImpl<_$VehicleMakeImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$VehicleMakeImplToJson(
-      this,
-    );
-  }
+@override@JsonKey(fromJson: _parseInt) final  int id;
+@override@JsonKey(name: 'user_id', fromJson: _parseInt) final  int? userId;
+@override final  String name;
+@override final  String slug;
+@override final  String? image;
+@override@JsonKey(name: 'created_at') final  DateTime createdAt;
+@override@JsonKey(name: 'updated_at') final  DateTime updatedAt;
+ final  List<VehicleModel> _models;
+@override@JsonKey(name: 'brand_models') List<VehicleModel> get models {
+  if (_models is EqualUnmodifiableListView) return _models;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_models);
 }
 
-abstract class _VehicleMake implements VehicleMake {
-  const factory _VehicleMake(
-      {@JsonKey(fromJson: _parseInt) required final int id,
-      @JsonKey(name: 'user_id', fromJson: _parseInt) final int? userId,
-      required final String name,
-      required final String slug,
-      final String? image,
-      @JsonKey(name: 'created_at') required final DateTime createdAt,
-      @JsonKey(name: 'updated_at') required final DateTime updatedAt,
-      @JsonKey(name: 'brand_models')
-      required final List<VehicleModel> models}) = _$VehicleMakeImpl;
 
-  factory _VehicleMake.fromJson(Map<String, dynamic> json) =
-      _$VehicleMakeImpl.fromJson;
+/// Create a copy of VehicleMake
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$VehicleMakeCopyWith<_VehicleMake> get copyWith => __$VehicleMakeCopyWithImpl<_VehicleMake>(this, _$identity);
 
-  @override
-  @JsonKey(fromJson: _parseInt)
-  int get id;
-  @override
-  @JsonKey(name: 'user_id', fromJson: _parseInt)
-  int? get userId;
-  @override
-  String get name;
-  @override
-  String get slug;
-  @override
-  String? get image;
-  @override
-  @JsonKey(name: 'created_at')
-  DateTime get createdAt;
-  @override
-  @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
-  @override
-  @JsonKey(name: 'brand_models')
-  List<VehicleModel> get models;
-
-  /// Create a copy of VehicleMake
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$VehicleMakeImplCopyWith<_$VehicleMakeImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+Map<String, dynamic> toJson() {
+  return _$VehicleMakeToJson(this, );
 }
 
-VehicleModel _$VehicleModelFromJson(Map<String, dynamic> json) {
-  return _VehicleModel.fromJson(json);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VehicleMake&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.image, image) || other.image == image)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&const DeepCollectionEquality().equals(other._models, _models));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,userId,name,slug,image,createdAt,updatedAt,const DeepCollectionEquality().hash(_models));
+
+@override
+String toString() {
+  return 'VehicleMake(id: $id, userId: $userId, name: $name, slug: $slug, image: $image, createdAt: $createdAt, updatedAt: $updatedAt, models: $models)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$VehicleMakeCopyWith<$Res> implements $VehicleMakeCopyWith<$Res> {
+  factory _$VehicleMakeCopyWith(_VehicleMake value, $Res Function(_VehicleMake) _then) = __$VehicleMakeCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(fromJson: _parseInt) int id,@JsonKey(name: 'user_id', fromJson: _parseInt) int? userId, String name, String slug, String? image,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt,@JsonKey(name: 'brand_models') List<VehicleModel> models
+});
+
+
+
+
+}
+/// @nodoc
+class __$VehicleMakeCopyWithImpl<$Res>
+    implements _$VehicleMakeCopyWith<$Res> {
+  __$VehicleMakeCopyWithImpl(this._self, this._then);
+
+  final _VehicleMake _self;
+  final $Res Function(_VehicleMake) _then;
+
+/// Create a copy of VehicleMake
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = freezed,Object? name = null,Object? slug = null,Object? image = freezed,Object? createdAt = null,Object? updatedAt = null,Object? models = null,}) {
+  return _then(_VehicleMake(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,userId: freezed == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as int?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
+as String,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,models: null == models ? _self._models : models // ignore: cast_nullable_to_non_nullable
+as List<VehicleModel>,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$VehicleModel {
-  @JsonKey(fromJson: _parseInt)
-  int get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'brand_id', fromJson: _parseInt)
-  int get makeId => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  String get slug => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'updated_at')
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+
+@JsonKey(fromJson: _parseInt) int get id;@JsonKey(name: 'brand_id', fromJson: _parseInt) int get makeId; String get name; String get slug;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
+/// Create a copy of VehicleModel
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$VehicleModelCopyWith<VehicleModel> get copyWith => _$VehicleModelCopyWithImpl<VehicleModel>(this as VehicleModel, _$identity);
 
   /// Serializes this VehicleModel to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of VehicleModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $VehicleModelCopyWith<VehicleModel> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VehicleModel&&(identical(other.id, id) || other.id == id)&&(identical(other.makeId, makeId) || other.makeId == makeId)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,makeId,name,slug,createdAt,updatedAt);
+
+@override
+String toString() {
+  return 'VehicleModel(id: $id, makeId: $makeId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $VehicleModelCopyWith<$Res> {
-  factory $VehicleModelCopyWith(
-          VehicleModel value, $Res Function(VehicleModel) then) =
-      _$VehicleModelCopyWithImpl<$Res, VehicleModel>;
-  @useResult
-  $Res call(
-      {@JsonKey(fromJson: _parseInt) int id,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) int makeId,
-      String name,
-      String slug,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
-}
+abstract mixin class $VehicleModelCopyWith<$Res>  {
+  factory $VehicleModelCopyWith(VehicleModel value, $Res Function(VehicleModel) _then) = _$VehicleModelCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(fromJson: _parseInt) int id,@JsonKey(name: 'brand_id', fromJson: _parseInt) int makeId, String name, String slug,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+});
 
+
+
+
+}
 /// @nodoc
-class _$VehicleModelCopyWithImpl<$Res, $Val extends VehicleModel>
+class _$VehicleModelCopyWithImpl<$Res>
     implements $VehicleModelCopyWith<$Res> {
-  _$VehicleModelCopyWithImpl(this._value, this._then);
+  _$VehicleModelCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final VehicleModel _self;
+  final $Res Function(VehicleModel) _then;
 
-  /// Create a copy of VehicleModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? makeId = null,
-    Object? name = null,
-    Object? slug = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      makeId: null == makeId
-          ? _value.makeId
-          : makeId // ignore: cast_nullable_to_non_nullable
-              as int,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
-  }
+/// Create a copy of VehicleModel
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? makeId = null,Object? name = null,Object? slug = null,Object? createdAt = null,Object? updatedAt = null,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,makeId: null == makeId ? _self.makeId : makeId // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
 }
 
-/// @nodoc
-abstract class _$$VehicleModelImplCopyWith<$Res>
-    implements $VehicleModelCopyWith<$Res> {
-  factory _$$VehicleModelImplCopyWith(
-          _$VehicleModelImpl value, $Res Function(_$VehicleModelImpl) then) =
-      __$$VehicleModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {@JsonKey(fromJson: _parseInt) int id,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) int makeId,
-      String name,
-      String slug,
-      @JsonKey(name: 'created_at') DateTime createdAt,
-      @JsonKey(name: 'updated_at') DateTime updatedAt});
 }
 
-/// @nodoc
-class __$$VehicleModelImplCopyWithImpl<$Res>
-    extends _$VehicleModelCopyWithImpl<$Res, _$VehicleModelImpl>
-    implements _$$VehicleModelImplCopyWith<$Res> {
-  __$$VehicleModelImplCopyWithImpl(
-      _$VehicleModelImpl _value, $Res Function(_$VehicleModelImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of VehicleModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? makeId = null,
-    Object? name = null,
-    Object? slug = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_$VehicleModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as int,
-      makeId: null == makeId
-          ? _value.makeId
-          : makeId // ignore: cast_nullable_to_non_nullable
-              as int,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      slug: null == slug
-          ? _value.slug
-          : slug // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ));
-  }
+/// Adds pattern-matching-related methods to [VehicleModel].
+extension VehicleModelPatterns on VehicleModel {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VehicleModel value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _VehicleModel() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VehicleModel value)  $default,){
+final _that = this;
+switch (_that) {
+case _VehicleModel():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VehicleModel value)?  $default,){
+final _that = this;
+switch (_that) {
+case _VehicleModel() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _parseInt)  int id, @JsonKey(name: 'brand_id', fromJson: _parseInt)  int makeId,  String name,  String slug, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _VehicleModel() when $default != null:
+return $default(_that.id,_that.makeId,_that.name,_that.slug,_that.createdAt,_that.updatedAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: _parseInt)  int id, @JsonKey(name: 'brand_id', fromJson: _parseInt)  int makeId,  String name,  String slug, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
+switch (_that) {
+case _VehicleModel():
+return $default(_that.id,_that.makeId,_that.name,_that.slug,_that.createdAt,_that.updatedAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: _parseInt)  int id, @JsonKey(name: 'brand_id', fromJson: _parseInt)  int makeId,  String name,  String slug, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
+switch (_that) {
+case _VehicleModel() when $default != null:
+return $default(_that.id,_that.makeId,_that.name,_that.slug,_that.createdAt,_that.updatedAt);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$VehicleModelImpl implements _VehicleModel {
-  const _$VehicleModelImpl(
-      {@JsonKey(fromJson: _parseInt) required this.id,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) required this.makeId,
-      required this.name,
-      required this.slug,
-      @JsonKey(name: 'created_at') required this.createdAt,
-      @JsonKey(name: 'updated_at') required this.updatedAt});
 
-  factory _$VehicleModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$VehicleModelImplFromJson(json);
+class _VehicleModel implements VehicleModel {
+  const _VehicleModel({@JsonKey(fromJson: _parseInt) required this.id, @JsonKey(name: 'brand_id', fromJson: _parseInt) required this.makeId, required this.name, required this.slug, @JsonKey(name: 'created_at') required this.createdAt, @JsonKey(name: 'updated_at') required this.updatedAt});
+  factory _VehicleModel.fromJson(Map<String, dynamic> json) => _$VehicleModelFromJson(json);
 
-  @override
-  @JsonKey(fromJson: _parseInt)
-  final int id;
-  @override
-  @JsonKey(name: 'brand_id', fromJson: _parseInt)
-  final int makeId;
-  @override
-  final String name;
-  @override
-  final String slug;
-  @override
-  @JsonKey(name: 'created_at')
-  final DateTime createdAt;
-  @override
-  @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+@override@JsonKey(fromJson: _parseInt) final  int id;
+@override@JsonKey(name: 'brand_id', fromJson: _parseInt) final  int makeId;
+@override final  String name;
+@override final  String slug;
+@override@JsonKey(name: 'created_at') final  DateTime createdAt;
+@override@JsonKey(name: 'updated_at') final  DateTime updatedAt;
 
-  @override
-  String toString() {
-    return 'VehicleModel(id: $id, makeId: $makeId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
-  }
+/// Create a copy of VehicleModel
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$VehicleModelCopyWith<_VehicleModel> get copyWith => __$VehicleModelCopyWithImpl<_VehicleModel>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$VehicleModelImpl &&
-            (identical(other.id, id) || other.id == id) &&
-            (identical(other.makeId, makeId) || other.makeId == makeId) &&
-            (identical(other.name, name) || other.name == name) &&
-            (identical(other.slug, slug) || other.slug == slug) &&
-            (identical(other.createdAt, createdAt) ||
-                other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, makeId, name, slug, createdAt, updatedAt);
-
-  /// Create a copy of VehicleModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$VehicleModelImplCopyWith<_$VehicleModelImpl> get copyWith =>
-      __$$VehicleModelImplCopyWithImpl<_$VehicleModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$VehicleModelImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$VehicleModelToJson(this, );
 }
 
-abstract class _VehicleModel implements VehicleModel {
-  const factory _VehicleModel(
-      {@JsonKey(fromJson: _parseInt) required final int id,
-      @JsonKey(name: 'brand_id', fromJson: _parseInt) required final int makeId,
-      required final String name,
-      required final String slug,
-      @JsonKey(name: 'created_at') required final DateTime createdAt,
-      @JsonKey(name: 'updated_at')
-      required final DateTime updatedAt}) = _$VehicleModelImpl;
-
-  factory _VehicleModel.fromJson(Map<String, dynamic> json) =
-      _$VehicleModelImpl.fromJson;
-
-  @override
-  @JsonKey(fromJson: _parseInt)
-  int get id;
-  @override
-  @JsonKey(name: 'brand_id', fromJson: _parseInt)
-  int get makeId;
-  @override
-  String get name;
-  @override
-  String get slug;
-  @override
-  @JsonKey(name: 'created_at')
-  DateTime get createdAt;
-  @override
-  @JsonKey(name: 'updated_at')
-  DateTime get updatedAt;
-
-  /// Create a copy of VehicleModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$VehicleModelImplCopyWith<_$VehicleModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VehicleModel&&(identical(other.id, id) || other.id == id)&&(identical(other.makeId, makeId) || other.makeId == makeId)&&(identical(other.name, name) || other.name == name)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
-PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) {
-  return _PaginationLinks.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,makeId,name,slug,createdAt,updatedAt);
+
+@override
+String toString() {
+  return 'VehicleModel(id: $id, makeId: $makeId, name: $name, slug: $slug, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$VehicleModelCopyWith<$Res> implements $VehicleModelCopyWith<$Res> {
+  factory _$VehicleModelCopyWith(_VehicleModel value, $Res Function(_VehicleModel) _then) = __$VehicleModelCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(fromJson: _parseInt) int id,@JsonKey(name: 'brand_id', fromJson: _parseInt) int makeId, String name, String slug,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$VehicleModelCopyWithImpl<$Res>
+    implements _$VehicleModelCopyWith<$Res> {
+  __$VehicleModelCopyWithImpl(this._self, this._then);
+
+  final _VehicleModel _self;
+  final $Res Function(_VehicleModel) _then;
+
+/// Create a copy of VehicleModel
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? makeId = null,Object? name = null,Object? slug = null,Object? createdAt = null,Object? updatedAt = null,}) {
+  return _then(_VehicleModel(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as int,makeId: null == makeId ? _self.makeId : makeId // ignore: cast_nullable_to_non_nullable
+as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
+as String,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$PaginationLinks {
-  String get first => throw _privateConstructorUsedError;
-  String get last => throw _privateConstructorUsedError;
-  String? get prev => throw _privateConstructorUsedError;
-  String? get next => throw _privateConstructorUsedError;
+
+ String get first; String get last; String? get prev; String? get next;
+/// Create a copy of PaginationLinks
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaginationLinksCopyWith<PaginationLinks> get copyWith => _$PaginationLinksCopyWithImpl<PaginationLinks>(this as PaginationLinks, _$identity);
 
   /// Serializes this PaginationLinks to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of PaginationLinks
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $PaginationLinksCopyWith<PaginationLinks> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaginationLinks&&(identical(other.first, first) || other.first == first)&&(identical(other.last, last) || other.last == last)&&(identical(other.prev, prev) || other.prev == prev)&&(identical(other.next, next) || other.next == next));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,first,last,prev,next);
+
+@override
+String toString() {
+  return 'PaginationLinks(first: $first, last: $last, prev: $prev, next: $next)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $PaginationLinksCopyWith<$Res> {
-  factory $PaginationLinksCopyWith(
-          PaginationLinks value, $Res Function(PaginationLinks) then) =
-      _$PaginationLinksCopyWithImpl<$Res, PaginationLinks>;
-  @useResult
-  $Res call({String first, String last, String? prev, String? next});
-}
+abstract mixin class $PaginationLinksCopyWith<$Res>  {
+  factory $PaginationLinksCopyWith(PaginationLinks value, $Res Function(PaginationLinks) _then) = _$PaginationLinksCopyWithImpl;
+@useResult
+$Res call({
+ String first, String last, String? prev, String? next
+});
 
+
+
+
+}
 /// @nodoc
-class _$PaginationLinksCopyWithImpl<$Res, $Val extends PaginationLinks>
+class _$PaginationLinksCopyWithImpl<$Res>
     implements $PaginationLinksCopyWith<$Res> {
-  _$PaginationLinksCopyWithImpl(this._value, this._then);
+  _$PaginationLinksCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final PaginationLinks _self;
+  final $Res Function(PaginationLinks) _then;
 
-  /// Create a copy of PaginationLinks
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? first = null,
-    Object? last = null,
-    Object? prev = freezed,
-    Object? next = freezed,
-  }) {
-    return _then(_value.copyWith(
-      first: null == first
-          ? _value.first
-          : first // ignore: cast_nullable_to_non_nullable
-              as String,
-      last: null == last
-          ? _value.last
-          : last // ignore: cast_nullable_to_non_nullable
-              as String,
-      prev: freezed == prev
-          ? _value.prev
-          : prev // ignore: cast_nullable_to_non_nullable
-              as String?,
-      next: freezed == next
-          ? _value.next
-          : next // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
-  }
+/// Create a copy of PaginationLinks
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? first = null,Object? last = null,Object? prev = freezed,Object? next = freezed,}) {
+  return _then(_self.copyWith(
+first: null == first ? _self.first : first // ignore: cast_nullable_to_non_nullable
+as String,last: null == last ? _self.last : last // ignore: cast_nullable_to_non_nullable
+as String,prev: freezed == prev ? _self.prev : prev // ignore: cast_nullable_to_non_nullable
+as String?,next: freezed == next ? _self.next : next // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$PaginationLinksImplCopyWith<$Res>
-    implements $PaginationLinksCopyWith<$Res> {
-  factory _$$PaginationLinksImplCopyWith(_$PaginationLinksImpl value,
-          $Res Function(_$PaginationLinksImpl) then) =
-      __$$PaginationLinksImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String first, String last, String? prev, String? next});
 }
 
-/// @nodoc
-class __$$PaginationLinksImplCopyWithImpl<$Res>
-    extends _$PaginationLinksCopyWithImpl<$Res, _$PaginationLinksImpl>
-    implements _$$PaginationLinksImplCopyWith<$Res> {
-  __$$PaginationLinksImplCopyWithImpl(
-      _$PaginationLinksImpl _value, $Res Function(_$PaginationLinksImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of PaginationLinks
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? first = null,
-    Object? last = null,
-    Object? prev = freezed,
-    Object? next = freezed,
-  }) {
-    return _then(_$PaginationLinksImpl(
-      first: null == first
-          ? _value.first
-          : first // ignore: cast_nullable_to_non_nullable
-              as String,
-      last: null == last
-          ? _value.last
-          : last // ignore: cast_nullable_to_non_nullable
-              as String,
-      prev: freezed == prev
-          ? _value.prev
-          : prev // ignore: cast_nullable_to_non_nullable
-              as String?,
-      next: freezed == next
-          ? _value.next
-          : next // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
+/// Adds pattern-matching-related methods to [PaginationLinks].
+extension PaginationLinksPatterns on PaginationLinks {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PaginationLinks value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PaginationLinks() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PaginationLinks value)  $default,){
+final _that = this;
+switch (_that) {
+case _PaginationLinks():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PaginationLinks value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PaginationLinks() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String first,  String last,  String? prev,  String? next)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PaginationLinks() when $default != null:
+return $default(_that.first,_that.last,_that.prev,_that.next);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String first,  String last,  String? prev,  String? next)  $default,) {final _that = this;
+switch (_that) {
+case _PaginationLinks():
+return $default(_that.first,_that.last,_that.prev,_that.next);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String first,  String last,  String? prev,  String? next)?  $default,) {final _that = this;
+switch (_that) {
+case _PaginationLinks() when $default != null:
+return $default(_that.first,_that.last,_that.prev,_that.next);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$PaginationLinksImpl implements _PaginationLinks {
-  const _$PaginationLinksImpl(
-      {required this.first,
-      required this.last,
-      required this.prev,
-      required this.next});
 
-  factory _$PaginationLinksImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PaginationLinksImplFromJson(json);
+class _PaginationLinks implements PaginationLinks {
+  const _PaginationLinks({required this.first, required this.last, required this.prev, required this.next});
+  factory _PaginationLinks.fromJson(Map<String, dynamic> json) => _$PaginationLinksFromJson(json);
 
-  @override
-  final String first;
-  @override
-  final String last;
-  @override
-  final String? prev;
-  @override
-  final String? next;
+@override final  String first;
+@override final  String last;
+@override final  String? prev;
+@override final  String? next;
 
-  @override
-  String toString() {
-    return 'PaginationLinks(first: $first, last: $last, prev: $prev, next: $next)';
-  }
+/// Create a copy of PaginationLinks
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PaginationLinksCopyWith<_PaginationLinks> get copyWith => __$PaginationLinksCopyWithImpl<_PaginationLinks>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$PaginationLinksImpl &&
-            (identical(other.first, first) || other.first == first) &&
-            (identical(other.last, last) || other.last == last) &&
-            (identical(other.prev, prev) || other.prev == prev) &&
-            (identical(other.next, next) || other.next == next));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, first, last, prev, next);
-
-  /// Create a copy of PaginationLinks
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$PaginationLinksImplCopyWith<_$PaginationLinksImpl> get copyWith =>
-      __$$PaginationLinksImplCopyWithImpl<_$PaginationLinksImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PaginationLinksImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$PaginationLinksToJson(this, );
 }
 
-abstract class _PaginationLinks implements PaginationLinks {
-  const factory _PaginationLinks(
-      {required final String first,
-      required final String last,
-      required final String? prev,
-      required final String? next}) = _$PaginationLinksImpl;
-
-  factory _PaginationLinks.fromJson(Map<String, dynamic> json) =
-      _$PaginationLinksImpl.fromJson;
-
-  @override
-  String get first;
-  @override
-  String get last;
-  @override
-  String? get prev;
-  @override
-  String? get next;
-
-  /// Create a copy of PaginationLinks
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PaginationLinksImplCopyWith<_$PaginationLinksImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaginationLinks&&(identical(other.first, first) || other.first == first)&&(identical(other.last, last) || other.last == last)&&(identical(other.prev, prev) || other.prev == prev)&&(identical(other.next, next) || other.next == next));
 }
 
-PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) {
-  return _PaginationMeta.fromJson(json);
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,first,last,prev,next);
+
+@override
+String toString() {
+  return 'PaginationLinks(first: $first, last: $last, prev: $prev, next: $next)';
 }
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PaginationLinksCopyWith<$Res> implements $PaginationLinksCopyWith<$Res> {
+  factory _$PaginationLinksCopyWith(_PaginationLinks value, $Res Function(_PaginationLinks) _then) = __$PaginationLinksCopyWithImpl;
+@override @useResult
+$Res call({
+ String first, String last, String? prev, String? next
+});
+
+
+
+
+}
+/// @nodoc
+class __$PaginationLinksCopyWithImpl<$Res>
+    implements _$PaginationLinksCopyWith<$Res> {
+  __$PaginationLinksCopyWithImpl(this._self, this._then);
+
+  final _PaginationLinks _self;
+  final $Res Function(_PaginationLinks) _then;
+
+/// Create a copy of PaginationLinks
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? first = null,Object? last = null,Object? prev = freezed,Object? next = freezed,}) {
+  return _then(_PaginationLinks(
+first: null == first ? _self.first : first // ignore: cast_nullable_to_non_nullable
+as String,last: null == last ? _self.last : last // ignore: cast_nullable_to_non_nullable
+as String,prev: freezed == prev ? _self.prev : prev // ignore: cast_nullable_to_non_nullable
+as String?,next: freezed == next ? _self.next : next // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$PaginationMeta {
-  @JsonKey(name: 'current_page', fromJson: _parseInt)
-  int get currentPage => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _parseInt)
-  int get from => throw _privateConstructorUsedError;
-  @JsonKey(name: 'last_page', fromJson: _parseInt)
-  int get lastPage => throw _privateConstructorUsedError;
-  List<PaginationLink> get links => throw _privateConstructorUsedError;
-  String get path => throw _privateConstructorUsedError;
-  @JsonKey(name: 'per_page', fromJson: _parseInt)
-  int get perPage => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _parseInt)
-  int get to => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _parseInt)
-  int get total => throw _privateConstructorUsedError;
+
+@JsonKey(name: 'current_page', fromJson: _parseInt) int get currentPage;@JsonKey(fromJson: _parseInt) int get from;@JsonKey(name: 'last_page', fromJson: _parseInt) int get lastPage; List<PaginationLink> get links; String get path;@JsonKey(name: 'per_page', fromJson: _parseInt) int get perPage;@JsonKey(fromJson: _parseInt) int get to;@JsonKey(fromJson: _parseInt) int get total;
+/// Create a copy of PaginationMeta
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaginationMetaCopyWith<PaginationMeta> get copyWith => _$PaginationMetaCopyWithImpl<PaginationMeta>(this as PaginationMeta, _$identity);
 
   /// Serializes this PaginationMeta to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of PaginationMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $PaginationMetaCopyWith<PaginationMeta> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaginationMeta&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.from, from) || other.from == from)&&(identical(other.lastPage, lastPage) || other.lastPage == lastPage)&&const DeepCollectionEquality().equals(other.links, links)&&(identical(other.path, path) || other.path == path)&&(identical(other.perPage, perPage) || other.perPage == perPage)&&(identical(other.to, to) || other.to == to)&&(identical(other.total, total) || other.total == total));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,currentPage,from,lastPage,const DeepCollectionEquality().hash(links),path,perPage,to,total);
+
+@override
+String toString() {
+  return 'PaginationMeta(currentPage: $currentPage, from: $from, lastPage: $lastPage, links: $links, path: $path, perPage: $perPage, to: $to, total: $total)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $PaginationMetaCopyWith<$Res> {
-  factory $PaginationMetaCopyWith(
-          PaginationMeta value, $Res Function(PaginationMeta) then) =
-      _$PaginationMetaCopyWithImpl<$Res, PaginationMeta>;
-  @useResult
-  $Res call(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
-      @JsonKey(fromJson: _parseInt) int from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
-      List<PaginationLink> links,
-      String path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
-      @JsonKey(fromJson: _parseInt) int to,
-      @JsonKey(fromJson: _parseInt) int total});
-}
+abstract mixin class $PaginationMetaCopyWith<$Res>  {
+  factory $PaginationMetaCopyWith(PaginationMeta value, $Res Function(PaginationMeta) _then) = _$PaginationMetaCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,@JsonKey(fromJson: _parseInt) int from,@JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage, List<PaginationLink> links, String path,@JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,@JsonKey(fromJson: _parseInt) int to,@JsonKey(fromJson: _parseInt) int total
+});
 
+
+
+
+}
 /// @nodoc
-class _$PaginationMetaCopyWithImpl<$Res, $Val extends PaginationMeta>
+class _$PaginationMetaCopyWithImpl<$Res>
     implements $PaginationMetaCopyWith<$Res> {
-  _$PaginationMetaCopyWithImpl(this._value, this._then);
+  _$PaginationMetaCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final PaginationMeta _self;
+  final $Res Function(PaginationMeta) _then;
 
-  /// Create a copy of PaginationMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? currentPage = null,
-    Object? from = null,
-    Object? lastPage = null,
-    Object? links = null,
-    Object? path = null,
-    Object? perPage = null,
-    Object? to = null,
-    Object? total = null,
-  }) {
-    return _then(_value.copyWith(
-      currentPage: null == currentPage
-          ? _value.currentPage
-          : currentPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      from: null == from
-          ? _value.from
-          : from // ignore: cast_nullable_to_non_nullable
-              as int,
-      lastPage: null == lastPage
-          ? _value.lastPage
-          : lastPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      links: null == links
-          ? _value.links
-          : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationLink>,
-      path: null == path
-          ? _value.path
-          : path // ignore: cast_nullable_to_non_nullable
-              as String,
-      perPage: null == perPage
-          ? _value.perPage
-          : perPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      to: null == to
-          ? _value.to
-          : to // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
-  }
+/// Create a copy of PaginationMeta
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? currentPage = null,Object? from = null,Object? lastPage = null,Object? links = null,Object? path = null,Object? perPage = null,Object? to = null,Object? total = null,}) {
+  return _then(_self.copyWith(
+currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,from: null == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
+as int,lastPage: null == lastPage ? _self.lastPage : lastPage // ignore: cast_nullable_to_non_nullable
+as int,links: null == links ? _self.links : links // ignore: cast_nullable_to_non_nullable
+as List<PaginationLink>,path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String,perPage: null == perPage ? _self.perPage : perPage // ignore: cast_nullable_to_non_nullable
+as int,to: null == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-abstract class _$$PaginationMetaImplCopyWith<$Res>
-    implements $PaginationMetaCopyWith<$Res> {
-  factory _$$PaginationMetaImplCopyWith(_$PaginationMetaImpl value,
-          $Res Function(_$PaginationMetaImpl) then) =
-      __$$PaginationMetaImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,
-      @JsonKey(fromJson: _parseInt) int from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage,
-      List<PaginationLink> links,
-      String path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,
-      @JsonKey(fromJson: _parseInt) int to,
-      @JsonKey(fromJson: _parseInt) int total});
 }
 
-/// @nodoc
-class __$$PaginationMetaImplCopyWithImpl<$Res>
-    extends _$PaginationMetaCopyWithImpl<$Res, _$PaginationMetaImpl>
-    implements _$$PaginationMetaImplCopyWith<$Res> {
-  __$$PaginationMetaImplCopyWithImpl(
-      _$PaginationMetaImpl _value, $Res Function(_$PaginationMetaImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of PaginationMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? currentPage = null,
-    Object? from = null,
-    Object? lastPage = null,
-    Object? links = null,
-    Object? path = null,
-    Object? perPage = null,
-    Object? to = null,
-    Object? total = null,
-  }) {
-    return _then(_$PaginationMetaImpl(
-      currentPage: null == currentPage
-          ? _value.currentPage
-          : currentPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      from: null == from
-          ? _value.from
-          : from // ignore: cast_nullable_to_non_nullable
-              as int,
-      lastPage: null == lastPage
-          ? _value.lastPage
-          : lastPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      links: null == links
-          ? _value._links
-          : links // ignore: cast_nullable_to_non_nullable
-              as List<PaginationLink>,
-      path: null == path
-          ? _value.path
-          : path // ignore: cast_nullable_to_non_nullable
-              as String,
-      perPage: null == perPage
-          ? _value.perPage
-          : perPage // ignore: cast_nullable_to_non_nullable
-              as int,
-      to: null == to
-          ? _value.to
-          : to // ignore: cast_nullable_to_non_nullable
-              as int,
-      total: null == total
-          ? _value.total
-          : total // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
-  }
+/// Adds pattern-matching-related methods to [PaginationMeta].
+extension PaginationMetaPatterns on PaginationMeta {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PaginationMeta value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PaginationMeta() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PaginationMeta value)  $default,){
+final _that = this;
+switch (_that) {
+case _PaginationMeta():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PaginationMeta value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PaginationMeta() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'current_page', fromJson: _parseInt)  int currentPage, @JsonKey(fromJson: _parseInt)  int from, @JsonKey(name: 'last_page', fromJson: _parseInt)  int lastPage,  List<PaginationLink> links,  String path, @JsonKey(name: 'per_page', fromJson: _parseInt)  int perPage, @JsonKey(fromJson: _parseInt)  int to, @JsonKey(fromJson: _parseInt)  int total)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PaginationMeta() when $default != null:
+return $default(_that.currentPage,_that.from,_that.lastPage,_that.links,_that.path,_that.perPage,_that.to,_that.total);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'current_page', fromJson: _parseInt)  int currentPage, @JsonKey(fromJson: _parseInt)  int from, @JsonKey(name: 'last_page', fromJson: _parseInt)  int lastPage,  List<PaginationLink> links,  String path, @JsonKey(name: 'per_page', fromJson: _parseInt)  int perPage, @JsonKey(fromJson: _parseInt)  int to, @JsonKey(fromJson: _parseInt)  int total)  $default,) {final _that = this;
+switch (_that) {
+case _PaginationMeta():
+return $default(_that.currentPage,_that.from,_that.lastPage,_that.links,_that.path,_that.perPage,_that.to,_that.total);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'current_page', fromJson: _parseInt)  int currentPage, @JsonKey(fromJson: _parseInt)  int from, @JsonKey(name: 'last_page', fromJson: _parseInt)  int lastPage,  List<PaginationLink> links,  String path, @JsonKey(name: 'per_page', fromJson: _parseInt)  int perPage, @JsonKey(fromJson: _parseInt)  int to, @JsonKey(fromJson: _parseInt)  int total)?  $default,) {final _that = this;
+switch (_that) {
+case _PaginationMeta() when $default != null:
+return $default(_that.currentPage,_that.from,_that.lastPage,_that.links,_that.path,_that.perPage,_that.to,_that.total);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$PaginationMetaImpl implements _PaginationMeta {
-  const _$PaginationMetaImpl(
-      {@JsonKey(name: 'current_page', fromJson: _parseInt)
-      required this.currentPage,
-      @JsonKey(fromJson: _parseInt) required this.from,
-      @JsonKey(name: 'last_page', fromJson: _parseInt) required this.lastPage,
-      required final List<PaginationLink> links,
-      required this.path,
-      @JsonKey(name: 'per_page', fromJson: _parseInt) required this.perPage,
-      @JsonKey(fromJson: _parseInt) required this.to,
-      @JsonKey(fromJson: _parseInt) required this.total})
-      : _links = links;
 
-  factory _$PaginationMetaImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PaginationMetaImplFromJson(json);
+class _PaginationMeta implements PaginationMeta {
+  const _PaginationMeta({@JsonKey(name: 'current_page', fromJson: _parseInt) required this.currentPage, @JsonKey(fromJson: _parseInt) required this.from, @JsonKey(name: 'last_page', fromJson: _parseInt) required this.lastPage, required final  List<PaginationLink> links, required this.path, @JsonKey(name: 'per_page', fromJson: _parseInt) required this.perPage, @JsonKey(fromJson: _parseInt) required this.to, @JsonKey(fromJson: _parseInt) required this.total}): _links = links;
+  factory _PaginationMeta.fromJson(Map<String, dynamic> json) => _$PaginationMetaFromJson(json);
 
-  @override
-  @JsonKey(name: 'current_page', fromJson: _parseInt)
-  final int currentPage;
-  @override
-  @JsonKey(fromJson: _parseInt)
-  final int from;
-  @override
-  @JsonKey(name: 'last_page', fromJson: _parseInt)
-  final int lastPage;
-  final List<PaginationLink> _links;
-  @override
-  List<PaginationLink> get links {
-    if (_links is EqualUnmodifiableListView) return _links;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_links);
-  }
-
-  @override
-  final String path;
-  @override
-  @JsonKey(name: 'per_page', fromJson: _parseInt)
-  final int perPage;
-  @override
-  @JsonKey(fromJson: _parseInt)
-  final int to;
-  @override
-  @JsonKey(fromJson: _parseInt)
-  final int total;
-
-  @override
-  String toString() {
-    return 'PaginationMeta(currentPage: $currentPage, from: $from, lastPage: $lastPage, links: $links, path: $path, perPage: $perPage, to: $to, total: $total)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$PaginationMetaImpl &&
-            (identical(other.currentPage, currentPage) ||
-                other.currentPage == currentPage) &&
-            (identical(other.from, from) || other.from == from) &&
-            (identical(other.lastPage, lastPage) ||
-                other.lastPage == lastPage) &&
-            const DeepCollectionEquality().equals(other._links, _links) &&
-            (identical(other.path, path) || other.path == path) &&
-            (identical(other.perPage, perPage) || other.perPage == perPage) &&
-            (identical(other.to, to) || other.to == to) &&
-            (identical(other.total, total) || other.total == total));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, currentPage, from, lastPage,
-      const DeepCollectionEquality().hash(_links), path, perPage, to, total);
-
-  /// Create a copy of PaginationMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$PaginationMetaImplCopyWith<_$PaginationMetaImpl> get copyWith =>
-      __$$PaginationMetaImplCopyWithImpl<_$PaginationMetaImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PaginationMetaImplToJson(
-      this,
-    );
-  }
+@override@JsonKey(name: 'current_page', fromJson: _parseInt) final  int currentPage;
+@override@JsonKey(fromJson: _parseInt) final  int from;
+@override@JsonKey(name: 'last_page', fromJson: _parseInt) final  int lastPage;
+ final  List<PaginationLink> _links;
+@override List<PaginationLink> get links {
+  if (_links is EqualUnmodifiableListView) return _links;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_links);
 }
 
-abstract class _PaginationMeta implements PaginationMeta {
-  const factory _PaginationMeta(
-          {@JsonKey(name: 'current_page', fromJson: _parseInt)
-          required final int currentPage,
-          @JsonKey(fromJson: _parseInt) required final int from,
-          @JsonKey(name: 'last_page', fromJson: _parseInt)
-          required final int lastPage,
-          required final List<PaginationLink> links,
-          required final String path,
-          @JsonKey(name: 'per_page', fromJson: _parseInt)
-          required final int perPage,
-          @JsonKey(fromJson: _parseInt) required final int to,
-          @JsonKey(fromJson: _parseInt) required final int total}) =
-      _$PaginationMetaImpl;
+@override final  String path;
+@override@JsonKey(name: 'per_page', fromJson: _parseInt) final  int perPage;
+@override@JsonKey(fromJson: _parseInt) final  int to;
+@override@JsonKey(fromJson: _parseInt) final  int total;
 
-  factory _PaginationMeta.fromJson(Map<String, dynamic> json) =
-      _$PaginationMetaImpl.fromJson;
+/// Create a copy of PaginationMeta
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PaginationMetaCopyWith<_PaginationMeta> get copyWith => __$PaginationMetaCopyWithImpl<_PaginationMeta>(this, _$identity);
 
-  @override
-  @JsonKey(name: 'current_page', fromJson: _parseInt)
-  int get currentPage;
-  @override
-  @JsonKey(fromJson: _parseInt)
-  int get from;
-  @override
-  @JsonKey(name: 'last_page', fromJson: _parseInt)
-  int get lastPage;
-  @override
-  List<PaginationLink> get links;
-  @override
-  String get path;
-  @override
-  @JsonKey(name: 'per_page', fromJson: _parseInt)
-  int get perPage;
-  @override
-  @JsonKey(fromJson: _parseInt)
-  int get to;
-  @override
-  @JsonKey(fromJson: _parseInt)
-  int get total;
-
-  /// Create a copy of PaginationMeta
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PaginationMetaImplCopyWith<_$PaginationMetaImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+Map<String, dynamic> toJson() {
+  return _$PaginationMetaToJson(this, );
 }
 
-PaginationLink _$PaginationLinkFromJson(Map<String, dynamic> json) {
-  return _PaginationLink.fromJson(json);
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaginationMeta&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.from, from) || other.from == from)&&(identical(other.lastPage, lastPage) || other.lastPage == lastPage)&&const DeepCollectionEquality().equals(other._links, _links)&&(identical(other.path, path) || other.path == path)&&(identical(other.perPage, perPage) || other.perPage == perPage)&&(identical(other.to, to) || other.to == to)&&(identical(other.total, total) || other.total == total));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,currentPage,from,lastPage,const DeepCollectionEquality().hash(_links),path,perPage,to,total);
+
+@override
+String toString() {
+  return 'PaginationMeta(currentPage: $currentPage, from: $from, lastPage: $lastPage, links: $links, path: $path, perPage: $perPage, to: $to, total: $total)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PaginationMetaCopyWith<$Res> implements $PaginationMetaCopyWith<$Res> {
+  factory _$PaginationMetaCopyWith(_PaginationMeta value, $Res Function(_PaginationMeta) _then) = __$PaginationMetaCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 'current_page', fromJson: _parseInt) int currentPage,@JsonKey(fromJson: _parseInt) int from,@JsonKey(name: 'last_page', fromJson: _parseInt) int lastPage, List<PaginationLink> links, String path,@JsonKey(name: 'per_page', fromJson: _parseInt) int perPage,@JsonKey(fromJson: _parseInt) int to,@JsonKey(fromJson: _parseInt) int total
+});
+
+
+
+
+}
+/// @nodoc
+class __$PaginationMetaCopyWithImpl<$Res>
+    implements _$PaginationMetaCopyWith<$Res> {
+  __$PaginationMetaCopyWithImpl(this._self, this._then);
+
+  final _PaginationMeta _self;
+  final $Res Function(_PaginationMeta) _then;
+
+/// Create a copy of PaginationMeta
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? currentPage = null,Object? from = null,Object? lastPage = null,Object? links = null,Object? path = null,Object? perPage = null,Object? to = null,Object? total = null,}) {
+  return _then(_PaginationMeta(
+currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,from: null == from ? _self.from : from // ignore: cast_nullable_to_non_nullable
+as int,lastPage: null == lastPage ? _self.lastPage : lastPage // ignore: cast_nullable_to_non_nullable
+as int,links: null == links ? _self._links : links // ignore: cast_nullable_to_non_nullable
+as List<PaginationLink>,path: null == path ? _self.path : path // ignore: cast_nullable_to_non_nullable
+as String,perPage: null == perPage ? _self.perPage : perPage // ignore: cast_nullable_to_non_nullable
+as int,to: null == to ? _self.to : to // ignore: cast_nullable_to_non_nullable
+as int,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
 
 /// @nodoc
 mixin _$PaginationLink {
-  String? get url => throw _privateConstructorUsedError;
-  String get label => throw _privateConstructorUsedError;
-  bool get active => throw _privateConstructorUsedError;
+
+ String? get url; String get label; bool get active;
+/// Create a copy of PaginationLink
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PaginationLinkCopyWith<PaginationLink> get copyWith => _$PaginationLinkCopyWithImpl<PaginationLink>(this as PaginationLink, _$identity);
 
   /// Serializes this PaginationLink to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of PaginationLink
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $PaginationLinkCopyWith<PaginationLink> get copyWith =>
-      throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaginationLink&&(identical(other.url, url) || other.url == url)&&(identical(other.label, label) || other.label == label)&&(identical(other.active, active) || other.active == active));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,url,label,active);
+
+@override
+String toString() {
+  return 'PaginationLink(url: $url, label: $label, active: $active)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $PaginationLinkCopyWith<$Res> {
-  factory $PaginationLinkCopyWith(
-          PaginationLink value, $Res Function(PaginationLink) then) =
-      _$PaginationLinkCopyWithImpl<$Res, PaginationLink>;
-  @useResult
-  $Res call({String? url, String label, bool active});
-}
+abstract mixin class $PaginationLinkCopyWith<$Res>  {
+  factory $PaginationLinkCopyWith(PaginationLink value, $Res Function(PaginationLink) _then) = _$PaginationLinkCopyWithImpl;
+@useResult
+$Res call({
+ String? url, String label, bool active
+});
 
+
+
+
+}
 /// @nodoc
-class _$PaginationLinkCopyWithImpl<$Res, $Val extends PaginationLink>
+class _$PaginationLinkCopyWithImpl<$Res>
     implements $PaginationLinkCopyWith<$Res> {
-  _$PaginationLinkCopyWithImpl(this._value, this._then);
+  _$PaginationLinkCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final PaginationLink _self;
+  final $Res Function(PaginationLink) _then;
 
-  /// Create a copy of PaginationLink
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? url = freezed,
-    Object? label = null,
-    Object? active = null,
-  }) {
-    return _then(_value.copyWith(
-      url: freezed == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String?,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      active: null == active
-          ? _value.active
-          : active // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
-  }
+/// Create a copy of PaginationLink
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? url = freezed,Object? label = null,Object? active = null,}) {
+  return _then(_self.copyWith(
+url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as String?,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
 }
 
-/// @nodoc
-abstract class _$$PaginationLinkImplCopyWith<$Res>
-    implements $PaginationLinkCopyWith<$Res> {
-  factory _$$PaginationLinkImplCopyWith(_$PaginationLinkImpl value,
-          $Res Function(_$PaginationLinkImpl) then) =
-      __$$PaginationLinkImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String? url, String label, bool active});
 }
 
-/// @nodoc
-class __$$PaginationLinkImplCopyWithImpl<$Res>
-    extends _$PaginationLinkCopyWithImpl<$Res, _$PaginationLinkImpl>
-    implements _$$PaginationLinkImplCopyWith<$Res> {
-  __$$PaginationLinkImplCopyWithImpl(
-      _$PaginationLinkImpl _value, $Res Function(_$PaginationLinkImpl) _then)
-      : super(_value, _then);
 
-  /// Create a copy of PaginationLink
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? url = freezed,
-    Object? label = null,
-    Object? active = null,
-  }) {
-    return _then(_$PaginationLinkImpl(
-      url: freezed == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as String?,
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      active: null == active
-          ? _value.active
-          : active // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
-  }
+/// Adds pattern-matching-related methods to [PaginationLink].
+extension PaginationLinkPatterns on PaginationLink {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PaginationLink value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _PaginationLink() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PaginationLink value)  $default,){
+final _that = this;
+switch (_that) {
+case _PaginationLink():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PaginationLink value)?  $default,){
+final _that = this;
+switch (_that) {
+case _PaginationLink() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? url,  String label,  bool active)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _PaginationLink() when $default != null:
+return $default(_that.url,_that.label,_that.active);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? url,  String label,  bool active)  $default,) {final _that = this;
+switch (_that) {
+case _PaginationLink():
+return $default(_that.url,_that.label,_that.active);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? url,  String label,  bool active)?  $default,) {final _that = this;
+switch (_that) {
+case _PaginationLink() when $default != null:
+return $default(_that.url,_that.label,_that.active);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$PaginationLinkImpl implements _PaginationLink {
-  const _$PaginationLinkImpl(
-      {required this.url, required this.label, required this.active});
 
-  factory _$PaginationLinkImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PaginationLinkImplFromJson(json);
+class _PaginationLink implements PaginationLink {
+  const _PaginationLink({required this.url, required this.label, required this.active});
+  factory _PaginationLink.fromJson(Map<String, dynamic> json) => _$PaginationLinkFromJson(json);
 
-  @override
-  final String? url;
-  @override
-  final String label;
-  @override
-  final bool active;
+@override final  String? url;
+@override final  String label;
+@override final  bool active;
 
-  @override
-  String toString() {
-    return 'PaginationLink(url: $url, label: $label, active: $active)';
-  }
+/// Create a copy of PaginationLink
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$PaginationLinkCopyWith<_PaginationLink> get copyWith => __$PaginationLinkCopyWithImpl<_PaginationLink>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$PaginationLinkImpl &&
-            (identical(other.url, url) || other.url == url) &&
-            (identical(other.label, label) || other.label == label) &&
-            (identical(other.active, active) || other.active == active));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, url, label, active);
-
-  /// Create a copy of PaginationLink
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$PaginationLinkImplCopyWith<_$PaginationLinkImpl> get copyWith =>
-      __$$PaginationLinkImplCopyWithImpl<_$PaginationLinkImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PaginationLinkImplToJson(
-      this,
-    );
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$PaginationLinkToJson(this, );
 }
 
-abstract class _PaginationLink implements PaginationLink {
-  const factory _PaginationLink(
-      {required final String? url,
-      required final String label,
-      required final bool active}) = _$PaginationLinkImpl;
-
-  factory _PaginationLink.fromJson(Map<String, dynamic> json) =
-      _$PaginationLinkImpl.fromJson;
-
-  @override
-  String? get url;
-  @override
-  String get label;
-  @override
-  bool get active;
-
-  /// Create a copy of PaginationLink
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PaginationLinkImplCopyWith<_$PaginationLinkImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaginationLink&&(identical(other.url, url) || other.url == url)&&(identical(other.label, label) || other.label == label)&&(identical(other.active, active) || other.active == active));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,url,label,active);
+
+@override
+String toString() {
+  return 'PaginationLink(url: $url, label: $label, active: $active)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$PaginationLinkCopyWith<$Res> implements $PaginationLinkCopyWith<$Res> {
+  factory _$PaginationLinkCopyWith(_PaginationLink value, $Res Function(_PaginationLink) _then) = __$PaginationLinkCopyWithImpl;
+@override @useResult
+$Res call({
+ String? url, String label, bool active
+});
+
+
+
+
+}
+/// @nodoc
+class __$PaginationLinkCopyWithImpl<$Res>
+    implements _$PaginationLinkCopyWith<$Res> {
+  __$PaginationLinkCopyWithImpl(this._self, this._then);
+
+  final _PaginationLink _self;
+  final $Res Function(_PaginationLink) _then;
+
+/// Create a copy of PaginationLink
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? url = freezed,Object? label = null,Object? active = null,}) {
+  return _then(_PaginationLink(
+url: freezed == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as String?,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
+as String,active: null == active ? _self.active : active // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+// dart format on

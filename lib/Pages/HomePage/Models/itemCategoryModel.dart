@@ -1,130 +1,305 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+class ItemCategoryResponse {
+  final List<ItemCategory> data;
+  final CategoryPaginationLinks links;
+  final CategoryPaginationMeta meta;
 
-part 'itemCategoryModel.freezed.dart';
-part 'itemCategoryModel.g.dart';
+  ItemCategoryResponse({
+    required this.data,
+    required this.links,
+    required this.meta,
+  });
 
-@freezed
-class ItemCategoryResponse with _$ItemCategoryResponse {
-  const factory ItemCategoryResponse({
-    required List<ItemCategory> data,
-    required PaginationLinks links,
-    required PaginationMeta meta,
-  }) = _ItemCategoryResponse;
+  factory ItemCategoryResponse.fromJson(Map<String, dynamic> json) {
+    return ItemCategoryResponse(
+      data: (json['data'] as List? ?? [])
+          .map((item) => ItemCategory.fromJson(item))
+          .toList(),
+      links: CategoryPaginationLinks.fromJson(json['links'] ?? {}),
+      meta: CategoryPaginationMeta.fromJson(json['meta'] ?? {}),
+    );
+  }
 
-  factory ItemCategoryResponse.fromJson(Map<String, dynamic> json) =>
-      _$ItemCategoryResponseFromJson(json);
+  Map<String, dynamic> toJson() {
+    return {
+      'data': data.map((e) => e.toJson()).toList(),
+      'links': links.toJson(),
+      'meta': meta.toJson(),
+    };
+  }
 }
 
-@freezed
-class ItemCategory with _$ItemCategory {
-  const ItemCategory._(); // Added constructor for methods
+class ItemCategory {
+  final int id;
+  final int? userId;
+  final int? parentId;
+  final String name;
+  final String slug;
+  final String? description;
+  final List<String> features;
+  final String image;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final bool requireMake;
+  final bool requireModel;
+  final List<ItemField> itemFields;
 
-  @JsonSerializable(explicitToJson: true)
-  const factory ItemCategory({
-    @JsonKey(fromJson: _parseInt) required int id,
-    @JsonKey(name: 'user_id', fromJson: _parseNullableInt) int? userId,
-    @JsonKey(name: 'parent_id', fromJson: _parseNullableInt) int? parentId,
-    @JsonKey(fromJson: _parseString) required String name,
-    @JsonKey(fromJson: _parseString) required String slug,
-    @JsonKey(fromJson: _parseString) required String description,
-    @JsonKey(fromJson: _parseStringList) required List<String> features,
-    @JsonKey(fromJson: _parseString) required String image,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    @JsonKey(name: 'item_fields') required List<ItemField> itemFields,
-  }) = _ItemCategory;
+  ItemCategory({
+    required this.id,
+    this.userId,
+    this.parentId,
+    required this.name,
+    required this.slug,
+    this.description,
+    required this.features,
+    required this.image,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.requireMake,
+    required this.requireModel,
+    required this.itemFields,
+  });
 
-  // Simplified fromJson without manual processing
-  factory ItemCategory.fromJson(Map<String, dynamic> json) =>
-      _$ItemCategoryFromJson(json);
+  factory ItemCategory.fromJson(Map<String, dynamic> json) {
+    return ItemCategory(
+      id: _parseInt(json['id']),
+      userId: _parseNullableInt(json['user_id']),
+      parentId: _parseNullableInt(json['parent_id']),
+      name: json['name']?.toString() ?? '',
+      slug: json['slug']?.toString() ?? '',
+      description: json['description']?.toString(),
+      features: _parseStringList(json['features']),
+      image: json['image']?.toString() ?? '',
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ?? DateTime.now(),
+      requireMake: _boolFromInt(json['require_make']),
+      requireModel: _boolFromInt(json['require_model']),
+      itemFields: (json['item_fields'] as List? ?? [])
+          .map((field) => ItemField.fromJson(field))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'user_id': userId,
+      'parent_id': parentId,
+      'name': name,
+      'slug': slug,
+      'description': description,
+      'features': features,
+      'image': image,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'require_make': requireMake ? 1 : 0,
+      'require_model': requireModel ? 1 : 0,
+      'item_fields': itemFields.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
-@freezed
-class ItemField with _$ItemField {
-  const ItemField._(); // Added constructor for methods
+class ItemField {
+  final int id;
+  final String name;
+  final String label;
+  final String type;
+  final bool required;
+  final bool unique;
+  final bool nullable;
+  final List<dynamic> options;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final ItemFieldPivot pivot;
 
-  @JsonSerializable(explicitToJson: true)
-  const factory ItemField({
-    @JsonKey(fromJson: _parseInt) required int id,
-    @JsonKey(fromJson: _parseString) required String name,
-    @JsonKey(fromJson: _parseString) required String label,
-    @JsonKey(fromJson: _parseString) required String type,
-    @JsonKey(fromJson: _boolFromInt) required bool required,
-    @JsonKey(fromJson: _boolFromInt) required bool unique,
-    @JsonKey(fromJson: _boolFromInt) required bool nullable,
-    List<dynamic>? options,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
-    required ItemFieldPivot pivot,
-  }) = _ItemField;
+  ItemField({
+    required this.id,
+    required this.name,
+    required this.label,
+    required this.type,
+    required this.required,
+    required this.unique,
+    required this.nullable,
+    required this.options,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.pivot,
+  });
 
-  // Simplified fromJson without manual processing
-  factory ItemField.fromJson(Map<String, dynamic> json) =>
-      _$ItemFieldFromJson(json);
+  factory ItemField.fromJson(Map<String, dynamic> json) {
+    return ItemField(
+      id: _parseInt(json['id']),
+      name: json['name']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      type: json['type']?.toString() ?? '',
+      required: _boolFromInt(json['required']),
+      unique: _boolFromInt(json['unique']),
+      nullable: _boolFromInt(json['nullable']),
+      options: json['options'] as List? ?? [],
+      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ?? DateTime.now(),
+      pivot: ItemFieldPivot.fromJson(json['pivot'] ?? {}),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'label': label,
+      'type': type,
+      'required': required ? 1 : 0,
+      'unique': unique ? 1 : 0,
+      'nullable': nullable ? 1 : 0,
+      'options': options,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'pivot': pivot.toJson(),
+    };
+  }
 }
 
-@freezed
-class ItemFieldPivot with _$ItemFieldPivot {
-  const ItemFieldPivot._(); // Added constructor for methods
+class ItemFieldPivot {
+  final int categoryId;
+  final int itemFieldId;
+  final int highlight;
 
-  const factory ItemFieldPivot({
-    @JsonKey(name: 'category_id', fromJson: _parseInt) required int categoryId,
-    @JsonKey(name: 'item_field_id', fromJson: _parseInt) required int itemFieldId,
-  }) = _ItemFieldPivot;
+  ItemFieldPivot({
+    required this.categoryId,
+    required this.itemFieldId,
+    required this.highlight,
+  });
 
-  factory ItemFieldPivot.fromJson(Map<String, dynamic> json) =>
-      _$ItemFieldPivotFromJson(json);
+  factory ItemFieldPivot.fromJson(Map<String, dynamic> json) {
+    return ItemFieldPivot(
+      categoryId: _parseInt(json['category_id']),
+      itemFieldId: _parseInt(json['item_field_id']),
+      highlight: _parseInt(json['highlight']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'category_id': categoryId,
+      'item_field_id': itemFieldId,
+      'highlight': highlight,
+    };
+  }
 }
 
-@freezed
-class PaginationLinks with _$PaginationLinks {
-  const PaginationLinks._(); // Added constructor for methods
+class CategoryPaginationLinks {
+  final String? first;
+  final String? last;
+  final String? prev;
+  final String? next;
 
-  const factory PaginationLinks({
-    @JsonKey(fromJson: _parseString) required String first,
-    @JsonKey(fromJson: _parseString) required String last,
-    @JsonKey(fromJson: _parseNullableString) required String? prev,
-    @JsonKey(fromJson: _parseNullableString) required String? next,
-  }) = _PaginationLinks;
+  CategoryPaginationLinks({
+    this.first,
+    this.last,
+    this.prev,
+    this.next,
+  });
 
-  factory PaginationLinks.fromJson(Map<String, dynamic> json) =>
-      _$PaginationLinksFromJson(json);
+  factory CategoryPaginationLinks.fromJson(Map<String, dynamic> json) {
+    return CategoryPaginationLinks(
+      first: json['first']?.toString(),
+      last: json['last']?.toString(),
+      prev: json['prev']?.toString(),
+      next: json['next']?.toString(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'first': first,
+      'last': last,
+      'prev': prev,
+      'next': next,
+    };
+  }
 }
 
-@freezed
-class PaginationMeta with _$PaginationMeta {
-  const PaginationMeta._(); // Added constructor for methods
+class CategoryPaginationMeta {
+  final int currentPage;
+  final int from;
+  final int lastPage;
+  final List<CategoryPaginationLink> links;
+  final String path;
+  final int perPage;
+  final int to;
+  final int total;
 
-  const factory PaginationMeta({
-    @JsonKey(name: 'current_page', fromJson: _parseInt) required int currentPage,
-    @JsonKey(fromJson: _parseInt) required int from,
-    @JsonKey(name: 'last_page', fromJson: _parseInt) required int lastPage,
-    required List<PaginationLink> links,
-    @JsonKey(fromJson: _parseString) required String path,
-    @JsonKey(name: 'per_page', fromJson: _parseInt) required int perPage,
-    @JsonKey(fromJson: _parseInt) required int to,
-    @JsonKey(fromJson: _parseInt) required int total,
-  }) = _PaginationMeta;
+  CategoryPaginationMeta({
+    required this.currentPage,
+    required this.from,
+    required this.lastPage,
+    required this.links,
+    required this.path,
+    required this.perPage,
+    required this.to,
+    required this.total,
+  });
 
-  factory PaginationMeta.fromJson(Map<String, dynamic> json) =>
-      _$PaginationMetaFromJson(json);
+  factory CategoryPaginationMeta.fromJson(Map<String, dynamic> json) {
+    return CategoryPaginationMeta(
+      currentPage: _parseInt(json['current_page']),
+      from: _parseInt(json['from']),
+      lastPage: _parseInt(json['last_page']),
+      links: (json['links'] as List? ?? [])
+          .map((item) => CategoryPaginationLink.fromJson(item))
+          .toList(),
+      path: json['path']?.toString() ?? '',
+      perPage: _parseInt(json['per_page']),
+      to: _parseInt(json['to']),
+      total: _parseInt(json['total']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'current_page': currentPage,
+      'from': from,
+      'last_page': lastPage,
+      'links': links.map((e) => e.toJson()).toList(),
+      'path': path,
+      'per_page': perPage,
+      'to': to,
+      'total': total,
+    };
+  }
 }
 
-@freezed
-class PaginationLink with _$PaginationLink {
-  const PaginationLink._(); // Added constructor for methods
+class CategoryPaginationLink {
+  final String? url;
+  final String label;
+  final bool active;
 
-  const factory PaginationLink({
-    @JsonKey(fromJson: _parseNullableString) required String? url,
-    @JsonKey(fromJson: _parseString) required String label,
-    required bool active,
-  }) = _PaginationLink;
+  CategoryPaginationLink({
+    this.url,
+    required this.label,
+    required this.active,
+  });
 
-  factory PaginationLink.fromJson(Map<String, dynamic> json) =>
-      _$PaginationLinkFromJson(json);
+  factory CategoryPaginationLink.fromJson(Map<String, dynamic> json) {
+    return CategoryPaginationLink(
+      url: json['url']?.toString(),
+      label: json['label']?.toString() ?? '',
+      active: json['active'] == true,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'label': label,
+      'active': active,
+    };
+  }
 }
 
-// Helper functions (keep these outside any class)
+// ---------------------
+// Helper functions
+// ---------------------
+
 int _parseInt(dynamic value) {
   if (value == null) return 0;
   if (value is int) return value;
@@ -143,21 +318,9 @@ int? _parseNullableInt(dynamic value) {
 
 bool _boolFromInt(dynamic value) {
   if (value is bool) return value;
-  if (value is int) return value == 1;
-  if (value is String) return value == '1';
+  if (value is int) return value != 0;  // any non-zero = required/visible
+  if (value is String) return value != '0' && value.isNotEmpty;
   return false;
-}
-
-String _parseString(dynamic value) {
-  if (value == null) return '';
-  if (value is String) return value;
-  return value.toString();
-}
-
-String? _parseNullableString(dynamic value) {
-  if (value == null) return null;
-  if (value is String) return value;
-  return value.toString();
 }
 
 List<String> _parseStringList(dynamic value) {

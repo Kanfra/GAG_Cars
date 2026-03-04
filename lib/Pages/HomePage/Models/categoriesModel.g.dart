@@ -6,17 +6,15 @@ part of 'categoriesModel.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PaginationLinksImpl _$$PaginationLinksImplFromJson(
-        Map<String, dynamic> json) =>
-    _$PaginationLinksImpl(
+_PaginationLinks _$PaginationLinksFromJson(Map<String, dynamic> json) =>
+    _PaginationLinks(
       first: json['first'] as String?,
       last: json['last'] as String?,
       prev: json['prev'] as String?,
       next: json['next'] as String?,
     );
 
-Map<String, dynamic> _$$PaginationLinksImplToJson(
-        _$PaginationLinksImpl instance) =>
+Map<String, dynamic> _$PaginationLinksToJson(_PaginationLinks instance) =>
     <String, dynamic>{
       'first': instance.first,
       'last': instance.last,
@@ -24,8 +22,8 @@ Map<String, dynamic> _$$PaginationLinksImplToJson(
       'next': instance.next,
     };
 
-_$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
-    _$PaginationMetaImpl(
+_PaginationMeta _$PaginationMetaFromJson(Map<String, dynamic> json) =>
+    _PaginationMeta(
       current_page: (json['current_page'] as num).toInt(),
       from: (json['from'] as num).toInt(),
       last_page: (json['last_page'] as num).toInt(),
@@ -36,8 +34,7 @@ _$PaginationMetaImpl _$$PaginationMetaImplFromJson(Map<String, dynamic> json) =>
       links: json['links'] as List<dynamic>? ?? const [],
     );
 
-Map<String, dynamic> _$$PaginationMetaImplToJson(
-        _$PaginationMetaImpl instance) =>
+Map<String, dynamic> _$PaginationMetaToJson(_PaginationMeta instance) =>
     <String, dynamic>{
       'current_page': instance.current_page,
       'from': instance.from,
@@ -49,41 +46,38 @@ Map<String, dynamic> _$$PaginationMetaImplToJson(
       'links': instance.links,
     };
 
-_$MetaLinkImpl _$$MetaLinkImplFromJson(Map<String, dynamic> json) =>
-    _$MetaLinkImpl(
-      url: json['url'] as String?,
-      label: json['label'] as String,
-      page: (json['page'] as num?)?.toInt(),
-      active: json['active'] as bool,
-    );
+_MetaLink _$MetaLinkFromJson(Map<String, dynamic> json) => _MetaLink(
+  url: json['url'] as String?,
+  label: json['label'] as String,
+  page: (json['page'] as num?)?.toInt(),
+  active: json['active'] as bool,
+);
 
-Map<String, dynamic> _$$MetaLinkImplToJson(_$MetaLinkImpl instance) =>
-    <String, dynamic>{
-      'url': instance.url,
-      'label': instance.label,
-      'page': instance.page,
-      'active': instance.active,
-    };
+Map<String, dynamic> _$MetaLinkToJson(_MetaLink instance) => <String, dynamic>{
+  'url': instance.url,
+  'label': instance.label,
+  'page': instance.page,
+  'active': instance.active,
+};
 
-_$ItemFieldImpl _$$ItemFieldImplFromJson(Map<String, dynamic> json) =>
-    _$ItemFieldImpl(
-      id: (json['id'] as num).toInt(),
-      name: json['name'] as String,
-      label: json['label'] as String,
-      type: json['type'] as String,
-      isRequired: (json['required'] as num).toInt(),
-      unique: (json['unique'] as num).toInt(),
-      nullable: (json['nullable'] as num).toInt(),
-      options: json['options'],
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      pivot: json['pivot'] as Map<String, dynamic>?,
-      optionsKeys: (json['options_keys'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-    );
+_ItemField _$ItemFieldFromJson(Map<String, dynamic> json) => _ItemField(
+  id: (json['id'] as num).toInt(),
+  name: json['name'] as String,
+  label: json['label'] as String,
+  type: json['type'] as String,
+  isRequired: (json['required'] as num).toInt(),
+  unique: (json['unique'] as num).toInt(),
+  nullable: (json['nullable'] as num).toInt(),
+  options: json['options'],
+  createdAt: DateTime.parse(json['created_at'] as String),
+  updatedAt: DateTime.parse(json['updated_at'] as String),
+  pivot: json['pivot'] as Map<String, dynamic>?,
+  optionsKeys: (json['options_keys'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+);
 
-Map<String, dynamic> _$$ItemFieldImplToJson(_$ItemFieldImpl instance) =>
+Map<String, dynamic> _$ItemFieldToJson(_ItemField instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
@@ -99,33 +93,32 @@ Map<String, dynamic> _$$ItemFieldImplToJson(_$ItemFieldImpl instance) =>
       'options_keys': instance.optionsKeys,
     };
 
-_$CategoriesImpl _$$CategoriesImplFromJson(Map<String, dynamic> json) =>
-    _$CategoriesImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
-      parentId: (json['parent_id'] as num?)?.toInt(),
-      name: json['name'] as String,
-      slug: json['slug'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      features: (json['features'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      image:
-          json['image'] as String? ?? 'assets/images/category_placeholder.png',
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      itemFields: (json['item_fields'] as List<dynamic>?)
-              ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      highlightedFields: (json['highlighted_fields'] as List<dynamic>?)
-              ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-    );
+_Categories _$CategoriesFromJson(Map<String, dynamic> json) => _Categories(
+  id: (json['id'] as num).toInt(),
+  userId: json['user_id'] as String?,
+  parentId: (json['parent_id'] as num?)?.toInt(),
+  name: json['name'] as String,
+  slug: json['slug'] as String? ?? '',
+  description: json['description'] as String? ?? '',
+  features:
+      (json['features'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  image: json['image'] as String? ?? 'assets/images/category_placeholder.png',
+  createdAt: DateTime.parse(json['created_at'] as String),
+  updatedAt: DateTime.parse(json['updated_at'] as String),
+  itemFields:
+      (json['item_fields'] as List<dynamic>?)
+          ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  highlightedFields:
+      (json['highlighted_fields'] as List<dynamic>?)
+          ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
 
-Map<String, dynamic> _$$CategoriesImplToJson(_$CategoriesImpl instance) =>
+Map<String, dynamic> _$CategoriesToJson(_Categories instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -141,10 +134,10 @@ Map<String, dynamic> _$$CategoriesImplToJson(_$CategoriesImpl instance) =>
       'highlighted_fields': instance.highlightedFields,
     };
 
-_$CategoriesResponseImpl _$$CategoriesResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$CategoriesResponseImpl(
-      data: (json['data'] as List<dynamic>?)
+_CategoriesResponse _$CategoriesResponseFromJson(Map<String, dynamic> json) =>
+    _CategoriesResponse(
+      data:
+          (json['data'] as List<dynamic>?)
               ?.map((e) => Categories.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -152,43 +145,41 @@ _$CategoriesResponseImpl _$$CategoriesResponseImplFromJson(
       meta: PaginationMeta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$CategoriesResponseImplToJson(
-        _$CategoriesResponseImpl instance) =>
+Map<String, dynamic> _$CategoriesResponseToJson(_CategoriesResponse instance) =>
     <String, dynamic>{
       'data': instance.data,
       'links': instance.links,
       'meta': instance.meta,
     };
 
-_$DetailedCategoryImpl _$$DetailedCategoryImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DetailedCategoryImpl(
-      id: (json['id'] as num).toInt(),
-      userId: json['user_id'] as String?,
-      parentId: (json['parent_id'] as num?)?.toInt(),
-      name: json['name'] as String,
-      slug: json['slug'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      features: (json['features'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      image:
-          json['image'] as String? ?? 'assets/images/category_placeholder.png',
-      createdAt: DateTime.parse(json['created_at'] as String),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      itemFields: (json['item_fields'] as List<dynamic>?)
-              ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      highlightedFields: (json['highlighted_fields'] as List<dynamic>?)
-              ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-    );
+_DetailedCategory _$DetailedCategoryFromJson(
+  Map<String, dynamic> json,
+) => _DetailedCategory(
+  id: (json['id'] as num).toInt(),
+  userId: json['user_id'] as String?,
+  parentId: (json['parent_id'] as num?)?.toInt(),
+  name: json['name'] as String,
+  slug: json['slug'] as String? ?? '',
+  description: json['description'] as String? ?? '',
+  features:
+      (json['features'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  image: json['image'] as String? ?? 'assets/images/category_placeholder.png',
+  createdAt: DateTime.parse(json['created_at'] as String),
+  updatedAt: DateTime.parse(json['updated_at'] as String),
+  itemFields:
+      (json['item_fields'] as List<dynamic>?)
+          ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  highlightedFields:
+      (json['highlighted_fields'] as List<dynamic>?)
+          ?.map((e) => ItemField.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+);
 
-Map<String, dynamic> _$$DetailedCategoryImplToJson(
-        _$DetailedCategoryImpl instance) =>
+Map<String, dynamic> _$DetailedCategoryToJson(_DetailedCategory instance) =>
     <String, dynamic>{
       'id': instance.id,
       'user_id': instance.userId,
@@ -204,14 +195,12 @@ Map<String, dynamic> _$$DetailedCategoryImplToJson(
       'highlighted_fields': instance.highlightedFields,
     };
 
-_$DetailedCategoryResponseImpl _$$DetailedCategoryResponseImplFromJson(
-        Map<String, dynamic> json) =>
-    _$DetailedCategoryResponseImpl(
-      data: DetailedCategory.fromJson(json['data'] as Map<String, dynamic>),
-    );
+_DetailedCategoryResponse _$DetailedCategoryResponseFromJson(
+  Map<String, dynamic> json,
+) => _DetailedCategoryResponse(
+  data: DetailedCategory.fromJson(json['data'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$$DetailedCategoryResponseImplToJson(
-        _$DetailedCategoryResponseImpl instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-    };
+Map<String, dynamic> _$DetailedCategoryResponseToJson(
+  _DetailedCategoryResponse instance,
+) => <String, dynamic>{'data': instance.data};
